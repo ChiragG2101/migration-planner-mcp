@@ -14,6 +14,32 @@ Before you implement a milestone, read its plan file and the overview. Don't inv
 
 `.private/` is gitignored and holds research, rationale and internal notes. The repo will be open source, so put research and decision notes there, not in `docs/`.
 
+## Working rules for agents
+
+These apply to every change, in any tool.
+
+1. **Work from the plan.** For milestone work, read the milestone file and the overview first, and stay inside its Scope. Extras go in a "noticed, not done" list for the user, not in the diff.
+2. **Ask instead of guessing** when the plan, a constraint or the user's intent is unclear. Decisions you do make go in `docs/design.md`.
+3. **Never weaken a constraint, a gate or a test to make something pass.** No skipped, deleted or loosened tests and no lowered thresholds. Raise it with the user instead.
+4. **Tests come with the code.** Every guard gets a test that fails when the guard is removed (see the `write-tests` skill).
+5. **Report honestly.** Say what you ran and what it printed. Never call a gate passed without running it; if a command doesn't exist yet, say so.
+6. **Keep the docs in step.** Update the spine docs and this file in the same change (`update-spine-docs` skill).
+7. **Independent review.** Whoever builds a milestone does not review it. The review runs in a fresh session (`review-milestone` skill).
+
+## Contributor skills
+
+Skills live in `.agents/skills/` (see `.agents/README.md`). Claude Code users run `scripts/link-agent-skills.sh` once, and again after pulling new skills. `scripts/check-agent-skills.sh` checks the skills follow the rules.
+
+| Skill | Use it to |
+| --- | --- |
+| `implement-milestone` | Build a milestone inside its scope and run the gates |
+| `review-milestone` | Review a milestone or PR against its plan, in a fresh session |
+| `quiz-me` | Run the comprehension check after a milestone |
+| `write-tests` | Write tests, especially permissions and gate tests |
+| `add-pack` | Add a migration pack without touching the core |
+| `add-golden-case` | Find, vet and add a real migration PR as an eval case |
+| `update-spine-docs` | Keep invariants, failure modes and design decisions current |
+
 ## What is being built
 
 A local-first **migration engine plus migration packs**. The engine is general (run state, plan schema, gates, verify loop, eval, permissions). Each migration is a pack: rules, codemod references, a verification hint and golden cases. Pack 1 is a **Next.js major upgrade**; pack 2 is a **Django LTS to LTS upgrade**, there to prove the engine works for a second language without core changes. The working name is `migration-planner-mcp`; the final name is chosen in M10.
