@@ -1,78 +1,70 @@
-# M3 - Rule pack, get_rule_pack, assess_risk, short skill with references
+# M3 - Pack schema, Next.js pack, get_rule_pack, assess_risk, generated skill
 
-**PRD refs:** sections 2 (retrieval rows), 9 (skills, and the rule-pack trust model), 8 (Rule packs and skills row), 11. **Done when:** the pack and SKILL.md are generated from one source and the skill lint passes.
+**PRD refs:** sections 2 (retrieval rows), 9 (skills, pack shape and trust model), 8 (Rule packs and skills row), 11. **Done when:** the pack and SKILL.md are generated from one source and the skill lint passes.
 
 ## Scope
 
 - In scope:
-  - the Express to Hono rule pack as data
-  - a pack schema and loader
+  - a pack schema that covers both pack kinds (`upgrade` and `swap`) and codemod references
+  - the Next.js major-upgrade pack as data
+  - a pack loader
   - `get_rule_pack`
   - a deterministic `assess_risk`
   - a generator that builds `SKILL.md` and the `references/` files from the pack source
   - the skill and pack lint in CI
-- Out of scope: Context7 (M4), producing findings (M5), and third-party packs (not supported in v0.1).
+- Out of scope: Context7 (M4), producing findings (M5), running codemods (M8; this milestone only references them), the Django pack (M10) and third-party packs (not supported in v0.1).
 
 ## Tasks
 
 1. **Pack schema (`src/schema/rulePack.ts`, Zod).**
-   - Fields: `name`, `version` (semver), `source {library, range}`, `target {library, range}`, `trigger` (a single sentence), `rules[]`, `references[]`.
-   - Each rule has: `id`, `usage_kinds[]` (links to M2 kinds), `symbol_pattern`, `concern`, `default_severity`, `mapping` (from and to text), `no_equivalent` (bool), `notes`, `doc_hints[]` (library and topic strings for M4, not URLs), `verify_hint` and `rollback_hint`.
-   - **No executable fields.** The schema rejects unknown keys. A lint check also rejects strings that look like shell commands in non-`verify_hint` fields, and `verify_hint` is display text only (C3).
-2. **Express to Hono source (`rules/express-to-hono/rules.json`, `CHANGELOG.md`, `references-src/*.md`).** Rules should cover at least:
-   - app and router creation
-   - route methods and params (`:id` syntax and `c.req.param`)
-   - `req.body` and body parsing (`c.req.json()`, async)
-   - `res.json/send/status/redirect` mapped to `c.json/c.text/c.status/c.redirect`
-   - middleware signature (`next()` vs `await next()`)
-   - error middleware (`app.onError`)
-   - 404 handling (`app.notFound`)
-   - static files (adapter-specific `serveStatic`)
-   - streaming (`hono/streaming`)
-   - `res.locals` mapped to `c.set/c.get`
-   - `app.listen` mapped to a runtime adapter (`@hono/node-server`)
-   - `trust proxy` and `req.ip`
-   - cookies (`hono/cookie`)
-   - CORS and third-party middleware equivalents (`hono/cors`, plus an explicit `no_equivalent: true` for unmapped ones such as `multer` and `passport`)
-   - types (`Request`/`Response` mapped to `Context`)
-
-   **Write every mapping against the current Hono docs**, and record the doc page in `doc_hints`. These are verified again via Context7 in M4.
+   - Fields: `name`, `version` (semver), `kind` (`upgrade` or `swap`), `source {library, range}`, `target {library, range}` (for `upgrade`, the same library with two ranges), `languages[]`, `trigger` (a single sentence), `usage_kinds[] {kind, lens}` (which M5 lens receives each usage kind), `staging` (`leaf_first` or `config_first`, read by the M6 aggregator), `rules[]`, `codemods[]`, `checks_hint`, `references[]`.
+   - Each rule has: `id`, `usage_kinds[]` (links to M2 kinds), `symbol_pattern`, `concern`, `default_severity`, `mapping` (from and to text), `no_equivalent` (bool), `codemod?` (an ID from `codemods[]`), `notes`, `doc_hints[]` (library and topic strings for M4, not URLs), `verify_hint` and `rollback_hint`.
+   - `codemods[]` entries are `{ id, covers_rules[], notes }`. The `id` must exist in the core codemod registry (M8 implements the registry; M3 ships its ID list as data in `src/verify/codemodIds.ts` so the lint can check references now). A pack can never supply a command, binary name, package name or arguments.
+   - `checks_hint`: display text that suggests which checks a user should declare (for example "typecheck, build, unit tests"). Never executed.
+   - **No executable fields.** The schema rejects unknown keys. A lint check also rejects strings that look like shell commands in any field other than `verify_hint` and `checks_hint`, and both of those are display text only (C3, C9).
+2. **Next.js pack (`rules/nextjs-upgrade/rules.json`, `CHANGELOG.md`, `references-src/*.md`).**
+   - Kind `upgrade`, library `next` plus the required `react` and `react-dom` changes. The `from` and `to` ranges are fixed at the start of M3 against the current Next.js release and upgrade guide, and recorded in the changelog with the date.
+   - Rules cover each usage kind from M2: async request APIs, caching and segment config, config keys, removed or renamed packages, the React changes the Next.js major requires, peer-dependency conflicts, and type changes.
+   - Codemod references: the official `@next/codemod` transforms that cover rules (for example the async request API transform and the upgrade command), and React's official codemods where they apply. Each reference names which rules it covers, so the plan can show what the codemod leaves for manual work.
+   - **Write every mapping against the current Next.js and React docs**, and record the doc page in `doc_hints`. These are verified again via Context7 in M4. Nothing is written from memory.
 3. **Generator (`scripts/build-pack.ts`).** Reads `rules.json` and `references-src/` and writes:
-   - `rules/express-to-hono/SKILL.md`, at most about 100 lines. Frontmatter `name` and `description`, where description = the trigger sentence: "Use when planning an Express to Hono migration in a TypeScript repo." The body is the steps, the tool order (`scan_repo` → `find_usages` → `get_rule_pack` → `assess_risk` → `get_migration_docs` → `plan_migration` → `merge_findings` → `validate_plan`), the output contract (the finding schema by name, not inline) and pointers to the references. No API tables inline.
-   - `rules/express-to-hono/references/{breaking-changes,middleware-mappings,streaming,error-handling}.md`, generated from the rule entries, each with a header that names the pack version.
+   - `rules/nextjs-upgrade/SKILL.md`, at most about 100 lines. Frontmatter `name` and `description`, where description = the trigger sentence: "Use when planning a Next.js major version upgrade in a TypeScript or JavaScript repo." The body is the steps, the tool order (`scan_repo` → `find_usages` → `get_rule_pack` → `assess_risk` → `get_migration_docs` → `plan_migration` → `merge_findings` → `validate_plan` → `emit_plan`, then at L1 `verify_stage`), the output contract (the finding schema by name, not inline) and pointers to the references. No API tables inline.
+   - `rules/nextjs-upgrade/references/{breaking-changes,async-request-apis,caching,react-changes,codemods}.md`, generated from the rule entries, each with a header that names the pack version.
    - Generated files carry a "do not edit; generated from rules.json vX.Y.Z" banner. CI regenerates them and fails on a diff, which is the drift check.
 4. **Skill and pack lint (`scripts/lint-packs.ts`, run in `npm run lint` and CI).** It fails on:
-   - a missing or overly broad trigger. The description must name both libraries and contain "Use when", and a blocklist rejects phrases like "working with backends" and "any".
+   - a missing or overly broad trigger. The description must name the library and the migration, and contain "Use when", and a blocklist rejects phrases like "working with React" and "any".
    - SKILL.md over the line limit
    - a reference link to a file that does not exist
+   - a codemod reference whose ID is not in the core registry list, or a rule pointing at a codemod not in the pack's `codemods[]`
    - a pack version not bumped while rules changed (compared with git HEAD in CI)
    - a missing CHANGELOG entry for the current version
    - any file in the pack dir other than `.json` or `.md` (no scripts)
-5. **Pack loader (`src/rules/loader.ts`).** Loads packs only from the repo's bundled `rules/` dir in v0.1 and validates them with Zod. A `--rules-dir` pointing anywhere else is refused with "third-party packs not supported in v0.1". At server start it logs the pack name, version and content hash to stderr. Every run records `pack_name@version#hash` in `runs.versions_json`.
-6. **`get_rule_pack` tool.** Input is `run_id`, or `source` and `target`. It returns the pack version, the rules (optionally filtered to usage kinds present in the run) and the reference file paths as MCP resources, so the agent loads them only on demand (progressive disclosure).
-7. **`assess_risk` tool (`src/analysis/risk.ts`, deterministic, no LLM).** For each usage in the run it computes signals:
+5. **Pack loader (`src/rules/loader.ts`).** Loads packs only from the repo's bundled `rules/` dir in v0.1 and validates them with Zod. A `--rules-dir` pointing anywhere else is refused with "third-party packs not supported in v0.1". At startup it logs the pack name, version and content hash to stderr. Every run records `pack_name@version#hash` in `runs.versions_json`.
+6. **`get_rule_pack` (core, tool and CLI `pack`).** Input is `run_id`, or `source` and `target`. It returns the pack version, the rules (optionally filtered to usage kinds present in the run), the codemod references with the rules they cover, and the reference file paths as MCP resources, so the agent loads them only on demand (progressive disclosure).
+7. **`assess_risk` (`src/analysis/risk.ts`, core, tool and CLI `risk`; deterministic, no LLM).** For each usage in the run it computes signals:
    - whether a matched rule exists, and the rule's default severity
+   - whether a codemod covers the rule (lower risk for the mechanical part, but the usage still needs a verify step)
    - `no_equivalent`
    - indirect via re-export depth
    - heuristic match confidence
    - fan-in (how many files import the module containing the usage)
-   - whether the file is an entrypoint
+   - whether the file is an entrypoint (a page, layout, route handler or middleware)
    - whether there is a test file covering the module (by import graph)
-   - async/sync signature change (middleware `next`)
-   - streaming or `res` mutation
+   - sync-to-async signature changes
+   - behaviour-only changes with no syntax change (caching defaults)
 
    It outputs `risk_signals[]` and a computed `suggested_severity` with an explanation per signal. Usages that match no rule are flagged as `unmapped`, which is an input for the M5 lenses and gate 2.
 
 ## Files and modules
 
-`src/schema/rulePack.ts`, `src/rules/loader.ts`, `src/tools/{getRulePack,assessRisk}.ts`, `src/analysis/risk.ts`, `rules/express-to-hono/{rules.json,CHANGELOG.md,SKILL.md,references/*,references-src/*}`, `scripts/{build-pack,lint-packs}.ts`, `test/unit/{rulePack,risk,lintPacks}.test.ts`.
+`src/schema/rulePack.ts`, `src/rules/loader.ts`, `src/verify/codemodIds.ts`, `src/core/{getRulePack,assessRisk}.ts`, `src/tools/{getRulePack,assessRisk}.ts`, `src/cli/{pack,risk}.ts`, `src/analysis/risk.ts`, `rules/nextjs-upgrade/{rules.json,CHANGELOG.md,SKILL.md,references/*,references-src/*}`, `scripts/{build-pack,lint-packs}.ts`, `test/unit/{rulePack,risk,lintPacks}.test.ts`.
 
 ## Tests
 
-- **Schema:** rejects unknown keys, a missing trigger and an executable-looking field.
-- **Lint:** one failing fixture per lint rule (an overly broad trigger, 150 lines, a missing reference, a `.sh` file in the pack, an unbumped version).
+- **Schema:** rejects unknown keys, a missing trigger, an executable-looking field and a codemod entry with a `command` key.
+- **Lint:** one failing fixture per lint rule (an overly broad trigger, 150 lines, a missing reference, an unknown codemod ID, a `.sh` file in the pack, an unbumped version).
 - **Generator:** golden-file test, so the same input gives byte-identical output.
-- **Risk:** a table-driven test of the signals on the `express-tricky` seeded repo. Streaming, error middleware and `multer` must come out at `high` or `blocker` suggested severity.
+- **Risk:** a table-driven test of the signals on the `next-tricky` seeded repo. Async request APIs used through a helper, caching-only changes and peer conflicts must come out at `high` or `blocker` suggested severity.
 - **Loader:** `--rules-dir` outside the bundled dir is refused, and the pack version appears in the run record.
 - **Permissions:** the full suite still passes.
 
@@ -81,12 +73,15 @@
 - `npm run build:packs` regenerates SKILL.md and references with zero diff, and editing `rules.json` without regenerating fails CI.
 - SKILL.md is at most 100 lines and has a narrow trigger. The lint passes.
 - `assess_risk` on the seeded repo flags every planted hard case at `medium` or above, with signal explanations.
+- Every codemod reference resolves to a registry ID, and the plan can list which rules each codemod covers.
 - The pack name, version and hash are printed at startup and recorded per run.
 
 ## Risks
 
-- **The rule pack is wrong or out of date, which is a supply-chain risk to plan quality.** Mitigation: version and changelog, PR review, rule re-verification against Context7 in M4, and from M7 a golden-set rerun on every pack change.
-- **A skill trigger that is too broad loads on unrelated tasks.** Mitigation: the lint blocklist plus a manual check in Cursor and Claude Code that the skill does not trigger on a generic backend question.
+- **The pack is wrong or out of date, which is a supply-chain risk to plan quality.** Mitigation: version and changelog, PR review, rule re-verification against Context7 in M4, and from M7 a golden-set rerun on every pack change.
+- **Next.js ships a new major during the build.** Mitigation: the pack's ranges are explicit; a new major is a new pack version with its own changelog entry and eval rerun, not a silent edit.
+- **Over-trusting codemods.** Mitigation: a codemod-covered usage still needs a finding with a verify step; gate 2 coverage does not count the codemod as coverage on its own.
+- **A skill trigger that is too broad loads on unrelated tasks.** Mitigation: the lint blocklist plus a manual check in Cursor and Claude Code that the skill does not trigger on a generic React question.
 - **Over-tuned risk heuristics.** Mitigation: keep the signals explainable, and tune the weights only from M7 eval data.
 
 ## Dependencies
