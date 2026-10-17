@@ -615,11 +615,9 @@ http-client.private.env.json
 # Private notes, research and decisions. Not part of the open-source repo.
 .private/
 
-# Per-user agent settings. Shared agent assets live in .agents/ and AGENTS.md.
-# Everything Claude Code writes in .claude/ is personal, except .claude/skills/,
-# which will hold committed symlinks into .agents/skills/ (see .agents/README.md).
-.claude/*
-!.claude/skills/
+# Tool-specific agent folders are never committed. Shared agent assets live in
+# AGENTS.md and .agents/; tool folders are created locally (see .agents/README.md).
+.claude/
 CLAUDE.local.md
 
 # Per-user editor settings. The VisualStudioCode template above keeps
