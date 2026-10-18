@@ -51,8 +51,8 @@ Gates 1–6 run on the plan in `validate_plan`; gate 7 runs on each L1 stage pat
 
 ## Sizing, scope and doc sources (see `design.md` D8, D9)
 
-- **INV-32:** The size is `none` only when the scan is complete (no unparsed files, unresolved dynamic imports or size-limit skips), zero usages match a rule and no dependency has a peer conflict. A `none` plan still lists the pack's behaviour changes. *(planned: `test/unit/sizing.test.ts` — M3)*
-- **INV-33:** Scope only narrows. `set_scope` accepts only offered option IDs, cannot change the paths, the deny list, the level, the checks or `--out`, can only move `depth` toward `full`, and is refused once the first lens packet is fetched. *(planned: `test/permissions/scope-cannot-widen.test.ts`, `test/unit/scope.test.ts` — M3)* — C4, C5, C9
+- **INV-32:** The size is `none` only when the scan is complete (no unparsed files, unresolved dynamic imports or size-limit skips), zero usages match a rule, no dependency has a peer conflict, and the installed version is not older than the knowledge's `covered_from`. A `none` plan still lists the pack's behaviour changes, and every usage found in it has an engine-written out-of-scope reason. *(planned: `test/unit/sizing.test.ts` — M3)*
+- **INV-33:** Scope only narrows. `set_scope` accepts only offered option IDs, cannot change the paths, the deny list, the level, the checks or `--out`, can only move `depth` toward `full`, and is refused once the first lens packet is fetched or `merge_findings` has run, whichever comes first. *(planned: `test/permissions/scope-cannot-widen.test.ts`, `test/unit/scope.test.ts` — M3)* — C4, C5, C9
 - **INV-34:** Every usage the scope excluded, whose rule has `necessity: breaks`, appears in "Review first". *(planned: `test/unit/routing.test.ts` — M9)*
 - **INV-35:** Every doc a run uses records `fetched_by` and `official`. An agent-registered doc whose URL is outside the `doc_sources` prefixes of the pack's libraries is never shown as verified, and findings citing only such docs carry the "docs unverified" badge. *(planned: `test/unit/docs/source-labels.test.ts` — M4)* — gate 3 support
 

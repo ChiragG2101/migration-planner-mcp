@@ -25,7 +25,8 @@
      - Each stage gets `depends_on` derived from the graph.
      - Stage titles are templated, not LLM-written.
    - **Coverage flags:** any usage ID with no covering finding and no `out_of_scope` entry is listed under `uncovered_usages` (input to gate 2). The engine-written `scope: …` entries from `set_scope` (M3) count as `out_of_scope` entries with a reason.
-   - **`none` runs:** with no lens findings, the aggregator builds the plan itself. It has one dependency stage with a templated version-bump finding (`source: rule_pack`, concern `dependency`, evidence = the dependency's line in the manifest, `verify` = the pack's `checks_hint`, rollback = revert the manifest and lockfile). It also includes the list of behaviour changes from `propose_scope`. The gates run on it like any other plan.
+   - **`none` runs:** with no lens findings, the aggregator builds the plan itself. It has one dependency stage with a templated version-bump finding (`source: rule_pack`, concern `dependency`, evidence = the dependency's line in the manifest, `verify` = the pack's `checks_hint`, rollback = revert the manifest and lockfile). It also includes the list of behaviour changes from `propose_scope`. Every usage in the run gets an engine-written `out_of_scope` entry with the reason `none: no rule in range`, since by the definition of `none` no usage matches a composed rule (M3). The gates run on it like any other plan.
+   - **Scope freeze:** calling `merge_findings` freezes the run's scope if no lens packet has already done so (M3, `docs/design.md` D12).
    - Output: a `Plan` object stored in SQLite with a `round` number.
 2. **Gates (`src/pipeline/gates/`), one file per gate with a shared interface `Gate { id, run(plan, ctx) => GateResult[] }`.** `GateResult` is `{finding_id | stage_id | null, gate, pass, reason, expected?, actual?}`, so the agent sees the *exact* failure.
    1. `g1-evidence.ts`: every evidence file resolves through `SafePath` for its `repo_id`, the line range is within the file, and the recomputed `snippet_hash` (the same normaliser as M2) matches.
@@ -62,7 +63,7 @@
   Each fixture fails **only** its target gate, and a test asserts the other gates pass, so the gates are shown to be independent.
 - **False-pass checks:** mutating a good plan in each of these ways must flip the gate result. A gate that passes after a mutation is a bug.
 - **Aggregator:** exact duplicates merge, a severity conflict takes the higher value and writes a conflict event, different actions on the same span are not merged, staging on a small graph fixture comes out in leaf-first order, `config_first` puts config findings first, `lands_on: source` findings land in prep stages before the bump while unmatched findings land after it, and within a stage codemod steps come before manual steps.
-- **`none` plan:** on `next-clean` (M3), merge, validate and emit produce a one-stage plan whose bump finding's evidence resolves (gate 1) and which lists the behaviour changes. Scope-excluded usages satisfy gate 2 through their engine-written reasons.
+- **`none` plan:** on `next-clean` (M3), merge, validate and emit produce a one-stage plan whose bump finding's evidence resolves (gate 1) and which lists the behaviour changes. Scope-excluded usages, and usages that match no rule (`none: no rule in range`), satisfy gate 2 through their engine-written reasons. After `merge_findings`, `set_scope` is refused.
 - **Round cap:** after 3 failing rounds, the plan is emitted with `unresolved[]` populated and the status is not `passed`.
 - **Permissions:** emit writes only under `<out>/<run_id>/`. An emit with `--out` pointing into the repo is refused, and the repo hash is unchanged.
 

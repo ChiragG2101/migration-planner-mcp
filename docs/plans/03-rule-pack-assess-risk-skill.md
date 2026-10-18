@@ -114,7 +114,7 @@
 12. **Sizing and scope (`src/analysis/sizing.ts`, `src/core/{proposeScope,setScope}.ts`, tools, CLI `scope`; deterministic, no LLM).**
     - **`propose_scope`** (input `run_id`) returns a size, a summary and the questions.
     - **Size** is computed from the facts, never guessed:
-      - `none` only when all of these hold: zero usages match a composed rule, the scan is complete (no `unparsed_files`, `unresolved_dynamic` or `skipped_by_limit`), no dependency has a `peer_conflict`, and the installed version is not older than `covered_from`. The output still lists the composed `changed_behavior` and `changed_default` rules in one line each ("not found in your code; listed because behaviour changes can hide").
+      - `none` only when all of these hold: zero usages match a composed rule, the scan is complete (no `unparsed_files`, `unresolved_dynamic` or `skipped_by_limit`), no dependency has a `peer_conflict`, and the installed version is not older than `covered_from`. The output still lists the composed `changed_behavior` and `changed_default` rules in one line each ("not found in your code; listed because behaviour changes can hide"). Usages that `find_usages` found but that match no composed rule (for example code already in the target form) are marked out of scope by the engine when it builds the `none` plan (M6), so gate 2 holds without any lens.
       - `small` when the scan is complete, the matched usages are at most `--small-max-usages` (default 10, recorded per run and tuned from M7 data), every one is covered by a codemod, and none has a `suggested_severity` of `high` or `blocker`.
       - `full` otherwise.
     - **Questions** come from the facts, and only when relevant. Each has an ID, fixed options and a default:
@@ -126,7 +126,7 @@
     - **`set_scope`** (input `run_id` and `answers{question_id: option_id}`) records the answers as a `scope.set` event.
       - An answer that is not one of the offered options is rejected. There are no free-text answers.
       - Scope can only narrow. It cannot touch paths, the deny list, the level, the checks or `--out`. `stop_at` becomes the effective target, so composition (task 4) and M4's doc version pin both use it.
-      - Scope is frozen once the first lens packet is fetched (M5), so it can't be used mid-run to drop items that fail a gate.
+      - Scope is frozen at whichever comes first: fetching the first lens packet (M5) or calling `merge_findings` (M6). A `none` run fetches no packet, so `merge_findings` is what freezes it. Either way, scope can't be used mid-run to drop items that fail a gate (`docs/design.md` D12).
       - Unanswered questions take their defaults, and the report says which answers were defaults.
       - Excluded usages get engine-written `out_of_scope` entries with the reason `scope: <question>=<answer>`.
     - The CLI `scope` prints the proposal, and `scope --answers <file.json>` sets it, for CI.
@@ -156,7 +156,7 @@
 - **Risk:** a table-driven test of the signals on the `next-tricky` seeded repo. Async request APIs used through a helper, caching-only changes and peer conflicts must come out at `high` or `blocker` suggested severity.
 - **Loader:** `--rules-dir` outside the bundled dirs is refused, drafts are skipped and counted, and the pack version and hash appear in the run record.
 - **Sizing:** `next-clean` comes out `none`, and `next-tricky` comes out `full`. Each `none` condition is shown to matter: an unparsed file, an unresolved dynamic import, a peer conflict, a single matched usage, or an installed version older than `covered_from` each turns `none` into `small` or `full`. A usage with no codemod, or a high-risk one, turns `small` into `full`.
-- **Scope:** an answer outside the offered options is rejected; `depth` can move up but not down; `set_scope` after the first lens packet is refused; excluded usages get engine-written `out_of_scope` reasons; unanswered questions take their defaults and are reported as defaults.
+- **Scope:** an answer outside the offered options is rejected; `depth` can move up but not down; `set_scope` after the first lens packet is refused, and so is `set_scope` after `merge_findings` on a `none` run; excluded usages get engine-written `out_of_scope` reasons; unanswered questions take their defaults and are reported as defaults.
 - **Permissions (`scope-cannot-widen`):** no `set_scope` input can change the paths, the deny list, the level, the checks or `--out`, and a `stop_at` outside the pack's supported range is rejected.
 - **Permissions:** the full suite still passes, and an import lint shows nothing under `src/` imports from `scripts/`.
 

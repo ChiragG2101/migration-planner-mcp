@@ -113,6 +113,8 @@ Why:
 
 *Revised by D10:* `necessity` is no longer typed into each rule. It is derived per run from the rule's events in the installed-to-target range.
 
+*Revised by D12:* scope freezes at the first lens packet or the first `merge_findings`, whichever comes first, so a `none` run freezes too.
+
 Why:
 
 - **Over-engineering small upgrades.** Running four lenses and gate rounds on an upgrade that touches no code is waste, and users would stop trusting the tool for big upgrades if it is slow on trivial ones. The engine already holds the facts to prove a migration is small, so sizing is a deterministic computation, not a model's guess.
@@ -182,3 +184,16 @@ Why:
 - **Every tool stops at a human decision.** The drafter writes `draft` rules that don't load until reviewed. The finder writes candidates to a gitignored folder and never adds a case. The report is attached to the PR, not committed, so no doc checklist has to be maintained.
 - **No model in the tools (C7 in spirit).** The drafter and report split notes with a plain parser. The judgment part (writing the match, the fix, the severity) is done by the contributor's own agent with the `add-release-knowledge` skill, the same way the product uses the host agent.
 - **Official sources, not Context7, for the pack check.** Context7 snippets are community-contributed (PRD section 9). The pack's own correctness is checked against the primary source.
+
+## 2026-10-18: fixes from the plan review of the knowledge and scope changes
+
+An independent review of the plan changes (`1f6c12e..7ad5bbf`) found gaps that would have stopped M2, M3, M4, M6 or M10 being built as written. The decisions below close them.
+
+### D12 - `none` runs cover their usages and freeze scope too
+
+**Decision: when the aggregator builds a `none` plan, it marks every usage in the run out of scope with the reason `none: no rule in range`. Scope freezes at whichever comes first: the first lens packet or the first `merge_findings`.**
+
+Why:
+
+- `none` means no usage matches a composed rule, but `find_usages` can still find usages, for example code already in the target form. With no lens to cover them, gate 2 would fail three times and push them into `unresolved` on every `none` run. The engine already knows why they need no change, so it writes the reason itself, the same way it writes `scope:` reasons.
+- Freezing only at the first lens packet left `none` runs, which fetch no packet, open to `set_scope` between gate rounds. That is exactly the abuse D8 set out to close.
