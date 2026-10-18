@@ -237,8 +237,8 @@ The same review corrected two contradictions with D9 and D11 rather than decidin
 
 **Decision:**
 
-- C9 and INV-10 name both `knowledge/` and `packs/`.
-- `scripts/check-core-untouched.ts` (M10) is an allowlist. A pack PR may change only its knowledge and pack folders, one new usage adapter and its registry line, eval data, tests and docs.
+- C9, INV-8, INV-10 and every list of places commands may never come from name both `knowledge/` and `packs/`.
+- `scripts/check-core-untouched.ts` (M10) is an allowlist. A pack PR may change only its knowledge and pack folders, one new usage adapter and its registry line, eval data, tests, docs, and the outputs its build and eval regenerate (`plugin/**`, `eval/history/`, `eval/seeded/recall.md`, its entry in `eval/seeded/ratchet.json`), whose content the drift and ratchet checks guard.
 - The regression rule also covers `src/analysis/` and the staging, packet and routing code, and it applies from M7.
 - C8 reads "until v0.1 ships (M11) with real eval numbers", as PRD section 1 already says.
 
@@ -248,4 +248,5 @@ Why:
 - The old protected list missed `scripts/`, so a pack PR could have loosened the very lint and generator it is checked by. It also missed the risk, sizing, docs and CLI code. An allowlist can't miss a new folder.
 - Sizing decides whether the lenses run at all, and the usage adapters and risk signals decide what is found and how it is rated. Changing them without rerunning the eval would let plan quality move unseen.
 - C8 had two readings: "until eval numbers exist" (true from M7) and "until M11" (M10's README task). The PRD's wording settles it.
-- The ESLint write and spawn rule is scoped to `src/`, because the maintainer tools in `scripts/` legitimately write files and run `git` and `gh`. They stay outside the engine through the import lint.
+- The ESLint write and spawn rule is scoped to `src/`, because the maintainer tools in `scripts/` and the eval tooling under `eval/` legitimately write files and run `git` and `gh`. They stay outside the engine through the import lint, which stops anything under `src/` importing from `scripts/` or `eval/` (INV-40).
+- Generated outputs have to change with the pack: the plugin bundle is drift-checked, and every eval rerun writes a history file. Leaving them off the allowlist would fail every honest pack PR.

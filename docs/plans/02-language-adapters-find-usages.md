@@ -58,11 +58,11 @@
       - a file already in the target form, for example one that already awaits `cookies()` [`no_change`: it must be found, then marked out of scope as already migrated]
       - decoys: old-style code the target still supports, for example a still-supported legacy pattern or a lint-level smell [`no_finding`]
 13. **Python adapter fixture (`test/fixtures/python-imports/`).** A small package with absolute, relative, `importlib` and settings-string references, used only for adapter unit tests. The Django seeded repo comes in M10.
-14. **Recall script (`eval/seeded/recall.ts`).** Compares `find_usages` output with the ground truth and prints recall per kind and overall, plus the misses. Recall counts `change` and `no_change` entries, since both are usages that must be found. `no_finding` entries are scored at the plan level in M7. Writes `eval/seeded/recall.md`. It is pack-independent, so M10 reuses it.
+14. **Recall script (`eval/seeded/recall.ts`).** Compares `find_usages` output with the ground truth and prints recall per kind and overall, plus the misses. Recall counts `change` and `no_change` entries, since both are usages that must be found. `no_finding` entries are scored at the plan level in M7. Writes `eval/seeded/recall.md`. The ratchet floor for each seeded repo is recorded in `eval/seeded/ratchet.json`. It is pack-independent, so M10 reuses it.
 
 ## Files and modules
 
-`src/lang/{adapter,text}.ts`, `src/lang/ts/{program,imports,symbols}.ts`, `src/lang/python/{parser,imports,symbols}.ts`, `src/analysis/snippet.ts`, `src/analysis/usages/{adapter,index,nextjs}.ts`, `src/store/usages.ts`, `src/store/migrations/002_usages.sql`, `src/core/findUsages.ts`, `src/tools/findUsages.ts`, `src/cli/usages.ts`, `eval/seeded/next-tricky/**`, `eval/seeded/recall.ts`, `eval/seeded/recall.md`, `test/fixtures/python-imports/**`, `test/unit/{lang,usages}/*.test.ts`.
+`src/lang/{adapter,text}.ts`, `src/lang/ts/{program,imports,symbols}.ts`, `src/lang/python/{parser,imports,symbols}.ts`, `src/analysis/snippet.ts`, `src/analysis/usages/{adapter,index,nextjs}.ts`, `src/store/usages.ts`, `src/store/migrations/002_usages.sql`, `src/core/findUsages.ts`, `src/tools/findUsages.ts`, `src/cli/usages.ts`, `eval/seeded/next-tricky/**`, `eval/seeded/recall.ts`, `eval/seeded/recall.md`, `eval/seeded/ratchet.json`, `test/fixtures/python-imports/**`, `test/unit/{lang,usages}/*.test.ts`.
 
 ## Tests
 
@@ -71,7 +71,7 @@
 - **Next.js adapter:** one test per usage kind, using small inline fixtures.
 - **Snippet hash stability:** CRLF vs LF and trailing spaces give the same hash, and a real edit changes the hash, for both TS and Python files.
 - **Permissions:** the full suite still passes. A deny-listed file is never parsed even when imported. Neither `CompilerHost` nor the Python adapter can read outside the root (a test plants a tsconfig `paths` entry and a Python relative import pointing at `../outside`).
-- **Recall:** this is the smoke eval. CI fails if overall recall on `next-tricky` drops below the recorded value (a ratchet that only moves up).
+- **Recall:** this is the smoke eval. CI fails if overall recall on `next-tricky` drops below its value in `eval/seeded/ratchet.json`, or if a change lowers that value (a ratchet that only moves up).
 
 ## Acceptance criteria
 

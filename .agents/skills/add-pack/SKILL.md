@@ -44,13 +44,13 @@ Never put commands, scripts or shell snippets in a pack. Only `checks_hint` may 
 
 ## 5. Eval
 
-- Seeded repo `eval/seeded/<name>/`, the one `pack.json` names in `seeded`, with planted hard cases and `ground_truth.json` (each `expect: change` entry names its `rule_id`). Report recall with the recall script and record the ratchet.
+- Seeded repo `eval/seeded/<name>/`, the one `pack.json` names in `seeded`, with planted hard cases and `ground_truth.json` (each `expect: change` entry names its `rule_id`). Report recall with the recall script and add the pack's entry to `eval/seeded/ratchet.json`.
 - At least **2 golden cases** from real public PRs: find candidates with `npm run cases:find` and vet them with the `add-golden-case` skill. Declare `checks` so L1 can run on at least one.
 - Run the eval for the new pack and for every existing pack. The eval table compares the new pack with the baseline; if it doesn't beat the baseline on recall, say so plainly in the PR and raise it with the maintainer. Existing packs must not regress beyond the recorded noise band.
 
 ## 6. Open the PR
 
-- The `check-core-untouched` check must pass.
+- The `check-core-untouched` check must pass. It allows only the pack's knowledge and pack folders, the adapter and its registry line, eval data, tests, docs and regenerated outputs (see `docs/plans/10-*`).
 - Attach the output of `npm run pack:report -- <pack>` and explain every "missing" item.
 - The PR description lists the libraries and range, the codemods used, and the eval table, with the misses.
 - Disclose AI assistance as `AI_POLICY.md` asks.

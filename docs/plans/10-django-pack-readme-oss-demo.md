@@ -29,6 +29,7 @@ Adding the pack may only touch:
 - eval data: the new cases under `eval/cases/`, the seeded repo `eval/seeded/django-tricky/`, and the regenerated `eval/results.md`
 - the adapter's unit tests and fixtures under `test/`
 - docs (`docs/`, `README.md`)
+- the outputs the pack's build and eval regenerate: `plugin/**`, `eval/history/`, `eval/seeded/recall.md` and the new pack's entry in `eval/seeded/ratchet.json`. The drift check guards the generated content, and the ratchet check refuses a lower recorded value.
 
 The Python language adapter (M2), the text scanner (M2), the staging options (M6) and the `django-upgrade` codemod registry entry (M8) already exist, so none of them count as changes here.
 

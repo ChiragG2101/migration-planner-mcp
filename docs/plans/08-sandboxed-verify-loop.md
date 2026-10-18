@@ -25,7 +25,7 @@
 1. **Check config (`src/verify/checks.ts`).**
    - Sources in M8: repeated CLI flags given at process start, `--install "<cmd>"` and `--check <name>="<cmd>"` (for example `typecheck="npx tsc --noEmit"`, `test="npm test"`). For the MCP adapter, these go in the user's MCP config, which the user owns. M10 adds the AGENTS.md snippet `checks:` block as a second source.
    - Commands are parsed into argv with shell-word rules and run **without a shell**. A user who wants a shell writes `sh -c "..."` themselves, which is their explicit choice.
-   - The check set is frozen at startup and recorded in the run. No tool argument, pack field, prompt or agent message can add, change or reorder checks.
+   - The check set is frozen at startup and recorded in the run. No tool argument, pack or knowledge field, prompt or agent message can add, change or reorder checks.
 2. **Exec (`src/security/exec.ts`).** `run({ argv, cwd: SandboxPath, timeoutMs })`:
    - Asserts level 1 or above.
    - `cwd` must be a branded `SandboxPath` (a `SafePath` under `<out>/<run_id>/sandbox`). Nothing else type-checks.

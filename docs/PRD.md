@@ -172,7 +172,7 @@ A sentence in a skill or prompt is not a security control. Safety is enforced in
 - **Execution in L1, inside a sandbox only:**
   - The sandbox is a `git clone --no-hardlinks` of the repo into `<out>/<run_id>/sandbox`. Cloning only reads the source repo. An optional `--sandbox container` mode runs checks in a container instead.
   - `src/security/exec.ts` is the only module that can spawn a process. Its working directory is always inside the sandbox.
-  - **Commands come only from user-owned config:** CLI flags or the AGENTS.md snippet. Never from MCP tool arguments, packs, prompts or the agent.
+  - **Commands come only from user-owned config:** CLI flags or the AGENTS.md snippet. Never from MCP tool arguments, packs, knowledge, prompts or the agent.
   - **Codemods come only from a core allowlist,** each with a pinned version. A pack names a codemod by ID; it cannot supply a command string.
   - The child environment is scrubbed (an allowlist of variables, no tokens or keys by default). Every command has a timeout.
   - Dependency installs the checks need are declared by the user as part of their check commands, and may use the network. This is stated in the run report.

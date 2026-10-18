@@ -61,7 +61,7 @@ These are enforced in code, not in prose. A change that breaks one of them is wr
   - allowlisted codemods from `src/verify/codemods.ts`, at pinned versions;
   - a fixed set of git operations, with hooks disabled.
 
-  `cwd` is always inside `<out>/<run_id>/sandbox`, and the child environment is scrubbed. Commands never come from tool arguments, packs, prompts or the agent. `--level 2` is refused as "not built in v0.1", and a tool argument can never raise the level.
+  `cwd` is always inside `<out>/<run_id>/sandbox`, and the child environment is scrubbed. Commands never come from tool arguments, packs, knowledge, prompts or the agent. `--level 2` is refused as "not built in v0.1", and a tool argument can never raise the level.
 - **Path boundary.** All reads go through `resolveInside(root, p)`, which returns a branded `SafePath` carrying the `repo_id`. It realpaths both sides, so `..`, absolute paths and symlink escapes are rejected. Deny-listed files (`.env*`, keys, `.npmrc`, `.pypirc`, and so on) are never read. The AGENTS.md snippet can only *add* deny entries.
 - **Pack and knowledge data never executes.** `packs/` and `knowledge/` hold only JSON and Markdown. They name a codemod by allowlist ID only, never by command, and their schemas reject command-like fields.
 - **Network (the engine's own).** Only Context7 (`src/docs/context7.ts`), only when configured, and with a typed payload carrying library names, versions and symbols only, never repo contents. The engine works offline through the cache. No telemetry.
@@ -85,7 +85,7 @@ These are enforced in code, not in prose. A change that breaks one of them is wr
   - Necessity (`breaks` or `deprecated`) and `lands_on` are derived per run from the rules' events, never typed in.
   - Only `reviewed` rules load. New rules start as drafts from `npm run knowledge:draft` (the `add-release-knowledge` skill).
   - `SKILL.md`, `references/` and the plugin bundle are *generated* from the pack plus its knowledge (with a "do not edit" banner), so edit the data and regenerate rather than editing generated files. CI fails on drift. SKILL.md stays at most about 100 lines with a narrow trigger sentence.
-- **Maintainer tools live in `scripts/` and are outside the engine:** the pack build and lint, the release drafter, the pack update report, and the golden-case finder and re-checker. The pack build and lint run offline in CI (the drift check and `npm run lint`). The other four may use the network and never run in default CI. `src/` never imports from `scripts/`.
+- **Maintainer tools live in `scripts/` and are outside the engine:** the pack build and lint, the release drafter, the pack update report, and the golden-case finder and re-checker. The pack build and lint run offline in CI (the drift check and `npm run lint`). The other four may use the network and never run in default CI. `src/` never imports from `scripts/` or `eval/`.
 - **Prompts are versioned files** (`prompts/plan_migration.v1.md`, `v2`, and so on). Never overwrite an existing version; add a new one.
 - **Zod schemas in `src/schema/`** produce both the TS types and the MCP JSON Schema.
 - **`snippet_hash`** uses one shared normaliser, which `find_usages`, finding normalisation and gate 1 all reuse.

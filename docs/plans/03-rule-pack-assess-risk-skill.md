@@ -162,7 +162,7 @@
 - **Sizing:** `next-clean` comes out `none`, and `next-tricky` comes out `full`. Each `none` condition is shown to matter: an unparsed file, an unresolved dynamic import, a peer conflict, a single matched usage, or an installed version older than `covered_from` or `supported.from` each turns `none` into `small` or `full`. A usage with no codemod, or a high-risk one, turns `small` into `full`.
 - **Scope:** an answer outside the offered options is rejected; `depth` can move up but not down; `set_scope` after the first lens packet is refused, and so is `set_scope` after `merge_findings` on a `none` run; excluded usages get engine-written `out_of_scope` reasons; unanswered questions take their defaults and are reported as defaults.
 - **Permissions (`scope-cannot-widen`):** no `set_scope` input can change the paths, the deny list, the level, the checks or `--out`, and a `stop_at` outside the pack's supported range is rejected.
-- **Permissions:** the full suite still passes, and an import lint shows nothing under `src/` imports from `scripts/`.
+- **Permissions:** the full suite still passes, and an import lint shows nothing under `src/` imports from `scripts/` or `eval/`.
 
 ## Acceptance criteria
 
