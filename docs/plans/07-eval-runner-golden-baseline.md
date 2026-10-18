@@ -19,7 +19,8 @@
    - Fields: `pack`, `repo_url`, `base_commit` (the parent of the migration), `merge_commit`, `pr_url`, `source`, `target`, `checks` (the check commands the case's repo uses, for M8; optional here), `notes` and `tags` (for example `messy` or `monorepo`).
    - Ground truth is derived deterministically. `scripts/derive-truth.ts` diffs base against merge and maps the changed hunks to M2 usages at base, writing `truth.json` (true changed usages, touched files, and per-file edit size, which is used for severity calibration).
    - The diff and checkout are done by **eval tooling**, outside the engine, in a temp clone under the eval workspace. The engine only ever sees a read-only path (C3 still holds for the engine).
-2. **Pick and pin 5 cases.** Extend the M0 Next.js list to 5, with at least one messy case: a partial upgrade, a reverted PR, or a PR with follow-up fixes. Prefer cases whose repo has a runnable test suite, so M8 can reuse them. Record why each was chosen. The Django cases from M0 are added in M10.
+2. **Pick and pin 5 cases.** Extend the M0 Next.js list to 5, with at least one messy case: a partial upgrade, a reverted PR, or a PR with follow-up fixes. Prefer cases whose repo has a runnable test suite, so M8 can reuse them. Record why each was chosen.
+   - **Pick for spread, not count.** `eval/cases/README.md` keeps a coverage matrix: router (app, pages or both), monorepo or single package, one major hop or several, test runner, data layer, and size of the real diff. A new case should fill an empty cell rather than repeat a covered one, and empty cells are listed as known gaps in `results.md` (`docs/design.md` D7). The Django cases from M0 are added in M10.
 3. **Runner (`eval/runner.ts`).**
    - Modes:
      - `--tier unit|seeded|golden|baseline|all`
@@ -34,21 +35,25 @@
    - evidence validity (share of resolving citations, with a target of 100%)
    - severity calibration (the share of high and blocker findings whose files needed non-trivial edits, with the threshold defined in code)
    - the false-alarm rate for high and blocker findings
+   - seeded precision: a finding that proposes a change on a `no_change` or `no_finding` seeded entry (M2) counts as a false alarm; marking a `no_change` entry out of scope is correct
    - the `out_of_scope` rate
    - unresolved count
    - cost (tokens if reported) and wall time
    - repo-untouched (bool)
 6. **Results (`eval/results.md`, generated).** One table per tier and per pack: case × metric, plus a **with engine vs. without** comparison table. It includes a "Misses" section listing every false negative and false alarm with a link, and records the versions of the pack, prompt, gates (a code hash) and engine. History is kept in `eval/history/<date>-<git-sha>.json`.
+   - **PR-missed annotations.** A real PR can itself miss a required change, which makes a correct finding score as a false alarm. A reviewer may record this in `eval/cases/<id>/annotations.json` (finding, reason, reviewer, date). The file is hand-reviewed and never generated; M9's `record_feedback` export may only propose entries. Annotated findings are listed in a separate "PR missed" section. **Headline metrics are always computed from raw truth.** An annotation only adds an adjusted figure next to them, never replaces them, and `truth.json` is still never hand-edited.
 7. **Regression rule in CI.** A path filter on `prompts/`, `rules/`, `rules/**/SKILL.md`, `src/pipeline/gates/` and `src/verify/` (codemod registry and gate 7, from M8) requires `eval/results.md` to be regenerated in the same PR (CI checks that the results' recorded version hashes match HEAD). The smoke tier runs on every PR in replay mode, offline and for free.
 8. **Threshold tuning input.** Export the per-finding confidence vs. correctness pairs to `eval/calibration.csv`. M9 uses them to tune the 0.6 threshold.
 
 ## Files and modules
 
-`eval/runner.ts`, `eval/metrics.ts`, `eval/baseline/{prompt.md,parse.ts}`, `eval/cases/<5 ids>/{case.json,truth.json}`, `scripts/derive-truth.ts`, `eval/results.md`, `eval/history/`, `eval/calibration.csv`, `.github/workflows/ci.yml` (or a local `npm run ci` if CI is not used), `test/unit/eval/*.test.ts`.
+`eval/runner.ts`, `eval/metrics.ts`, `eval/baseline/{prompt.md,parse.ts}`, `eval/cases/<5 ids>/{case.json,truth.json,annotations.json?}`, `eval/cases/README.md` (coverage matrix), `scripts/derive-truth.ts`, `eval/results.md`, `eval/history/`, `eval/calibration.csv`, `.github/workflows/ci.yml` (or a local `npm run ci` if CI is not used), `test/unit/eval/*.test.ts`.
 
 ## Tests
 
 - **Metrics:** unit tests with hand-computed fixtures for recall, precision, calibration and false-alarm rate.
+- **Seeded precision:** a finding proposing a change on a `no_change` or `no_finding` entry counts as a false alarm, and an `out_of_scope` mark on a `no_change` entry does not.
+- **Annotations cannot move the headline:** adding an `annotations.json` entry leaves every headline metric byte-identical and changes only the adjusted column and the "PR missed" section.
 - **Truth derivation:** a tiny synthetic repo with two commits gives the expected `truth.json`.
 - **Repo-untouched:** the runner fails a case when the target hash changes. Tested by planting a write in a fake planner, which must be caught.
 - **Replay determinism:** re-scoring the same recorded run twice gives byte-identical metrics.
@@ -61,6 +66,7 @@
 - Every case reports `repo_untouched: true`.
 - Evidence validity for the engine is 100%, because the gates enforce it. If it isn't, that is a bug filed before M7 closes.
 - `results.md` states plainly where the engine does **not** beat the baseline.
+- `results.md` lists the empty cells of the case coverage matrix as known gaps.
 
 ## Risks
 

@@ -60,6 +60,9 @@ A CI check (`scripts/check-core-untouched.ts`) diffs the pack PR against the pro
      - a third-party app with an incompatible support range
      - a custom field overriding a changed method
      - a dynamic `import_module`
+     - existing-state cases, with the same `expect` labels as M2: an API deprecated before the source release, never cleaned up and removed inside the range [`change`]; an import from a private or undocumented Django module [`change`]; a module already in the target form [`no_change`]; and decoys, old-style code the target still supports [`no_finding`]
+   - The M3 lint applies unchanged: every Django rule needs a seeded case and a `lands_on` value. Many Django fixes are `lands_on: source`, because a deprecation can be cleared on the old version before the bump.
+   - Golden cases are picked for spread using the M7 coverage matrix (settings layout, monorepo or not, test runner, one LTS hop or more), not for count.
    - Recall is reported with the M2 recall script and ratcheted. Both packs appear in `eval/results.md`.
 4. **AGENTS.md snippet (separate core PR).**
    - `examples/AGENTS.snippet.md`: a short fenced block under a `## migration-planner` heading (renamed with the final name) with these keys:

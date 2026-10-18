@@ -67,6 +67,38 @@ Consequences and the standing follow-up:
 - This makes M0's ≥2 Django minimum met with one strict LTS→LTS (`ror-api`) and one to-LTS (`thunderstore`). It is a widening of the plan's wording, recorded here per working-rule 2 ("decisions you make go in `docs/design.md`").
 - **Follow-up, not optional:** before M7 derives truth and M10 locks the Django pack scope, add a *second genuine LTS→LTS* case (another 3.2 → 4.2, or a 4.2 → 5.2). Tracked in `eval/cases/README.md` "Open items". If the maintainer prefers strict LTS→LTS only for M0, that is a scope call to raise now rather than silently.
 
+## 2026-10-18: coverage and the existing state of the target repo
+
+Plan amendments made after the M0 review, to M2, M3, M6, M7 and M10. They answer two questions: how a few golden cases can give real coverage, and how the engine treats bad practices already in the target repo.
+
+### D5 - Rules span the whole version range, and fixes that work on the source version land first
+
+**Decision: a pack's rules cover the removals of every release in its range, not only the target major. Each rule declares `lands_on: source | target`. The aggregator puts `source` fixes in prep stages before the version bump, and gate 5 checks that order. A finding with no matched rule defaults to `target`.**
+
+Why:
+
+- The commonest mandatory change in a long-lived repo is a deprecation the team ignored for years that the target finally removes. Django drops an API about two feature releases after deprecating it. Next.js and React do the same across majors. A pack that only reads the target's release notes misses exactly this debt.
+- Fixes that already work on the old version can be merged and verified with the old stack still in place. That keeps the bump stage small and easy to roll back, which is Django's own advice (clear the deprecation warnings, then upgrade).
+- `target` is the safe default for an unmatched finding: staging it late can only cost an extra stage, while staging it early can break the build.
+
+### D6 - Every rule has a seeded case, and seeded repos test what must *not* be flagged
+
+**Decision: the pack lint fails if a rule has no `expect: change` seeded case, or if a code-usage kind has no indirect seeded entry. Seeded ground truth labels each entry `change`, `no_change` (already in target form: found, then marked out of scope) or `no_finding` (a decoy the migration does not require). Changes proposed on the last two count as false alarms.**
+
+Why:
+
+- Golden PRs show how the engine does on real code. They can't show breadth, because a handful of PRs exercises only a few of a pack's rules. Seeded cases are cheap and can cover every rule, so the lint makes that coverage a rule, not a hope.
+- Selectivity (PRD §3) has two failure directions. Recall alone rewards an engine that flags everything. Decoys and already-migrated files measure the other direction: rewriting code the migration does not need to touch.
+
+### D7 - Golden cases are picked for spread, and a PR's own misses never improve the headline
+
+**Decision: golden cases are chosen to fill a coverage matrix (router, monorepo, version hops, test runner, data layer, diff size), and empty cells are reported as known gaps. When a reviewer confirms that a real PR missed a required change, the case gets a hand-reviewed `annotations.json` entry. That adds an adjusted figure and a "PR missed" list, but the headline metrics stay computed from raw truth.**
+
+Why:
+
+- Five cases that repeat the same shape count as one case. A matrix makes the gaps visible instead of hidden behind a count.
+- A merged PR is imperfect ground truth. But letting annotations rewrite the headline would let the project grade its own homework, which is the same risk gate 7 guards against. Raw numbers stay primary, and the adjustment is shown beside them with each entry linked.
+
 ### Confirmation of the overview defaults
 
 Reviewing the above did not change any standing default in [`plans/00-overview.md`](plans/00-overview.md). Confirmed as-is for M1: Node 22 LTS / TypeScript strict / ESM runtime; core-plus-adapters engine shape; official MCP TS SDK v2 over stdio (pin the exact version, re-check at each milestone); `node:sqlite` with a `better-sqlite3` fallback; the TypeScript compiler API for TS/JS; tree-sitter WASM for Python; Zod schemas; Vitest; ESLint with the fs-write / `child_process` import restriction; npm; Apache-2.0; working name `migration-planner-mcp`.

@@ -41,3 +41,10 @@ Gates 1–6 run on the plan in `validate_plan`; gate 7 runs on each L1 stage pat
 - **INV-25:** Any change under `prompts/`, `rules/`, `src/pipeline/gates/` or `src/verify/` regenerates `eval/results.md` in the same change (the regression rule). *(planned: CI check — M7)*
 - **INV-26:** The README says "currently building" until real eval numbers exist. *(planned: M10 review check)* — C8
 - **INV-27:** Adding a pack must not touch protected core paths. *(planned: `scripts/check-core-untouched.ts` — M10)*
+
+## Coverage and staging (added after the M0 review; see `design.md` D5–D7)
+
+- **INV-28:** Every pack rule has a `lands_on` value and at least one `expect: change` seeded case, and every code-usage kind has an indirect seeded entry. *(planned: `scripts/lint-packs.ts`, `test/unit/lintPacks.test.ts` — M3)*
+- **INV-29:** No prep stage depends on the version-bump stage, and no `lands_on: target` finding (including any finding with no matched rule) is staged before it. *(planned: `src/pipeline/gates/g5-stage-order.ts`, `test/unit/gates/` `bad-g5` fixture — M6)*
+- **INV-30:** Eval headline metrics are computed from raw truth only. `annotations.json` entries add an adjusted figure and a "PR missed" list, never change the headline. *(planned: `test/unit/eval/` annotations test — M7)*
+- **INV-31:** A finding that proposes a change on a seeded `no_change` or `no_finding` entry counts as a false alarm. *(planned: `test/unit/eval/` seeded-precision test — M7)*

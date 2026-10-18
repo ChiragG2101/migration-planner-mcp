@@ -18,13 +18,16 @@
 
 1. **Pack schema (`src/schema/rulePack.ts`, Zod).**
    - Fields: `name`, `version` (semver), `kind` (`upgrade` or `swap`), `source {library, range}`, `target {library, range}` (for `upgrade`, the same library with two ranges), `languages[]`, `trigger` (a single sentence), `usage_kinds[] {kind, lens}` (which M5 lens receives each usage kind), `staging` (`leaf_first` or `config_first`, read by the M6 aggregator), `rules[]`, `codemods[]`, `checks_hint`, `references[]`.
-   - Each rule has: `id`, `usage_kinds[]` (links to M2 kinds), `symbol_pattern`, `concern`, `default_severity`, `mapping` (from and to text), `no_equivalent` (bool), `codemod?` (an ID from `codemods[]`), `notes`, `doc_hints[]` (library and topic strings for M4, not URLs), `verify_hint` and `rollback_hint`.
+   - Each rule has: `id`, `usage_kinds[]` (links to M2 kinds), `symbol_pattern`, `concern`, `default_severity`, `mapping` (from and to text), `no_equivalent` (bool), `codemod?` (an ID from `codemods[]`), `notes`, `doc_hints[]` (library and topic strings for M4, not URLs), `verify_hint`, `rollback_hint` and `lands_on`.
+   - `lands_on` is `source` or `target`. `source` means the fix also works on the source version, so it can land and be verified *before* the version bump (Django's own advice: clear the deprecation warnings first). `target` means it only works after the bump. The M6 aggregator reads it for staging (`docs/design.md` D5).
    - `codemods[]` entries are `{ id, covers_rules[], notes }`. The `id` must exist in the core codemod registry (M8 implements the registry; M3 ships its ID list as data in `src/verify/codemodIds.ts` so the lint can check references now). A pack can never supply a command, binary name, package name or arguments.
    - `checks_hint`: display text that suggests which checks a user should declare (for example "typecheck, build, unit tests"). Never executed.
    - **No executable fields.** The schema rejects unknown keys. A lint check also rejects strings that look like shell commands in any field other than `verify_hint` and `checks_hint`, and both of those are display text only (C3, C9).
 2. **Next.js pack (`rules/nextjs-upgrade/rules.json`, `CHANGELOG.md`, `references-src/*.md`).**
    - Kind `upgrade`, library `next` plus the required `react` and `react-dom` changes. The `from` and `to` ranges are fixed at the start of M3 against the current Next.js release and upgrade guide, and recorded in the changelog with the date.
    - Rules cover each usage kind from M2: async request APIs, caching and segment config, config keys, removed or renamed packages, the React changes the Next.js major requires, peer-dependency conflicts, and type changes.
+   - Rules cover the breaking changes and removals of **every** release in the `from` to `to` range, not only the target major. A range starting one major earlier includes that major's removals too, because repos that skipped a cleanup still carry the code.
+   - Every rule has at least one seeded case. M3 adds `rule_id` to the `next-tricky` ground-truth entries and plants a case for any rule that has none.
    - Codemod references: the official `@next/codemod` transforms that cover rules (for example the async request API transform and the upgrade command), and React's official codemods where they apply. Each reference names which rules it covers, so the plan can show what the codemod leaves for manual work.
    - **Write every mapping against the current Next.js and React docs**, and record the doc page in `doc_hints`. These are verified again via Context7 in M4. Nothing is written from memory.
 3. **Generator (`scripts/build-pack.ts`).** Reads `rules.json` and `references-src/` and writes:
@@ -38,6 +41,9 @@
    - a codemod reference whose ID is not in the core registry list, or a rule pointing at a codemod not in the pack's `codemods[]`
    - a pack version not bumped while rules changed (compared with git HEAD in CI)
    - a missing CHANGELOG entry for the current version
+   - a rule with no seeded case: every rule `id` must be the `rule_id` of at least one `expect: change` entry in the pack's seeded `ground_truth.json`
+   - a code-usage kind (calls and imports, not config keys or dependency ranges) with no indirect seeded entry (through a helper, wrapper or re-export)
+   - a rule with no `lands_on`
    - any file in the pack dir other than `.json` or `.md` (no scripts)
 5. **Pack loader (`src/rules/loader.ts`).** Loads packs only from the repo's bundled `rules/` dir in v0.1 and validates them with Zod. A `--rules-dir` pointing anywhere else is refused with "third-party packs not supported in v0.1". At startup it logs the pack name, version and content hash to stderr. Every run records `pack_name@version#hash` in `runs.versions_json`.
 6. **`get_rule_pack` (core, tool and CLI `pack`).** Input is `run_id`, or `source` and `target`. It returns the pack version, the rules (optionally filtered to usage kinds present in the run), the codemod references with the rules they cover, and the reference file paths as MCP resources, so the agent loads them only on demand (progressive disclosure).
@@ -57,12 +63,12 @@
 
 ## Files and modules
 
-`src/schema/rulePack.ts`, `src/rules/loader.ts`, `src/verify/codemodIds.ts`, `src/core/{getRulePack,assessRisk}.ts`, `src/tools/{getRulePack,assessRisk}.ts`, `src/cli/{pack,risk}.ts`, `src/analysis/risk.ts`, `rules/nextjs-upgrade/{rules.json,CHANGELOG.md,SKILL.md,references/*,references-src/*}`, `scripts/{build-pack,lint-packs}.ts`, `test/unit/{rulePack,risk,lintPacks}.test.ts`.
+`src/schema/rulePack.ts`, `src/rules/loader.ts`, `src/verify/codemodIds.ts`, `src/core/{getRulePack,assessRisk}.ts`, `src/tools/{getRulePack,assessRisk}.ts`, `src/cli/{pack,risk}.ts`, `src/analysis/risk.ts`, `rules/nextjs-upgrade/{rules.json,CHANGELOG.md,SKILL.md,references/*,references-src/*}`, `scripts/{build-pack,lint-packs}.ts`, `eval/seeded/next-tricky/**` (`rule_id` tags and cases for uncovered rules), `test/unit/{rulePack,risk,lintPacks}.test.ts`.
 
 ## Tests
 
 - **Schema:** rejects unknown keys, a missing trigger, an executable-looking field and a codemod entry with a `command` key.
-- **Lint:** one failing fixture per lint rule (an overly broad trigger, 150 lines, a missing reference, an unknown codemod ID, a `.sh` file in the pack, an unbumped version).
+- **Lint:** one failing fixture per lint rule (an overly broad trigger, 150 lines, a missing reference, an unknown codemod ID, a `.sh` file in the pack, an unbumped version, a rule with no seeded case, a code-usage kind with no indirect seeded entry, a rule with no `lands_on`).
 - **Generator:** golden-file test, so the same input gives byte-identical output.
 - **Risk:** a table-driven test of the signals on the `next-tricky` seeded repo. Async request APIs used through a helper, caching-only changes and peer conflicts must come out at `high` or `blocker` suggested severity.
 - **Loader:** `--rules-dir` outside the bundled dir is refused, and the pack version appears in the run record.
@@ -74,6 +80,7 @@
 - SKILL.md is at most 100 lines and has a narrow trigger. The lint passes.
 - `assess_risk` on the seeded repo flags every planted hard case at `medium` or above, with signal explanations.
 - Every codemod reference resolves to a registry ID, and the plan can list which rules each codemod covers.
+- Every rule has a seeded case and a `lands_on` value, and the changelog records which releases in the range the rules were checked against.
 - The pack name, version and hash are printed at startup and recorded per run.
 
 ## Risks

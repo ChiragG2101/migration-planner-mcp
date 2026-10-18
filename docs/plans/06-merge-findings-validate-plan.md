@@ -17,7 +17,8 @@
    - **Dedupe key:** `(evidence repo_id, file, line_start, line_end, normalised action)`, where the normalisation lowercases the text, collapses whitespace and strips punctuation. Exact-key duplicates merge, and their `usage_ids` and `doc_refs` are combined.
    - **Conflicts:** when the same key has different severity or concern, take the higher severity, keep both reasonings and write a `conflict` event. Different actions on the same span are **not** merged; both are kept and flagged `overlapping` for review (failure matrix: merging findings that are actually different).
    - **Staging:** group findings into stages using the import graph from M2. The strategy is a generic core option selected by **pack data** (`staging` in the pack: `leaf_first` or `config_first`), so a later pack does not need a core change:
-     - Stage 0 is dependency and build prep: for a `swap`, adding the new library alongside the old one; for an `upgrade`, bumping the version and resolving peer-dependency conflicts.
+     - **Prep stages** come first: findings whose rule has `lands_on: source` (M3) are fixes that also work on the source version, so they land and are verified before anything is bumped. They are ordered by the same strategy as the rest. A finding with no matched rule (for example `agent_judgment`) is treated as `lands_on: target`, the safe default (`docs/design.md` D5).
+     - Then the dependency and build stage: for a `swap`, adding the new library alongside the old one; for an `upgrade`, bumping the version and resolving peer-dependency conflicts. All `lands_on: target` findings come after it.
      - `leaf_first` (the Next.js default): leaf modules come before the modules that import them, so the build can stay green. Entrypoints (pages, layouts, route handlers, middleware) come last, and for a `swap`, removing the old dependency comes after that.
      - `config_first`: configuration and settings changes come first, then modules in leaf-first order.
      - **Within a stage, codemod steps come before manual steps**, so manual findings describe what is left after the codemod, and the verify loop (M8) can run the codemod first.
@@ -30,7 +31,7 @@
    2. `g2-coverage.ts`: every `find_usages` usage for the run is covered by `usage_ids` on some finding, or by `out_of_scope` with a non-empty reason.
    3. `g3-doc-refs.ts`: every `doc_refs[].doc_id` exists in `run_docs` for **this** run, and the URL matches the stored URL.
    4. `g4-rollback-verify.ts`: severity `high` or `blocker` requires non-empty `rollback` and `verify` that are not placeholders (a blocklist rejects "TBD", "n/a" and "revert", the last only when it is the whole string).
-   5. `g5-stage-order.ts`: for each stage S and each finding in S that touches file F, no file F imports (transitively, via the import graph) may have a required change in a later stage. Dependency stages must come before the stages that use them, and `depends_on` must have no cycles.
+   5. `g5-stage-order.ts`: for each stage S and each finding in S that touches file F, no file F imports (transitively, via the import graph) may have a required change in a later stage. Dependency stages must come before the stages that use them, and `depends_on` must have no cycles. No prep stage may depend on the bump stage, and no `lands_on: target` finding may be staged before it.
    6. `g6-schema-ids.ts`: Zod validates the whole plan, and finding and stage IDs are unique.
    The gate interface is shared with gate 7 (`src/verify/testIntegrity.ts`, M8), so all gates report results in one format.
 3. **`validate_plan` (core, tool `src/tools/validatePlan.ts`, CLI `validate`).**
@@ -55,11 +56,11 @@
   - `bad-g2`: one usage left uncovered, and an `out_of_scope` entry with an empty reason.
   - `bad-g3`: a URL never retrieved in this run, and a `doc_id` from a different run.
   - `bad-g4`: a high finding without rollback, and a blocker whose verify is "TBD".
-  - `bad-g5`: an importer staged before its dependency, and a cycle in `depends_on`.
+  - `bad-g5`: an importer staged before its dependency, a cycle in `depends_on`, a `lands_on: target` finding staged before the bump, and a `lands_on: source` prep stage that depends on the bump.
   - `bad-g6`: a duplicate ID and a missing required field.
   Each fixture fails **only** its target gate, and a test asserts the other gates pass, so the gates are shown to be independent.
 - **False-pass checks:** mutating a good plan in each of these ways must flip the gate result. A gate that passes after a mutation is a bug.
-- **Aggregator:** exact duplicates merge, a severity conflict takes the higher value and writes a conflict event, different actions on the same span are not merged, staging on a small graph fixture comes out in leaf-first order, `config_first` puts config findings first, and within a stage codemod steps come before manual steps.
+- **Aggregator:** exact duplicates merge, a severity conflict takes the higher value and writes a conflict event, different actions on the same span are not merged, staging on a small graph fixture comes out in leaf-first order, `config_first` puts config findings first, `lands_on: source` findings land in prep stages before the bump while unmatched findings land after it, and within a stage codemod steps come before manual steps.
 - **Round cap:** after 3 failing rounds, the plan is emitted with `unresolved[]` populated and the status is not `passed`.
 - **Permissions:** emit writes only under `<out>/<run_id>/`. An emit with `--out` pointing into the repo is refused, and the repo hash is unchanged.
 

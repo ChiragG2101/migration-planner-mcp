@@ -21,4 +21,12 @@ The failure matrix from [`PRD.md`](PRD.md) §8, with a "test or check" column ad
 
 ## Added since the PRD
 
-Rows found during the build go here, newest first. None yet — M0 is pre-code.
+Rows found during the build go here, newest first.
+
+| Component | Engineering failures | LLM failures | Design response | Test or check |
+| --- | --- | --- | --- | --- |
+| Eval | A golden PR itself misses a required change, so a correct finding is scored as a false alarm | n/a | Hand-reviewed `annotations.json`; headline from raw truth, adjusted figure beside it (D7) | Annotations leave headline metrics byte-identical (INV-30, M7) |
+| Eval | Golden cases repeat one repo shape, so a count hides gaps | n/a | Coverage matrix; empty cells reported as gaps (D7) | `results.md` lists empty matrix cells (M7) |
+| Rule packs and skills | Pack covers only the target major's changes and misses removals from releases in between | n/a | Rules span every release in the range; every rule has a seeded case (D5, D6) | Pack lint: rule with no seeded case fails (INV-28, M3, M10) |
+| Aggregator | Fixes that work on the old version are bundled into the bump, so the bump stage is large and hard to roll back | n/a | `lands_on` per rule; prep stages before the bump (D5) | Gate 5 `bad-g5` fixtures (INV-29, M6) |
+| Specialists (lenses) | Partly migrated repo: usages already in target form | Lens proposes changes to code already migrated, or "fixes" debt the migration does not require | Mark already-migrated usages out of scope; findings need a rule or doc citation (D6) | Seeded `no_change` and `no_finding` entries scored as false alarms (INV-31, M2, M7, M10) |

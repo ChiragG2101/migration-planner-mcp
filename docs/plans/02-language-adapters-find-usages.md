@@ -41,7 +41,7 @@
     - Input: `run_id` and optional filters.
     - Output: paginated usages plus a summary (counts per kind, `unparsed_files[]`, `unresolved_dynamic[]`, `skipped_by_limit[]`).
     - The response never truncates silently. If it paginates, it says so and gives the total.
-12. **Seeded-defect repo (`eval/seeded/next-tricky/`).** A small Next.js app on an older major with planted hard cases, each tagged in a `ground_truth.json` (id, file, line, kind):
+12. **Seeded-defect repo (`eval/seeded/next-tricky/`).** A small Next.js app on an older major with planted hard cases, each tagged in a `ground_truth.json` (id, file, line, kind, `expect`; M3 adds `rule_id`). `expect` is `change` (the migration must change it), `no_change` (a pack usage that must be found but needs no change) or `no_finding` (not a pack usage; no finding may cite it). See `docs/design.md` D6.
     - `cookies()` called through a helper in another module
     - `params` destructured in a layout and passed down to a client component
     - a route handler relying on implicit `GET` caching
@@ -52,8 +52,13 @@
     - a dependency with a peer range that excludes the target React
     - a `next.config` with a removed experimental flag
     - a type-only import of a changed type
+    - **Existing-state cases** (`expect` in brackets):
+      - an API deprecated in an earlier major, never cleaned up, and removed inside the range [`change`]
+      - an import of a framework internal (`next/dist/...`) whose path changes in the target [`change`]
+      - a file already in the target form, for example one that already awaits `cookies()` [`no_change`: it must be found, then marked out of scope as already migrated]
+      - decoys: old-style code the target still supports, for example a still-supported legacy pattern or a lint-level smell [`no_finding`]
 13. **Python adapter fixture (`test/fixtures/python-imports/`).** A small package with absolute, relative, `importlib` and settings-string references, used only for adapter unit tests. The Django seeded repo comes in M10.
-14. **Recall script (`eval/seeded/recall.ts`).** Compares `find_usages` output with the ground truth and prints recall per kind and overall, plus the misses. Writes `eval/seeded/recall.md`. It is pack-independent, so M10 reuses it.
+14. **Recall script (`eval/seeded/recall.ts`).** Compares `find_usages` output with the ground truth and prints recall per kind and overall, plus the misses. Recall counts `change` and `no_change` entries, since both are usages that must be found. `no_finding` entries are scored at the plan level in M7. Writes `eval/seeded/recall.md`. It is pack-independent, so M10 reuses it.
 
 ## Files and modules
 
