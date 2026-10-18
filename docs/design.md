@@ -99,6 +99,22 @@ Why:
 - Five cases that repeat the same shape count as one case. A matrix makes the gaps visible instead of hidden behind a count.
 - A merged PR is imperfect ground truth. But letting annotations rewrite the headline would let the project grade its own homework, which is the same risk gate 7 guards against. Raw numbers stay primary, and the adjustment is shown beside them with each entry linked.
 
+## 2026-10-18: size the migration and ask about scope before planning
+
+### D8 - A sizing and scope step after the facts are built
+
+**Decision: after `scan_repo`, `find_usages`, `get_rule_pack` and `assess_risk`, the engine runs `propose_scope`. It sizes the migration as `none`, `small` or `full` from the facts and offers a few scope questions, only when the facts make them relevant. `set_scope` records the answers. Scope can only narrow, takes fixed options, and is frozen once planning starts. Rules gain `necessity: breaks | deprecated`. PRD sections 2, 6, 7, 9 and 11 are updated, along with M3, M5, M6 and M9.**
+
+Why:
+
+- **Over-engineering small upgrades.** Running four lenses and gate rounds on an upgrade that touches no code is waste, and users would stop trusting the tool for big upgrades if it is slow on trivial ones. The engine already holds the facts to prove a migration is small, so sizing is a deterministic computation, not a model's guess.
+- **`none` has to be earned.** It needs a complete scan, zero matched usages and no peer conflicts, and it still lists the pack's behaviour changes. Some upgrades change behaviour with no code change (for example caching defaults in Next.js 15), so "nothing matched" alone is not proof of "nothing to do".
+- **Users often want less than everything:** one app out of three, a stop at the major in between, or only the changes that break. Asking after the scan means questions are concrete ("these 3 apps") rather than a generic form, and only relevant ones are asked.
+- **Narrow-only, fixed options, frozen once planning starts.** These close the obvious abuses. Scope can't widen the path boundary, the level or the commands (C4, C5, C9), and it can't be used mid-run to drop items that fail gate 2. Excluding something that breaks on the target is allowed, because it is the user's call, but it goes to "Review first".
+- **Defaults keep CI and non-interactive runs working:** full scope at the computed size.
+
+What it costs: two tools, one rule field, a `combined` lens for `small` runs, and an engine-built plan for `none` runs. The four-lens path is unchanged.
+
 ### Confirmation of the overview defaults
 
 Reviewing the above did not change any standing default in [`plans/00-overview.md`](plans/00-overview.md). Confirmed as-is for M1: Node 22 LTS / TypeScript strict / ESM runtime; core-plus-adapters engine shape; official MCP TS SDK v2 over stdio (pin the exact version, re-check at each milestone); `node:sqlite` with a `better-sqlite3` fallback; the TypeScript compiler API for TS/JS; tree-sitter WASM for Python; Zod schemas; Vitest; ESLint with the fs-write / `child_process` import restriction; npm; Apache-2.0; working name `migration-planner-mcp`.

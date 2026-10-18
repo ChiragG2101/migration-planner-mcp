@@ -28,7 +28,7 @@ These come from PRD sections 1, 3 and 7A. A milestone that breaks one of them is
 | M0 | (this file, section below) | `docs/failure-modes.md`, `docs/invariants.md`, golden cases chosen for both packs | none |
 | M1 | [`01-engine-skeleton-scan-repo-permissions.md`](01-engine-skeleton-scan-repo-permissions.md) | Engine skeleton, CLI and MCP adapters, `scan_repo` (JS/TS and Python), event log with campaign and repo IDs, path boundary, read-only rule | M0 |
 | M2 | [`02-language-adapters-find-usages.md`](02-language-adapters-find-usages.md) | TS and Python language adapters, import graphs, `find_usages` for Next.js, usage index | M1 |
-| M3 | [`03-rule-pack-assess-risk-skill.md`](03-rule-pack-assess-risk-skill.md) | Pack schema, Next.js pack, `get_rule_pack`, `assess_risk`, generated skill | M2 |
+| M3 | [`03-rule-pack-assess-risk-skill.md`](03-rule-pack-assess-risk-skill.md) | Pack schema, Next.js pack, `get_rule_pack`, `assess_risk`, sizing and scope (`propose_scope`, `set_scope`), generated skill | M2 |
 | M4 | [`04-context7-docs-cache.md`](04-context7-docs-cache.md) | Context7 integration, retrieval log, cache | M1 (M3 for the fallback content) |
 | M5 | [`05-finding-schema-prompt-lenses.md`](05-finding-schema-prompt-lenses.md) | Finding schema, `plan_migration` prompt, four lenses | M2, M3, M4 |
 | M6 | [`06-merge-findings-validate-plan.md`](06-merge-findings-validate-plan.md) | `merge_findings`, `validate_plan` gates 1 to 6, emit | M5 |

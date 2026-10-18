@@ -48,7 +48,7 @@ A local-first **migration engine plus migration packs**. The engine is general (
 
 Delivery layers: a core library in `src/core/`, with thin adapters over it: a CLI (`src/cli/`), a stdio MCP server (`src/server.ts`, `src/tools/`), and generated skills. Adapters contain no logic. The host agent (Claude Code, Cursor) is the LLM; the engine is deterministic and never uses MCP sampling or an LLM SDK.
 
-Pipeline: `Ingest -> Context build (scan_repo, find_usages via language adapters) -> four lenses run by the host agent via the plan_migration prompt -> merge_findings -> validate_plan (gates 1-6, max 3 rounds) -> emit (plan, checklists, run report) -> at L1 only: verify loop (sandbox, codemods, agent patch, declared checks, gate 7, keep or roll back, patches out)`. Every step is recorded in a SQLite event spine keyed by run ID, under campaign and repo IDs.
+Pipeline: `Ingest -> Context build (scan_repo, find_usages via language adapters) -> size and scope (propose_scope: none/small/full plus scope questions; set_scope narrows only) -> four lenses (one combined lens for small, none skips them) run by the host agent via the plan_migration prompt -> merge_findings -> validate_plan (gates 1-6, max 3 rounds) -> emit (plan, checklists, run report) -> at L1 only: verify loop (sandbox, codemods, agent patch, declared checks, gate 7, keep or roll back, patches out)`. Every step is recorded in a SQLite event spine keyed by run ID, under campaign and repo IDs.
 
 ## Non-negotiable constraints
 
@@ -88,7 +88,7 @@ These are enforced in code, not in prose. A change that breaks one of them is wr
 
 Node 22 LTS, TypeScript strict, ESM, npm, Vitest, ESLint, the official MCP TS SDK v2 (`@modelcontextprotocol/server`, pinned version), the `typescript` compiler API, `web-tree-sitter` with the Python grammar, Zod. Licence Apache-2.0.
 
-Planned scripts: `npm run build`, `npm test`, `npm run typecheck`, `npm run lint` (which includes `scripts/lint-packs.ts`), `npm run test:permissions`, `npm run build:packs`, `npm run eval:smoke`, and `npm run eval -- --tier all`. The CLI's commands mirror the tools (`scan`, `usages`, `pack`, `risk`, `docs`, `merge`, `validate`, `emit`, `verify`, `report`, `feedback`), and `mcp` starts the MCP adapter. To run a single test, use `npx vitest run <path>` or `-t "<name>"`.
+Planned scripts: `npm run build`, `npm test`, `npm run typecheck`, `npm run lint` (which includes `scripts/lint-packs.ts`), `npm run test:permissions`, `npm run build:packs`, `npm run eval:smoke`, and `npm run eval -- --tier all`. The CLI's commands mirror the tools (`scan`, `usages`, `pack`, `risk`, `scope`, `docs`, `merge`, `validate`, `emit`, `verify`, `report`, `feedback`), and `mcp` starts the MCP adapter. To run a single test, use `npx vitest run <path>` or `-t "<name>"`.
 
 ## Definition of done per milestone
 

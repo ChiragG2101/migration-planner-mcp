@@ -21,7 +21,7 @@
    - `reasoning`, `action`, `rollback` (optional in the schema; gate 4 enforces it for high and above), `verify` (text; at L0 never executed, and at L1 the verify loop runs the user's declared checks, not this text), `confidence` (0 to 1).
    - `step_kind` enum: `codemod` or `manual`. When it is `codemod`, `codemod` must be an ID from the pack's `codemods[]` (M3), and the finding lists which usages the codemod is expected to change.
    - `source` enum: `rule_pack`, `usage_scan`, `codemod`, `agent_judgment`.
-   - Extra fields: `lens` (`api`, `dependency_build`, `behavior_runtime` or `verification`), `rule_id?`, `usage_ids[]` (links to M2 usages; needed for gate 2), `docs_status` (`verified` or `unverified`, from M4), `prompt_version`.
+   - Extra fields: `lens` (`api`, `dependency_build`, `behavior_runtime`, `verification`, or `combined` for a `small` run, M3), `rule_id?`, `usage_ids[]` (links to M2 usages; needed for gate 2), `docs_status` (`verified` or `unverified`, from M4), `prompt_version`.
    - A schema-level refinement rejects `source = agent_judgment` with empty `evidence` (PRD section 5).
    - `Plan`: `run_id`, `campaign_id`, `repo_id`, `pack`, `prompt_version`, `stages[] {id, order, title, finding_ids[], depends_on[]}`, `findings[]`, `out_of_scope[] {usage_id, reason}` and `unresolved[]`.
    - Export the JSON Schema through `zod-to-json-schema` (or the SDK's built-in conversion) as the resources `schema://finding` and `schema://plan`.
@@ -31,10 +31,15 @@
    - **Behavior/runtime:** caching and segment config usages, behaviour-only changes, middleware, and data flow of `params` into client components, together with the risk signals from M3.
    - **Verification:** the test setup, test files mapped to modules through the import graph, modules with no covering test, the pack's `checks_hint` and the `verify_hint`s.
 
+   - **Combined (`small` runs only):** one packet with what all four lenses would get, still size-bounded. A `small` run has at most `--small-max-usages` usages, so this stays small. `get_lens_packet` refuses `combined` unless the run's size is `small`, and refuses the four separate lenses for a `none` run.
+   - Fetching the first packet freezes the run's scope (M3).
+
    A packet never includes other lenses' findings, which keeps the lenses independent (PRD section 6.3). Packets contain file:line plus a bounded context, deny-list checked.
 3. **Prompt (`prompts/plan_migration.v1.md`, registered as an MCP prompt).**
    - States the trigger and rejection rule: it requires a repo path, source@version and target@version; anything vaguer gets a question back.
    - Gives the tool order, which matches SKILL.md (M3). The skill generator embeds the prompt version, which keeps them in sync.
+   - **Sizing and scope first.** After `assess_risk`, the agent calls `propose_scope`, shows the user the size and summary, and asks each question with its options. It never invents a question or an option. Then it calls `set_scope` with the answers. In a non-interactive session it calls `set_scope` with no answers, so the defaults apply.
+   - **Then it branches on the size.** For `none`, it skips the lenses and goes straight to `merge_findings`, `validate_plan` and `emit_plan` (M6 builds the plan). For `small`, it runs the single `combined` lens. For `full`, it runs the four lenses below.
    - Gives per-lens narrow instructions. Each lens:
      - fetches its packet
      - calls Context7 for each distinct API symbol in the packet, then registers the docs via `get_migration_docs`

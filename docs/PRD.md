@@ -30,6 +30,12 @@ Remove the AI and write down every micro-decision a human makes, then mark which
 
 **Trigger:** a user (or their agent) names a repo path and a source and target with versions. Nothing else starts it. Vague input ("modernise this") is rejected with a question.
 
+**Sizing and scope.** Once the repo facts are built, the engine sizes the migration from those facts and proposes a scope before any planning starts:
+
+- **Size:** `none` (no code is affected, so the answer is a short version-bump plan), `small` (a few usages, all covered by official codemods, none high risk, so one combined planning pass), or `full` (the whole process). `none` is only given when the scan is complete, and it still lists the pack's behaviour changes, because those can hide without any matching code.
+- **Questions,** asked only when the facts make them relevant: which apps or packages to plan for, whether to stop at an intermediate major, and whether to include changes that are only deprecated (still working on the target). The host agent asks the user, and the answers are recorded with the run.
+- **Scope only narrows.** Answers pick from the offered options. They can never widen the paths, the level or the commands. Anything excluded is listed with the reason, and an excluded change that breaks on the target is shown to the human first. With no answers (CI, or a non-interactive run), the defaults apply: full scope, at the computed size.
+
 **Output:** MIGRATION_PLAN.md plus plan.json made of structured findings (section 5). At L1, also per-stage patches and a verify report.
 
 **Design rule:** the mechanical rows go to deterministic code and wrapped codemods, retrieval rows go to Context7 plus a curated rule pack, and only the judgment rows use the model. The human sees the plan and the exceptions.
@@ -108,7 +114,7 @@ Finding {
 Pipeline, per run:
 
 ```
-Ingest -> Context build -> Specialist fan-out -> Aggregate -> Gates -> Emit -> (L1) Verify loop
+Ingest -> Context build -> Size and scope -> Specialist fan-out -> Aggregate -> Gates -> Emit -> (L1) Verify loop
                              | api agent
                              | dependency/build agent
                              | behavior/runtime agent
@@ -117,6 +123,7 @@ Ingest -> Context build -> Specialist fan-out -> Aggregate -> Gates -> Emit -> (
 
 1. **Ingest.** Validates input: path exists, source and target versions resolved from lockfiles (npm, pnpm, yarn, uv, poetry, pip requirements), git state clean or noted. Produces a run ID under a campaign and repo ID. Everything downstream is idempotent per run ID.
 2. **Context builder.** Deterministic. `scan_repo` and `find_usages` build the repo facts through the language adapter for each file: dependency graph, import graph, entrypoints, usage list with file:line. Stored in SQLite with a symbol index; no vector DB for v0.1.
+   - **Then size and scope** (section 2). `propose_scope` computes the size and the questions from the facts, and `set_scope` records the answers. Scope is frozen once planning starts. A `none` size skips the specialist fan-out, and a `small` size runs one combined lens instead of four. The gates run on every plan, whatever its size.
 3. **Specialist fan-out.** The `plan_migration` prompt instructs the host agent to work four lenses independently, each with its own evidence packet and narrow instruction: **API**, **Dependency/build**, **Behavior/runtime**, **Verification**. Each lens returns findings only in the schema above. Lenses do not see each other's output.
 4. **Aggregator.** `merge_findings` dedupes overlapping findings, resolves conflicts (take the higher severity and note it), groups findings into ordered stages (codemod steps first within a stage), and flags any usage with no covering finding.
 5. **Gates (deterministic critic).** `validate_plan` runs the hard checks in section 7. Failing findings go back to the agent with the exact failure. Cap at 3 rounds, then the plan is emitted with unresolved items marked, never silently passed.
@@ -146,6 +153,7 @@ The verify loop runs gate 7 on each L1 stage patch:
 
 - Confidence below 0.6 goes in a "needs human decision" section, not the main plan.
 - Any blocker or high severity finding with `agent_judgment` source is always shown to the human first.
+- Any usage the user's scope excluded, whose rule breaks on the target, is always shown to the human first.
 - Everything else is included in the plan.
 - The 0.6 threshold is a starting value. Tune it from eval results, not by feel.
 
@@ -210,6 +218,7 @@ Verified earlier against https://github.com/upstash/context7:
 **Rule packs: shape and trust model.**
 
 - A pack has a `kind`: `upgrade` (same library, from one version range to another) or `swap` (one library to another).
+- Each rule says whether it **breaks** on the target or is only **deprecated**, and whether its fix also works on the source version (`lands_on`). Sizing, scope questions and staging read these.
 - Packs are data (JSON plus markdown). No executable scripts, no network calls, no shell snippets. A pack may **reference** a codemod by its allowlist ID (for example `next-codemod:next-async-request-api`); the engine's core registry maps the ID to a pinned tool and arguments. Adding a codemod to the registry is a core change, reviewed as code.
 - Each pack has a version and a changelog. The plan records the pack version used, so a plan can be reproduced.
 - Only reviewed packs ship in the repo. Any change goes through a pull request and reruns the golden eval set.
@@ -263,6 +272,7 @@ Every tool is also a CLI command over the same engine function.
 | `get_rule_pack` | `pack` | Curated mappings, codemod references and known breaking changes (reports pack version) |
 | `get_migration_docs` | `docs` | Docs for both sides via Context7, with cache and retrieval log |
 | `assess_risk` | `risk` | Computed risk signals per usage (not LLM) |
+| `propose_scope`, `set_scope` | `scope` | Size the migration (`none`, `small`, `full`), propose scope questions from the facts, record the answers (narrowing only) |
 | `get_lens_packet`, `submit_findings` | (MCP only) | Lens evidence in, schema-checked findings out |
 | `merge_findings` | `merge` | Aggregate, dedupe, order into stages |
 | `validate_plan` | `validate` | Run gates 1 to 6, return per-finding pass or fail |
