@@ -19,7 +19,7 @@
    - `evidence[]`: `{repo_id, file, line_start, line_end, snippet_hash}`.
    - `doc_refs[]`: `{library, version, url, doc_id}`. `doc_id` is added so gate 3 is a lookup rather than a URL string match.
    - `reasoning`, `action`, `rollback` (optional in the schema; gate 4 enforces it for high and above), `verify` (text; at L0 never executed, and at L1 the verify loop runs the user's declared checks, not this text), `confidence` (0 to 1).
-   - `step_kind` enum: `codemod` or `manual`. When it is `codemod`, `codemod` must be an ID from the pack's `codemods[]` (M3), and the finding lists which usages the codemod is expected to change.
+   - `step_kind` enum: `codemod` or `manual`. When it is `codemod`, `codemod` must be a codemod ID listed by the rule's library (`library.json`, M3), and the finding lists which usages the codemod is expected to change.
    - `source` enum: `rule_pack`, `usage_scan`, `codemod`, `agent_judgment`.
    - Extra fields: `lens` (`api`, `dependency_build`, `behavior_runtime`, `verification`, or `combined` for a `small` run, M3), `rule_id?`, `usage_ids[]` (links to M2 usages; needed for gate 2), `docs_status` (`verified` or `unverified`, from M4), `prompt_version`.
    - A schema-level refinement rejects `source = agent_judgment` with empty `evidence` (PRD section 5).

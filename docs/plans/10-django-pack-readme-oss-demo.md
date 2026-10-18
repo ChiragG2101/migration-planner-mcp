@@ -24,18 +24,18 @@ It is a different language, package manager, test runner and project layout from
 
 Adding the pack may only touch:
 
-- `rules/django-upgrade/**`
+- `knowledge/pypi/django/**` and `packs/django-upgrade/**`
 - one new usage adapter `src/analysis/usages/django.ts`, registered with one line in `src/analysis/usages/index.ts`
 - eval cases and fixtures
 - docs
 
 The Python language adapter (M2), the text scanner (M2), the staging options (M6) and the `django-upgrade` codemod registry entry (M8) already exist, so none of them count as changes here.
 
-A CI check (`scripts/check-core-untouched.ts`) diffs the pack PR against the protected paths: `src/core/**`, `src/lang/**`, `src/pipeline/**`, `src/schema/**`, `src/security/**`, `src/store/**`, `src/verify/**` and `src/tools/**`, other than the registry line. It fails on any change. If the pack cannot be added without a core change, that is a design bug. Fix it in a separate, reviewed core PR **before** the pack PR, and record the fix in `docs/design.md`.
+A CI check (`scripts/check-core-untouched.ts`) diffs the pack PR against the protected paths: `src/core/**`, `src/lang/**`, `src/pipeline/**`, `src/rules/**` (loader, version schemes, composition), `src/schema/**` (including the match kinds), `src/security/**`, `src/store/**`, `src/verify/**` and `src/tools/**`, other than the registry line. It fails on any change. If the pack cannot be added without a core change, that is a design bug. Fix it in a separate, reviewed core PR **before** the pack PR, and record the fix in `docs/design.md`.
 
 ## Tasks
 
-1. **Django usage adapter (`src/analysis/usages/django.ts`).** It uses the M2 `UsageAdapter` interface, the Python adapter and the text scanner. The starting list below is a draft. **Every item is checked against the Django release notes and deprecation timeline for each version in the range, through Context7 (M4), before rules are written.**
+1. **Django usage adapter (`src/analysis/usages/django.ts`).** It uses the M2 `UsageAdapter` interface, the Python adapter and the text scanner. The starting list below is a draft. **Every item is checked against the official Django release notes and deprecation timeline for each feature release in the range (drafted with M3's release drafter) before rules are written.**
    - Settings: removed or renamed settings and changed defaults, read from the settings modules found by `scan_repo`, including settings split across files.
    - Dotted-path strings in settings (middleware, apps, backends, storages, authentication backends), followed through the `string_ref` edges from M2.
    - Imports of removed or moved modules and functions.
@@ -44,13 +44,12 @@ A CI check (`scripts/check-core-untouched.ts`) diffs the pack PR against the pro
    - Templates: removed or changed tags and filters, found with the text scanner and labelled `heuristic`.
    - Middleware, signals and management commands that override changed base-class methods.
    - Third-party Django apps whose declared support range excludes the target version, read from the lockfile and labelled `peer_conflict`.
-2. **Pack (`rules/django-upgrade/rules.json`, `CHANGELOG.md`, `references-src/`).**
-   - `kind: upgrade`, library `django`. The `from` and `to` ranges are one LTS to the next, fixed at the start of M10 against the current release, and recorded in the changelog with the date.
-   - `staging: config_first`, since settings changes usually have to land before the code that depends on them.
-   - Codemod reference: `django-upgrade` with the target version, listing which rules it covers.
-   - `doc_sources`: `https://docs.djangoproject.com/` and the docs folder of the official `django/django` repo.
+2. **Knowledge (`knowledge/pypi/django/`) and pack (`packs/django-upgrade/`).** Built entirely on M3's data model, version schemes and match kinds, with no core change.
+   - `library.json`: `version_scheme: pep440`, `release_unit: minor` (Django's X.Y feature releases), `lts[]` (the LTS releases), `covered_from`, `doc_sources` (`https://docs.djangoproject.com/` and the docs folder of the official `django/django` repo), `release_notes` (the per-release notes in the official repo, format `rst`, with the backwards-incompatible, removed and deprecated sections), and the `django-upgrade` codemod by registry ID.
+   - Release files for every feature release in the supported range, drafted from the official notes with `npm run knowledge:draft`, then completed and reviewed (`add-release-knowledge` skill). Django's deprecation timeline maps directly onto `deprecated` and `removed` events, so `necessity` and `lands_on` are derived, not typed in.
+   - `pack.json`: `kind: upgrade`, primary library `pypi/django`, `supported` spanning at least one LTS to the next (fixed at the start of M10 against the current release and recorded in the changelog with the date), `staging: config_first` (settings changes usually have to land before the code that depends on them).
    - `checks_hint`: the system check framework, a migrations check that fails if new migrations would be generated, and the test suite run with deprecation warnings treated as errors. These are hints the user copies into their own check config. The pack never runs them.
-   - Trigger: "Use when planning a Django major or LTS upgrade in a Python repo." Built with the M3 generator and lint. Mappings verified with `scripts/verify-pack-docs.ts`.
+   - Trigger: "Use when planning a Django major or LTS upgrade in a Python repo." Built with the M3 generator and lint. `npm run pack:report -- django-upgrade` runs against the live official notes, and its output is attached to the pack PR.
 3. **Django eval cases.**
    - Golden: at least 2 public Django upgrade PRs from the M0 list, with `checks` declared so M8 can run L1 on at least one.
    - Seeded: `eval/seeded/django-tricky/`, with:
@@ -62,7 +61,7 @@ A CI check (`scripts/check-core-untouched.ts`) diffs the pack PR against the pro
      - a custom field overriding a changed method
      - a dynamic `import_module`
      - existing-state cases, with the same `expect` labels as M2: an API deprecated before the source release, never cleaned up and removed inside the range [`change`]; an import from a private or undocumented Django module [`change`]; a module already in the target form [`no_change`]; and decoys, old-style code the target still supports [`no_finding`]
-   - The M3 lint applies unchanged: every Django rule needs a seeded case and a `lands_on` value. Many Django fixes are `lands_on: source`, because a deprecation can be cleared on the old version before the bump.
+   - The M3 lint applies unchanged: every reviewed Django rule reachable in the supported range needs a seeded case, and its match kind must be declared by the Django usage adapter. Many Django fixes come out `lands_on: source`, because the replacement usually exists a release or two before the removal.
    - Golden cases are picked for spread using the M7 coverage matrix (settings layout, monorepo or not, test runner, one LTS hop or more), not for count.
    - Recall is reported with the M2 recall script and ratcheted. Both packs appear in `eval/results.md`.
 4. **AGENTS.md snippet (separate core PR).**
@@ -118,7 +117,7 @@ A CI check (`scripts/check-core-untouched.ts`) diffs the pack PR against the pro
 
 ## Files and modules
 
-`src/analysis/usages/django.ts`, `src/analysis/usages/index.ts` (one registry line), `rules/django-upgrade/**`, `eval/cases/<django ids>/**`, `eval/seeded/django-tricky/**`, `scripts/check-core-untouched.ts`, `src/pipeline/agentsSnippet.ts`, plus `src/pipeline/ingest.ts`, `src/security/denyList.ts` and `src/verify/checks.ts` (separate PR), `examples/AGENTS.snippet.md`, `CONTRIBUTING.md`, `AI_POLICY.md`, `SECURITY.md`, `CODE_OF_CONDUCT.md`, `.github/ISSUE_TEMPLATE/*`, `plugin/**`, `README.md`, `docs/demo/{script.md,demo.gif}`, `test/unit/{djangoAdapter,agentsSnippet}.test.ts`, `test/permissions/{agents-snippet-cannot-widen,repo-checks-need-trust}.test.ts`.
+`src/analysis/usages/django.ts`, `src/analysis/usages/index.ts` (one registry line), `knowledge/pypi/django/**`, `packs/django-upgrade/**`, `eval/cases/<django ids>/**`, `eval/seeded/django-tricky/**`, `scripts/check-core-untouched.ts`, `src/pipeline/agentsSnippet.ts`, plus `src/pipeline/ingest.ts`, `src/security/denyList.ts` and `src/verify/checks.ts` (separate PR), `examples/AGENTS.snippet.md`, `CONTRIBUTING.md`, `AI_POLICY.md`, `SECURITY.md`, `CODE_OF_CONDUCT.md`, `.github/ISSUE_TEMPLATE/*`, `plugin/**`, `README.md`, `docs/demo/{script.md,demo.gif}`, `test/unit/{djangoAdapter,agentsSnippet}.test.ts`, `test/permissions/{agents-snippet-cannot-widen,repo-checks-need-trust}.test.ts`.
 
 ## Tests
 

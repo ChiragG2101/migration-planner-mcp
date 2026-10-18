@@ -19,7 +19,7 @@
 1. **Routing (`src/pipeline/routing.ts`).**
    - `threshold` comes from config (`--confidence-threshold`, default `0.6`). Its value and source are recorded per run.
    - Rules, in order:
-     1. `severity ∈ {high, blocker}` with `source = agent_judgment` goes to **"Review first"** at the very top, regardless of confidence. L1 stages whose patch is in `patches/needs-review/` (gate 7) also go here, with the gate 7 reason. So does every usage the user's scope excluded whose rule has `necessity: breaks` (M3), with the line "excluded by your scope, but this breaks on the target".
+     1. `severity ∈ {high, blocker}` with `source = agent_judgment` goes to **"Review first"** at the very top, regardless of confidence. L1 stages whose patch is in `patches/needs-review/` (gate 7) also go here, with the gate 7 reason. So does every usage the user's scope excluded whose rule has `necessity: breaks` (derived per run by M3's composition), with the line "excluded by your scope, but this breaks on the target".
      2. `confidence < threshold` goes to **"Needs human decision"**, not the main plan.
      3. Everything else goes into the main plan stages.
      4. "Docs unverified" findings (M4) get a visible badge wherever they land.

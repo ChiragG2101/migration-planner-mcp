@@ -37,14 +37,14 @@ Gates 1–6 run on the plan in `validate_plan`; gate 7 runs on each L1 stage pat
 
 - **INV-22:** A finding with `source = agent_judgment` and no evidence is rejected (not merely down-ranked). *(planned: `test/unit/finding-schema.test.ts` — M5)* — PRD §5
 - **INV-23:** Prompts are versioned files (`prompts/plan_migration.vN.md`); a released version is never overwritten, only a new version added. *(planned: `test/unit/prompt-versioning.test.ts` / lint — M5)*
-- **INV-24:** Rule-pack `SKILL.md` and `references/` are generated from `rules/<pack>/rules.json` with a "do not edit" banner; CI fails on drift. *(planned: `test/unit/pack-gen-drift.test.ts` / `npm run build:packs` check — M3)*
-- **INV-25:** Any change under `prompts/`, `rules/`, `src/pipeline/gates/` or `src/verify/` regenerates `eval/results.md` in the same change (the regression rule). *(planned: CI check — M7)*
+- **INV-24:** Pack `SKILL.md` and `references/` are generated from `packs/<pack>/pack.json` and the knowledge it uses, with a "do not edit" banner; CI fails on drift. *(planned: `test/unit/pack-gen-drift.test.ts` / `npm run build:packs` check — M3)*
+- **INV-25:** Any change under `prompts/`, `knowledge/`, `packs/`, `src/rules/`, `src/pipeline/gates/` or `src/verify/` regenerates `eval/results.md` in the same change (the regression rule). *(planned: CI check — M7)*
 - **INV-26:** The README says "currently building" until real eval numbers exist. *(planned: M10 review check)* — C8
 - **INV-27:** Adding a pack must not touch protected core paths. *(planned: `scripts/check-core-untouched.ts` — M10)*
 
 ## Coverage and staging (added after the M0 review; see `design.md` D5–D7)
 
-- **INV-28:** Every pack rule has a `lands_on` value and at least one `expect: change` seeded case, and every code-usage kind has an indirect seeded entry. *(planned: `scripts/lint-packs.ts`, `test/unit/lintPacks.test.ts` — M3)*
+- **INV-28:** Every reviewed rule reachable in a pack's supported range has at least one `expect: change` seeded case in that pack, and every code-usage kind has an indirect seeded entry. (Revised by D10: `lands_on` is derived, not a field.) *(planned: `scripts/lint-packs.ts`, `test/unit/lintPacks.test.ts` — M3)*
 - **INV-29:** No prep stage depends on the version-bump stage, and no `lands_on: target` finding (including any finding with no matched rule) is staged before it. *(planned: `src/pipeline/gates/g5-stage-order.ts`, `test/unit/gates/` `bad-g5` fixture — M6)*
 - **INV-30:** Eval headline metrics are computed from raw truth only. `annotations.json` entries add an adjusted figure and a "PR missed" list, never change the headline. *(planned: `test/unit/eval/` annotations test — M7)*
 - **INV-31:** A finding that proposes a change on a seeded `no_change` or `no_finding` entry counts as a false alarm. *(planned: `test/unit/eval/` seeded-precision test — M7)*
@@ -54,4 +54,13 @@ Gates 1–6 run on the plan in `validate_plan`; gate 7 runs on each L1 stage pat
 - **INV-32:** The size is `none` only when the scan is complete (no unparsed files, unresolved dynamic imports or size-limit skips), zero usages match a rule and no dependency has a peer conflict. A `none` plan still lists the pack's behaviour changes. *(planned: `test/unit/sizing.test.ts` — M3)*
 - **INV-33:** Scope only narrows. `set_scope` accepts only offered option IDs, cannot change the paths, the deny list, the level, the checks or `--out`, can only move `depth` toward `full`, and is refused once the first lens packet is fetched. *(planned: `test/permissions/scope-cannot-widen.test.ts`, `test/unit/scope.test.ts` — M3)* — C4, C5, C9
 - **INV-34:** Every usage the scope excluded, whose rule has `necessity: breaks`, appears in "Review first". *(planned: `test/unit/routing.test.ts` — M9)*
-- **INV-35:** Every doc a run uses records `fetched_by` and `official`. An agent-registered doc whose URL is outside the pack's `doc_sources` prefixes is never shown as verified, and findings citing only such docs carry the "docs unverified" badge. *(planned: `test/unit/docs/source-labels.test.ts` — M4)* — gate 3 support
+- **INV-35:** Every doc a run uses records `fetched_by` and `official`. An agent-registered doc whose URL is outside the `doc_sources` prefixes of the pack's libraries is never shown as verified, and findings citing only such docs carry the "docs unverified" badge. *(planned: `test/unit/docs/source-labels.test.ts` — M4)* — gate 3 support
+
+## Knowledge, composition and maintainer tools (see `design.md` D10, D11)
+
+- **INV-36:** Only `reviewed` rules load. Drafts are skipped and counted, never composed, sized or cited. *(planned: `test/unit/knowledge.test.ts`, loader test — M3)*
+- **INV-37:** For installed version S and target T, a rule applies only when it has an event in (S, T]. `necessity` and `lands_on` are derived from its events and `replacement_since`, never read from a field, and are identical for `semver` and `pep440` on equivalent inputs. *(planned: `test/unit/compose.test.ts` — M3)*
+- **INV-38:** Pre-release versions are refused at ingest and in composition. *(planned: `test/unit/versions.test.ts` — M3)*
+- **INV-39:** Every reviewed rule reachable in a pack's supported range uses a match kind the pack's usage adapter declares, and its `source` is under one of its library's `doc_sources`. *(planned: `scripts/lint-packs.ts`, `test/unit/lintPacks.test.ts` — M3)*
+- **INV-40:** Nothing under `src/` imports from `scripts/`, so maintainer tools that use the network stay outside the engine (C6). *(planned: import lint, `test/permissions/` — M3)* — C6
+- **INV-41:** Maintainer tools never commit a decision. The drafter only writes `draft` rules and never overwrites a reviewed one, and the golden-case finder only writes to `eval/.work/candidates/`. *(planned: `test/unit/` drafter and finder tests on recorded fixtures — M3, M7)*

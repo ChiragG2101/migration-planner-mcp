@@ -44,9 +44,9 @@ What we keep from the investigation:
 
 Why:
 
-- The architecture is explicitly *one core with thin adapters* (CLI, MCP server, generated skills) and *packs as data*, not as separately published code. The target source layout in the overview is already a single tree under `src/` with `rules/<pack>/` as data directories. A monorepo would add workspace tooling, cross-package versioning and release orchestration to buy separation the design does not need, because the adapters contain no logic and the packs are JSON/Markdown.
+- The architecture is explicitly *one core with thin adapters* (CLI, MCP server, generated skills) and *packs as data*, not as separately published code. The target source layout in the overview is already a single tree under `src/` with the data directories beside it (`rules/<pack>/` at the time; `knowledge/` and `packs/` since D10). A monorepo would add workspace tooling, cross-package versioning and release orchestration to buy separation the design does not need, because the adapters contain no logic and the packs are JSON/Markdown.
 - A single package is the lowest-friction `npx` target (overview "Package manager"), which is the same reason D1 lands on Node-over-npx. One package means one `npx <name>` entry point for both the CLI and the MCP config, one version to pin, one permissions audit surface.
-- "Pack as the unit of contribution" (`landscape.md`, open-source section) is satisfied by `rules/<pack>/` directories plus the "no core changes" check (`scripts/check-core-untouched.ts`, M10), not by separate packages. A contributor adds a directory and golden cases; they do not publish a package. CI eval is the reviewer.
+- "Pack as the unit of contribution" (`landscape.md`, open-source section) is satisfied by data directories (`knowledge/` and `packs/` since D10) plus the "no core changes" check (`scripts/check-core-untouched.ts`, M10), not by separate packages. A contributor adds a directory and golden cases; they do not publish a package. CI eval is the reviewer.
 
 Consequences:
 
@@ -79,6 +79,8 @@ Plan amendments made after the M0 review, to M2, M3, M6, M7 and M10. They answer
 
 **Decision: a pack's rules cover the removals of every release in its range, not only the target major. Each rule declares `lands_on: source | target`. The aggregator puts `source` fixes in prep stages before the version bump, and gate 5 checks that order. A finding with no matched rule defaults to `target`.**
 
+*Revised by D10:* `lands_on` is no longer typed into each rule. It is derived per run from the rule's `replacement_since` and the installed version.
+
 Why:
 
 - The commonest mandatory change in a long-lived repo is a deprecation the team ignored for years that the target finally removes. Django drops an API about two feature releases after deprecating it. Next.js and React do the same across majors. A pack that only reads the target's release notes misses exactly this debt.
@@ -109,6 +111,8 @@ Why:
 
 **Decision: after `scan_repo`, `find_usages`, `get_rule_pack` and `assess_risk`, the engine runs `propose_scope`. It sizes the migration as `none`, `small` or `full` from the facts and offers a few scope questions, only when the facts make them relevant. `set_scope` records the answers. Scope can only narrow, takes fixed options, and is frozen once planning starts. Rules gain `necessity: breaks | deprecated`. PRD sections 2, 6, 7, 9 and 11 are updated, along with M3, M5, M6 and M9.**
 
+*Revised by D10:* `necessity` is no longer typed into each rule. It is derived per run from the rule's events in the installed-to-target range.
+
 Why:
 
 - **Over-engineering small upgrades.** Running four lenses and gate rounds on an upgrade that touches no code is waste, and users would stop trusting the tool for big upgrades if it is slow on trivial ones. The engine already holds the facts to prove a migration is small, so sizing is a deterministic computation, not a model's guess.
@@ -125,8 +129,56 @@ What it costs: two tools, one rule field, a `combined` lens for `small` runs, an
 
 **Decision: every doc a run uses records `fetched_by` (`engine` or `agent`) and `official` (its URL falls under one of the pack's `doc_sources` prefixes). An agent-registered doc from outside those prefixes is `unverified`, and findings citing only such docs carry the "docs unverified" badge. Gate 3 itself is unchanged.**
 
+*Revised by D10:* `doc_sources` live in each library's `library.json`, not in the pack. A pack's official prefixes are those of its libraries.
+
 Why:
 
 - In the agent-side mode (the v0.1 default), the agent fetches a doc and hands the engine both the link and the text. Gate 3 then proves only that a doc was *registered* in this run, not that it is real or authoritative. Without labels, a doc from a random blog and one from nextjs.org look the same in the plan.
 - A prefix list per pack is a few lines that rarely change (a docs site and a repo folder). It is not a copy of the docs, so it adds almost no maintenance.
 - **Stated limit:** an official URL with made-up content can't be caught without fetching it. Only the server-side mode, where the engine fetches the doc itself, vouches for content. The run report says so rather than implying more.
+
+## 2026-10-18: how knowledge and packs are structured
+
+### D10 - Knowledge per library, kept by release; thin packs that compose it
+
+**Decision: replace the one-file-per-pack `rules/<pack>/rules.json` with two layers.**
+
+- **`knowledge/<ecosystem>/<library>/`** holds the facts. `library.json` gives the version scheme, release unit, LTS list, `covered_from`, official doc sources, release-notes location and codemods. There is one `releases/<release>.json` per release, which may be split by area when large.
+- **`packs/<pack>/pack.json`** names its libraries (a primary and companions), the checked range, the usage adapter, staging and trigger. It holds no rules.
+
+The engine composes the rules for any installed-to-target range at run time, and derives `necessity` and `lands_on` from each rule's events. Rules have typed matches and one official source link, and only `reviewed` rules load. Both version schemes (`semver`, `pep440`) and every match kind both v0.1 packs need are built in M3.
+
+Why:
+
+- **Ranges must compose.** A user on Next 13 going to 15 needs 14's changes and 15's. A fixed per-pack range forces either a pack per pair or rewriting the pack each release. Facts kept by release, composed at run time, cover every pair inside the checked range.
+- **Maintenance grows by appending.** A new release is one new file plus a pack version bump. Old release files only change to fix a mistake, recorded in the library changelog. That bounds the "never-ending maintenance" worry: work is per release of the framework, and finished releases stay finished.
+- **Libraries are shared.** React's changes are written once and used by any pack that needs them, instead of being copied into the Next.js pack.
+- **Fewer hand judgments.** Whether a change breaks on the target, and whether its fix can land before the upgrade, follow from when it was deprecated, removed and replaced. Deriving them removes two fields that were easy to get wrong (revising D5 and D8).
+- **Different ecosystems differ in data, not code.** Next.js counts majors, Django counts X.Y feature releases with LTS releases and a deprecation timeline. Both are expressed as a version scheme plus a release unit.
+- **No core change for pack 2.** The `pep440` scheme and the Python and Django match kinds (`attribute`, `setting`, `string_ref`, template tags and filters) are in M3, so M10's "no core changes" check can hold. `src/rules/**` is added to its protected paths.
+- **Thin, not a docs mirror.** Each rule stores one official link, not doc text. Live docs are still looked up at run time through Context7.
+
+Caveats accepted:
+
+- Composition and version comparison are new core logic. They are covered by table-driven tests on both schemes (inclusive and exclusive bounds, patch-level events, pre-release refusal).
+- Conditional peer requirements (Next 15's app router needs React 19, its pages router doesn't) are expressed as `peer_requirement` rules tied to a match. That is more complex than a flat list.
+- A user older than `covered_from` gets a "changes before X were not checked" note, and the size can't be `none`.
+- A future pack needing a new version scheme or match kind is a core change, reviewed as code. That is by design: packs are data and can't run code.
+
+### D11 - Maintainer tools that draft knowledge and find golden cases, with a human always deciding
+
+**Decision: four maintainer tools under `scripts/`, outside the engine:**
+
+- the **release drafter** (`knowledge:draft`, M3)
+- the **pack update report** (`pack:report`, M3), which replaces the planned Context7-based cross-check and the committed docs checklist
+- the **golden-case finder** (`cases:find`, M7)
+- the **case re-checker** (`cases:verify`, M7)
+
+They may use the network, never run in default CI, and `src/` never imports from `scripts/`. A test-example stub generator was considered and left out, because the useful seeded cases are the indirect ones, which need a person.
+
+Why:
+
+- **The slow, error-prone part of maintenance is mechanical.** That means reading release notes item by item, and checking a PR's licence, parentage and lockfile versions. The M0 golden-case review found errors in exactly these mechanical facts. Tools do them repeatably.
+- **Every tool stops at a human decision.** The drafter writes `draft` rules that don't load until reviewed. The finder writes candidates to a gitignored folder and never adds a case. The report is attached to the PR, not committed, so no doc checklist has to be maintained.
+- **No model in the tools (C7 in spirit).** The drafter and report split notes with a plain parser. The judgment part (writing the match, the fix, the severity) is done by the contributor's own agent with the `add-release-knowledge` skill, the same way the product uses the host agent.
+- **Official sources, not Context7, for the pack check.** Context7 snippets are community-contributed (PRD section 9). The pack's own correctness is checked against the primary source.

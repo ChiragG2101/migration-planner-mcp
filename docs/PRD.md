@@ -107,7 +107,8 @@ Finding {
      event spine (SQLite) · permissions (security/) · campaign and repo IDs
                                    │
        Language adapters   TS/JS (TypeScript compiler API) · Python (tree-sitter WASM)
-       Migration packs     rules.json · codemod references · verification recipe · golden cases
+       Knowledge           per library, one file per release: rules with events, typed matches, one official source link
+       Migration packs     pack.json (which libraries, how to plan) · codemod references · verification recipe · golden cases
        Wrapped tools       @next/codemod · django-upgrade · the user's own test, typecheck and lint commands
 ```
 
@@ -215,13 +216,18 @@ Verified earlier against https://github.com/upstash/context7:
 - **No scripts.** Skills are instructions only.
 - **Lint in CI.** A check fails the build if a skill has no trigger sentence, exceeds the length target, or has references that do not exist.
 
-**Rule packs: shape and trust model.**
+**Knowledge and packs: shape and trust model.**
 
-- A pack has a `kind`: `upgrade` (same library, from one version range to another) or `swap` (one library to another).
-- Each rule says whether it **breaks** on the target or is only **deprecated**, and whether its fix also works on the source version (`lands_on`). Sizing, scope questions and staging read these.
-- A pack lists the **official doc sources** for its libraries, as URL prefixes (the docs site and the docs folder of the official repo). Each doc the run uses is labelled with who fetched it (the engine, or the agent registering it) and whether it comes from an official source. A doc the agent registers from anywhere else is unofficial, and findings citing only such docs are marked "docs unverified". In the agent-side mode the engine can check where a doc *claims* to come from, not its content; only the server-side mode, where the engine fetches the doc itself, proves the content.
-- Packs are data (JSON plus markdown). No executable scripts, no network calls, no shell snippets. A pack may **reference** a codemod by its allowlist ID (for example `next-codemod:next-async-request-api`); the engine's core registry maps the ID to a pinned tool and arguments. Adding a codemod to the registry is a core change, reviewed as code.
-- Each pack has a version and a changelog. The plan records the pack version used, so a plan can be reproduced.
+The migration knowledge is in two layers, so it can grow by release without rewrites and be shared between packs:
+
+- **Knowledge, per library and kept by release** (`knowledge/<ecosystem>/<library>/`). `library.json` says how the library numbers its versions (`semver` or `pep440`, and whether a release unit is a major or an X.Y feature release), its LTS releases if any, where its official release notes and docs live, and its official codemods. One file per release holds the changes first made in that release, plus later events (for example "removed in 16") for changes made earlier. Release files only gain entries for their own release.
+- **Each rule** is a short fact, not a copy of the docs: what changed and when (deprecated, removed, behaviour or default changed, renamed, peer requirement), when the new form became available, a **typed match** saying what to look for (an import, a call, a setting, a config key, a template filter, a dependency, …), the fix, an optional codemod ID, and **one** official source link. Only rules marked `reviewed` are used.
+- **Packs are thin** (`packs/<pack>/pack.json`). A pack has a `kind`: `upgrade` (same library, from one version range to another) or `swap` (one library to another). It names its libraries (a primary, plus companions such as React for Next.js), the range it has been checked for, its usage adapter, staging and skill trigger. It holds no rules.
+- **Ranges are composed at run time.** For an installed version S and a target T, the engine takes every rule with an event in (S, T]. It then derives whether each **breaks** or is only **deprecated**, and whether its fix also works on S (`lands_on`). Sizing, scope questions and staging read these. Any S to T inside the pack's checked range works without a new pack. Version comparison and composition are core code, because packs can't run code.
+- **Maintainer tools keep the knowledge honest.** A release drafter turns a release's official notes into draft rules. A pack update report, run on every pack change, lists official items with no rule, dead source links, unreviewed drafts and rules with no seeded case. Both are outside the engine.
+- Each library lists its **official doc sources**, as URL prefixes (the docs site and the docs folder of the official repo). Each doc the run uses is labelled with who fetched it (the engine, or the agent registering it) and whether it comes from an official source. A doc the agent registers from anywhere else is unofficial, and findings citing only such docs are marked "docs unverified". In the agent-side mode the engine can check where a doc *claims* to come from, not its content; only the server-side mode, where the engine fetches the doc itself, proves the content.
+- Knowledge and packs are data (JSON plus markdown). No executable scripts, no network calls, no shell snippets. A rule may **reference** a codemod by its allowlist ID (for example `next-codemod:next-async-request-api`); the engine's core registry maps the ID to a pinned tool and arguments. Adding a codemod to the registry is a core change, reviewed as code.
+- Each pack and each library has a changelog, and each pack has a version. The plan records the pack version and a hash of the knowledge files it used, so a plan can be reproduced.
 - Only reviewed packs ship in the repo. Any change goes through a pull request and reruns the golden eval set.
 - README limit, stated plainly: a third-party pack installed by a user is outside the project's review. The engine prints the pack name and version at the start of every run. Third-party packs loaded from outside the repo are not supported in v0.1.
 
@@ -330,8 +336,10 @@ migration-planner-mcp/          (working name)
        schema/ finding.ts plan.ts rulePack.ts
        store/ (sqlite event spine, campaigns, repos)
        docs/ context7.ts cache.ts
-  rules/nextjs-upgrade/ (rules.json, SKILL.md, references/)
-  rules/django-upgrade/
+  knowledge/npm/next/ npm/react/ pypi/django/ (library.json, releases/*.json)
+  packs/nextjs-upgrade/ (pack.json, SKILL.md, references/)
+  packs/django-upgrade/
+  scripts/ (maintainer tools: pack build and lint, release drafter, pack update report, golden-case finder and re-checker; never imported by src/)
   prompts/ plan_migration.v1.md
   eval/ cases/ seeded/ baseline/ runner.ts results.md
   examples/ AGENTS.snippet.md

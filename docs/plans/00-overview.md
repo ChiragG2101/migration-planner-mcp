@@ -28,11 +28,11 @@ These come from PRD sections 1, 3 and 7A. A milestone that breaks one of them is
 | M0 | (this file, section below) | `docs/failure-modes.md`, `docs/invariants.md`, golden cases chosen for both packs | none |
 | M1 | [`01-engine-skeleton-scan-repo-permissions.md`](01-engine-skeleton-scan-repo-permissions.md) | Engine skeleton, CLI and MCP adapters, `scan_repo` (JS/TS and Python), event log with campaign and repo IDs, path boundary, read-only rule | M0 |
 | M2 | [`02-language-adapters-find-usages.md`](02-language-adapters-find-usages.md) | TS and Python language adapters, import graphs, `find_usages` for Next.js, usage index | M1 |
-| M3 | [`03-rule-pack-assess-risk-skill.md`](03-rule-pack-assess-risk-skill.md) | Pack schema, Next.js pack, `get_rule_pack`, `assess_risk`, sizing and scope (`propose_scope`, `set_scope`), generated skill | M2 |
+| M3 | [`03-rule-pack-assess-risk-skill.md`](03-rule-pack-assess-risk-skill.md) | Knowledge and pack schema (per-library releases, version schemes, range composition), Next.js knowledge and pack, `get_rule_pack`, `assess_risk`, sizing and scope (`propose_scope`, `set_scope`), generated skill, release drafter and pack update report | M1, M2 |
 | M4 | [`04-context7-docs-cache.md`](04-context7-docs-cache.md) | Context7 integration, retrieval log, cache | M1 (M3 for the fallback content) |
 | M5 | [`05-finding-schema-prompt-lenses.md`](05-finding-schema-prompt-lenses.md) | Finding schema, `plan_migration` prompt, four lenses | M2, M3, M4 |
 | M6 | [`06-merge-findings-validate-plan.md`](06-merge-findings-validate-plan.md) | `merge_findings`, `validate_plan` gates 1 to 6, emit | M5 |
-| M7 | [`07-eval-runner-golden-baseline.md`](07-eval-runner-golden-baseline.md) | Eval runner, 5 Next.js golden cases, baseline run | M6 |
+| M7 | [`07-eval-runner-golden-baseline.md`](07-eval-runner-golden-baseline.md) | Eval runner, 5 Next.js golden cases, baseline run, golden-case finder and re-checker | M6 |
 | M8 | [`08-sandboxed-verify-loop.md`](08-sandboxed-verify-loop.md) | Sandboxed verify loop (L1), codemod registry, gate 7 (test integrity), outcome metrics | M6, M7 |
 | M9 | [`09-confidence-feedback-report.md`](09-confidence-feedback-report.md) | Confidence routing, `record_feedback`, run report | M6, M7, M8 |
 | M10 | [`10-django-pack-readme-oss-demo.md`](10-django-pack-readme-oss-demo.md) | Django pack (no core changes), README, open-source files, plugin bundle, demo, name decided | M3, M7, M8, M9 |
@@ -100,7 +100,8 @@ src/
   schema/                   # finding.ts, plan.ts, rulePack.ts, events.ts, verify.ts
   store/                    # db.ts, migrations/, campaigns.ts, events.ts, usages.ts, docs.ts
   docs/                     # context7.ts, cache.ts
-rules/<pack>/               # rules.json (source of truth), CHANGELOG.md, generated SKILL.md, references/
+knowledge/<ecosystem>/<library>/   # library.json, CHANGELOG.md, releases/<release>.json (facts per release; source of truth)
+packs/<pack>/               # pack.json (which libraries, how to plan), CHANGELOG.md, generated SKILL.md, references/
 prompts/                    # plan_migration.v1.md (+ later versions, never overwritten)
 eval/                       # cases/, seeded/, baseline/, runner.ts, results.md
 examples/AGENTS.snippet.md
