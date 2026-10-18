@@ -49,8 +49,9 @@ Gates 1–6 run on the plan in `validate_plan`; gate 7 runs on each L1 stage pat
 - **INV-30:** Eval headline metrics are computed from raw truth only. `annotations.json` entries add an adjusted figure and a "PR missed" list, never change the headline. *(planned: `test/unit/eval/` annotations test — M7)*
 - **INV-31:** A finding that proposes a change on a seeded `no_change` or `no_finding` entry counts as a false alarm. *(planned: `test/unit/eval/` seeded-precision test — M7)*
 
-## Sizing and scope (see `design.md` D8)
+## Sizing, scope and doc sources (see `design.md` D8, D9)
 
 - **INV-32:** The size is `none` only when the scan is complete (no unparsed files, unresolved dynamic imports or size-limit skips), zero usages match a rule and no dependency has a peer conflict. A `none` plan still lists the pack's behaviour changes. *(planned: `test/unit/sizing.test.ts` — M3)*
 - **INV-33:** Scope only narrows. `set_scope` accepts only offered option IDs, cannot change the paths, the deny list, the level, the checks or `--out`, can only move `depth` toward `full`, and is refused once the first lens packet is fetched. *(planned: `test/permissions/scope-cannot-widen.test.ts`, `test/unit/scope.test.ts` — M3)* — C4, C5, C9
 - **INV-34:** Every usage the scope excluded, whose rule has `necessity: breaks`, appears in "Review first". *(planned: `test/unit/routing.test.ts` — M9)*
+- **INV-35:** Every doc a run uses records `fetched_by` and `official`. An agent-registered doc whose URL is outside the pack's `doc_sources` prefixes is never shown as verified, and findings citing only such docs carry the "docs unverified" badge. *(planned: `test/unit/docs/source-labels.test.ts` — M4)* — gate 3 support

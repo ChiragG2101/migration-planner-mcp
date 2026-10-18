@@ -21,10 +21,15 @@ Both modes fall back in the same order: the fresh cache, then the stale cache (m
 
 1. **Store (`src/store/docs.ts`, migration `003_docs.sql`).** Tables:
    - `doc_cache(doc_id, library, version, topic, url, content, fetched_at, source)`: global across runs and keyed by library@version so it can be reused offline.
-   - `run_docs(run_id, doc_id, mode, status)`: per-run and used by gate 3, where status is `fresh`, `stale` or `unverified`.
+   - `run_docs(run_id, doc_id, mode, status, fetched_by, official)`: per-run and used by gate 3, where status is `fresh`, `stale` or `unverified`. `fetched_by` is `engine` (server-side mode) or `agent` (registered by the agent). `official` says whether the URL falls under one of the pack's `doc_sources` (M3).
 2. **`get_migration_docs` (`src/core/getMigrationDocs.ts`, tool `src/tools/getMigrationDocs.ts`, CLI `docs`).**
    - Accepts `register` (agent-side) or `query` (server-side), and returns formatted snippets with `doc_id`, `url`, `library`, `version` and `status`.
    - Formats the output for compact context: a per-symbol section with the old side and the new side.
+   - **Labels where each doc came from** (`docs/design.md` D9):
+     - Every registered doc gets `fetched_by: agent`, and every doc the engine fetches gets `fetched_by: engine`.
+     - `official` is computed by normalising the URL (lowercase scheme and host, no credentials, no default port, `..` resolved) and checking it starts with one of the pack's `doc_sources` prefixes. So `https://nextjs.org.evil.com/`, `http://nextjs.org/docs/` and `https://github.com/vercel/next.js-fork/` are not official.
+     - A doc with `fetched_by: agent` and `official: false` is stored with status `unverified`. Findings that cite only such docs get the "docs unverified" badge (task 5), so they stay citable but are never presented as checked.
+     - What this does not prove: in the agent-side mode, an official URL with content the agent made up can't be detected without fetching. The report says this. The server-side mode is the only one in which the engine vouches for content.
    - Version pinning: it refuses a register or query whose version does not match the versions resolved at ingest (major.minor). For an `upgrade` pack, the valid versions are the installed `from` version, the target version, and any intermediate majors the pack lists (upgrade guides are per major, and a jump across two majors needs both). The error tells the agent the expected versions (failure matrix: stale version).
    - Libraries per run come from the pack: for the Next.js pack that is `next`, `react` and `react-dom`; for the Django pack (M10), `django`.
 3. **Context7 client (`src/docs/context7.ts`, stretch).**
@@ -43,6 +48,7 @@ Both modes fall back in the same order: the fresh cache, then the stale cache (m
 ## Tests
 
 - **Registration:** registered docs get stable `doc_id`s, and re-registering is idempotent.
+- **Source labels (`test/unit/docs/source-labels.test.ts`):** a registered doc gets `fetched_by: agent`, and an engine-fetched one gets `fetched_by: engine`. URLs under a `doc_sources` prefix are `official`. Look-alike hosts, `http://`, credentials in the URL, a sibling repo (`next.js-fork`) and a `..` path that climbs out of the prefix are all `official: false`. An agent-registered unofficial doc is `unverified`, and a finding citing only such docs carries the badge.
 - **Version pin:** for a Next.js upgrade from major N to N+1, registering docs for N-1 is rejected with the expected versions in the message, while docs for N and N+1 are accepted. An intermediate major is accepted only if the pack lists it.
 - **Fallback matrix (`test/unit/docs/fallback.test.ts`):** using a fake transport, it covers Context7 up, timeout, 429, offline, unconfigured, cache-fresh, cache-stale and empty cache. Each gives the expected status and fallback event. **This is the milestone's "done when" test.**
 - **Network:** no outbound calls when unconfigured. Calling a non-allowlisted host throws. The outbound payload contains only `library`, `version` and `symbol`.
@@ -52,6 +58,7 @@ Both modes fall back in the same order: the fresh cache, then the stale cache (m
 
 - With Context7 unreachable, a full `scan_repo` → `find_usages` → `get_rule_pack` → `get_migration_docs` sequence completes. Docs come back marked `stale` or `docs_unverified`, and a `docs.fallback` event is recorded.
 - Every doc returned to the agent has a `doc_id` present in `run_docs` for that run.
+- Every doc in `run_docs` has `fetched_by` and `official`. No agent-registered doc from outside the pack's `doc_sources` is ever shown as verified.
 - No network traffic happens without explicit configuration (verified by test).
 
 ## Risks

@@ -48,6 +48,7 @@ A CI check (`scripts/check-core-untouched.ts`) diffs the pack PR against the pro
    - `kind: upgrade`, library `django`. The `from` and `to` ranges are one LTS to the next, fixed at the start of M10 against the current release, and recorded in the changelog with the date.
    - `staging: config_first`, since settings changes usually have to land before the code that depends on them.
    - Codemod reference: `django-upgrade` with the target version, listing which rules it covers.
+   - `doc_sources`: `https://docs.djangoproject.com/` and the docs folder of the official `django/django` repo.
    - `checks_hint`: the system check framework, a migrations check that fails if new migrations would be generated, and the test suite run with deprecation warnings treated as errors. These are hints the user copies into their own check config. The pack never runs them.
    - Trigger: "Use when planning a Django major or LTS upgrade in a Python repo." Built with the M3 generator and lint. Mappings verified with `scripts/verify-pack-docs.ts`.
 3. **Django eval cases.**

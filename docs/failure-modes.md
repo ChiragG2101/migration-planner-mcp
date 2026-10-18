@@ -25,6 +25,7 @@ Rows found during the build go here, newest first.
 
 | Component | Engineering failures | LLM failures | Design response | Test or check |
 | --- | --- | --- | --- | --- |
+| Docs retrieval | A look-alike host or a forked repo passes as official | Agent registers a doc from an unofficial site, or one it never fetched | Label `fetched_by` and `official` from the pack's `doc_sources`; content is vouched for only in server-side mode (D9) | Source-label tests, including look-alike hosts (INV-35, M4) |
 | Size and scope | The full process runs on an upgrade that touches no code (over-engineering) | n/a | Sizing from the facts: `none`, `small`, `full` (D8) | `next-clean` sizes as `none` (M3) |
 | Size and scope | `none` given wrongly: the scan missed files, or a behaviour change has no matching code | n/a | `none` needs a complete scan and no peer conflicts; behaviour changes are always listed (D8) | Each `none` condition flips the verdict when broken (INV-32, M3) |
 | Size and scope | n/a | Agent uses scope to drop items that fail a gate, or invents scope options | Fixed options only; frozen at the first lens packet; excluded breaking items go to "Review first" (D8) | `scope-cannot-widen` permissions test; routing test (INV-33, INV-34, M3, M9) |

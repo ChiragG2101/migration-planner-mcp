@@ -67,6 +67,10 @@ Consequences and the standing follow-up:
 - This makes M0's ≥2 Django minimum met with one strict LTS→LTS (`ror-api`) and one to-LTS (`thunderstore`). It is a widening of the plan's wording, recorded here per working-rule 2 ("decisions you make go in `docs/design.md`").
 - **Follow-up, not optional:** before M7 derives truth and M10 locks the Django pack scope, add a *second genuine LTS→LTS* case (another 3.2 → 4.2, or a 4.2 → 5.2). Tracked in `eval/cases/README.md` "Open items". If the maintainer prefers strict LTS→LTS only for M0, that is a scope call to raise now rather than silently.
 
+### Confirmation of the overview defaults
+
+Reviewing the above did not change any standing default in [`plans/00-overview.md`](plans/00-overview.md). Confirmed as-is for M1: Node 22 LTS / TypeScript strict / ESM runtime; core-plus-adapters engine shape; official MCP TS SDK v2 over stdio (pin the exact version, re-check at each milestone); `node:sqlite` with a `better-sqlite3` fallback; the TypeScript compiler API for TS/JS; tree-sitter WASM for Python; Zod schemas; Vitest; ESLint with the fs-write / `child_process` import restriction; npm; Apache-2.0; working name `migration-planner-mcp`.
+
 ## 2026-10-18: coverage and the existing state of the target repo
 
 Plan amendments made after the M0 review, to M2, M3, M6, M7 and M10. They answer two questions: how a few golden cases can give real coverage, and how the engine treats bad practices already in the target repo.
@@ -115,6 +119,14 @@ Why:
 
 What it costs: two tools, one rule field, a `combined` lens for `small` runs, and an engine-built plan for `none` runs. The four-lens path is unchanged.
 
-### Confirmation of the overview defaults
+## 2026-10-18: where docs come from
 
-Reviewing the above did not change any standing default in [`plans/00-overview.md`](plans/00-overview.md). Confirmed as-is for M1: Node 22 LTS / TypeScript strict / ESM runtime; core-plus-adapters engine shape; official MCP TS SDK v2 over stdio (pin the exact version, re-check at each milestone); `node:sqlite` with a `better-sqlite3` fallback; the TypeScript compiler API for TS/JS; tree-sitter WASM for Python; Zod schemas; Vitest; ESLint with the fs-write / `child_process` import restriction; npm; Apache-2.0; working name `migration-planner-mcp`.
+### D9 - Label who fetched each doc and whether it is official
+
+**Decision: every doc a run uses records `fetched_by` (`engine` or `agent`) and `official` (its URL falls under one of the pack's `doc_sources` prefixes). An agent-registered doc from outside those prefixes is `unverified`, and findings citing only such docs carry the "docs unverified" badge. Gate 3 itself is unchanged.**
+
+Why:
+
+- In the agent-side mode (the v0.1 default), the agent fetches a doc and hands the engine both the link and the text. Gate 3 then proves only that a doc was *registered* in this run, not that it is real or authoritative. Without labels, a doc from a random blog and one from nextjs.org look the same in the plan.
+- A prefix list per pack is a few lines that rarely change (a docs site and a repo folder). It is not a copy of the docs, so it adds almost no maintenance.
+- **Stated limit:** an official URL with made-up content can't be caught without fetching it. Only the server-side mode, where the engine fetches the doc itself, vouches for content. The run report says so rather than implying more.

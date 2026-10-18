@@ -41,7 +41,7 @@
    - size and scope: the computed size with its reasons, each scope question with its answer (marked when it was a default), and the usages each answer excluded
    - coverage (usages found, covered, out of scope with reasons, uncovered)
    - unparsed and skipped files
-   - docs status (fresh, stale or unverified counts, and fallback events)
+   - docs status (fresh, stale or unverified counts, and fallback events), split by `fetched_by` (engine or agent) and `official` (M4), with the plain note that agent-registered docs are checked for source, not content
    - gate results per round
    - **verify (only when L1 ran):** the baseline results, per-stage decision and attempts, checks with durations, gate 7 results, flaky checks, every command run with its exit code, the steps that used the network, and the exact `git apply` command for the kept patches
    - what was dropped and why (dedupe merges, lens gaps, budget cuts)

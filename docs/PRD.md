@@ -219,6 +219,7 @@ Verified earlier against https://github.com/upstash/context7:
 
 - A pack has a `kind`: `upgrade` (same library, from one version range to another) or `swap` (one library to another).
 - Each rule says whether it **breaks** on the target or is only **deprecated**, and whether its fix also works on the source version (`lands_on`). Sizing, scope questions and staging read these.
+- A pack lists the **official doc sources** for its libraries, as URL prefixes (the docs site and the docs folder of the official repo). Each doc the run uses is labelled with who fetched it (the engine, or the agent registering it) and whether it comes from an official source. A doc the agent registers from anywhere else is unofficial, and findings citing only such docs are marked "docs unverified". In the agent-side mode the engine can check where a doc *claims* to come from, not its content; only the server-side mode, where the engine fetches the doc itself, proves the content.
 - Packs are data (JSON plus markdown). No executable scripts, no network calls, no shell snippets. A pack may **reference** a codemod by its allowlist ID (for example `next-codemod:next-async-request-api`); the engine's core registry maps the ID to a pinned tool and arguments. Adding a codemod to the registry is a core change, reviewed as code.
 - Each pack has a version and a changelog. The plan records the pack version used, so a plan can be reproduced.
 - Only reviewed packs ship in the repo. Any change goes through a pull request and reruns the golden eval set.
