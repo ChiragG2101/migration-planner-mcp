@@ -4,11 +4,13 @@ Instructions for coding agents working in this repository (Claude Code, Codex, C
 
 ## Current state
 
-**Planning stage only. There is no code, `package.json` or test setup yet.** The repo holds the spec and per-milestone plans:
+**Pre-code: M0 done, no `package.json` or test setup yet.** M0 (spine docs and golden cases) is complete; code starts at M1. The repo holds the spec, the per-milestone plans, the spine docs and the golden-case records:
 
 - `docs/PRD.md`: the product requirements and build spec. This is the source of truth.
 - `docs/plans/00-overview.md`: the cross-cutting constraints (C1 to C10), the tech decisions, the per-milestone gates, the cut order and the target source layout.
 - `docs/plans/01-...` to `10-...`: one plan per milestone (M1 to M10). Each lists scope, tasks, files, tests, acceptance criteria and "must not break". M0 and M11 live in the overview.
+- `docs/design.md`, `docs/invariants.md`, `docs/failure-modes.md`: the spine docs (M0). Invariants name *planned* test paths until the owning milestone adds the code and test.
+- `plan.md`: the milestone checklist index. `eval/cases/`: the golden-case records (M0); base commits are pinned, truth is derived from M7.
 
 Before you implement a milestone, read its plan file and the overview. Don't invent commands or files the plans don't describe. When you add tooling, update this file with the real commands.
 
