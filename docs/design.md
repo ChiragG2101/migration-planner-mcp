@@ -205,7 +205,7 @@ Why:
 **Decision:**
 
 - A `peer_requirement` rule carries `requires {library, range}`. A companion is composed to the lowest version that satisfies every `requires` in range, and conditional requirements are applied too, with a note when their match finds nothing.
-- The pack's `supported` range bounds a run. A target newer than `supported.to` is refused at ingest. An installed version older than `supported.from` gets a note, and the size can't be `none`. Pre-releases are refused at ingest as well as in composition.
+- The pack's `supported` range bounds a run. Both bounds are compared by release unit, so `5.2.7` counts as `5.2` and `15.3.2` as `15`, and a patch release of a checked release unit is accepted. A target whose release unit is newer than `supported.to` is refused at ingest. An installed version whose release unit is older than `supported.from` gets a note, and the size can't be `none`. Pre-releases are refused at ingest as well as in composition.
 - `pack.json` names its seeded repo (`seeded`), and the lint reads that repo's `ground_truth.json`.
 - The display-text fields that may look like commands are `verify_hint` and `rollback_hint` in rules, and `checks_hint` in packs.
 
@@ -214,6 +214,7 @@ Why:
 - Composition had to find "the version the primary's peer requirements demand", but no field held it. A rule's single `match` says *where* a requirement applies; `requires` says *what* it requires.
 - Applying a conditional requirement even when its match finds nothing errs toward flagging (PRD section 3). Skipping it could hide a needed React upgrade behind a file the scan missed.
 - Nothing said what happens when the target is newer than the pack has been checked for, which is the usual case right after a new major ships. Refusing is honest. Composing anyway would give a plan built on knowledge that nobody has written yet.
+- Comparing raw versions would refuse almost every real target, because `supported` is written in release units and real targets carry a patch number (`5.2.7` is newer than `5.2`). Patch releases don't get their own release file, so the release unit is the right grain.
 - INV-38 promised refusal at ingest, but no milestone touched ingest for it. M3 now does.
 - The lint and the skills disagreed about where a pack's seeded repo lives (`eval/seeded/<pack>/` vs `next-tricky`). An explicit field removes the guess.
 - A rollback hint such as "pin next@14 again" reads like a command. Without the exemption, the lint would reject honest rules.
