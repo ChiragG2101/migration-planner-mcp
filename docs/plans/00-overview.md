@@ -93,11 +93,12 @@ src/
   server.ts                 # MCP stdio adapter: tool/prompt/resource registration
   tools/                    # one file per MCP tool; thin, validate input -> call core
   lang/                     # ts/ (TypeScript compiler API), python/ (tree-sitter WASM); one LanguageAdapter interface
-  analysis/                 # scanner, usage adapters per pack, risk signals (deterministic)
+  analysis/                 # scanner, usage adapters per pack, risk signals, sizing (deterministic)
+  rules/                    # loader.ts, versions.ts, compose.ts (knowledge loading, version schemes, range composition)
   pipeline/                 # ingest.ts, packets.ts, aggregate.ts, gates/*.ts, emit.ts, routing.ts, report.ts
   verify/                   # sandbox.ts, loop.ts, testIntegrity.ts (gate 7), codemods.ts (registry)
   security/                 # pathBoundary.ts, denyList.ts, level.ts, safeWrite.ts, exec.ts, network.ts
-  schema/                   # finding.ts, plan.ts, rulePack.ts, events.ts, verify.ts
+  schema/                   # finding.ts, plan.ts, knowledge.ts, pack.ts, match.ts, scope.ts, events.ts, verify.ts
   store/                    # db.ts, migrations/, campaigns.ts, events.ts, usages.ts, docs.ts
   docs/                     # context7.ts, cache.ts
 knowledge/<ecosystem>/<library>/   # library.json, CHANGELOG.md, releases/<release>.json (facts per release; source of truth)

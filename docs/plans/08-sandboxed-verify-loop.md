@@ -94,7 +94,7 @@
   - `exec-cwd-outside-sandbox-refused`: a `cwd` of the source repo, the out dir root or `/tmp` does not type-check, and a forced cast is caught at runtime.
   - `command-from-tool-arg-refused`: tool input schemas reject any `command`, `argv` or `script` field, and a static test asserts that no tool schema has a free-text field that reaches `exec.ts`.
   - `unlisted-argv-refused`: an argv that is not a configured check, a registry codemod or an allowed git operation is refused, and so is a configured check with an extra argument appended.
-  - `unlisted-codemod-refused`: a pack or finding naming an unknown codemod ID is refused.
+  - `unlisted-codemod-refused`: a knowledge rule or finding naming an unknown codemod ID is refused.
   - `env-scrubbed`: with `GITHUB_TOKEN` and `AWS_SECRET_ACCESS_KEY` set in the parent, a fixture check that prints its environment shows neither.
   - `source-repo-untouched`: the source repo hash, including `.git/index`, is identical after a full L1 run (clone, dirty check, three stages, a rollback).
   - `source-hooks-not-run`: a `post-checkout` hook planted in the fixture's `.git/hooks` does not run during clone or any sandbox git operation.
@@ -131,7 +131,7 @@
 
 ## Dependencies
 
-- M6 (validated, staged plans and the shared gate interface), M7 (the eval runner and golden cases), M1 (security layer and level), M2 (language adapters for counting tests), M3 (codemod IDs in packs).
+- M6 (validated, staged plans and the shared gate interface), M7 (the eval runner and golden cases), M1 (security layer and level), M2 (language adapters for counting tests), M3 (codemod IDs in the knowledge, and the ID list in `src/verify/codemodIds.ts`).
 
 ## Must not break
 

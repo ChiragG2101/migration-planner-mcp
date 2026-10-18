@@ -55,7 +55,7 @@ The problem is not producing output, it is deciding which findings are worth a h
 
 ## 4. Scope
 
-**The engine is general; packs are specific.** The engine (run state, plan schema, gates, verify loop, eval, permissions) knows nothing about any one framework. Each migration is a pack: rules, codemod references, verification recipe and golden cases.
+**The engine is general; packs are specific.** The engine (run state, plan schema, gates, verify loop, eval, permissions) knows nothing about any one framework. Each migration is a pack: a thin `pack.json` over per-library knowledge (the rules, kept by release, with their codemod references), a verification hint and golden cases.
 
 Migrations come in four kinds, each checked differently:
 
@@ -107,8 +107,8 @@ Finding {
      event spine (SQLite) · permissions (security/) · campaign and repo IDs
                                    │
        Language adapters   TS/JS (TypeScript compiler API) · Python (tree-sitter WASM)
-       Knowledge           per library, one file per release: rules with events, typed matches, one official source link
-       Migration packs     pack.json (which libraries, how to plan) · codemod references · verification recipe · golden cases
+       Knowledge           per library, one file per release: rules with events, typed matches, codemod IDs, one official source link
+       Migration packs     pack.json (which libraries, how to plan) · verification hint · golden cases
        Wrapped tools       @next/codemod · django-upgrade · the user's own test, typecheck and lint commands
 ```
 
@@ -148,7 +148,7 @@ Ingest -> Context build -> Size and scope -> Specialist fan-out -> Aggregate -> 
 
 The verify loop runs gate 7 on each L1 stage patch:
 
-7. **Test integrity.** Compared with the sandbox before the stage, the patch must not reduce the number of test cases or assertions, add skip, only, todo or xfail markers, delete test files or snapshots, or lower coverage thresholds. A stage that needs one of these changes goes to "Review first" with the reason, never into a kept patch silently.
+7. **Test integrity.** Compared with the sandbox before the stage, the patch must not reduce the number of test cases or assertions, add skip, only, todo or xfail markers, delete test files or snapshots, lower coverage thresholds, or edit the files that define the declared checks. A stage that needs one of these changes goes to "Review first" with the reason, never into a kept patch silently.
 
 ### Confidence routing
 
@@ -208,7 +208,7 @@ Verified earlier against https://github.com/upstash/context7:
 
 **Composition:** v0.1 is agent-side (the plan prompt tells the host agent to call Context7 for each distinct API symbol; `get_migration_docs` is a cache and formatter that records which docs were retrieved, so gate 3 can check citations). Stretch: the engine calls Context7 as an MCP client.
 
-**Skills.** One SKILL.md per pack, generated from the same file as the rule pack so they cannot drift.
+**Skills.** One SKILL.md per pack, generated from the pack and the knowledge it uses, so they cannot drift.
 
 - **Narrow trigger.** The description says exactly when to use it: "Use when planning a Next.js major version upgrade in a TypeScript or JavaScript repo". Never "use when working with React".
 - **Short body.** Target under about 100 lines: the steps, the tool order, the output contract. No API tables inline.
@@ -307,11 +307,11 @@ Write the design, break it into milestones with a written definition of done, an
 | M0 | Failure matrix and invariants written, golden cases chosen (Next.js and Django) | Files exist, cases listed with base commits |
 | M1 | Engine skeleton with CLI and MCP adapters, scan_repo (JS/TS and Python), event log with campaign and repo IDs, path boundary, read-only rule | Works from the CLI, Claude Code and Cursor; permissions tests pass; run recorded |
 | M2 | Language adapters (TS, Python), import graphs, find_usages for Next.js, usage index | Recall on the seeded-defect repo reported |
-| M3 | Rule pack schema, Next.js pack, get_rule_pack, assess_risk, generated skill | Pack and SKILL.md generated from one source; skill lint passes |
+| M3 | Knowledge and pack schema, Next.js knowledge and pack, get_rule_pack, assess_risk, sizing and scope, generated skill, release drafter and pack update report | SKILL.md and references generated from the pack and its knowledge; composition tested on both version schemes; skill and pack lint passes |
 | M4 | Context7 integration, retrieval log, cache | Works with Context7 down (fallback tested) |
 | M5 | Finding schema, plan_migration prompt, lenses | Valid findings on one real repo |
 | M6 | merge_findings, validate_plan gates 1 to 6, emit | Bad plans are rejected for each gate type |
-| M7 | Eval runner, 5 Next.js golden cases, baseline run | eval/results.md published |
+| M7 | Eval runner, 5 Next.js golden cases, baseline run, golden-case finder and re-checker | eval/results.md published |
 | M8 | Sandboxed verify loop (L1), codemod registry, gate 7 | Permissions tests for execution pass; weakened-test fixtures are all rejected |
 | M9 | Confidence routing, record_feedback, run report | Needs-human section works; report traces to events |
 | M10 | Django pack (no core changes), README, open-source files, demo, name decided | Pack added with no core changes; README states limits |
@@ -333,7 +333,8 @@ migration-planner-mcp/          (working name)
        pipeline/ (ingest, packets, aggregate, gates, emit, routing, report)
        verify/ (sandbox, stage loop, test integrity, codemod registry)
        security/ (path boundary, deny list, level, safe write, exec, network)
-       schema/ finding.ts plan.ts rulePack.ts
+       rules/ (knowledge loader, version schemes, range composition)
+       schema/ finding.ts plan.ts knowledge.ts pack.ts match.ts
        store/ (sqlite event spine, campaigns, repos)
        docs/ context7.ts cache.ts
   knowledge/npm/next/ npm/react/ pypi/django/ (library.json, releases/*.json)

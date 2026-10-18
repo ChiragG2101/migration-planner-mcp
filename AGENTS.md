@@ -45,7 +45,7 @@ Skills live in `.agents/skills/` (see `.agents/README.md`). Claude Code users ru
 
 ## What is being built
 
-A local-first **migration engine plus migration packs**. The engine is general (run state, plan schema, gates, verify loop, eval, permissions). Each migration is a pack: rules, codemod references, a verification hint and golden cases. Pack 1 is a **Next.js major upgrade**; pack 2 is a **Django LTS to LTS upgrade**, there to prove the engine works for a second language without core changes. The working name is `migration-planner-mcp`; the final name is chosen in M10.
+A local-first **migration engine plus migration packs**. The engine is general (run state, plan schema, gates, verify loop, eval, permissions). Each migration is a pack: a thin `pack.json` over per-library knowledge (the rules, kept by release, with their codemod references), a verification hint and golden cases. Pack 1 is a **Next.js major upgrade**; pack 2 is a **Django LTS to LTS upgrade**, there to prove the engine works for a second language without core changes. The working name is `migration-planner-mcp`; the final name is chosen in M10.
 
 Delivery layers: a core library in `src/core/`, with thin adapters over it: a CLI (`src/cli/`), a stdio MCP server (`src/server.ts`, `src/tools/`), and generated skills. Adapters contain no logic. The host agent (Claude Code, Cursor) is the LLM; the engine is deterministic and never uses MCP sampling or an LLM SDK.
 
@@ -73,7 +73,7 @@ These are enforced in code, not in prose. A change that breaks one of them is wr
 ## Architecture rules that span files
 
 - **Language adapters** (`src/lang/`) share one `LanguageAdapter` interface: TS/JS through the TypeScript compiler API, and Python through tree-sitter WASM (no native build, no subprocess). A line-based text scanner covers templates and config. **Usage adapters** (`src/analysis/usages/`) are per pack and registered with one line.
-- **Pack-specific behaviour is pack data, not core code:** which lens gets which usage kind, the staging strategy (`leaf_first` or `config_first`), and codemod references. Adding a pack must not touch protected core paths; `scripts/check-core-untouched.ts` enforces this from M10.
+- **Pack-specific behaviour is data, not core code:** which lens gets which usage kind and the staging strategy (`leaf_first` or `config_first`) live in `pack.json`, and codemod references live in the knowledge. Adding a pack must not touch protected core paths; `scripts/check-core-untouched.ts` enforces this from M10.
 - **Gates are deterministic and independent.**
   - Gates 1-6 (`src/pipeline/gates/g1..g6-*.ts`) run on the plan.
   - Gate 7, test integrity (`src/verify/testIntegrity.ts`), runs on L1 stage patches. It fails the stage on fewer tests or assertions, new skip/only/xfail markers, deleted tests or snapshots, lowered coverage thresholds, or edited check definitions.
@@ -85,7 +85,7 @@ These are enforced in code, not in prose. A change that breaks one of them is wr
   - Necessity (`breaks` or `deprecated`) and `lands_on` are derived per run from the rules' events, never typed in.
   - Only `reviewed` rules load. New rules start as drafts from `npm run knowledge:draft` (the `add-release-knowledge` skill).
   - `SKILL.md`, `references/` and the plugin bundle are *generated* from the pack plus its knowledge (with a "do not edit" banner), so edit the data and regenerate rather than editing generated files. CI fails on drift. SKILL.md stays at most about 100 lines with a narrow trigger sentence.
-- **Maintainer tools live in `scripts/` and are outside the engine:** the pack build and lint, the release drafter, the pack update report, and the golden-case finder and re-checker. They may use the network, they never run in default CI, and `src/` never imports from `scripts/`.
+- **Maintainer tools live in `scripts/` and are outside the engine:** the pack build and lint, the release drafter, the pack update report, and the golden-case finder and re-checker. The pack build and lint run offline in CI (the drift check and `npm run lint`). The other four may use the network and never run in default CI. `src/` never imports from `scripts/`.
 - **Prompts are versioned files** (`prompts/plan_migration.v1.md`, `v2`, and so on). Never overwrite an existing version; add a new one.
 - **Zod schemas in `src/schema/`** produce both the TS types and the MCP JSON Schema.
 - **`snippet_hash`** uses one shared normaliser, which `find_usages`, finding normalisation and gate 1 all reuse.

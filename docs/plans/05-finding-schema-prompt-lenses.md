@@ -64,7 +64,7 @@
 
 ## Tests
 
-- **Schema:** valid and invalid fixtures for every enum. A `codemod` step with an ID not in the pack is rejected, and evidence with a different `repo_id` is rejected. `agent_judgment` with no evidence is rejected. `confidence` must be within 0 to 1.
+- **Schema:** valid and invalid fixtures for every enum. A `codemod` step with an ID the rule's library doesn't list is rejected, and evidence with a different `repo_id` is rejected. `agent_judgment` with no evidence is rejected. `confidence` must be within 0 to 1.
 - **Packet isolation:** the packet for lens A contains no finding IDs from lens B, even after lens B has submitted.
 - **Packet bounds:** the maximum size is respected, and truncation is reported in the packet, never silent.
 - **Retry policy:** the first invalid submit returns errors, the second invalid submit records `lens.gap`, and a third attempt is refused.

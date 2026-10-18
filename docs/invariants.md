@@ -25,12 +25,12 @@ Numbered rules that must always hold. Each names the test that fails when the ru
 
 Gates 1–6 run on the plan in `validate_plan`; gate 7 runs on each L1 stage patch. All gates re-check against real files and import no network or model code. After 3 rounds/attempts, failures go to `unresolved[]` and are never marked passed.
 
-- **INV-15 (gate 1):** Every evidence location exists and its `snippet_hash` matches the current file, via the one shared normaliser. *(planned: `src/pipeline/gates/g1-evidence.ts`, `test/unit/gate1.test.ts` — M6)*
-- **INV-16 (gate 2):** Every usage found by `find_usages` is covered by a finding or explicitly marked out of scope with a reason. *(planned: `src/pipeline/gates/g2-coverage.ts`, `test/unit/gate2.test.ts` — M6)*
-- **INV-17 (gate 3):** Every `doc_refs` entry came from the docs tool in this run; no invented links. *(planned: `src/pipeline/gates/g3-docs.ts`, `test/unit/gate3.test.ts` — M6)*
-- **INV-18 (gate 4):** Every finding with severity `high` or `blocker` has a rollback and a verify step. *(planned: `src/pipeline/gates/g4-rollback.ts`, `test/unit/gate4.test.ts` — M6)*
-- **INV-19 (gate 5):** Stage order is valid: no stage depends on a change that comes later, checked against the import graph. *(planned: `src/pipeline/gates/g5-order.ts`, `test/unit/gate5.test.ts` — M6)*
-- **INV-20 (gate 6):** The plan is schema-valid with no duplicate finding IDs. *(planned: `src/pipeline/gates/g6-schema.ts`, `test/unit/gate6.test.ts` — M6)*
+- **INV-15 (gate 1):** Every evidence location exists and its `snippet_hash` matches the current file, via the one shared normaliser. *(planned: `src/pipeline/gates/g1-evidence.ts`, `test/unit/gates/` `bad-g1` fixture — M6)*
+- **INV-16 (gate 2):** Every usage found by `find_usages` is covered by a finding or explicitly marked out of scope with a reason. *(planned: `src/pipeline/gates/g2-coverage.ts`, `test/unit/gates/` `bad-g2` fixture — M6)*
+- **INV-17 (gate 3):** Every `doc_refs` entry came from the docs tool in this run; no invented links. *(planned: `src/pipeline/gates/g3-doc-refs.ts`, `test/unit/gates/` `bad-g3` fixture — M6)*
+- **INV-18 (gate 4):** Every finding with severity `high` or `blocker` has a rollback and a verify step. *(planned: `src/pipeline/gates/g4-rollback-verify.ts`, `test/unit/gates/` `bad-g4` fixture — M6)*
+- **INV-19 (gate 5):** Stage order is valid: no stage depends on a change that comes later, checked against the import graph. *(planned: `src/pipeline/gates/g5-stage-order.ts`, `test/unit/gates/` `bad-g5` fixture — M6)*
+- **INV-20 (gate 6):** The plan is schema-valid with no duplicate finding IDs. *(planned: `src/pipeline/gates/g6-schema-ids.ts`, `test/unit/gates/` `bad-g6` fixture — M6)*
 - **INV-21 (gate 7, test integrity):** Compared with the sandbox before the stage, an L1 patch must not reduce the number of test cases or assertions, add `skip`/`only`/`todo`/`xfail` markers, delete test files or snapshots, lower coverage thresholds, or edit check definitions. A stage needing any of these goes to "Review first", never into a kept patch silently. *(planned: `src/verify/testIntegrity.ts`, `test/unit/gate7-*.test.ts`, weakened-test fixtures all rejected — M8)*
 
 ## Output and honesty

@@ -16,7 +16,7 @@
 ## Tasks
 
 1. **Case format (`eval/cases/<id>/case.json`).**
-   - Fields: `pack`, `repo_url`, `base_commit` (the parent of the migration), `merge_commit`, `pr_url`, `source`, `target`, `checks` (the check commands the case's repo uses, for M8; optional here), `notes` and `tags` (for example `messy` or `monorepo`).
+   - Fields: `id`, `pack`, `repo_url`, `base_commit` (the parent of the migration), `merge_commit`, `pr_url`, `source` and `target` (each `{framework, version}`, as the M0 records use), `license`, `checks` (the check commands the case's repo uses, for M8; optional here), `notes` and `tags` (for example `messy` or `monorepo`).
    - Ground truth is derived deterministically. `scripts/derive-truth.ts` diffs base against merge and maps the changed hunks to M2 usages at base, writing `truth.json` (true changed usages, touched files, and per-file edit size, which is used for severity calibration).
    - The diff and checkout are done by **eval tooling**, outside the engine, in a temp clone under the eval workspace. The engine only ever sees a read-only path (C3 still holds for the engine).
 2. **Pick and pin 5 cases.** Extend the M0 Next.js list to 5, with at least one messy case: a partial upgrade, a reverted PR, or a PR with follow-up fixes. Prefer cases whose repo has a runnable test suite, so M8 can reuse them. Record why each was chosen.
