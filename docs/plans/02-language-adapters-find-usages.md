@@ -26,7 +26,7 @@
 5. **Unresolved imports.** Dynamic `import(expr)`, `require(expr)` and `importlib.import_module(expr)` with non-literal arguments are recorded as `unresolved_dynamic` usages. They are reported, never dropped (failure matrix: Context builder).
 6. **Import graph store.** `imports(run_id, repo_id, from_file, to_module, to_file, kind, line, lang)`. M6 reuses it for gate 5, and M3 for fan-in.
 7. **Usage adapter interface (`src/analysis/usages/adapter.ts`).** `UsageAdapter { id, languages[], match_kinds[], detect(ctx) => Usage[] }`, where `ctx` gives access to the parsed trees, the import graph and the text scanner. `match_kinds[]` declares which typed rule matches (M3: `import`, `call`, `config_key`, …) the adapter can find; the M3 lint rejects a pack whose rules need a kind its adapter does not declare. Adapters are registered in a single list (`src/analysis/usages/index.ts`), so M10 adds Django with one line.
-8. **Next.js usage adapter (`src/analysis/usages/nextjs.ts`).** The starting list below is a draft. **Every item is checked against the current Next.js and React upgrade guides through Context7 (M4) before the M3 rules are written**, and the list is trimmed or extended to match.
+8. **Next.js usage adapter (`src/analysis/usages/nextjs.ts`).** The starting list below is a draft. **Every item is checked against the current official Next.js and React upgrade guides and release notes (the primary sources, not Context7; `docs/design.md` D11) before the M3 rules are written**, and the list is trimmed or extended to match.
    - Request APIs that became async in recent majors: `cookies()`, `headers()`, `draftMode()` from `next/headers`, and the `params` and `searchParams` props in pages, layouts, route handlers and `generateMetadata`.
    - Caching behaviour: `fetch` calls in server components and route handlers, `GET` route handlers, and segment config exports (`dynamic`, `revalidate`, `fetchCache`, `runtime`).
    - Config: `next.config.*` keys (experimental flags, image config), `middleware.*`.
@@ -83,7 +83,7 @@
 ## Risks
 
 - **Indirect-usage recall is the core value and the hardest part.** Mitigation: the seeded repo grows whenever a real repo surprises us (failure-matrix quadrant rule). Add embeddings only if recall measurably misses things. Not in M2.
-- **The draft Next.js list is wrong for the current major.** Mitigation: it is checked against the upgrade guide via Context7 before M3 writes rules, and the seeded repo is adjusted with it.
+- **The draft Next.js list is wrong for the current major.** Mitigation: it is checked against the official upgrade guide and release notes before M3 writes rules, and the seeded repo is adjusted with it.
 - **TS program build is slow on large monorepos.** Mitigation: a per-package program, the incremental cache and size limits.
 - **Python without types gives weak resolution.** Mitigation: heuristic labels, which feed M3 risk and M9 routing; recall is measured on the Django seeded repo in M10.
 - **tree-sitter WASM loading problems on some platforms.** Mitigation: test on the CI matrix; the pure-JS fallback is recorded in the overview decisions.

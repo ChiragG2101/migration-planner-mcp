@@ -133,11 +133,13 @@ What it costs: two tools, one rule field, a `combined` lens for `small` runs, an
 
 *Revised by D10:* `doc_sources` live in each library's `library.json`, not in the pack. A pack's official prefixes are those of its libraries.
 
+*Revised by D14:* `fetched_by` gains a third value, `knowledge`, for fallback links.
+
 Why:
 
 - In the agent-side mode (the v0.1 default), the agent fetches a doc and hands the engine both the link and the text. Gate 3 then proves only that a doc was *registered* in this run, not that it is real or authoritative. Without labels, a doc from a random blog and one from nextjs.org look the same in the plan.
 - A prefix list per pack is a few lines that rarely change (a docs site and a repo folder). It is not a copy of the docs, so it adds almost no maintenance.
-- **Stated limit:** an official URL with made-up content can't be caught without fetching it. Only the server-side mode, where the engine fetches the doc itself, vouches for content. The run report says so rather than implying more.
+- **Stated limit:** an official URL with made-up content can't be caught without fetching it. The server-side mode, where the engine fetches the doc itself, takes the agent out of the path, but the content still comes from Context7, which is community-contributed (PRD section 9). Neither mode checks content against the official source. The run report says so rather than implying more.
 
 ## 2026-10-18: how knowledge and packs are structured
 
@@ -215,3 +217,15 @@ Why:
 - INV-38 promised refusal at ingest, but no milestone touched ingest for it. M3 now does.
 - The lint and the skills disagreed about where a pack's seeded repo lives (`eval/seeded/<pack>/` vs `next-tricky`). An explicit field removes the guess.
 - A rollback hint such as "pin next@14 again" reads like a command. Without the exemption, the lint would reject honest rules.
+
+### D14 - Fallback docs are recorded as `fetched_by: knowledge`
+
+**Decision: when Context7 is unavailable and the engine falls back to the rules' `source` links and the generated references, each one is written to `run_docs` with `fetched_by: knowledge`, status `unverified` and a `doc_id`. In server-side mode the engine queries Context7 by a symbol from the rule's typed match, never by `doc_topics`.**
+
+Why:
+
+- `fetched_by` could only be `engine` or `agent`, and nothing said whether fallback links got a `doc_id`. Either INV-35 or gate 3 would have broken whenever Context7 was down, which is the case M4 exists to handle.
+- They stay `unverified` even though the links are official. That is the same rule D9 applies everywhere: a URL proves where a doc claims to come from, not what it says.
+- `doc_topics` are free-text search phrases. Sending them from the engine would break the "no free-text field" rule of C6, even though they come from reviewed knowledge rather than the repo.
+
+The same review corrected two contradictions with D9 and D11 rather than deciding anything new. M4's risks section had required an allowlisted host for registered docs; D9 accepts any doc and labels it. M2 had checked the Next.js usage list through Context7; D11 checks it against the official sources. D9's claim that the server-side mode "vouches for content" was also narrowed: it removes the agent from the path, but the content is still Context7's.

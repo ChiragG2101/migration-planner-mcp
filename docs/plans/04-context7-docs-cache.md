@@ -15,21 +15,22 @@ Two modes share one log:
 1. **Agent-side (MVP).** The host agent calls Context7's `resolve-library-id` and `query-docs` itself, then calls `get_migration_docs({ run_id, register: [{ library, version, topic, url, content }] })`. The server normalises and caches each doc, assigns `doc_id = sha256(library@version|url|content_hash)` and writes a `docs.retrieved` event. Only registered docs are citable (gate 3 in M6).
 2. **Server-side (stretch).** If `CONTEXT7_API_KEY` or a local Context7 package is configured, `get_migration_docs({ run_id, query: [{ library, version, symbol }] })` calls Context7 itself, with a typed outbound payload of library, version and symbol only (C6).
 
-Both modes fall back in the same order: the fresh cache, then the stale cache (marked `stale`), then the composed rules' `source` links and the pack's generated references (marked `docs_unverified`).
+Both modes fall back in the same order: the fresh cache, then the stale cache (marked `stale`), then the composed rules' `source` links and the pack's generated references (marked `docs_unverified`). Fallback docs are written to `run_docs` like any other doc, with `fetched_by: knowledge`, so they get a `doc_id` and gate 3 accepts citations of them (`docs/design.md` D14).
 
 ## Tasks
 
 1. **Store (`src/store/docs.ts`, migration `003_docs.sql`).** Tables:
    - `doc_cache(doc_id, library, version, topic, url, content, fetched_at, source)`: global across runs and keyed by library@version so it can be reused offline.
-   - `run_docs(run_id, doc_id, mode, status, fetched_by, official)`: per-run and used by gate 3, where status is `fresh`, `stale` or `unverified`. `fetched_by` is `engine` (server-side mode) or `agent` (registered by the agent). `official` says whether the URL falls under one of the `doc_sources` in the `library.json` of a library the pack uses (M3).
+   - `run_docs(run_id, doc_id, mode, status, fetched_by, official)`: per-run and used by gate 3, where status is `fresh`, `stale` or `unverified`. `fetched_by` is `engine` (server-side mode), `agent` (registered by the agent) or `knowledge` (a rule's `source` link or a generated reference, used as a fallback). `official` says whether the URL falls under one of the `doc_sources` in the `library.json` of a library the pack uses (M3).
 2. **`get_migration_docs` (`src/core/getMigrationDocs.ts`, tool `src/tools/getMigrationDocs.ts`, CLI `docs`).**
    - Accepts `register` (agent-side) or `query` (server-side), and returns formatted snippets with `doc_id`, `url`, `library`, `version` and `status`.
    - Formats the output for compact context: a per-symbol section with the old side and the new side.
    - **Labels where each doc came from** (`docs/design.md` D9):
      - Every registered doc gets `fetched_by: agent`, and every doc the engine fetches gets `fetched_by: engine`.
      - `official` is computed by normalising the URL (lowercase scheme and host, no credentials, no default port, `..` resolved) and checking it starts with one of the `doc_sources` prefixes of the pack's libraries. So `https://nextjs.org.evil.com/`, `http://nextjs.org/docs/` and `https://github.com/vercel/next.js-fork/` are not official.
+     - A fallback doc gets `fetched_by: knowledge` and status `unverified`. Its link is official (the M3 lint checks every rule `source`), but no one fetched its content in this run.
      - A doc with `fetched_by: agent` and `official: false` is stored with status `unverified`. Findings that cite only such docs get the "docs unverified" badge (task 5), so they stay citable but are never presented as checked.
-     - What this does not prove: in the agent-side mode, an official URL with content the agent made up can't be detected without fetching. The report says this. The server-side mode is the only one in which the engine vouches for content.
+     - What this does not prove: in the agent-side mode, an official URL with content the agent made up can't be detected without fetching. The report says this. In the server-side mode the engine fetches the content itself, which takes the agent out of the path, but the content is still Context7's, which is community-contributed (PRD section 9), not checked against the official source.
    - Version pinning: it refuses a register or query whose version does not match the versions resolved at ingest (major.minor). For an `upgrade` pack, the valid versions are the installed `from` version, the effective target (after any `stop_at`), and every release unit in between from M3's composition (upgrade guides are per release, and a jump across two majors needs both). Companion libraries use their own composed range. The error tells the agent the expected versions (failure matrix: stale version).
    - Libraries per run come from the pack: for the Next.js pack that is `next`, `react` and `react-dom`; for the Django pack (M10), `django`.
 3. **Context7 client (`src/docs/context7.ts`, stretch).**
@@ -39,7 +40,7 @@ Both modes fall back in the same order: the fresh cache, then the stale cache (m
    - **Never** sends file paths, snippets or code.
 4. **Network guard (`src/security/network.ts`).** A module-level allowlist containing only the Context7 host. Any other outbound request throws. Context7 is disabled unless configured, and a test asserts that no network is used when it is unconfigured.
 5. **Reliability.** Mark findings that cite only `stale` or `unverified` docs as "docs unverified" (consumed in M5 and shown in M9's report). Record `docs.fallback` events with the reason (timeout, 429, offline or unconfigured).
-6. **Lookup terms.** The agent's Context7 queries use each composed rule's `doc_topics[]` (M3). The pack-level check against the docs is M3's pack update report (`scripts/pack-docs-report.ts`), which reads the official sources directly rather than Context7.
+6. **Lookup terms.** The agent's Context7 queries use each composed rule's `doc_topics[]` (M3). In the server-side mode the engine queries by a symbol taken from the rule's typed match (a module, name, setting or config key), never by `doc_topics`, so the outbound payload stays `{library, version, symbol}` with no free text (C6). The pack-level check against the docs is M3's pack update report (`scripts/pack-docs-report.ts`), which reads the official sources directly rather than Context7.
 
 ## Files and modules
 
@@ -48,7 +49,7 @@ Both modes fall back in the same order: the fresh cache, then the stale cache (m
 ## Tests
 
 - **Registration:** registered docs get stable `doc_id`s, and re-registering is idempotent.
-- **Source labels (`test/unit/docs/source-labels.test.ts`):** a registered doc gets `fetched_by: agent`, and an engine-fetched one gets `fetched_by: engine`. URLs under a `doc_sources` prefix of one of the pack's libraries are `official`. Look-alike hosts, `http://`, credentials in the URL, a sibling repo (`next.js-fork`) and a `..` path that climbs out of the prefix are all `official: false`. An agent-registered unofficial doc is `unverified`, and a finding citing only such docs carries the badge.
+- **Source labels (`test/unit/docs/source-labels.test.ts`):** a registered doc gets `fetched_by: agent`, and an engine-fetched one gets `fetched_by: engine`. URLs under a `doc_sources` prefix of one of the pack's libraries are `official`. Look-alike hosts, `http://`, credentials in the URL, a sibling repo (`next.js-fork`) and a `..` path that climbs out of the prefix are all `official: false`. An agent-registered unofficial doc is `unverified`, and a finding citing only such docs carries the badge. With Context7 down, a fallback doc gets `fetched_by: knowledge`, status `unverified` and a `doc_id` in `run_docs`, and a finding citing it passes gate 3.
 - **Version pin:** for a Next.js upgrade from major N to N+1, registering docs for N-1 is rejected with the expected versions in the message, while docs for N and N+1 are accepted. An intermediate release unit is accepted only if it lies in the composed range, and a release beyond a `stop_at` is rejected.
 - **Fallback matrix (`test/unit/docs/fallback.test.ts`):** using a fake transport, it covers Context7 up, timeout, 429, offline, unconfigured, cache-fresh, cache-stale and empty cache. Each gives the expected status and fallback event. **This is the milestone's "done when" test.**
 - **Network:** no outbound calls when unconfigured. Calling a non-allowlisted host throws. The outbound payload contains only `library`, `version` and `symbol`.
@@ -65,7 +66,7 @@ Both modes fall back in the same order: the fresh cache, then the stale cache (m
 
 - **Context7 tool names or auth change.** Mitigation: a thin adapter, re-checked at M4 start, plus recorded fixtures.
 - **Community docs can be wrong (PRD section 9).** Mitigation: docs are treated as cited evidence, not truth. The rule pack and the gates stay authoritative for structure.
-- **The agent "registers" a doc it did not actually fetch, with made-up content.** Mitigation: the registered URL must be on a Context7 or official-docs host allowlist and the content must be non-empty. In server-side mode the content is fetched by the server. Document this residual trust gap in `docs/failure-modes.md`.
+- **The agent "registers" a doc it did not actually fetch, with made-up content.** Mitigation: the content must be non-empty, and a doc from outside its libraries' `doc_sources` is labelled `unverified` (D9), never shown as checked. In server-side mode the content comes from Context7, not from the agent. The residual trust gap is recorded in `docs/failure-modes.md` and stated in the run report.
 - **Cache growth.** Mitigation: a size cap with LRU eviction. Never evict docs referenced by a run in the last N runs.
 
 ## Dependencies
