@@ -23,7 +23,7 @@
    - `source` enum: `rule_pack`, `usage_scan`, `codemod`, `agent_judgment`.
    - Extra fields: `lens` (`api`, `dependency_build`, `behavior_runtime`, `verification`, or `combined` for a `small` run, M3), `rule_id?`, `usage_ids[]` (links to M2 usages; needed for gate 2), `docs_status` (`verified` or `unverified`, from M4), `prompt_version`.
    - A schema-level refinement rejects `source = agent_judgment` with empty `evidence` (PRD section 5).
-   - `Plan`: `run_id`, `campaign_id`, `repo_id`, `pack`, `prompt_version`, `stages[] {id, order, title, finding_ids[], depends_on[]}`, `findings[]`, `out_of_scope[] {usage_id, reason}` and `unresolved[]`.
+   - `Plan`: `run_id`, `campaign_id`, `repo_id`, `pack`, `prompt_version`, `stages[] {id, order, title, finding_ids[], depends_on[]}`, `findings[]`, `out_of_scope[] {usage_id, reason, written_by}` (`written_by` is `scope`, `engine` or the lens; `docs/design.md` D16) and `unresolved[]`.
    - Export the JSON Schema through `zod-to-json-schema` (or the SDK's built-in conversion) as the resources `schema://finding` and `schema://plan`.
 2. **Evidence packets (`src/pipeline/packets.ts`, tool `get_lens_packet`).** For each lens, a deterministic and size-bounded packet containing only what that lens needs. Which usage kinds go to which lens is **pack data** (a `lens` field per usage kind in the pack), not core code, so M10 adds Django without touching packets. For the Next.js pack:
    - **API:** async request API usages, removed or renamed imports, React API removals, the matching rules, the codemods that cover them, and the doc IDs for those symbols.
@@ -45,13 +45,14 @@
      - calls Context7 for each distinct API symbol in the packet, then registers the docs via `get_migration_docs`
      - outputs findings **only** as schema JSON
      - cites only usage IDs and doc IDs it was given
+     - marks a usage in its packet that needs no change (for example code already in the target form) as out of scope with a reason, rather than leaving it uncovered or writing a finding for it
      - sets `source` honestly
      - gives a rollback and a verify step for anything rated high or above
      - prefers a codemod step where the pack lists one, and states what the codemod leaves for manual work
    - **Contains no instruction to edit files or run commands.** This does not replace the code enforcement (C3); it only avoids prompting for it.
    - Prompts are versioned files. `v1` is never edited after release, and changes create `v2`. A test enforces this by comparing a hash recorded in `prompts/manifest.json`.
 4. **`submit_findings` tool (`src/tools/submitFindings.ts`).**
-   - Input: `run_id`, `lens` and `findings[]`.
+   - Input: `run_id`, `lens`, `findings[]` and `out_of_scope[] {usage_id, reason}`. An `out_of_scope` entry must name a usage ID from this lens's packet and give a non-empty reason. It is stored with `written_by` set to the lens (`docs/design.md` D16).
    - Parses each finding with Zod and normalises evidence: it re-reads the file through `SafePath` and recomputes `snippet_hash`. A mismatch is flagged here and gate 1 checks it again later.
    - Valid findings are stored. For invalid output it returns the exact Zod errors and allows **one** retry per lens. After that it records a `lens.gap` event and moves on (reliability layer).
    - Stores findings both before and after normalisation as events (audit trail).
@@ -65,6 +66,7 @@
 ## Tests
 
 - **Schema:** valid and invalid fixtures for every enum. A `codemod` step with an ID the rule's library doesn't list is rejected, and evidence with a different `repo_id` is rejected. `agent_judgment` with no evidence is rejected. `confidence` must be within 0 to 1.
+- **Lens out of scope:** an entry naming a usage outside the lens's packet, or with an empty reason, is rejected; a valid one is stored with `written_by` set to the lens.
 - **Packet isolation:** the packet for lens A contains no finding IDs from lens B, even after lens B has submitted.
 - **Packet bounds:** the maximum size is respected, and truncation is reported in the packet, never silent.
 - **Retry policy:** the first invalid submit returns errors, the second invalid submit records `lens.gap`, and a third attempt is refused.

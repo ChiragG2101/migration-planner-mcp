@@ -53,7 +53,7 @@ Gates 1–6 run on the plan in `validate_plan`; gate 7 runs on each L1 stage pat
 
 - **INV-32:** The size is `none` only when the scan is complete (no unparsed files, unresolved dynamic imports or size-limit skips), zero usages match a rule, no dependency has a peer conflict, and the installed version is not older than the knowledge's `covered_from` or the pack's `supported.from`. A `none` plan still lists the pack's behaviour changes, and every usage found in it has an engine-written out-of-scope reason. *(planned: `test/unit/sizing.test.ts` — M3)*
 - **INV-33:** Scope only narrows. `set_scope` accepts only offered option IDs, cannot change the paths, the deny list, the level, the checks or `--out`, can only move `depth` toward `full`, and is refused once the first lens packet is fetched or `merge_findings` has run, whichever comes first. *(planned: `test/permissions/scope-cannot-widen.test.ts`, `test/unit/scope.test.ts` — M3)* — C4, C5, C9
-- **INV-34:** Every usage the scope excluded, whose rule has `necessity: breaks`, appears in "Review first". *(planned: `test/unit/routing.test.ts` — M9)*
+- **INV-34:** Every usage that the scope excluded or a lens marked out of scope, whose rule has `necessity: breaks`, appears in "Review first". *(planned: `test/unit/routing.test.ts` — M9)*
 - **INV-35:** Every doc a run uses, including fallback links, records `fetched_by` (`engine`, `agent` or `knowledge`) and `official`, and has a `doc_id` in `run_docs`. An agent-registered doc whose URL is outside the `doc_sources` prefixes of the pack's libraries is never shown as verified, and findings citing only such docs carry the "docs unverified" badge. *(planned: `test/unit/docs/source-labels.test.ts` — M4)* — gate 3 support
 
 ## Knowledge, composition and maintainer tools (see `design.md` D10, D11)
@@ -64,3 +64,7 @@ Gates 1–6 run on the plan in `validate_plan`; gate 7 runs on each L1 stage pat
 - **INV-39:** Every reviewed rule reachable in a pack's supported range uses a match kind the pack's usage adapter declares, and its `source` is under one of its library's `doc_sources`. *(planned: `scripts/lint-packs.ts`, `test/unit/lintPacks.test.ts` — M3)*
 - **INV-40:** Nothing under `src/` imports from `scripts/` or `eval/`, so maintainer tools that use the network, and tooling that writes files and runs git outside the ESLint rule, stay outside the engine. *(planned: import lint, `test/permissions/` — M3)* — C3, C6
 - **INV-41:** Maintainer tools never commit a decision. The drafter only writes `draft` rules and never overwrites a reviewed one, and the golden-case finder only writes to `eval/.work/candidates/`. *(planned: `test/unit/` drafter and finder tests on recorded fixtures — M3, M7)*
+
+## Out of scope (see `design.md` D16)
+
+- **INV-42:** Every `out_of_scope` entry has a non-empty reason and a `written_by` (`scope`, `engine` or a lens). A lens can only mark usage IDs from its own packet, a usage keeps one entry (`scope`, then `engine`, then a lens), and every usage that matches no composed rule gets the engine's `no rule in range` reason, in every run size. *(planned: `test/unit/submitFindings.test.ts` — M5; `test/unit/aggregate.test.ts` — M6)*

@@ -280,7 +280,7 @@ Every tool is also a CLI command over the same engine function.
 | `get_migration_docs` | `docs` | Docs for both sides via Context7, with cache and retrieval log |
 | `assess_risk` | `risk` | Computed risk signals per usage (not LLM) |
 | `propose_scope`, `set_scope` | `scope` | Size the migration (`none`, `small`, `full`), propose scope questions from the facts, record the answers (narrowing only) |
-| `get_lens_packet`, `submit_findings` | (MCP only) | Lens evidence in, schema-checked findings out |
+| `get_lens_packet`, `submit_findings` | (MCP only) | Lens evidence in, schema-checked findings and out-of-scope marks out |
 | `merge_findings` | `merge` | Aggregate, dedupe, order into stages |
 | `validate_plan` | `validate` | Run gates 1 to 6, return per-finding pass or fail |
 | `emit_plan` | `emit` | Write the plan, checklists and run report |

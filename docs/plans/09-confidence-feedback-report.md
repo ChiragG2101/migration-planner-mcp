@@ -19,7 +19,7 @@
 1. **Routing (`src/pipeline/routing.ts`).**
    - `threshold` comes from config (`--confidence-threshold`, default `0.6`). Its value and source are recorded per run.
    - Rules, in order:
-     1. `severity ∈ {high, blocker}` with `source = agent_judgment` goes to **"Review first"** at the very top, regardless of confidence. L1 stages whose patch is in `patches/needs-review/` (gate 7) also go here, with the gate 7 reason. So does every usage the user's scope excluded whose rule has `necessity: breaks` (derived per run by M3's composition), with the line "excluded by your scope, but this breaks on the target".
+     1. `severity ∈ {high, blocker}` with `source = agent_judgment` goes to **"Review first"** at the very top, regardless of confidence. L1 stages whose patch is in `patches/needs-review/` (gate 7) also go here, with the gate 7 reason. So does every usage the user's scope excluded whose rule has `necessity: breaks` (derived per run by M3's composition), with the line "excluded by your scope, but this breaks on the target". So does every usage a lens marked out of scope whose rule `breaks`, with the line "marked as needing no change, but this rule breaks on the target" (`docs/design.md` D16).
      2. `confidence < threshold` goes to **"Needs human decision"**, not the main plan.
      3. Everything else goes into the main plan stages.
      4. "Docs unverified" findings (M4) get a visible badge wherever they land.
@@ -39,7 +39,7 @@
    - inputs, campaign and repo IDs, and resolved versions
    - pack, prompt and codemod-registry versions
    - size and scope: the computed size with its reasons, each scope question with its answer (marked when it was a default), and the usages each answer excluded
-   - coverage (usages found, covered, out of scope with reasons, uncovered)
+   - coverage (usages found, covered, out of scope with reasons split by `written_by`, uncovered)
    - unparsed and skipped files
    - docs status (fresh, stale or unverified counts, and fallback events), split by `fetched_by` (engine, agent or knowledge) and `official` (M4), with the plain note that agent-registered docs are checked for source, not content
    - gate results per round
@@ -63,7 +63,7 @@
 
 ## Tests
 
-- **Routing:** a table test across confidence 0.59, 0.6 and 0.61; each severity; and each source. An agent-judgment blocker at confidence 0.95 still goes to "Review first". A gate 7 needs-review stage goes to "Review first". A usage excluded by scope whose rule `breaks` goes to "Review first", and one whose rule is only `deprecated` does not. A custom threshold is respected and recorded.
+- **Routing:** a table test across confidence 0.59, 0.6 and 0.61; each severity; and each source. An agent-judgment blocker at confidence 0.95 still goes to "Review first". A gate 7 needs-review stage goes to "Review first". A usage excluded by scope whose rule `breaks` goes to "Review first", and one whose rule is only `deprecated` does not. A usage a lens marked out of scope whose rule `breaks` also goes there. A custom threshold is respected and recorded.
 - **Emit order:** a golden-file test of section order for a mixed plan, with and without L1 results. The needs-human section is present only when it is non-empty.
 - **Checklists:** one per stage, codemods listed before manual steps, written only under `<out>/<run_id>/stages/`.
 - **Report:** every number in `run_report.md` traces to events. A test rebuilds the report from fixture event logs, one L0 and one L1.

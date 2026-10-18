@@ -24,8 +24,8 @@
      - **Within a stage, codemod steps come before manual steps**, so manual findings describe what is left after the codemod, and the verify loop (M8) can run the codemod first.
      - Each stage gets `depends_on` derived from the graph.
      - Stage titles are templated, not LLM-written.
-   - **Coverage flags:** any usage ID with no covering finding and no `out_of_scope` entry is listed under `uncovered_usages` (input to gate 2). The engine-written `scope: …` entries from `set_scope` (M3) count as `out_of_scope` entries with a reason.
-   - **`none` runs:** with no lens findings, the aggregator builds the plan itself. It has one dependency stage with a templated version-bump finding (`source: rule_pack`, concern `dependency`, evidence = the dependency's line in the manifest, `verify` = the pack's `checks_hint`, rollback = revert the manifest and lockfile). It also includes the list of behaviour changes from `propose_scope`. Every usage in the run gets an engine-written `out_of_scope` entry with the reason `none: no rule in range`, since by the definition of `none` no usage matches a composed rule (M3). The gates run on it like any other plan.
+   - **Coverage flags:** any usage ID with no covering finding and no `out_of_scope` entry is listed under `uncovered_usages` (input to gate 2). The engine-written `scope: …` entries from `set_scope` (M3) and the lenses' `out_of_scope` entries (M5) count as `out_of_scope` entries with a reason. In every run size, the aggregator also writes `no rule in range` for each usage that matches no composed rule. Each entry keeps its `written_by`, and a usage keeps one entry: `scope` first, then `engine`, then a lens, with the others recorded as events (`docs/design.md` D16).
+   - **`none` runs:** with no lens findings, the aggregator builds the plan itself. It has one dependency stage with a templated version-bump finding (`source: rule_pack`, concern `dependency`, evidence = the dependency's line in the manifest, `verify` = the pack's `checks_hint`, rollback = revert the manifest and lockfile). It also includes the list of behaviour changes from `propose_scope`. Every usage in the run that the scope didn't exclude gets the engine's `no rule in range` entry, since by the definition of `none` no usage matches a composed rule (M3). The gates run on it like any other plan.
    - **Scope freeze:** calling `merge_findings` freezes the run's scope if no lens packet has already done so (M3, `docs/design.md` D12).
    - Output: a `Plan` object stored in SQLite with a `round` number.
 2. **Gates (`src/pipeline/gates/`), one file per gate with a shared interface `Gate { id, run(plan, ctx) => GateResult[] }`.** `GateResult` is `{finding_id | stage_id | null, gate, pass, reason, expected?, actual?}`, so the agent sees the *exact* failure.
@@ -49,7 +49,7 @@
 
 ## Files and modules
 
-`src/pipeline/aggregate.ts`, `src/pipeline/gates/{index,g1-evidence,g2-coverage,g3-doc-refs,g4-rollback-verify,g5-stage-order,g6-schema-ids}.ts`, `src/pipeline/emit.ts`, `src/tools/{mergeFindings,validatePlan,emitPlan}.ts`, `src/store/plans.ts`, `src/store/migrations/005_plans.sql`, `templates/MIGRATION_PLAN.md.hbs` (or a template literal), `test/unit/gates/*.test.ts`, `test/fixtures/plans/{good,bad-g1..bad-g6}.json`.
+`src/pipeline/aggregate.ts`, `src/pipeline/gates/{index,g1-evidence,g2-coverage,g3-doc-refs,g4-rollback-verify,g5-stage-order,g6-schema-ids}.ts`, `src/pipeline/emit.ts`, `src/tools/{mergeFindings,validatePlan,emitPlan}.ts`, `src/store/plans.ts`, `src/store/migrations/005_plans.sql`, `templates/MIGRATION_PLAN.md.hbs` (or a template literal), `test/unit/aggregate.test.ts`, `test/unit/gates/*.test.ts`, `test/fixtures/plans/{good,bad-g1..bad-g6}.json`.
 
 ## Tests
 
@@ -63,7 +63,8 @@
   Each fixture fails **only** its target gate, and a test asserts the other gates pass, so the gates are shown to be independent.
 - **False-pass checks:** mutating a good plan in each of these ways must flip the gate result. A gate that passes after a mutation is a bug.
 - **Aggregator:** exact duplicates merge, a severity conflict takes the higher value and writes a conflict event, different actions on the same span are not merged, staging on a small graph fixture comes out in leaf-first order, `config_first` puts config findings first, `lands_on: source` findings land in prep stages before the bump while unmatched findings land after it, and within a stage codemod steps come before manual steps.
-- **`none` plan:** on `next-clean` (M3), merge, validate and emit produce a one-stage plan whose bump finding's evidence resolves (gate 1) and which lists the behaviour changes. Scope-excluded usages, and usages that match no rule (`none: no rule in range`), satisfy gate 2 through their engine-written reasons. After `merge_findings`, `set_scope` is refused.
+- **Out-of-scope entries:** on a `full` fixture, a usage already in the target form that a lens marks out of scope, and a usage that matches no composed rule, both satisfy gate 2. A usage with both a `scope` and a lens entry keeps the `scope` one, and the lens entry is recorded as an event.
+- **`none` plan:** on `next-clean` (M3), merge, validate and emit produce a one-stage plan whose bump finding's evidence resolves (gate 1) and which lists the behaviour changes. Scope-excluded usages, and usages that match no rule (`no rule in range`), satisfy gate 2 through their engine-written reasons. After `merge_findings`, `set_scope` is refused.
 - **Round cap:** after 3 failing rounds, the plan is emitted with `unresolved[]` populated and the status is not `passed`.
 - **Permissions:** emit writes only under `<out>/<run_id>/`. An emit with `--out` pointing into the repo is refused, and the repo hash is unchanged.
 
@@ -78,7 +79,7 @@
 
 - **A gate that passes wrongly is the most dangerous failure.** Mitigation: the mutation tests above, and the independent reviewer checks the gate code against PRD section 7 line by line.
 - **Gate 5 depends on import-graph quality.** Dynamic imports are unresolved. Mitigation: findings touching modules with unresolved dynamic imports get a `stage_order_unverified` warning rather than a silent pass.
-- **The agent gaming the gates** (for example by marking everything out of scope). Mitigation: the `out_of_scope` count and reasons are reported prominently, and M7 measures recall against real PRs, which catches this.
+- **The agent gaming the gates** (for example by marking everything out of scope). Mitigation: the `out_of_scope` count and reasons are reported prominently, split by `written_by`, lens-written entries on breaking rules go to "Review first" (M9), and M7 measures recall against real PRs, which catches this.
 - **Dedupe being too aggressive or too weak.** Mitigation: the key is deterministic and every merge is logged, with M7 eval feedback.
 
 ## Dependencies

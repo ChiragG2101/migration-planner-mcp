@@ -37,7 +37,7 @@
    - severity calibration (the share of high and blocker findings whose files needed non-trivial edits, with the threshold defined in code)
    - the false-alarm rate for high and blocker findings
    - seeded precision: a finding that proposes a change on a `no_change` or `no_finding` seeded entry (M2) counts as a false alarm; marking a `no_change` entry out of scope is correct
-   - the `out_of_scope` rate
+   - the `out_of_scope` rate, split by `written_by` (`scope`, `engine`, lens), so engine-written `no rule in range` entries don't hide what the lenses marked
    - unresolved count
    - cost (tokens if reported) and wall time
    - repo-untouched (bool)

@@ -25,6 +25,8 @@ Rows found during the build go here, newest first.
 
 | Component | Engineering failures | LLM failures | Design response | Test or check |
 | --- | --- | --- | --- | --- |
+| Aggregator | Code already in the target form can't be covered, so gate 2 fails on every `small` or `full` run | n/a | Lenses mark it out of scope with a reason; the engine writes `no rule in range` for unmatched usages in every run (D16) | `full`-run fixture where a `no_change` usage passes gate 2 (INV-42, M6) |
+| Aggregator | n/a | A lens marks a usage that needs a change out of scope to pass gate 2 | Only usage IDs from its own packet, a reason, `written_by` recorded; breaking ones go to "Review first"; counts split by writer (D16) | `submit_findings` and routing tests (INV-34, INV-42, M5, M9); recall against golden PRs (M7) |
 | Ingest | A patch release of a checked release unit is refused as newer than the pack | n/a | `supported` compared by release unit (D13) | Ingest test: `5.2.7` and `15.3.2` accepted, `6.0` and `16.0.0` refused (INV-38, M3) |
 | Rule packs and skills | Range composition off by one, or a version-scheme quirk (Django `4.2` vs `4.10`) | n/a | Composition and version comparison in core, table-tested on both schemes (D10) | `compose.test.ts`, `versions.test.ts` (INV-37, INV-38, M3) |
 | Rule packs and skills | A draft rule, or one from memory, reaches a user's plan | Contributor's agent fills in a match or fix wrongly | Only `reviewed` rules load; drafts come from the official notes; a second reviewer; the pack update report (D10, D11) | Loader skips drafts (INV-36); review-milestone checks review and report (M3) |

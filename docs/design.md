@@ -197,8 +197,10 @@ An independent review of the plan changes (`1f6c12e..7ad5bbf`) found gaps that w
 
 Why:
 
-- `none` means no usage matches a composed rule, but `find_usages` can still find usages, for example code already in the target form. With no lens to cover them, gate 2 would fail three times and push them into `unresolved` on every `none` run. The engine already knows why they need no change, so it writes the reason itself, the same way it writes `scope:` reasons.
+- `none` means no usage matches a composed rule, but `find_usages` can still find usages, for example a segment config export when no caching rule falls in (S, T]. With no lens to cover them, gate 2 would fail three times and push them into `unresolved` on every `none` run. The engine already knows why they need no change, so it writes the reason itself, the same way it writes `scope:` reasons.
 - Freezing only at the first lens packet left `none` runs, which fetch no packet, open to `set_scope` between gate rounds. That is exactly the abuse D8 set out to close.
+
+*Revised by D16:* the reason is now `no rule in range`, and the aggregator writes it in every run size, not only for `none`.
 
 ### D13 - Peer requirements name their companion range; the checked range bounds a run; packs name their seeded repo
 
@@ -250,3 +252,24 @@ Why:
 - C8 had two readings: "until eval numbers exist" (true from M7) and "until M11" (M10's README task). The PRD's wording settles it.
 - The ESLint write and spawn rule is scoped to `src/`, because the maintainer tools in `scripts/` and the eval tooling under `eval/` legitimately write files and run `git` and `gh`. They stay outside the engine through the import lint, which stops anything under `src/` importing from `scripts/` or `eval/` (INV-40).
 - Generated outputs have to change with the pack: the plugin bundle is drift-checked, and every eval rerun writes a history file. Leaving them off the allowlist would fail every honest pack PR.
+
+## 2026-10-18: fixes from the review of the plan fixes
+
+A second independent review (`b0f2fc2..plan-review-fixes`) found that D12 left gate 2 unmeetable outside `none` runs, and that the add-pack skill had loosened the baseline requirement. It also corrected D13 (release-unit comparison), D14 (generated references) and D15 (the allowlist's generated outputs, the import lint over `eval/`, and the C9 wording) in place, since those decisions had not been merged yet.
+
+### D16 - Lenses can mark usages out of scope; unmatched usages are covered in every run
+
+**Decision:**
+
+- `submit_findings` takes `out_of_scope[] {usage_id, reason}` alongside the findings. A lens may only name usage IDs from its own packet, and the reason must be non-empty. The usual case is code already in the target form (a seeded `no_change` entry).
+- In every run size, the aggregator writes `no rule in range` for each usage that matches no composed rule. This replaces D12's `none: no rule in range`, which only `none` runs got.
+- Every `out_of_scope` entry records `written_by`: `scope` (from `set_scope`), `engine` (`no rule in range`) or the lens. A usage keeps one entry. When more than one applies, `scope` wins, then `engine`, then a lens, and the others are recorded as events.
+- A lens-written entry on a usage whose rule has `necessity: breaks` goes to "Review first", like a scope exclusion (INV-34).
+- The run report and the eval split out-of-scope counts by `written_by`.
+
+Why:
+
+- Gate 2 needs every usage covered by a finding or an out-of-scope reason, but lenses could only submit findings. Code already in the target form, which M2 seeds on purpose as `no_change` ("found, then marked out of scope"), could not be covered in `small` or `full` runs. Gate 2 would fail three rounds and push it into `unresolved` on every such run, and `next-tricky` sizes as `full`.
+- Matches are syntactic: an awaited `cookies()` still matches `call {next/headers, cookies}`. Only a lens reading the code can tell that a matched usage needs no change. D12's example ("code already in the target form") was wrong for `none` runs and is corrected there.
+- Usages that match no composed rule need no judgment, so the engine covers them in every run, as D12 already did for `none`.
+- A lens marking a breaking usage out of scope carries the same risk as a scope exclusion: dropping work to pass a gate. Routing it to "Review first" and splitting the counts keeps it visible, and M7's recall against real PRs measures it.
