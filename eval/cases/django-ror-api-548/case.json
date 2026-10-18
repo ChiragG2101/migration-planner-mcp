@@ -1,0 +1,17 @@
+{
+  "id": "django-ror-api-548",
+  "pack": "django-upgrade",
+  "repo_url": "https://github.com/ror-community/ror-api",
+  "base_commit": "3ba4a12cee52912da2844ae94187a202f988a6c8",
+  "merge_commit": "3861c19d5e1181582f11f5f88d417101488a6d1e",
+  "pr_url": "https://github.com/ror-community/ror-api/pull/548",
+  "source": { "framework": "django", "version": "3.2.25" },
+  "target": { "framework": "django", "version": "4.2.30" },
+  "license": "MIT",
+  "checks": {
+    "install": ["pip install -r requirements.txt"],
+    "test": ["python manage.py setup $TEST_DATA_DUMP_FILE -t", "python manage.py test rorapi.tests.tests_unit"]
+  },
+  "tags": ["l1-candidate", "lts-to-lts", "clean"],
+  "notes": "The clean Django case: a focused LTS-to-LTS upgrade, Django 3.2.25 -> 4.2.30 (both LTS; versions from requirements.txt, so the from/to is unambiguous). Only 5 files changed, 18/19 lines: requirements.txt, rorapi/settings.py, rorapi/common/urls.py, rorapi/v2/models.py and the .github/workflows/run_tests.yml CI file. Almost no unrelated churn, so ground truth is tight. MIT licensed, has a manage.py and a run_tests.yml CI workflow. Single parent (not a merge commit). Checks mirror what CI actually runs at base: services are MySQL 8.4 and Elasticsearch 7.10.0 (NOT Postgres); CI loads data with 'manage.py setup <TEST_DATA_DUMP_FILE> -t' then runs ONLY 'python manage.py test rorapi.tests.tests_unit' (the integration and functional suites are commented out in run_tests.yml with a 'TODO fix these' note, so a plain 'manage.py test' that runs everything does not match CI). TEST_DATA_DUMP_FILE and several secrets (AWS_REGION, LaunchDarkly) are CI-provided; confirm the dump file and MySQL/ES service setup before enabling L1 in M8."
+}

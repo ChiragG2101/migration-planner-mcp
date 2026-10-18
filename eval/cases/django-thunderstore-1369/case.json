@@ -1,0 +1,17 @@
+{
+  "id": "django-thunderstore-1369",
+  "pack": "django-upgrade",
+  "repo_url": "https://github.com/thunderstore-io/Thunderstore",
+  "base_commit": "43873ef2484798482939de68cc6e847cad6d0fd7",
+  "merge_commit": "12d9ac99f1ed380b50eef958413a626241361430",
+  "pr_url": "https://github.com/thunderstore-io/Thunderstore/pull/1369",
+  "source": { "framework": "django", "version": "3.1.7" },
+  "target": { "framework": "django", "version": "4.2.30" },
+  "license": "AGPL-3.0",
+  "checks": {
+    "install": ["poetry -C django install"],
+    "test": ["docker compose -f docker/docker-compose.pytest.yml run --rm django"]
+  },
+  "tags": ["l1-candidate", "to-lts", "larger-surface", "monorepo-ish"],
+  "notes": "The larger Django case, to balance the clean ror-api one. poetry.lock shows Django 3.1.7 -> 4.2.30 (the PR title says 3.2 -> 4.2 but the lock is the source of truth, so from = 3.1.7). This is an upgrade TO an LTS (4.2 LTS), not LTS-to-LTS: Django 3.1 is NOT an LTS release (the LTS line is 2.2, 3.2, 4.2, 5.2), so it is tagged 'to-lts', not 'lts-to-lts'. See docs/design.md (D4) for why an upgrade landing on an LTS still qualifies as a Django golden case for M0. LAYOUT: this is a monorepo and the Python project lives under 'django/' (pyproject.toml, poetry.lock, manage.py, conftest.py are all in django/, NOT the repo root), so 'poetry install' at the root fails; use 'poetry -C django install'. TESTS run through Docker: 'docker/docker-compose.pytest.yml' has 'entrypoint: pytest' and needs Postgres 13 (+ pgbouncer), Redis, RabbitMQ and MinIO services; there is no bare 'pytest django/' path without those services. 31 files changed, 2111/1658 lines, including code changes beyond the version bump (e.g. a conftest.py cache-handler fix for the Django 3.x -> 4.x CacheHandler change) plus a django-cachalot bump (2.3.3 -> 2.9.1). Note any non-migration churn as an exclusion when truth is derived in M7. Licensed AGPL-3.0 (confirmed via the GitHub API): the eval only reads and analyses a local clone, so AGPL copyleft/network terms are not triggered; fine for golden-case use. Do not vendor or redistribute its code. base_commit is the first parent of the merge commit."
+}

@@ -1,0 +1,17 @@
+{
+  "id": "nextjs-neotree-editor-165",
+  "pack": "nextjs-upgrade",
+  "repo_url": "https://github.com/neotree/neotree-editor",
+  "base_commit": "1f15f5c18dae612a937268db858e4a1ec93b2f81",
+  "merge_commit": "d69425430632e5719823a6ba3c127c708d9af094",
+  "pr_url": "https://github.com/neotree/neotree-editor/pull/165",
+  "source": { "framework": "next", "version": "14.2.35" },
+  "target": { "framework": "next", "version": "15.5.27" },
+  "license": "MIT",
+  "checks": {
+    "install": ["yarn install --frozen-lockfile"],
+    "test": ["yarn test"]
+  },
+  "tags": ["l1-candidate", "tsx-tests", "drizzle"],
+  "notes": "Next.js 14.2.35 -> 15.5.27 on an established org repo (Neotree). Larger migration surface than the BigCommerce case: 40 files changed, 549/207 lines. Uses yarn (yarn.lock present at base). There IS a single aggregate 'test' script at base: it chains 26 standalone 'tsx tests/*.test.ts' scripts with '&&' (and all named test files exist), so 'checks.test' is 'yarn test'. Uses Drizzle ORM; 'db:push'/'db:studio' scripts need a database but the tsx integrity tests appear to be pure-logic. base_commit is the first parent of the merge commit."
+}

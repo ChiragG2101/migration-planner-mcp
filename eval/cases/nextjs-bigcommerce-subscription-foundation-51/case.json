@@ -1,0 +1,19 @@
+{
+  "id": "nextjs-bigcommerce-subscription-foundation-51",
+  "pack": "nextjs-upgrade",
+  "repo_url": "https://github.com/bigcommerce/subscription-foundation",
+  "base_commit": "6cff8058d722b751cca4961230e8f09af803a88a",
+  "merge_commit": "572d6a25eac7d55b10f240dcacae9e7e33617524",
+  "pr_url": "https://github.com/bigcommerce/subscription-foundation/pull/51",
+  "source": { "framework": "next", "version": "14.2.35" },
+  "target": { "framework": "next", "version": "15.5.21" },
+  "license": "MIT",
+  "checks": {
+    "install": ["npm ci"],
+    "test": ["npm test"],
+    "typecheck": ["npm run type-check"],
+    "lint": ["npm run lint"]
+  },
+  "tags": ["l1-candidate", "jest", "prisma"],
+  "notes": "Next.js 14 -> 15 major upgrade on a BigCommerce-owned repo. The repo uses npm: it has package-lock.json and no yarn.lock at base, so the checks are npm ('npm ci', 'npm test', 'npm run type-check', 'npm run lint'). Scripts at base: 'test': 'jest', 'type-check': 'tsc --pretty --noEmit', 'lint': 'next lint'. The diff touches package.json (next ^14.2.35 -> ^15.5.21) and the lockfile; 4 files changed but ~4.8k/2.6k lines are almost all package-lock.json churn, so most of the line count is not migration code. The real migration surface is small (dependency bump + any code the Next 15 async-request-API / caching defaults required). base_commit is the first parent of the merge commit. Caveat for L1: 'prebuild' runs 'prisma generate && prisma migrate deploy', so a full build needs a database; 'npm test' (jest) should run without one. Verify before enabling L1 for this case."
+}
