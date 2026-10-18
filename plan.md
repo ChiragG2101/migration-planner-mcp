@@ -19,4 +19,10 @@ A milestone is done only when every per-milestone gate holds (overview, "Per-mil
 | M10 | Django pack (no core changes), README, open-source files, demo, name decided | [10](docs/plans/10-django-pack-readme-oss-demo.md) | not started |
 | M11 | Publish to npm, tag v0.1 | [overview §M11](docs/plans/00-overview.md) | not started |
 
+## Noted for later (not yet planned)
+
+Ideas agreed to be worth building, but not yet given a milestone. Each needs a plan entry before work starts.
+
+- **Upgrade one version at a time.** Some official guides (Django's in particular) advise crossing several releases one at a time. Staging today orders work by file (`leaf_first`, `config_first`) and puts source-compatible fixes before the bump (D5), but it cannot split a multi-release range into one bump per release. It needs a pack option and an M6 staging mode.
+
 M0 deliverables: [`docs/design.md`](docs/design.md), [`docs/invariants.md`](docs/invariants.md), [`docs/failure-modes.md`](docs/failure-modes.md), this file, and the golden cases under [`eval/cases/`](eval/cases/).
