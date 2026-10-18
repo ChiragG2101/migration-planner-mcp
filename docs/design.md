@@ -223,6 +223,8 @@ Why:
 
 **Decision: when Context7 is unavailable and the engine falls back to the rules' `source` links and the generated references, each one is written to `run_docs` with `fetched_by: knowledge`, status `unverified` and a `doc_id`. In server-side mode the engine queries Context7 by a symbol from the rule's typed match, never by `doc_topics`.**
 
+A rule's `source` link keeps its URL and is `official`. A generated reference has no web URL, so it gets `pack://<pack>@<version>/references/<file>`, `official: false`, and the library and version of the release it describes. For both, the `doc_id` hashes the text the engine serves.
+
 Why:
 
 - `fetched_by` could only be `engine` or `agent`, and nothing said whether fallback links got a `doc_id`. Either INV-35 or gate 3 would have broken whenever Context7 was down, which is the case M4 exists to handle.

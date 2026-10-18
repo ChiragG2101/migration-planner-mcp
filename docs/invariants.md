@@ -25,12 +25,12 @@ Numbered rules that must always hold. Each names the test that fails when the ru
 
 Gates 1–6 run on the plan in `validate_plan`; gate 7 runs on each L1 stage patch. All gates re-check against real files and import no network or model code. After 3 rounds/attempts, failures go to `unresolved[]` and are never marked passed.
 
-- **INV-15 (gate 1):** Every evidence location exists and its `snippet_hash` matches the current file, via the one shared normaliser. *(planned: `src/pipeline/gates/g1-evidence.ts`, `test/unit/gates/` `bad-g1` fixture — M6)*
-- **INV-16 (gate 2):** Every usage found by `find_usages` is covered by a finding or explicitly marked out of scope with a reason. *(planned: `src/pipeline/gates/g2-coverage.ts`, `test/unit/gates/` `bad-g2` fixture — M6)*
-- **INV-17 (gate 3):** Every `doc_refs` entry came from the docs tool in this run; no invented links. *(planned: `src/pipeline/gates/g3-doc-refs.ts`, `test/unit/gates/` `bad-g3` fixture — M6)*
-- **INV-18 (gate 4):** Every finding with severity `high` or `blocker` has a rollback and a verify step. *(planned: `src/pipeline/gates/g4-rollback-verify.ts`, `test/unit/gates/` `bad-g4` fixture — M6)*
-- **INV-19 (gate 5):** Stage order is valid: no stage depends on a change that comes later, checked against the import graph. *(planned: `src/pipeline/gates/g5-stage-order.ts`, `test/unit/gates/` `bad-g5` fixture — M6)*
-- **INV-20 (gate 6):** The plan is schema-valid with no duplicate finding IDs. *(planned: `src/pipeline/gates/g6-schema-ids.ts`, `test/unit/gates/` `bad-g6` fixture — M6)*
+- **INV-15 (gate 1):** Every evidence location exists and its `snippet_hash` matches the current file, via the one shared normaliser. *(planned: `src/pipeline/gates/g1-evidence.ts`, `test/unit/gates/`, with the `bad-g1` fixture in `test/fixtures/plans/` — M6)*
+- **INV-16 (gate 2):** Every usage found by `find_usages` is covered by a finding or explicitly marked out of scope with a reason. *(planned: `src/pipeline/gates/g2-coverage.ts`, `test/unit/gates/`, with the `bad-g2` fixture in `test/fixtures/plans/` — M6)*
+- **INV-17 (gate 3):** Every `doc_refs` entry came from the docs tool in this run; no invented links. *(planned: `src/pipeline/gates/g3-doc-refs.ts`, `test/unit/gates/`, with the `bad-g3` fixture in `test/fixtures/plans/` — M6)*
+- **INV-18 (gate 4):** Every finding with severity `high` or `blocker` has a rollback and a verify step. *(planned: `src/pipeline/gates/g4-rollback-verify.ts`, `test/unit/gates/`, with the `bad-g4` fixture in `test/fixtures/plans/` — M6)*
+- **INV-19 (gate 5):** Stage order is valid: no stage depends on a change that comes later, checked against the import graph. *(planned: `src/pipeline/gates/g5-stage-order.ts`, `test/unit/gates/`, with the `bad-g5` fixture in `test/fixtures/plans/` — M6)*
+- **INV-20 (gate 6):** The plan is schema-valid with no duplicate finding IDs. *(planned: `src/pipeline/gates/g6-schema-ids.ts`, `test/unit/gates/`, with the `bad-g6` fixture in `test/fixtures/plans/` — M6)*
 - **INV-21 (gate 7, test integrity):** Compared with the sandbox before the stage, an L1 patch must not reduce the number of test cases or assertions, add `skip`/`only`/`todo`/`xfail` markers, delete test files or snapshots, lower coverage thresholds, or edit check definitions. A stage needing any of these goes to "Review first", never into a kept patch silently. *(planned: `src/verify/testIntegrity.ts`, `test/unit/gate7-*.test.ts`, weakened-test fixtures all rejected — M8)*
 
 ## Output and honesty
@@ -45,7 +45,7 @@ Gates 1–6 run on the plan in `validate_plan`; gate 7 runs on each L1 stage pat
 ## Coverage and staging (added after the M0 review; see `design.md` D5–D7)
 
 - **INV-28:** Every reviewed rule reachable in a pack's supported range has at least one `expect: change` seeded case in that pack, and every code-usage kind has an indirect seeded entry. (Revised by D10: `lands_on` is derived, not a field.) *(planned: `scripts/lint-packs.ts`, `test/unit/lintPacks.test.ts` — M3)*
-- **INV-29:** No prep stage depends on the version-bump stage, and no `lands_on: target` finding (including any finding with no matched rule) is staged before it. *(planned: `src/pipeline/gates/g5-stage-order.ts`, `test/unit/gates/` `bad-g5` fixture — M6)*
+- **INV-29:** No prep stage depends on the version-bump stage, and no `lands_on: target` finding (including any finding with no matched rule) is staged before it. *(planned: `src/pipeline/gates/g5-stage-order.ts`, `test/unit/gates/`, with the `bad-g5` fixture in `test/fixtures/plans/` — M6)*
 - **INV-30:** Eval headline metrics are computed from raw truth only. `annotations.json` entries add an adjusted figure and a "PR missed" list, never change the headline. *(planned: `test/unit/eval/` annotations test — M7)*
 - **INV-31:** A finding that proposes a change on a seeded `no_change` or `no_finding` entry counts as a false alarm. *(planned: `test/unit/eval/` seeded-precision test — M7)*
 

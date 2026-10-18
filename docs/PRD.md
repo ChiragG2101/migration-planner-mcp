@@ -124,7 +124,7 @@ Ingest -> Context build -> Size and scope -> Specialist fan-out -> Aggregate -> 
 
 1. **Ingest.** Validates input: path exists, source and target versions resolved from lockfiles (npm, pnpm, yarn, uv, poetry, pip requirements), git state clean or noted. Produces a run ID under a campaign and repo ID. Everything downstream is idempotent per run ID.
 2. **Context builder.** Deterministic. `scan_repo` and `find_usages` build the repo facts through the language adapter for each file: dependency graph, import graph, entrypoints, usage list with file:line. Stored in SQLite with a symbol index; no vector DB for v0.1.
-   - **Then size and scope** (section 2). `propose_scope` computes the size and the questions from the facts, and `set_scope` records the answers. Scope is frozen once planning starts. A `none` size skips the specialist fan-out, and a `small` size runs one combined lens instead of four. The gates run on every plan, whatever its size.
+   - **Then size and scope** (section 2). `propose_scope` computes the size and the questions from the facts, and `set_scope` records the answers. Scope is frozen at the first lens packet or the first `merge_findings`, whichever comes first. A `none` size skips the specialist fan-out, and a `small` size runs one combined lens instead of four. The gates run on every plan, whatever its size.
 3. **Specialist fan-out.** The `plan_migration` prompt instructs the host agent to work four lenses independently, each with its own evidence packet and narrow instruction: **API**, **Dependency/build**, **Behavior/runtime**, **Verification**. Each lens returns findings only in the schema above. Lenses do not see each other's output.
 4. **Aggregator.** `merge_findings` dedupes overlapping findings, resolves conflicts (take the higher severity and note it), groups findings into ordered stages (codemod steps first within a stage), and flags any usage with no covering finding.
 5. **Gates (deterministic critic).** `validate_plan` runs the hard checks in section 7. Failing findings go back to the agent with the exact failure. Cap at 3 rounds, then the plan is emitted with unresolved items marked, never silently passed.
@@ -266,7 +266,7 @@ Always:
 - Cost and time per run.
 - Repo untouched: a hash of the target repo before and after every eval run must match.
 
-**Regression rule:** any change to a prompt, the knowledge or a pack, a skill, a usage adapter, the risk or sizing logic, staging, packets or routing, a codemod registry entry or a gate reruns the golden set and writes `eval/results.md`. Publish the results with the misses.
+**Regression rule:** any change to a prompt, the knowledge or a pack, a skill, the knowledge loader or range composition, a usage adapter, the risk or sizing logic, staging, packets or routing, a codemod registry entry or a gate reruns the golden set and writes `eval/results.md`. Publish the results with the misses.
 
 ## 11. Tool surface
 
