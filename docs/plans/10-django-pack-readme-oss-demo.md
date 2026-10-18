@@ -51,7 +51,11 @@ A CI check (`scripts/check-core-untouched.ts`) diffs the pack PR against the pro
    - `checks_hint`: the system check framework, a migrations check that fails if new migrations would be generated, and the test suite run with deprecation warnings treated as errors. These are hints the user copies into their own check config. The pack never runs them.
    - Trigger: "Use when planning a Django major or LTS upgrade in a Python repo." Built with the M3 generator and lint. `npm run pack:report -- django-upgrade` runs against the live official notes, and its output is attached to the pack PR.
 3. **Django eval cases.**
-   - Golden: at least 2 public Django upgrade PRs from the M0 list, with `checks` declared so M8 can run L1 on at least one.
+   - Golden: at least 3 public Django upgrade PRs, with `checks` declared so M8 can run L1 on at least one, and all with an open licence. They must include:
+     - **at least 2 strict LTS-to-LTS upgrades** (tag `lts-to-lts`). The M0 list has one (`django-ror-api-548`). `django-thunderstore-1369` lands on an LTS from a non-LTS release (`to-lts`, `docs/design.md` D4), so it counts towards the total but not towards these 2.
+     - **at least 1 messy case** (tag `messy`): a reverted or partial Django upgrade, or one with follow-up fixes. The M0 list has none.
+
+     Find candidates with `npm run cases:find` (M7) and vet them with the `add-golden-case` skill. If either kind can't be found, stop and raise it with the maintainer: it changes what the Django results can claim.
    - Seeded: `eval/seeded/django-tricky/`, with:
      - a removed setting in a split settings module
      - middleware referenced only by a dotted string
@@ -137,6 +141,7 @@ A CI check (`scripts/check-core-untouched.ts`) diffs the pack PR against the pro
 
 - The Django pack, adapter and eval cases merge with `check-core-untouched` passing.
 - `eval/results.md` includes both packs and the baseline comparison, with misses listed, and an L1 run on at least one Django case.
+- The Django golden set has at least 3 licensed cases, including at least 2 tagged `lts-to-lts` and at least 1 tagged `messy`, and `npm run cases:verify -- --all` passes.
 - The AGENTS.md snippet works when present, is optional, provably cannot widen the boundary, and cannot add checks without the trust flag.
 - The open-source files and plugin bundle exist, and the README follows the order above, states its limits and claims only what exists.
 - The demo script reproduces the reject-then-pass flow, the gate 7 rejection and a clean `git status`.
