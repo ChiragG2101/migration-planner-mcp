@@ -35,14 +35,15 @@
      - `replacement_since?`: the release in which the new form first existed
      - `match`: what to look for, typed (task 3)
      - `concern`, `default_severity`, `mapping` (from and to text), `no_equivalent` (bool), `codemod?` (an ID from the library's `codemods[]`), `notes`, `verify_hint`, `rollback_hint`
+     - `requires {library, range}`: required on a `peer_requirement` rule and rejected on any other. It names the companion library and the version range the primary needs from this release (for example `npm/react`, `>=19`). The rule's `match` says where the requirement applies, so a requirement that only the app router has uses a match on app-router files (`docs/design.md` D13).
      - `source`: **one** official URL (under a `doc_sources` prefix) for the section that documents the change. It is the only doc reference stored. `doc_topics[]` are search terms the agent looks up in Context7 at run time (M4); they are not links.
      - `status`: `draft` or `reviewed`. **Only `reviewed` rules load.** Drafts may be committed so work can span PRs; the loader skips them and reports the count.
-   - **No executable fields.** The schema rejects unknown keys. The lint rejects strings that look like shell commands in any field other than `verify_hint`, which is display text only (C3, C9).
+   - **No executable fields.** The schema rejects unknown keys. The lint rejects strings that look like shell commands in any field except the display-text fields: `verify_hint` and `rollback_hint` in rules, and `checks_hint` in packs. These are shown to people and never executed (C3, C9).
 2. **Pack schema (`src/schema/pack.ts`, Zod).** `packs/<pack>/pack.json` is thin. It says which knowledge to use and how to plan with it, and holds no rules:
    - `name`, `version` (semver of the pack's content), `kind` (`upgrade` or `swap`), `language`, `trigger` (one sentence)
    - `libraries[] {id, role}`: one `primary` (the library being upgraded), plus `companion` libraries whose required range follows from the primary's `peer_requirement` rules (the Next.js pack: `npm/next` primary, `npm/react` companion)
    - `supported {from, to}`: the primary's release range this pack has been checked for. It must sit inside the knowledge's `covered_from` and its newest reviewed release.
-   - `usage_adapter` (a registry ID, M2), `usage_kinds[] {kind, lens}` (which M5 lens gets each usage kind), `staging` (`leaf_first` or `config_first`), `checks_hint` (display text, never executed), `references[]`
+   - `usage_adapter` (a registry ID, M2), `usage_kinds[] {kind, lens}` (which M5 lens gets each usage kind), `staging` (`leaf_first` or `config_first`), `checks_hint` (display text, never executed), `references[]`, `seeded` (the pack's seeded repo under `eval/seeded/`, for example `next-tricky`; the lint reads its `ground_truth.json`)
    - `CHANGELOG.md` next to it. The pack version must bump when `pack.json` or any knowledge file it uses changes. The run records `pack@version#hash`, where the hash covers the pack and every knowledge file it used.
 3. **Typed match kinds (`src/schema/match.ts`).** A rule's `match` is one of a fixed set, each with typed fields:
    - `import {module, name?}` (TS/JS and Python imports)
@@ -57,15 +58,16 @@
 
    The set covers both v0.1 packs, so M10 adds no core change. Each usage adapter declares the match kinds it supports (M2). A new kind for a future pack is a core change, reviewed as code.
 4. **Version schemes and range composition (`src/rules/versions.ts`, `src/rules/compose.ts`).** Core code, since packs are data and can't run code.
-   - `semver` and `pep440` parse and compare versions. Pre-releases (`canary`, `rc`, `a`, `b`, `dev`) are refused with "pre-release versions not supported in v0.1".
+   - `semver` and `pep440` parse and compare versions. Pre-releases (`canary`, `rc`, `a`, `b`, `dev`) are refused with "pre-release versions not supported in v0.1", both here and at ingest: M3 adds the check to `src/pipeline/ingest.ts`, using the library's version scheme, so a pre-release never gets a run.
+   - **The pack's `supported` range bounds the run, also checked at ingest.** A target T newer than `supported.to` is refused with "target <T> is newer than this pack has been checked for (up to <to>)". An installed S older than `supported.from`, but not older than `covered_from`, composes normally and reports "your version is older than this pack's checked range", and the size can't be `none`.
    - **Composition** for a run with installed version S and target T (both resolved at ingest, M1). A rule applies when it has at least one event with a version in (S, T]. Then, per rule:
      - `necessity` is `breaks` if a `removed`, `renamed`, `changed_behavior`, `changed_default` or `peer_requirement` event falls in (S, T]; otherwise it is `deprecated`. Sizing, the scope questions and routing read it (D8).
      - `lands_on` is `source` if `replacement_since` is at most S (the new form already exists in the installed version); otherwise it is `target`, which includes rules with no `replacement_since`. M6 staging reads it (D5).
-   - Companion libraries are composed from their installed version to the version that the primary's `peer_requirement` rules in range demand.
+   - Companion libraries are composed from their installed version to the lowest version that satisfies every `requires` range of the primary's `peer_requirement` rules in range. Conditional requirements are applied too, because flagging is the safe direction (PRD section 3). When a requirement's `match` finds nothing in the run, the plan says the companion upgrade may not be needed.
    - If S is older than `covered_from`, composition still runs and reports "changes before `<covered_from>` were not checked", and the size can't be `none`.
    - `stop_at` (D8) replaces T and must be a release unit inside `supported`.
 5. **Next.js knowledge and pack.**
-   - `knowledge/npm/next/` and `knowledge/npm/react/` (React's covers `react-dom`), with `library.json` and release files for every release unit in the pack's supported range. `packs/nextjs-upgrade/pack.json`, `CHANGELOG.md`, `references-src/*.md`.
+   - `knowledge/npm/next/` and `knowledge/npm/react/` (React's covers `react-dom`), with `library.json` and release files for every release unit in the pack's supported range. `packs/nextjs-upgrade/pack.json` (with `seeded: next-tricky`), `CHANGELOG.md`, `references-src/*.md`.
    - The supported range is fixed at the start of M3 against the current Next.js release and upgrade guides, and recorded in the pack changelog with the date. It should start at least one major before the newest one, so repos that skipped a cleanup are covered.
    - Rules cover each usage kind from M2: async request APIs, caching and segment config, config keys, removed or renamed packages, the React changes the Next.js majors require (as `peer_requirement` plus React's own rules), peer-dependency conflicts, and type changes.
    - Codemod references are the official `@next/codemod` transforms (including the upgrade command) and React's official codemods, each by registry ID. Which rules a codemod covers is derived from the rules that name it, so the plan can show what the codemod leaves for manual work.
@@ -79,11 +81,12 @@
    - a missing or overly broad trigger. The description must name the library and the migration and contain "Use when", and a blocklist rejects phrases like "working with React" and "any".
    - SKILL.md over the line limit, or a reference link to a file that does not exist
    - a codemod reference whose ID is not in the core registry list (`src/verify/codemodIds.ts`; M8 implements the registry), or a rule naming a codemod its library doesn't list
-   - a pack version not bumped while `pack.json` or a knowledge file it uses changed (compared with git HEAD in CI), or a missing CHANGELOG entry for the current pack or library version
+   - a string that looks like a shell command outside the display-text fields (task 1)
+   - a pack version not bumped while `pack.json` or a knowledge file it uses changed (compared with the PR's merge base in CI), or a missing CHANGELOG entry for the current pack or library version
    - a rule `id` used twice, an `events[]` entry naming an unknown rule, or a release file holding an event for a different release
    - a `source` that is not under the library's `doc_sources`, an empty `doc_sources`, or a prefix that is not `https://`
    - a reviewed rule reachable in a pack's supported range whose match kind the pack's usage adapter does not declare
-   - a reviewed rule reachable in a pack's supported range with no `expect: change` seeded case in that pack's `ground_truth.json`
+   - a reviewed rule reachable in a pack's supported range with no `expect: change` seeded case in the `ground_truth.json` of the pack's `seeded` repo, or a `seeded` repo that doesn't exist
    - a code-usage kind (calls and imports, not config keys or dependency ranges) with no indirect seeded entry (through a helper, wrapper or re-export)
    - `supported` outside the knowledge's `covered_from` and newest reviewed release
    - any file under `knowledge/` or `packs/` other than `.json` or `.md` (no scripts)
@@ -114,7 +117,7 @@
 12. **Sizing and scope (`src/analysis/sizing.ts`, `src/core/{proposeScope,setScope}.ts`, tools, CLI `scope`; deterministic, no LLM).**
     - **`propose_scope`** (input `run_id`) returns a size, a summary and the questions.
     - **Size** is computed from the facts, never guessed:
-      - `none` only when all of these hold: zero usages match a composed rule, the scan is complete (no `unparsed_files`, `unresolved_dynamic` or `skipped_by_limit`), no dependency has a `peer_conflict`, and the installed version is not older than `covered_from`. The output still lists the composed `changed_behavior` and `changed_default` rules in one line each ("not found in your code; listed because behaviour changes can hide"). Usages that `find_usages` found but that match no composed rule (for example code already in the target form) are marked out of scope by the engine when it builds the `none` plan (M6), so gate 2 holds without any lens.
+      - `none` only when all of these hold: zero usages match a composed rule, the scan is complete (no `unparsed_files`, `unresolved_dynamic` or `skipped_by_limit`), no dependency has a `peer_conflict`, and the installed version is not older than `covered_from` or `supported.from`. The output still lists the composed `changed_behavior` and `changed_default` rules in one line each ("not found in your code; listed because behaviour changes can hide"). Usages that `find_usages` found but that match no composed rule (for example code already in the target form) are marked out of scope by the engine when it builds the `none` plan (M6), so gate 2 holds without any lens.
       - `small` when the scan is complete, the matched usages are at most `--small-max-usages` (default 10, recorded per run and tuned from M7 data), every one is covered by a codemod, and none has a `suggested_severity` of `high` or `blocker`.
       - `full` otherwise.
     - **Questions** come from the facts, and only when relevant. Each has an ID, fixed options and a default:
@@ -133,20 +136,21 @@
 
 ## Files and modules
 
-`src/schema/{knowledge,pack,match,scope}.ts`, `src/rules/{loader,versions,compose}.ts`, `src/verify/codemodIds.ts`, `src/core/{getRulePack,assessRisk,proposeScope,setScope}.ts`, `src/tools/{getRulePack,assessRisk,proposeScope,setScope}.ts`, `src/cli/{pack,risk,scope}.ts`, `src/analysis/{risk,sizing}.ts`, `knowledge/npm/{next,react}/{library.json,CHANGELOG.md,releases/*}`, `packs/nextjs-upgrade/{pack.json,CHANGELOG.md,SKILL.md,references/*,references-src/*}`, `scripts/{build-pack,lint-packs,draft-release,pack-docs-report}.ts`, `scripts/lib/release-notes.ts` (the shared notes parser), `.agents/skills/add-release-knowledge/SKILL.md`, `eval/seeded/next-tricky/**` (`rule_id` tags and cases for uncovered rules), `test/fixtures/next-clean/` (a Next.js app with no affected code), `test/fixtures/knowledge/` (small fake libraries for both schemes), `test/fixtures/release-notes/` (recorded notes in `md`, `mdx` and `rst`), `test/unit/{knowledge,pack,versions,compose,lintPacks,risk,sizing,scope,releaseNotes}.test.ts`, `test/permissions/scope-cannot-widen.test.ts`.
+`src/schema/{knowledge,pack,match,scope}.ts`, `src/rules/{loader,versions,compose}.ts`, `src/pipeline/ingest.ts` (the pre-release and `supported` checks), `src/verify/codemodIds.ts`, `src/core/{getRulePack,assessRisk,proposeScope,setScope}.ts`, `src/tools/{getRulePack,assessRisk,proposeScope,setScope}.ts`, `src/cli/{pack,risk,scope}.ts`, `src/analysis/{risk,sizing}.ts`, `knowledge/npm/{next,react}/{library.json,CHANGELOG.md,releases/*}`, `packs/nextjs-upgrade/{pack.json,CHANGELOG.md,SKILL.md,references/*,references-src/*}`, `scripts/{build-pack,lint-packs,draft-release,pack-docs-report}.ts`, `scripts/lib/release-notes.ts` (the shared notes parser), `.agents/skills/add-release-knowledge/SKILL.md` (exists; keep it in step with the schema), `eval/seeded/next-tricky/**` (`rule_id` tags and cases for uncovered rules), `test/fixtures/next-clean/` (a Next.js app with no affected code), `test/fixtures/knowledge/` (small fake libraries for both schemes), `test/fixtures/release-notes/` (recorded notes in `md`, `mdx` and `rst`), `test/unit/{knowledge,pack,versions,compose,lintPacks,risk,sizing,scope,releaseNotes}.test.ts`, `test/permissions/scope-cannot-widen.test.ts`.
 
 ## Tests
 
-- **Schemas:** unknown keys, a missing trigger, an executable-looking field, a codemod entry with a `command` key, and a reviewed rule with an empty `match` are all rejected. A draft with an empty `match` is accepted but not loaded.
-- **Version schemes:** ordering tables for `semver` and `pep440`, including `4.2` vs `4.10`, patch levels, and refused pre-releases in each scheme.
+- **Schemas:** unknown keys, a missing trigger, an executable-looking field, a codemod entry with a `command` key, a reviewed rule with an empty `match`, a `peer_requirement` rule without `requires`, and `requires` on any other kind of rule are all rejected. A draft with an empty `match` is accepted but not loaded.
+- **Version schemes:** ordering tables for `semver` and `pep440`, including `4.2` vs `4.10`, patch levels, and refused pre-releases in each scheme. Ingest refuses a pre-release source or target (for example `next@16.0.0-canary.1`, `django==5.2a1`) with the same message, and refuses a target newer than `supported.to`.
 - **Composition (`compose.test.ts`), on fake libraries in both schemes.** This is the core of the milestone and is table-driven:
   - an event exactly at S is excluded, and one exactly at T is included
   - a rule deprecated in range and removed after T is `deprecated`
   - one deprecated before S and removed in range is `breaks`
   - one deprecated before S and not removed by T is not included
   - `replacement_since` at S gives `source`, after S gives `target`, and absent gives `target`
-  - a companion range follows the primary's `peer_requirement`
-  - S older than `covered_from` gives the "not checked" note
+  - a companion range follows the `requires` ranges of the primary's `peer_requirement` rules, and the stricter one wins when two disagree
+  - a conditional requirement whose match finds nothing is still applied, with the "may not be needed" note
+  - S older than `covered_from` gives the "not checked" note, and S older than `supported.from` gives the "older than this pack's checked range" note
   - `stop_at` narrows T
   - a draft rule never appears
 - **Lint:** one failing fixture per lint rule.
@@ -155,7 +159,7 @@
 - **Drafter and report (offline, on recorded fixtures):** the drafter never overwrites a reviewed rule; the report lists a planted missing item, a planted dead source and a planted draft.
 - **Risk:** a table-driven test of the signals on the `next-tricky` seeded repo. Async request APIs used through a helper, caching-only changes and peer conflicts must come out at `high` or `blocker` suggested severity.
 - **Loader:** `--rules-dir` outside the bundled dirs is refused, drafts are skipped and counted, and the pack version and hash appear in the run record.
-- **Sizing:** `next-clean` comes out `none`, and `next-tricky` comes out `full`. Each `none` condition is shown to matter: an unparsed file, an unresolved dynamic import, a peer conflict, a single matched usage, or an installed version older than `covered_from` each turns `none` into `small` or `full`. A usage with no codemod, or a high-risk one, turns `small` into `full`.
+- **Sizing:** `next-clean` comes out `none`, and `next-tricky` comes out `full`. Each `none` condition is shown to matter: an unparsed file, an unresolved dynamic import, a peer conflict, a single matched usage, or an installed version older than `covered_from` or `supported.from` each turns `none` into `small` or `full`. A usage with no codemod, or a high-risk one, turns `small` into `full`.
 - **Scope:** an answer outside the offered options is rejected; `depth` can move up but not down; `set_scope` after the first lens packet is refused, and so is `set_scope` after `merge_findings` on a `none` run; excluded usages get engine-written `out_of_scope` reasons; unanswered questions take their defaults and are reported as defaults.
 - **Permissions (`scope-cannot-widen`):** no `set_scope` input can change the paths, the deny list, the level, the checks or `--out`, and a `stop_at` outside the pack's supported range is rejected.
 - **Permissions:** the full suite still passes, and an import lint shows nothing under `src/` imports from `scripts/`.

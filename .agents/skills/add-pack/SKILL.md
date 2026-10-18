@@ -26,6 +26,7 @@ A pack is data plus one usage adapter. The facts live in `knowledge/`, per libra
 - `supported {from, to}`: only releases whose knowledge is reviewed. Record the date in `CHANGELOG.md`.
 - `staging: leaf_first` (code first, leaves before importers) or `config_first` (settings first).
 - `usage_adapter`, `usage_kinds[] {kind, lens}`, `checks_hint`, `trigger`.
+- `seeded`: the name of the pack's seeded repo under `eval/seeded/` (for example `next-tricky`).
 
 Never put commands, scripts or shell snippets in a pack. Only `checks_hint` may look like a command, and it is display text.
 
@@ -43,7 +44,7 @@ Never put commands, scripts or shell snippets in a pack. Only `checks_hint` may 
 
 ## 5. Eval
 
-- Seeded repo `eval/seeded/<pack>/`, with planted hard cases and `ground_truth.json` (each `expect: change` entry names its `rule_id`). Report recall with the recall script and record the ratchet.
+- Seeded repo `eval/seeded/<name>/`, the one `pack.json` names in `seeded`, with planted hard cases and `ground_truth.json` (each `expect: change` entry names its `rule_id`). Report recall with the recall script and record the ratchet.
 - At least **2 golden cases** from real public PRs: find candidates with `npm run cases:find` and vet them with the `add-golden-case` skill. Declare `checks` so L1 can run on at least one.
 - Run the eval for the new pack and for every existing pack. The new pack must beat the baseline on recall, and existing packs must not regress beyond the recorded noise band.
 

@@ -26,13 +26,14 @@ For each draft, read its `source` section in full, then fill in:
 - `replacement_since`: the release in which the new form first existed, if there is one. It decides whether the fix can land before the upgrade, so check it in the older release's notes.
 - `match`, using a typed match kind. If the change is about something already defined in an earlier release, add an `events[]` entry here instead of a new rule.
 - `concern`, `default_severity`, `mapping`, `no_equivalent`, `codemod` (only an ID the library lists), `doc_topics`, `verify_hint`, `rollback_hint`, `notes`
+- For a `peer_requirement` rule only: `requires {library, range}`, the companion and the range the primary needs. Its `match` says where the requirement applies.
 - Do not set `necessity` or `lands_on`. The engine derives both per run.
 
-Never put commands, scripts or shell snippets in a rule. `verify_hint` is display text only.
+Never put commands, scripts or shell snippets in a rule. `verify_hint` and `rollback_hint` are display text only.
 
 ## 3. Seed it
 
-For every rule a pack can reach, plant at least one `expect: change` case in that pack's seeded repo (`eval/seeded/<pack>/`) with its `rule_id`. Code-usage kinds also need an indirect case (through a helper, wrapper or re-export). Use the `write-tests` skill.
+For every rule a pack can reach, plant at least one `expect: change` case in the seeded repo that pack names in its `seeded` field (`eval/seeded/<name>/`), with its `rule_id`. Code-usage kinds also need an indirect case (through a helper, wrapper or re-export). Use the `write-tests` skill.
 
 ## 4. Check
 

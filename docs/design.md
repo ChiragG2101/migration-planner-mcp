@@ -163,7 +163,7 @@ Why:
 Caveats accepted:
 
 - Composition and version comparison are new core logic. They are covered by table-driven tests on both schemes (inclusive and exclusive bounds, patch-level events, pre-release refusal).
-- Conditional peer requirements (Next 15's app router needs React 19, its pages router doesn't) are expressed as `peer_requirement` rules tied to a match. That is more complex than a flat list.
+- Conditional peer requirements (Next 15's app router needs React 19, its pages router doesn't) are expressed as `peer_requirement` rules tied to a match, with a `requires {library, range}` field (D13). That is more complex than a flat list.
 - A user older than `covered_from` gets a "changes before X were not checked" note, and the size can't be `none`.
 - A future pack needing a new version scheme or match kind is a core change, reviewed as code. That is by design: packs are data and can't run code.
 
@@ -197,3 +197,21 @@ Why:
 
 - `none` means no usage matches a composed rule, but `find_usages` can still find usages, for example code already in the target form. With no lens to cover them, gate 2 would fail three times and push them into `unresolved` on every `none` run. The engine already knows why they need no change, so it writes the reason itself, the same way it writes `scope:` reasons.
 - Freezing only at the first lens packet left `none` runs, which fetch no packet, open to `set_scope` between gate rounds. That is exactly the abuse D8 set out to close.
+
+### D13 - Peer requirements name their companion range; the checked range bounds a run; packs name their seeded repo
+
+**Decision:**
+
+- A `peer_requirement` rule carries `requires {library, range}`. A companion is composed to the lowest version that satisfies every `requires` in range, and conditional requirements are applied too, with a note when their match finds nothing.
+- The pack's `supported` range bounds a run. A target newer than `supported.to` is refused at ingest. An installed version older than `supported.from` gets a note, and the size can't be `none`. Pre-releases are refused at ingest as well as in composition.
+- `pack.json` names its seeded repo (`seeded`), and the lint reads that repo's `ground_truth.json`.
+- The display-text fields that may look like commands are `verify_hint` and `rollback_hint` in rules, and `checks_hint` in packs.
+
+Why:
+
+- Composition had to find "the version the primary's peer requirements demand", but no field held it. A rule's single `match` says *where* a requirement applies; `requires` says *what* it requires.
+- Applying a conditional requirement even when its match finds nothing errs toward flagging (PRD section 3). Skipping it could hide a needed React upgrade behind a file the scan missed.
+- Nothing said what happens when the target is newer than the pack has been checked for, which is the usual case right after a new major ships. Refusing is honest. Composing anyway would give a plan built on knowledge that nobody has written yet.
+- INV-38 promised refusal at ingest, but no milestone touched ingest for it. M3 now does.
+- The lint and the skills disagreed about where a pack's seeded repo lives (`eval/seeded/<pack>/` vs `next-tricky`). An explicit field removes the guess.
+- A rollback hint such as "pin next@14 again" reads like a command. Without the exemption, the lint would reject honest rules.
