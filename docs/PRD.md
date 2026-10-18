@@ -266,7 +266,7 @@ Always:
 - Cost and time per run.
 - Repo untouched: a hash of the target repo before and after every eval run must match.
 
-**Regression rule:** any change to a prompt, rule pack, skill, codemod registry entry or gate reruns the golden set and writes `eval/results.md`. Publish the results with the misses.
+**Regression rule:** any change to a prompt, the knowledge or a pack, a skill, a usage adapter, the risk or sizing logic, staging, packets or routing, a codemod registry entry or a gate reruns the golden set and writes `eval/results.md`. Publish the results with the misses.
 
 ## 11. Tool surface
 

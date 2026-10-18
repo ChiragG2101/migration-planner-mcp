@@ -46,7 +46,7 @@ Keep each commit to one coherent step, and keep the test suite passing between s
 - Prompts are versioned. Never edit a released `prompts/*.vN.md`; add `vN+1`.
 - Generated files (SKILL.md and references under `packs/`) are never edited by hand. Change the knowledge or `pack.json` and regenerate.
 - `src/` never imports from `scripts/`. Maintainer tools that use the network stay outside the engine.
-- If you change anything under `prompts/`, `knowledge/`, `packs/`, `src/rules/`, `src/pipeline/gates/` or `src/verify/`, regenerate `eval/results.md` in the same change (the regression rule).
+- If you change anything under the regression-rule paths in `AGENTS.md` (`prompts/`, `knowledge/`, `packs/`, `src/rules/`, `src/analysis/`, staging, packets, routing, gates or `src/verify/`), regenerate `eval/results.md` in the same change. Before M7 there is no eval yet; say so in the handover.
 
 ## 5. Run the gates
 

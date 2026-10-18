@@ -26,12 +26,13 @@ Adding the pack may only touch:
 
 - `knowledge/pypi/django/**` and `packs/django-upgrade/**`
 - one new usage adapter `src/analysis/usages/django.ts`, registered with one line in `src/analysis/usages/index.ts`
-- eval cases and fixtures
-- docs
+- eval data: the new cases under `eval/cases/`, the seeded repo `eval/seeded/django-tricky/`, and the regenerated `eval/results.md`
+- the adapter's unit tests and fixtures under `test/`
+- docs (`docs/`, `README.md`)
 
 The Python language adapter (M2), the text scanner (M2), the staging options (M6) and the `django-upgrade` codemod registry entry (M8) already exist, so none of them count as changes here.
 
-A CI check (`scripts/check-core-untouched.ts`) diffs the pack PR against the protected paths: `src/core/**`, `src/lang/**`, `src/pipeline/**`, `src/rules/**` (loader, version schemes, composition), `src/schema/**` (including the match kinds), `src/security/**`, `src/store/**`, `src/verify/**` and `src/tools/**`, other than the registry line. It fails on any change. If the pack cannot be added without a core change, that is a design bug. Fix it in a separate, reviewed core PR **before** the pack PR, and record the fix in `docs/design.md`.
+A CI check (`scripts/check-core-untouched.ts`) is an allowlist: it fails the pack PR on any changed file outside the list above, and on more than one changed line in `src/analysis/usages/index.ts`. So everything else is protected, notably all of `src/` apart from the new adapter (including `src/analysis/` risk, sizing, scanner and snippet code, `src/rules/`, `src/schema/` with the match kinds, `src/docs/`, `src/cli/`, `src/tools/` and `src/server.ts`), `prompts/`, `scripts/` (so a pack PR can't loosen the pack lint or the generator it is checked by), and the eval scoring code (`eval/runner.ts`, `eval/metrics.ts`, `eval/baseline/`, `eval/seeded/recall.ts`). If the pack cannot be added without a core change, that is a design bug. Fix it in a separate, reviewed core PR **before** the pack PR, and record the fix in `docs/design.md`.
 
 ## Tasks
 
@@ -108,7 +109,7 @@ A CI check (`scripts/check-core-untouched.ts`) diffs the pack PR against the pro
    8. how to add a pack (link to `CONTRIBUTING.md`)
    9. companions (GitHub MCP, filesystem MCP, git MCP), with links checked against current docs
 
-   The status stays "currently building" until M11 (C8).
+   The status stays "currently building" until v0.1 ships in M11 with real eval numbers (C8).
 9. **Demo (60 to 90 seconds; `docs/demo/script.md` plus a recorded GIF or MP4).** Show Claude Code on a real Next.js repo on an older major:
    1. `git status` is clean
    2. ask for a plan

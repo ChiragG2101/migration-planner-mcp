@@ -14,8 +14,8 @@ Numbered rules that must always hold. Each names the test that fails when the ru
 - **INV-6:** Autonomy is opt-in. L0 is the default; L1 needs `--level 1`; `--level 2` is refused as "not built in v0.1". A tool argument can never raise the level. *(planned: `test/permissions/level.test.ts` — M1, M8)* — C5
 - **INV-7:** In L1, `cwd` for every spawned process is inside `<out>/<run_id>/sandbox`, the child environment is scrubbed to an allowlist, every command has a timeout, and the sandbox is a `git clone --no-hardlinks` of the repo. *(planned: `test/permissions/sandbox-cwd.test.ts`, `test/permissions/env-scrub.test.ts` — M8)* — C3, C5
 - **INV-8:** Commands run in L1 come only from user-owned config (CLI flags or the AGENTS.md snippet with `--trust-repo-checks`) or the pinned codemod allowlist. Never from tool arguments, packs, prompts or the agent. *(planned: `test/permissions/command-source.test.ts` — M8)* — C9
-- **INV-9:** Codemods come only from the core allowlist in `src/verify/codemods.ts`, each at a pinned version. A pack names a codemod by ID only. *(planned: `test/permissions/codemod-allowlist.test.ts` — M8)* — C9
-- **INV-10:** Pack data never executes. The pack schema rejects command-like / executable fields. *(planned: `test/unit/pack-schema.test.ts` — M3)* — C9
+- **INV-9:** Codemods come only from the core allowlist in `src/verify/codemods.ts`, each at a pinned version. Knowledge and packs name a codemod by ID only. *(planned: `test/permissions/codemod-allowlist.test.ts` — M8)* — C9
+- **INV-10:** Pack and knowledge data never execute. The knowledge and pack schemas reject unknown keys and command-like fields, and the pack lint rejects shell-like strings outside the display-text fields and any file under `knowledge/` or `packs/` that isn't JSON or Markdown. *(planned: `test/unit/knowledge.test.ts`, `test/unit/pack.test.ts`, `test/unit/lintPacks.test.ts` — M3)* — C9
 - **INV-11:** The engine's only outbound network is Context7, only when configured, carrying a typed payload of library names, versions and symbol names — never repo contents. No telemetry. *(planned: `test/unit/context7-payload.test.ts` — M4)* — C6
 - **INV-12:** Storage is SQLite (`node:sqlite`, falling back to `better-sqlite3`) plus plain files, all through `src/store/`. No vector DB. *(planned: `test/unit/store-only.test.ts` — M1)* — C2
 - **INV-13:** Runs, usages, findings and evidence carry a `repo_id` under a `campaign_id`. A request naming more than one repo is refused with "not built in v0.1". *(planned: `test/unit/single-repo-refusal.test.ts` — M1)* — C10
@@ -38,9 +38,9 @@ Gates 1–6 run on the plan in `validate_plan`; gate 7 runs on each L1 stage pat
 - **INV-22:** A finding with `source = agent_judgment` and no evidence is rejected (not merely down-ranked). *(planned: `test/unit/finding-schema.test.ts` — M5)* — PRD §5
 - **INV-23:** Prompts are versioned files (`prompts/plan_migration.vN.md`); a released version is never overwritten, only a new version added. *(planned: `test/unit/prompt-versioning.test.ts` / lint — M5)*
 - **INV-24:** Pack `SKILL.md` and `references/` are generated from `packs/<pack>/pack.json` and the knowledge it uses, with a "do not edit" banner; CI fails on drift. *(planned: `test/unit/pack-gen-drift.test.ts` / `npm run build:packs` check — M3)*
-- **INV-25:** Any change under `prompts/`, `knowledge/`, `packs/`, `src/rules/`, `src/pipeline/gates/` or `src/verify/` regenerates `eval/results.md` in the same change (the regression rule). *(planned: CI check — M7)*
-- **INV-26:** The README says "currently building" until real eval numbers exist. *(planned: M10 review check)* — C8
-- **INV-27:** Adding a pack must not touch protected core paths. *(planned: `scripts/check-core-untouched.ts` — M10)*
+- **INV-25:** From M7, any change under `prompts/`, `knowledge/`, `packs/`, `src/rules/`, `src/analysis/`, `src/pipeline/{aggregate,packets,routing}.ts`, `src/pipeline/gates/` or `src/verify/` regenerates `eval/results.md` in the same change (the regression rule). *(planned: CI check — M7)*
+- **INV-26:** The README says "currently building" until v0.1 ships (M11) with real eval numbers. *(planned: M10 review check)* — C8
+- **INV-27:** Adding a pack touches only an allowlist of paths: the pack's knowledge and pack folders, one new usage adapter and its registry line, eval data, tests and docs. Everything else, including `scripts/` and the eval scoring code, is protected. *(planned: `scripts/check-core-untouched.ts` — M10)*
 
 ## Coverage and staging (added after the M0 review; see `design.md` D5–D7)
 

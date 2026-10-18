@@ -52,7 +52,7 @@ Check the diff for each one. The common failures:
 ## 5. Docs and regression rule
 
 - `docs/invariants.md`, `docs/failure-modes.md` and `docs/design.md` reflect what the milestone added.
-- If `prompts/`, `knowledge/`, `packs/`, `src/rules/`, `src/pipeline/gates/` or `src/verify/` changed, `eval/results.md` was regenerated in the same change.
+- If anything under the regression-rule paths in `AGENTS.md` changed (`prompts/`, `knowledge/`, `packs/`, `src/rules/`, `src/analysis/`, staging, packets, routing, gates or `src/verify/`), `eval/results.md` was regenerated in the same change (from M7 on).
 - Generated files under `packs/` were regenerated, not hand-edited.
 - New or changed rules under `knowledge/` were reviewed by someone other than their author, and the pack update report is attached with every "missing" item explained.
 

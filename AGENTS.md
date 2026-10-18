@@ -63,12 +63,12 @@ These are enforced in code, not in prose. A change that breaks one of them is wr
 
   `cwd` is always inside `<out>/<run_id>/sandbox`, and the child environment is scrubbed. Commands never come from tool arguments, packs, prompts or the agent. `--level 2` is refused as "not built in v0.1", and a tool argument can never raise the level.
 - **Path boundary.** All reads go through `resolveInside(root, p)`, which returns a branded `SafePath` carrying the `repo_id`. It realpaths both sides, so `..`, absolute paths and symlink escapes are rejected. Deny-listed files (`.env*`, keys, `.npmrc`, `.pypirc`, and so on) are never read. The AGENTS.md snippet can only *add* deny entries.
-- **Pack data never executes.** Packs are JSON and Markdown. A pack names a codemod by allowlist ID only, never by command.
+- **Pack and knowledge data never executes.** `packs/` and `knowledge/` hold only JSON and Markdown. They name a codemod by allowlist ID only, never by command, and their schemas reject command-like fields.
 - **Network (the engine's own).** Only Context7 (`src/docs/context7.ts`), only when configured, and with a typed payload carrying library names, versions and symbols only, never repo contents. The engine works offline through the cache. No telemetry.
 - **Campaign and repo IDs everywhere,** but v0.1 behaviour is single-repo. More than one repo is refused with "not built in v0.1".
 - **Storage** is SQLite (`node:sqlite`, falling back to `better-sqlite3`) plus plain files, all through `src/store/`. No vector DB.
 - **stdout is the MCP protocol channel.** Logs and startup banners go to stderr.
-- The README says "currently building" until real eval numbers exist.
+- The README says "currently building" until v0.1 ships (M11) with real eval numbers.
 
 ## Architecture rules that span files
 
@@ -89,7 +89,7 @@ These are enforced in code, not in prose. A change that breaks one of them is wr
 - **Prompts are versioned files** (`prompts/plan_migration.v1.md`, `v2`, and so on). Never overwrite an existing version; add a new one.
 - **Zod schemas in `src/schema/`** produce both the TS types and the MCP JSON Schema.
 - **`snippet_hash`** uses one shared normaliser, which `find_usages`, finding normalisation and gate 1 all reuse.
-- **Regression rule:** any change under `prompts/`, `knowledge/`, `packs/`, `src/rules/`, `src/pipeline/gates/` or `src/verify/` (codemod registry, gate 7) requires regenerating `eval/results.md` in the same change.
+- **Regression rule:** any change under `prompts/`, `knowledge/`, `packs/`, `src/rules/`, `src/analysis/` (usage adapters, risk, sizing), `src/pipeline/{aggregate,packets,routing}.ts`, `src/pipeline/gates/` or `src/verify/` (codemod registry, gate 7) requires regenerating `eval/results.md` in the same change. It applies from M7, when the eval runner exists; before that, say in the change that the rerun isn't possible yet.
 
 ## Planned tooling (from M1; confirm once it exists)
 

@@ -229,3 +229,20 @@ Why:
 - `doc_topics` are free-text search phrases. Sending them from the engine would break the "no free-text field" rule of C6, even though they come from reviewed knowledge rather than the repo.
 
 The same review corrected two contradictions with D9 and D11 rather than deciding anything new. M4's risks section had required an allowlisted host for registered docs; D9 accepts any doc and labels it. M2 had checked the Next.js usage list through Context7; D11 checks it against the official sources. D9's claim that the server-side mode "vouches for content" was also narrowed: it removes the agent from the path, but the content is still Context7's.
+
+### D15 - C9 covers knowledge; the "no core changes" check is an allowlist; the regression rule covers what shapes a plan
+
+**Decision:**
+
+- C9 and INV-10 name both `knowledge/` and `packs/`.
+- `scripts/check-core-untouched.ts` (M10) is an allowlist. A pack PR may change only its knowledge and pack folders, one new usage adapter and its registry line, eval data, tests and docs.
+- The regression rule also covers `src/analysis/` and the staging, packet and routing code, and it applies from M7.
+- C8 reads "until v0.1 ships (M11) with real eval numbers", as PRD section 1 already says.
+
+Why:
+
+- Since D10, codemod IDs and every rule live in `knowledge/`. A constraint that only names packs no longer covers where the risk is.
+- The old protected list missed `scripts/`, so a pack PR could have loosened the very lint and generator it is checked by. It also missed the risk, sizing, docs and CLI code. An allowlist can't miss a new folder.
+- Sizing decides whether the lenses run at all, and the usage adapters and risk signals decide what is found and how it is rated. Changing them without rerunning the eval would let plan quality move unseen.
+- C8 had two readings: "until eval numbers exist" (true from M7) and "until M11" (M10's README task). The PRD's wording settles it.
+- The ESLint write and spawn rule is scoped to `src/`, because the maintainer tools in `scripts/` legitimately write files and run `git` and `gh`. They stay outside the engine through the import lint.
