@@ -11,7 +11,7 @@ Tool-neutral home for agent assets that contributors share. Nothing in here is s
 
 Project instructions live in `/AGENTS.md`, not here.
 
-These are **contributor skills**: they help agents build this repo (implement a milestone, review one, add a pack). **Product skills**, the ones users of the engine get, are generated from `rules/<pack>/rules.json` and are not stored here.
+These are **contributor skills**: they help agents build this repo (implement a milestone, review one, add a pack). **Product skills**, the ones users of the engine get, are generated from `packs/<pack>/pack.json` plus the library knowledge under `knowledge/`, and are not stored here.
 
 ## Which tools read what
 

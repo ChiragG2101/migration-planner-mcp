@@ -52,8 +52,9 @@ Check the diff for each one. The common failures:
 ## 5. Docs and regression rule
 
 - `docs/invariants.md`, `docs/failure-modes.md` and `docs/design.md` reflect what the milestone added.
-- If `prompts/`, `rules/`, `src/pipeline/gates/` or `src/verify/` changed, `eval/results.md` was regenerated in the same change.
-- Generated files under `rules/` were regenerated, not hand-edited.
+- If `prompts/`, `knowledge/`, `packs/`, `src/rules/`, `src/pipeline/gates/` or `src/verify/` changed, `eval/results.md` was regenerated in the same change.
+- Generated files under `packs/` were regenerated, not hand-edited.
+- New or changed rules under `knowledge/` were reviewed by someone other than their author, and the pack update report is attached with every "missing" item explained.
 
 ## 6. Verdict
 

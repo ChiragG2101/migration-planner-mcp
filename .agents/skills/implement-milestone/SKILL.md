@@ -42,10 +42,11 @@ Keep each commit to one coherent step, and keep the test suite passing between s
 - Never weaken a constraint to make something work. If C1 to C10 or a gate gets in the way, stop and raise it. A constraint change is a design decision for the user, not an implementation detail.
 - No scope creep. Useful extras go in a list for the user ("noticed, not done"), not in the diff.
 - Only `src/security/` writes files or spawns processes. Only `src/docs/context7.ts` uses the network.
-- Packs are data. Never add an executable field, a command string or a script to a pack.
+- Knowledge and packs are data. Never add an executable field, a command string or a script to either.
 - Prompts are versioned. Never edit a released `prompts/*.vN.md`; add `vN+1`.
-- Generated files (SKILL.md and references under `rules/`) are never edited by hand. Change `rules.json` and regenerate.
-- If you change anything under `prompts/`, `rules/`, `src/pipeline/gates/` or `src/verify/`, regenerate `eval/results.md` in the same change (the regression rule).
+- Generated files (SKILL.md and references under `packs/`) are never edited by hand. Change the knowledge or `pack.json` and regenerate.
+- `src/` never imports from `scripts/`. Maintainer tools that use the network stay outside the engine.
+- If you change anything under `prompts/`, `knowledge/`, `packs/`, `src/rules/`, `src/pipeline/gates/` or `src/verify/`, regenerate `eval/results.md` in the same change (the regression rule).
 
 ## 5. Run the gates
 

@@ -39,6 +39,7 @@ Skills live in `.agents/skills/` (see `.agents/README.md`). Claude Code users ru
 | `quiz-me` | Run the comprehension check after a milestone |
 | `write-tests` | Write tests, especially permissions and gate tests |
 | `add-pack` | Add a migration pack without touching the core |
+| `add-release-knowledge` | Draft, complete and review the rules for one library release under `knowledge/` |
 | `add-golden-case` | Find, vet and add a real migration PR as an eval case |
 | `update-spine-docs` | Keep invariants, failure modes and design decisions current |
 
@@ -78,17 +79,23 @@ These are enforced in code, not in prose. A change that breaks one of them is wr
   - Gate 7, test integrity (`src/verify/testIntegrity.ts`), runs on L1 stage patches. It fails the stage on fewer tests or assertions, new skip/only/xfail markers, deleted tests or snapshots, lowered coverage thresholds, or edited check definitions.
   - All gates share one `Gate` interface, re-check against real files, and import no network or model code.
   - After 3 rounds or attempts, failures go to `unresolved[]` and are never marked passed.
-- **Rule packs are data.** `rules/<pack>/rules.json` is the single source. `SKILL.md`, `references/` and the plugin bundle are *generated* from it (with a "do not edit" banner), so edit `rules.json` and regenerate rather than editing generated files. CI fails on drift. SKILL.md stays at most about 100 lines with a narrow trigger sentence.
+- **Knowledge and packs are data, in two layers** (`docs/design.md` D10).
+  - `knowledge/<ecosystem>/<library>/` holds the facts: `library.json` (version scheme, release unit, LTS list, official doc sources and release notes, codemods) and one `releases/<release>.json` per release. Release files only gain entries for their own release.
+  - `packs/<pack>/pack.json` is thin: which libraries, the checked range, the usage adapter, staging, the trigger. It holds no rules.
+  - Necessity (`breaks` or `deprecated`) and `lands_on` are derived per run from the rules' events, never typed in.
+  - Only `reviewed` rules load. New rules start as drafts from `npm run knowledge:draft` (the `add-release-knowledge` skill).
+  - `SKILL.md`, `references/` and the plugin bundle are *generated* from the pack plus its knowledge (with a "do not edit" banner), so edit the data and regenerate rather than editing generated files. CI fails on drift. SKILL.md stays at most about 100 lines with a narrow trigger sentence.
+- **Maintainer tools live in `scripts/` and are outside the engine:** the pack build and lint, the release drafter, the pack update report, and the golden-case finder and re-checker. They may use the network, they never run in default CI, and `src/` never imports from `scripts/`.
 - **Prompts are versioned files** (`prompts/plan_migration.v1.md`, `v2`, and so on). Never overwrite an existing version; add a new one.
 - **Zod schemas in `src/schema/`** produce both the TS types and the MCP JSON Schema.
 - **`snippet_hash`** uses one shared normaliser, which `find_usages`, finding normalisation and gate 1 all reuse.
-- **Regression rule:** any change under `prompts/`, `rules/`, `src/pipeline/gates/` or `src/verify/` (codemod registry, gate 7) requires regenerating `eval/results.md` in the same change.
+- **Regression rule:** any change under `prompts/`, `knowledge/`, `packs/`, `src/rules/`, `src/pipeline/gates/` or `src/verify/` (codemod registry, gate 7) requires regenerating `eval/results.md` in the same change.
 
 ## Planned tooling (from M1; confirm once it exists)
 
 Node 22 LTS, TypeScript strict, ESM, npm, Vitest, ESLint, the official MCP TS SDK v2 (`@modelcontextprotocol/server`, pinned version), the `typescript` compiler API, `web-tree-sitter` with the Python grammar, Zod. Licence Apache-2.0.
 
-Planned scripts: `npm run build`, `npm test`, `npm run typecheck`, `npm run lint` (which includes `scripts/lint-packs.ts`), `npm run test:permissions`, `npm run build:packs`, `npm run eval:smoke`, and `npm run eval -- --tier all`. The CLI's commands mirror the tools (`scan`, `usages`, `pack`, `risk`, `scope`, `docs`, `merge`, `validate`, `emit`, `verify`, `report`, `feedback`), and `mcp` starts the MCP adapter. To run a single test, use `npx vitest run <path>` or `-t "<name>"`.
+Planned scripts: `npm run build`, `npm test`, `npm run typecheck`, `npm run lint` (which includes `scripts/lint-packs.ts`), `npm run test:permissions`, `npm run build:packs`, `npm run eval:smoke`, and `npm run eval -- --tier all`. Maintainer tools (network, manual): `npm run knowledge:draft -- <library> <release>`, `npm run pack:report -- <pack>`, `npm run cases:find -- <pack> --from <v> --to <v>` and `npm run cases:verify -- <id>|--all`. The CLI's commands mirror the tools (`scan`, `usages`, `pack`, `risk`, `scope`, `docs`, `merge`, `validate`, `emit`, `verify`, `report`, `feedback`), and `mcp` starts the MCP adapter. To run a single test, use `npx vitest run <path>` or `-t "<name>"`.
 
 ## Definition of done per milestone
 
