@@ -46,7 +46,7 @@ Never put commands, scripts or shell snippets in a pack. Only `checks_hint` may 
 
 - Seeded repo `eval/seeded/<name>/`, the one `pack.json` names in `seeded`, with planted hard cases and `ground_truth.json` (each `expect: change` entry names its `rule_id`). Report recall with the recall script and record the ratchet.
 - At least **2 golden cases** from real public PRs: find candidates with `npm run cases:find` and vet them with the `add-golden-case` skill. Declare `checks` so L1 can run on at least one.
-- Run the eval for the new pack and for every existing pack. The new pack must beat the baseline on recall, and existing packs must not regress beyond the recorded noise band.
+- Run the eval for the new pack and for every existing pack. The eval table compares the new pack with the baseline; if it doesn't beat the baseline on recall, say so plainly in the PR and raise it with the maintainer. Existing packs must not regress beyond the recorded noise band.
 
 ## 6. Open the PR
 
