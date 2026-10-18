@@ -273,3 +273,12 @@ Why:
 - Matches are syntactic: an awaited `cookies()` still matches `call {next/headers, cookies}`. Only a lens reading the code can tell that a matched usage needs no change. D12's example ("code already in the target form") was wrong for `none` runs and is corrected there.
 - Usages that match no composed rule need no judgment, so the engine covers them in every run, as D12 already did for `none`.
 - A lens marking a breaking usage out of scope carries the same risk as a scope exclusion: dropping work to pass a gate. Routing it to "Review first" and splitting the counts keeps it visible, and M7's recall against real PRs measures it.
+
+### D17 - A pack PR must beat the baseline on recall
+
+**Decision: a new pack's eval must beat the no-engine baseline on recall before the pack merges, and existing packs must not regress beyond the recorded noise band. This applies to the Django pack in M10. A pack that misses is not ready; the contributor raises it with the maintainer instead of tuning the eval or the baseline.**
+
+Why:
+
+- PRD section 14 already says a pack PR must "pass the eval against the baseline". The add-pack skill had been changed to say only that a miss should be reported, which would have loosened a gate without a decision.
+- The baseline is what a user gets from their own agent. A pack that doesn't beat it adds maintenance with no measured value.

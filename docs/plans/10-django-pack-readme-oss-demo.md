@@ -82,7 +82,7 @@ A CI check (`scripts/check-core-untouched.ts`) is an allowlist: it fails the pac
    - The engine works without it, and its absence is logged as "AGENTS.md snippet: not found".
    - This touches `src/pipeline/ingest.ts`, `src/security/denyList.ts` and `src/verify/checks.ts`. Because it is a core change, it lands in its own PR, separate from the Django pack PR, so the "no core changes" check stays meaningful for the pack.
 5. **Open-source files.** `CONTRIBUTING.md` and `AI_POLICY.md` were added before M10; M10 brings them up to date with the points below. The rest are new.
-   - `CONTRIBUTING.md`: packs are the unit of contribution. A pack PR must include the knowledge it needs (one release per PR, each reviewed by someone other than its author), its `pack.json`, the generated skill, at least 2 golden cases, a seeded repo, the pack update report and an eval run against the baseline. CI's eval and the pack lint are part of review. Core changes need an issue first.
+   - `CONTRIBUTING.md`: packs are the unit of contribution. A pack PR must include the knowledge it needs (one release per PR, each reviewed by someone other than its author), its `pack.json`, the generated skill, at least 2 golden cases, a seeded repo, the pack update report and an eval run that beats the baseline on recall (`docs/design.md` D17). CI's eval and the pack lint are part of review. Core changes need an issue first.
    - `AI_POLICY.md`: AI-assisted contributions are welcome when disclosed in the PR. The human contributor is responsible for every change, must be able to explain it, and signs off every commit (DCO). AI co-author trailers are optional and are there for transparency; they never make the AI the accountable author.
    - `SECURITY.md`: how to report a sandbox, path-boundary or exec issue privately.
    - `CODE_OF_CONDUCT.md` and issue templates (bug, pack request with demand evidence, golden-case submission).
@@ -142,7 +142,7 @@ A CI check (`scripts/check-core-untouched.ts`) is an allowlist: it fails the pac
 ## Acceptance criteria
 
 - The Django pack, adapter and eval cases merge with `check-core-untouched` passing.
-- `eval/results.md` includes both packs and the baseline comparison, with misses listed, and an L1 run on at least one Django case.
+- `eval/results.md` includes both packs and the baseline comparison, with misses listed, and an L1 run on at least one Django case. The Django pack beats the baseline on recall (`docs/design.md` D17).
 - The Django golden set has at least 3 licensed cases, including at least 2 tagged `lts-to-lts` and at least 1 tagged `messy`, and `npm run cases:verify -- --all` passes.
 - The AGENTS.md snippet works when present, is optional, provably cannot widen the boundary, and cannot add checks without the trust flag.
 - The open-source files and plugin bundle exist, and the README follows the order above, states its limits and claims only what exists.

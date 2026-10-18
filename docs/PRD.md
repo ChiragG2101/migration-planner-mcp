@@ -354,7 +354,7 @@ migration-planner-mcp/          (working name)
 - **README order:** pitch, demo GIF, one-snippet install (CLI, Claude Code, Cursor), example output, how it works (diagram), eval table with baseline comparison, limits, how to add a pack.
 - **Limits section:** TS/JS and Python only, two packs, single repo, never writes to your repo, L1 runs your declared checks in a sandbox copy, no third-party packs.
 - **Optional AGENTS.md snippet.** `examples/AGENTS.snippet.md` is a few lines users paste into their repo's AGENTS.md: the check commands (test, typecheck, lint, and any install step), directories the engine should not read, and the target versions. The engine reads it at ingest if present. It is optional. A snippet can only add restrictions to the deny list, never widen the path boundary. Its check commands are the only commands L1 will run apart from allowlisted codemods.
-- **Open source.** Apache-2.0. `CONTRIBUTING.md` makes packs the unit of contribution: a pack PR must include golden cases and pass the eval against the baseline. `AI_POLICY.md` asks contributors to disclose AI assistance and keeps the human contributor responsible for every change. A Claude Code plugin bundle packages the generated skills and the MCP config.
+- **Open source.** Apache-2.0. `CONTRIBUTING.md` makes packs the unit of contribution: a pack PR must include golden cases and beat the baseline on recall in the eval. `AI_POLICY.md` asks contributors to disclose AI assistance and keeps the human contributor responsible for every change. A Claude Code plugin bundle packages the generated skills and the MCP config.
 
 ## 15. Risks
 
