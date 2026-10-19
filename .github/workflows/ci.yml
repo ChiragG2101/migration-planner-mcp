@@ -1,0 +1,48 @@
+# Runs the gates that need no network or model on every push and PR:
+# typecheck, lint, the whole test suite (permissions included), the build,
+# and the spine and skills checks (docs/design.md D23).
+name: CI
+
+on:
+  push:
+    branches: [main]
+  pull_request:
+
+permissions:
+  contents: read
+
+concurrency:
+  group: ci-${{ github.ref }}
+  cancel-in-progress: true
+
+jobs:
+  gates:
+    name: gates (${{ matrix.os }}, node ${{ matrix.node }})
+    runs-on: ${{ matrix.os }}
+    # Windows is not verified yet (the tests create symlinks, which need extra
+    # privileges there), so its failures are reported but don't block.
+    continue-on-error: ${{ matrix.experimental }}
+    strategy:
+      fail-fast: false
+      matrix:
+        include:
+          - { os: ubuntu-latest, node: '22.13.0', experimental: false } # the engines floor (D18)
+          - { os: ubuntu-latest, node: '22.x', experimental: false }
+          - { os: macos-latest, node: '22.x', experimental: false }
+          - { os: windows-latest, node: '22.x', experimental: true }
+    steps:
+      - uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1 # v7.0.1
+      - uses: actions/setup-node@949feb2413d6458794dcd2491c4babbbce0c15c1 # v7.1.0
+        with:
+          node-version: ${{ matrix.node }}
+          cache: npm
+      - run: npm ci
+      - run: npm run typecheck
+      - run: npm run lint
+      - run: npm test
+      - run: npm run build
+      - name: Spine and skills checks
+        shell: bash
+        run: |
+          sh scripts/check-spine.sh
+          sh scripts/check-agent-skills.sh

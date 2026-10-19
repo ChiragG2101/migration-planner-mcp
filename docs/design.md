@@ -446,3 +446,23 @@ Cursor (`.cursor/mcp.json` in the project, or `~/.cursor/mcp.json`):
 ```
 
 Add `"--out", "<dir>"` to the arguments to keep every run's output in one folder; without it, output goes to `.migration-planner/` beside each repo. The server logs its banner and output folder to stderr; stdout is the protocol channel.
+
+## 2026-10-19: maintenance
+
+### D23 - CI on every change, weekly dependency PRs, and the scanner split in M2
+
+**Decision:**
+
+- **CI** (`.github/workflows/ci.yml`) runs typecheck, lint, the full test suite (permissions included), the build, `check-spine.sh` and `check-agent-skills.sh` on every push to `main` and every PR. It runs on Linux at the Node floor (22.13.0) and latest 22, and on macOS. Windows runs too but doesn't block: the tests create symlinks, which need extra privileges there, and Windows hasn't been verified. Actions are pinned to commit SHAs, and the workflow can only read the repo.
+- **Dependabot** (`.github/dependabot.yml`) opens weekly PRs for npm and the CI actions, grouping minor and patch updates. It skips TypeScript 6.1 and later (D21) and `@types/node` majors (which follow the Node 22 floor, D18). An update merges only when CI passes. An MCP SDK bump also needs its changelog read, as the overview asks at each milestone.
+- **The scanner is split in M2** (task 15 in its plan), with no change in behaviour, before more code lands in `src/analysis/`.
+
+Why:
+
+- Before this, the gates ran only when someone ran them by hand. The permissions suite is the project's main safety control; it should fail a PR on its own.
+- Exact pins are reproducible but go stale without anyone noticing, including security fixes. Weekly PRs that must pass CI keep them current without loosening them.
+- The M1 plan named a Linux, macOS and Windows matrix as the mitigation for symlink and case-sensitivity edge cases. Linux and macOS are verified; Windows is reported until someone makes it pass, at which point it should block.
+- `scanner.ts` is about 550 lines and three milestones add to it. Splitting it now is a mechanical change that the M1 tests check; later it would be tangled with new behaviour.
+
+Revisit: make Windows blocking once it passes; add CI checks from later milestones (the pack lint in M3, the eval gates in M7) to the same workflow.
+

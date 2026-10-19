@@ -1,0 +1,24 @@
+# Weekly update PRs for the exact-pinned dependencies and the CI actions.
+# Each PR must pass CI before it can merge (docs/design.md D23).
+version: 2
+updates:
+  - package-ecosystem: npm
+    directory: /
+    schedule:
+      interval: weekly
+    open-pull-requests-limit: 5
+    groups:
+      minor-and-patch:
+        update-types: [minor, patch]
+    ignore:
+      # TypeScript 7's compiler API is unstable and typescript-eslint supports <6.1 (D21).
+      - dependency-name: typescript
+        versions: ['>=6.1']
+      # @types/node follows the engines floor, Node 22 (D18).
+      - dependency-name: '@types/node'
+        update-types: [version-update:semver-major]
+
+  - package-ecosystem: github-actions
+    directory: /
+    schedule:
+      interval: weekly

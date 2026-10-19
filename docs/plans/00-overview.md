@@ -69,6 +69,7 @@ M4 can run in parallel with M2 and M3 once M1 lands, except that M4's `official`
 | Tests | Vitest | Fast | none |
 | Lint | ESLint with a custom `no-restricted-imports` rule for fs-write and child_process | Supports C3 | none |
 | Package manager | npm | Lowest friction for users installing via `npx` | none |
+| CI | GitHub Actions (`.github/workflows/ci.yml`): typecheck, lint, the full test suite, build, and the spine and skills checks on every push and PR; Linux and macOS block, Windows is experimental. Dependabot opens weekly update PRs (D23) | Gates 1 and 2 run on every change, not only when someone remembers; exact pins don't go stale silently | Run the same commands locally before every merge |
 | Licence | Apache-2.0 | Patent grant; the licence larger companies approve most easily | none |
 | Name | Working name `migration-planner-mcp` | MCP is now one adapter, so the final name drops it | Decided in M10, before publish |
 

@@ -101,6 +101,7 @@ Commands that exist now:
 - `npm install`, then `npm run build` (to `dist/`), `npm test`, `npm run test:permissions`, `npm run typecheck`, `npm run lint`.
 - One test: `npx vitest run <path>` or `npx vitest run -t "<name>"`.
 - Repo hash (INV-1): `npx tsx scripts/repo-hash.ts <root>`.
+- CI (`.github/workflows/ci.yml`) runs typecheck, lint, `npm test`, the build, `check-spine.sh` and `check-agent-skills.sh` on every push and PR, on Linux and macOS (Windows is experimental and non-blocking). Dependabot (`.github/dependabot.yml`) opens weekly update PRs; never merge one that fails CI, and re-read the MCP SDK changelog before merging an SDK bump (D23).
 - The CLI from a build: `node dist/cli/index.js scan <repo> --source <lib> --target <lib@ver> [--out <dir>] [--format text]`, and `node dist/cli/index.js mcp` for the MCP server. Host wiring for Claude Code and Cursor is in `docs/design.md` (M1 task 10).
 
 Planned scripts: `npm run lint` gains `scripts/lint-packs.ts` (M3); `npm run build:packs`, `npm run eval:smoke`, and `npm run eval -- --tier all`. Maintainer tools (network, manual): `npm run knowledge:draft -- <library> <release>`, `npm run pack:report -- <pack>`, `npm run cases:find -- <pack> --from <v> --to <v>` and `npm run cases:verify -- <id>|--all`. The CLI's commands mirror the tools; after `scan` come `usages`, `pack`, `risk`, `scope`, `docs`, `merge`, `validate`, `emit`, `verify`, `report` and `feedback`.
