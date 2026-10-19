@@ -20,7 +20,8 @@
     "test": "vitest run",
     "test:permissions": "vitest run test/permissions",
     "typecheck": "tsc --noEmit",
-    "lint": "eslint ."
+    "lint": "eslint .",
+    "recall": "tsx eval/seeded/recall.ts"
   },
   "dependencies": {
     "@modelcontextprotocol/server": "2.3.1",

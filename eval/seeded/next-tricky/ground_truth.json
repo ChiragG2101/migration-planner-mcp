@@ -1,0 +1,297 @@
+{
+  "repo": "next-tricky",
+  "library": "next",
+  "source": "14.2.35",
+  "target": "16.0.0",
+  "note": "Seeded hard cases for the Next.js usage adapter (M2 task 12, docs/design.md D6). expect: change (the migration must change it), no_change (a pack usage that must be found but needs no change), no_finding (not a pack usage; no finding may cite it). M3 adds rule_id.",
+  "entries": [
+    {
+      "id": "nt-cookies-via-helper",
+      "file": "app/dashboard/page.tsx",
+      "line": 4,
+      "kind": "request_api",
+      "expect": "change",
+      "indirect": true,
+      "note": "cookies() called through a helper in another module; the caller must await the helper once it is async"
+    },
+    {
+      "id": "nt-cookies-helper",
+      "file": "server/session.ts",
+      "line": 4,
+      "kind": "request_api",
+      "expect": "change",
+      "indirect": false,
+      "note": "the helper's own synchronous cookies() call"
+    },
+    {
+      "id": "nt-params-layout",
+      "file": "app/[team]/layout.tsx",
+      "line": 5,
+      "kind": "request_props",
+      "expect": "change",
+      "indirect": false,
+      "note": "params destructured in a layout, accessed synchronously"
+    },
+    {
+      "id": "nt-params-to-client",
+      "file": "app/[team]/layout.tsx",
+      "line": 12,
+      "kind": "request_props",
+      "expect": "change",
+      "indirect": true,
+      "note": "params passed down to a client component"
+    },
+    {
+      "id": "nt-get-implicit-cache",
+      "file": "app/api/feed/route.ts",
+      "line": 1,
+      "kind": "route_handler",
+      "expect": "change",
+      "indirect": false,
+      "note": "a GET route handler relying on implicit caching, which Next.js 15 removed"
+    },
+    {
+      "id": "nt-route-fetch",
+      "file": "app/api/feed/route.ts",
+      "line": 2,
+      "kind": "fetch_call",
+      "expect": "change",
+      "indirect": false,
+      "note": "fetch in a route handler, no longer cached by default in Next.js 15"
+    },
+    {
+      "id": "nt-headers-via-barrel",
+      "file": "app/about/page.tsx",
+      "line": 4,
+      "kind": "request_api",
+      "expect": "change",
+      "indirect": true,
+      "note": "a barrel (server/index.ts) re-exports a wrapper around headers()"
+    },
+    {
+      "id": "nt-headers-wrapper",
+      "file": "server/request.ts",
+      "line": 4,
+      "kind": "request_api",
+      "expect": "change",
+      "indirect": false,
+      "note": "the wrapper's own synchronous headers() call"
+    },
+    {
+      "id": "nt-dynamic-page-import",
+      "file": "app/plugins/page.tsx",
+      "line": 3,
+      "kind": "unresolved_dynamic",
+      "expect": "no_change",
+      "indirect": false,
+      "note": "a dynamic import() of a page module by variable: reported for review, not a change in itself"
+    },
+    {
+      "id": "nt-searchparams-sync",
+      "file": "app/plugins/page.tsx",
+      "line": 1,
+      "kind": "request_props",
+      "expect": "change",
+      "indirect": false,
+      "note": "searchParams read synchronously in a page"
+    },
+    {
+      "id": "nt-string-ref-attr",
+      "file": "components/LegacyForm.jsx",
+      "line": 9,
+      "kind": "react_legacy",
+      "expect": "change",
+      "indirect": false,
+      "note": "a class component using a string ref (removed in React 19)"
+    },
+    {
+      "id": "nt-string-ref-this",
+      "file": "components/LegacyForm.jsx",
+      "line": 5,
+      "kind": "react_legacy",
+      "expect": "change",
+      "indirect": false,
+      "note": "this.refs, the other half of the string ref"
+    },
+    {
+      "id": "nt-fn-default-props",
+      "file": "components/Badge.tsx",
+      "line": 7,
+      "kind": "react_legacy",
+      "expect": "change",
+      "indirect": false,
+      "note": "defaultProps on a function component (removed in React 19)"
+    },
+    {
+      "id": "nt-peer-excludes-react19",
+      "file": "package-lock.json",
+      "line": 31,
+      "kind": "peer_dependency",
+      "expect": "change",
+      "indirect": false,
+      "note": "a dependency whose peer range on react excludes React 19; labelled peer_conflict once M3 supplies the React target"
+    },
+    {
+      "id": "nt-removed-experimental-flag",
+      "file": "next.config.js",
+      "line": 5,
+      "kind": "config_key",
+      "expect": "change",
+      "indirect": false,
+      "note": "experimental.serverComponentsExternalPackages, renamed to serverExternalPackages in Next.js 15"
+    },
+    {
+      "id": "nt-type-only-import",
+      "file": "components/useFocus.ts",
+      "line": 3,
+      "kind": "react_types",
+      "expect": "change",
+      "indirect": false,
+      "note": "a type-only import of a type the React 19 types deprecate (MutableRefObject)"
+    },
+    {
+      "id": "nt-existing-next-font",
+      "file": "app/fonts.ts",
+      "line": 1,
+      "kind": "removed_package",
+      "expect": "change",
+      "indirect": false,
+      "note": "existing state: @next/font, deprecated since 13.2 and never cleaned up, removed in Next.js 15"
+    },
+    {
+      "id": "nt-existing-internal-path",
+      "file": "server/legacyCookies.ts",
+      "line": 1,
+      "kind": "internal_import",
+      "expect": "change",
+      "indirect": false,
+      "note": "existing state: an import of a framework internal whose path changes in the target"
+    },
+    {
+      "id": "nt-runtime-experimental-edge",
+      "file": "app/edge/page.tsx",
+      "line": 1,
+      "kind": "segment_config",
+      "expect": "change",
+      "indirect": false,
+      "note": "runtime 'experimental-edge' is an error from Next.js 15"
+    },
+    {
+      "id": "nt-middleware-file",
+      "file": "middleware.ts",
+      "line": 3,
+      "kind": "middleware",
+      "expect": "change",
+      "indirect": false,
+      "note": "the middleware convention, renamed to proxy in Next.js 16"
+    },
+    {
+      "id": "nt-request-geo",
+      "file": "middleware.ts",
+      "line": 4,
+      "kind": "request_geo",
+      "expect": "change",
+      "indirect": false,
+      "note": "NextRequest.geo, removed in Next.js 15"
+    },
+    {
+      "id": "nt-revalidate-tag-one-arg",
+      "file": "server/revalidate.ts",
+      "line": 6,
+      "kind": "cache_api",
+      "expect": "change",
+      "indirect": false,
+      "note": "revalidateTag with one argument, which Next.js 16 deprecates"
+    },
+    {
+      "id": "nt-reactdom-render",
+      "file": "widgets/mount.tsx",
+      "line": 5,
+      "kind": "react_removed_api",
+      "expect": "change",
+      "indirect": false,
+      "note": "ReactDOM.render, removed in React 19"
+    },
+    {
+      "id": "nt-global-jsx",
+      "file": "app/layout.tsx",
+      "line": 3,
+      "kind": "react_types",
+      "expect": "change",
+      "indirect": false,
+      "note": "the global JSX namespace, which the React 19 types remove"
+    },
+    {
+      "id": "nt-sass-tilde",
+      "file": "styles/theme.scss",
+      "line": 1,
+      "kind": "sass_tilde_import",
+      "expect": "change",
+      "indirect": false,
+      "note": "a Sass import with the ~ prefix, which Turbopack (the Next.js 16 default) does not support"
+    },
+    {
+      "id": "nt-next-lint-script",
+      "file": "package.json",
+      "line": 8,
+      "kind": "next_lint_script",
+      "expect": "change",
+      "indirect": false,
+      "note": "next lint, removed in Next.js 16"
+    },
+    {
+      "id": "nt-already-awaited",
+      "file": "app/settings/page.tsx",
+      "line": 4,
+      "kind": "request_api",
+      "expect": "no_change",
+      "indirect": false,
+      "note": "already in the target form: cookies() is awaited; found, then marked out of scope as already migrated"
+    },
+    {
+      "id": "nt-decoy-local-cookies",
+      "file": "utils/cookies.ts",
+      "line": 5,
+      "kind": "request_api",
+      "expect": "no_finding",
+      "indirect": false,
+      "note": "decoy: a local function named cookies, not the next/headers API"
+    },
+    {
+      "id": "nt-decoy-class-default-props",
+      "file": "components/Card.tsx",
+      "line": 4,
+      "kind": "react_legacy",
+      "expect": "no_finding",
+      "indirect": false,
+      "note": "decoy: defaultProps on a class component, still supported in React 19"
+    },
+    {
+      "id": "nt-decoy-client-fetch",
+      "file": "components/ClientFetch.tsx",
+      "line": 8,
+      "kind": "fetch_call",
+      "expect": "no_finding",
+      "indirect": false,
+      "note": "decoy: fetch in a client component, which the server caching change does not touch"
+    },
+    {
+      "id": "nt-decoy-form-status",
+      "file": "components/Status.tsx",
+      "line": 6,
+      "kind": "react_renamed_api",
+      "expect": "no_finding",
+      "indirect": false,
+      "note": "decoy: useFormStatus, still supported (only useFormState was renamed)"
+    },
+    {
+      "id": "nt-decoy-next-image",
+      "file": "app/legacy-image/page.tsx",
+      "line": 1,
+      "kind": "deprecated_import",
+      "expect": "no_finding",
+      "indirect": false,
+      "note": "decoy: next/image, not next/legacy/image"
+    }
+  ]
+}

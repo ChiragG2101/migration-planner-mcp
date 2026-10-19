@@ -133,7 +133,8 @@ const spawnPaths = ['child_process', 'node:child_process', 'execa', 'worker_thre
 );
 
 export default tseslint.config(
-  { ignores: ['dist/**', 'node_modules/**', 'test/fixtures/**', 'coverage/**', '.private/**'] },
+  // Seeded-defect repos (eval/seeded/<repo>/) hold deliberately old code; the recall script beside them is linted.
+  { ignores: ['dist/**', 'node_modules/**', 'test/fixtures/**', 'eval/seeded/*/**', 'coverage/**', '.private/**'] },
   js.configs.recommended,
   ...tseslint.configs.recommended,
   {

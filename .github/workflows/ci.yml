@@ -1,6 +1,6 @@
 # Runs the gates that need no network or model on every push and PR:
-# typecheck, lint, the whole test suite (permissions included), the build,
-# and the spine and skills checks (docs/design.md D23).
+# typecheck, lint, the whole test suite (permissions included), the seeded
+# recall ratchet, the build, and the spine and skills checks (docs/design.md D23).
 name: CI
 
 on:
@@ -32,6 +32,9 @@ jobs:
           - { os: windows-latest, node: '22.x', experimental: true }
     steps:
       - uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1 # v7.0.1
+        with:
+          # The recall ratchet compares eval/seeded/ratchet.json with the PR base or the previous push.
+          fetch-depth: 0
       - uses: actions/setup-node@949feb2413d6458794dcd2491c4babbbce0c15c1 # v7.1.0
         with:
           node-version: ${{ matrix.node }}
@@ -40,6 +43,11 @@ jobs:
       - run: npm run typecheck
       - run: npm run lint
       - run: npm test
+      - name: Seeded recall ratchet (only moves up)
+        shell: bash
+        env:
+          BASE_SHA: ${{ github.event.pull_request.base.sha || github.event.before }}
+        run: npm run recall -- --check --base "$BASE_SHA"
       - run: npm run build
       - name: Spine and skills checks
         shell: bash
