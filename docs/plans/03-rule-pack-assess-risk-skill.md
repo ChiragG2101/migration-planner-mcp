@@ -84,7 +84,7 @@
    - a string that looks like a shell command outside the display-text fields (task 1)
    - a pack version not bumped while `pack.json` or a knowledge file it uses changed (compared with the PR's merge base in CI), or a missing CHANGELOG entry for the current pack or library version
    - a rule `id` used twice, an `events[]` entry naming an unknown rule, or a release file holding an event for a different release
-   - a `source` that is not under the library's `doc_sources`, an empty `doc_sources`, or a prefix that is not `https://`
+   - a `source` that is not under the library's `doc_sources`, an empty `doc_sources`, a prefix that is not `https://`, or a `doc_sources` prefix that does not end in `/`. The `source` check uses `src/docs/officialUrl.ts`, built here and reused by M4 to compute `official`. It normalises the URL (lowercase scheme and host, no default port, `..` resolved), rejects a URL that carries credentials or is not `https://`, and then checks that the result starts with one of the `doc_sources` prefixes. So a `source` the lint accepts is always `official` (`docs/design.md` D14).
    - a reviewed rule reachable in a pack's supported range whose match kind the pack's usage adapter does not declare
    - a reviewed rule reachable in a pack's supported range with no `expect: change` seeded case in the `ground_truth.json` of the pack's `seeded` repo, or a `seeded` repo that doesn't exist
    - a code-usage kind (calls and imports, not config keys or dependency ranges) with no indirect seeded entry (through a helper, wrapper or re-export)
@@ -131,12 +131,12 @@
       - Scope can only narrow. It cannot touch paths, the deny list, the level, the checks or `--out`. `stop_at` becomes the effective target, so composition (task 4) and M4's doc version pin both use it.
       - Scope is frozen at whichever comes first: fetching the first lens packet (M5) or calling `merge_findings` (M6). A `none` run fetches no packet, so `merge_findings` is what freezes it. Either way, scope can't be used mid-run to drop items that fail a gate (`docs/design.md` D12).
       - Unanswered questions take their defaults, and the report says which answers were defaults.
-      - Excluded usages get engine-written `out_of_scope` entries with the reason `scope: <question>=<answer>`.
+      - Excluded usages get `out_of_scope` entries with `written_by: scope` and the reason `scope: <question>=<answer>` (`docs/design.md` D16).
     - The CLI `scope` prints the proposal, and `scope --answers <file.json>` sets it, for CI.
 
 ## Files and modules
 
-`src/schema/{knowledge,pack,match,scope}.ts`, `src/rules/{loader,versions,compose}.ts`, `src/pipeline/ingest.ts` (the pre-release and `supported` checks), `src/verify/codemodIds.ts`, `src/core/{getRulePack,assessRisk,proposeScope,setScope}.ts`, `src/tools/{getRulePack,assessRisk,proposeScope,setScope}.ts`, `src/cli/{pack,risk,scope}.ts`, `src/analysis/{risk,sizing}.ts`, `knowledge/npm/{next,react}/{library.json,CHANGELOG.md,releases/*}`, `packs/nextjs-upgrade/{pack.json,CHANGELOG.md,SKILL.md,references/*,references-src/*}`, `scripts/{build-pack,lint-packs,draft-release,pack-docs-report}.ts`, `scripts/lib/release-notes.ts` (the shared notes parser), `.agents/skills/add-release-knowledge/SKILL.md` (exists; keep it in step with the schema), `eval/seeded/next-tricky/**` (`rule_id` tags and cases for uncovered rules), `test/fixtures/next-clean/` (a Next.js app with no affected code), `test/fixtures/knowledge/` (small fake libraries for both schemes), `test/fixtures/release-notes/` (recorded notes in `md`, `mdx` and `rst`), `test/unit/{knowledge,pack,versions,compose,ingest,lintPacks,risk,sizing,scope,releaseNotes}.test.ts`, `test/permissions/scope-cannot-widen.test.ts`.
+`src/schema/{knowledge,pack,match,scope}.ts`, `src/rules/{loader,versions,compose}.ts`, `src/pipeline/ingest.ts` (the pre-release and `supported` checks), `src/verify/codemodIds.ts`, `src/docs/officialUrl.ts` (the shared URL check, reused by M4), `src/core/{getRulePack,assessRisk,proposeScope,setScope}.ts`, `src/tools/{getRulePack,assessRisk,proposeScope,setScope}.ts`, `src/cli/{pack,risk,scope}.ts`, `src/analysis/{risk,sizing}.ts`, `knowledge/npm/{next,react}/{library.json,CHANGELOG.md,releases/*}`, `packs/nextjs-upgrade/{pack.json,CHANGELOG.md,SKILL.md,references/*,references-src/*}`, `scripts/{build-pack,lint-packs,draft-release,pack-docs-report}.ts`, `scripts/lib/release-notes.ts` (the shared notes parser), `.agents/skills/add-release-knowledge/SKILL.md` (exists; keep it in step with the schema), `eval/seeded/next-tricky/**` (`rule_id` tags and cases for uncovered rules), `test/fixtures/next-clean/` (a Next.js app with no affected code), `test/fixtures/knowledge/` (small fake libraries for both schemes), `test/fixtures/release-notes/` (recorded notes in `md`, `mdx` and `rst`), `test/unit/{knowledge,pack,versions,compose,ingest,lintPacks,risk,sizing,scope,releaseNotes}.test.ts`, `test/permissions/scope-cannot-widen.test.ts`.
 
 ## Tests
 
@@ -153,14 +153,14 @@
   - S older than `covered_from` gives the "not checked" note, and S older than `supported.from` gives the "older than this pack's checked range" note
   - `stop_at` narrows T
   - a draft rule never appears
-- **Lint:** one failing fixture per lint rule.
+- **Lint:** one failing fixture per lint rule. The `source` fixtures include a `..` path that climbs out of its prefix and a look-alike host, which a plain prefix match would accept, plus an `http://` URL, one with credentials, a sibling repo (`https://github.com/vercel/next.js-fork/` against the prefix `https://github.com/vercel/next.js/`) and a `doc_sources` prefix with no trailing `/`. A URL that differs from its prefix only by host case or a default port passes.
 - **Generator:** golden-file test, so the same input gives byte-identical output.
 - **Release-notes parser:** on the recorded `md`, `mdx` and `rst` fixtures, it extracts the expected items with anchors, and an unknown section heading is reported, not guessed.
 - **Drafter and report (offline, on recorded fixtures):** the drafter never overwrites a reviewed rule; the report lists a planted missing item, a planted dead source and a planted draft.
 - **Risk:** a table-driven test of the signals on the `next-tricky` seeded repo. Async request APIs used through a helper, caching-only changes and peer conflicts must come out at `high` or `blocker` suggested severity.
 - **Loader:** `--rules-dir` outside the bundled dirs is refused, drafts are skipped and counted, and the pack version and hash appear in the run record.
 - **Sizing:** `next-clean` comes out `none`, and `next-tricky` comes out `full`. Each `none` condition is shown to matter: an unparsed file, an unresolved dynamic import, a peer conflict, a single matched usage, or an installed version older than `covered_from` or `supported.from` each turns `none` into `small` or `full`. A usage with no codemod, or a high-risk one, turns `small` into `full`.
-- **Scope:** an answer outside the offered options is rejected; `depth` can move up but not down; `set_scope` after the first lens packet is refused, and so is `set_scope` after `merge_findings` on a `none` run; excluded usages get engine-written `out_of_scope` reasons; unanswered questions take their defaults and are reported as defaults.
+- **Scope:** an answer outside the offered options is rejected; `depth` can move up but not down; `set_scope` after the first lens packet is refused, and so is `set_scope` after `merge_findings` on a `none` run; excluded usages get `out_of_scope` reasons with `written_by: scope`; unanswered questions take their defaults and are reported as defaults.
 - **Permissions (`scope-cannot-widen`):** no `set_scope` input can change the paths, the deny list, the level, the checks or `--out`, and a `stop_at` outside the pack's supported range is rejected.
 - **Permissions:** the full suite still passes, and an import lint shows nothing under `src/` imports from `scripts/` or `eval/`.
 

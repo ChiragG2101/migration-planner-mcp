@@ -125,8 +125,8 @@ Ingest -> Context build -> Size and scope -> Specialist fan-out -> Aggregate -> 
 1. **Ingest.** Validates input: path exists, source and target versions resolved from lockfiles (npm, pnpm, yarn, uv, poetry, pip requirements), git state clean or noted. Produces a run ID under a campaign and repo ID. Everything downstream is idempotent per run ID.
 2. **Context builder.** Deterministic. `scan_repo` and `find_usages` build the repo facts through the language adapter for each file: dependency graph, import graph, entrypoints, usage list with file:line. Stored in SQLite with a symbol index; no vector DB for v0.1.
    - **Then size and scope** (section 2). `propose_scope` computes the size and the questions from the facts, and `set_scope` records the answers. Scope is frozen at the first lens packet or the first `merge_findings`, whichever comes first. A `none` size skips the specialist fan-out, and a `small` size runs one combined lens instead of four. The gates run on every plan, whatever its size.
-3. **Specialist fan-out.** The `plan_migration` prompt instructs the host agent to work four lenses independently, each with its own evidence packet and narrow instruction: **API**, **Dependency/build**, **Behavior/runtime**, **Verification**. Each lens returns findings only in the schema above. Lenses do not see each other's output.
-4. **Aggregator.** `merge_findings` dedupes overlapping findings, resolves conflicts (take the higher severity and note it), groups findings into ordered stages (codemod steps first within a stage), and flags any usage with no covering finding.
+3. **Specialist fan-out.** The `plan_migration` prompt instructs the host agent to work four lenses independently, each with its own evidence packet and narrow instruction: **API**, **Dependency/build**, **Behavior/runtime**, **Verification**. Each lens returns findings only in the schema above, and may mark a usage from its own packet out of scope with a reason (for example code already in the target form). Lenses do not see each other's output.
+4. **Aggregator.** `merge_findings` dedupes overlapping findings, resolves conflicts (take the higher severity and note it), groups findings into ordered stages (codemod steps first within a stage), and flags any usage with no covering finding. In every run size, a usage that matches no rule in range and that no finding covers gets the engine's reason `no rule in range`. So gate 2 doesn't make a lens look at code no rule concerns; the out-of-scope counts by writer and the recall against real PRs (section 10) show what that misses. Each out-of-scope entry records who wrote it: the scope, the engine or a lens. A usage keeps one entry, in that order of precedence. A finding outranks a lens's mark: a usage one lens marks out of scope and another covers with a finding stays in the plan, and the mark is recorded as a conflict. A lens that both marks a usage out of scope and covers it with a finding in one submission has the whole submission rejected and retried. The user's scope outranks a finding: excluded usages are left out of lens packets, and a finding that still covers one loses that usage, which is recorded as a conflict. The finding stays in the plan for its other usages; one left covering no usage is kept out of the plan and listed in the run report.
 5. **Gates (deterministic critic).** `validate_plan` runs the hard checks in section 7. Failing findings go back to the agent with the exact failure. Cap at 3 rounds, then the plan is emitted with unresolved items marked, never silently passed.
 6. **Emit.** MIGRATION_PLAN.md for people, plan.json for tools, run_report.md (coverage, cost, what was dropped and why) and per-stage checklists.
 7. **Verify loop (L1 only).** In a sandbox copy: record a baseline check run, then for each stage run the stage's codemods, apply the agent's patch, run the declared checks, run the test-integrity gate, and keep or roll back the stage. A stage that fails 3 times goes to unresolved. Output is one patch per kept stage plus `verify_report.json`.
@@ -155,6 +155,7 @@ The verify loop runs gate 7 on each L1 stage patch:
 - Confidence below 0.6 goes in a "needs human decision" section, not the main plan.
 - Any blocker or high severity finding with `agent_judgment` source is always shown to the human first.
 - Any usage the user's scope excluded, whose rule breaks on the target, is always shown to the human first.
+- Any usage a lens marked out of scope, whose rule breaks on the target, is always shown to the human first.
 - Everything else is included in the plan.
 - The 0.6 threshold is a starting value. Tune it from eval results, not by feel.
 
@@ -268,6 +269,8 @@ Always:
 
 **Regression rule:** any change to a prompt, the knowledge or a pack, a skill, the knowledge loader or range composition, a usage adapter, the risk or sizing logic, staging, packets or routing, a codemod registry entry or a gate reruns the golden set and writes `eval/results.md`. Publish the results with the misses.
 
+On every PR, a pack gate also checks that a new pack beats the baseline and that no pack falls below its recorded noise band (`docs/design.md` D17).
+
 ## 11. Tool surface
 
 Every tool is also a CLI command over the same engine function.
@@ -336,13 +339,13 @@ migration-planner-mcp/          (working name)
        rules/ (knowledge loader, version schemes, range composition)
        schema/ finding.ts plan.ts knowledge.ts pack.ts match.ts
        store/ (sqlite event spine, campaigns, repos)
-       docs/ context7.ts cache.ts
+       docs/ context7.ts cache.ts officialUrl.ts
   knowledge/npm/next/ npm/react/ pypi/django/ (library.json, releases/*.json)
   packs/nextjs-upgrade/ (pack.json, SKILL.md, references/)
   packs/django-upgrade/
   scripts/ (maintainer tools: pack build and lint, release drafter, pack update report, golden-case finder and re-checker; never imported by src/)
   prompts/ plan_migration.v1.md
-  eval/ cases/ seeded/ baseline/ runner.ts results.md
+  eval/ cases/ seeded/ baseline/ runs/ dryruns/ history/ runner.ts results.md
   examples/ AGENTS.snippet.md
   test/ (incl. permissions)
   README.md LICENSE CONTRIBUTING.md AI_POLICY.md

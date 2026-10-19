@@ -26,14 +26,14 @@ Adding the pack may only touch:
 
 - `knowledge/pypi/django/**` and `packs/django-upgrade/**`
 - one new usage adapter `src/analysis/usages/django.ts`, registered with one line in `src/analysis/usages/index.ts`
-- eval data: the new cases under `eval/cases/`, the seeded repo `eval/seeded/django-tricky/`, and the regenerated `eval/results.md`
+- eval data (`docs/design.md` D15): the Django cases under `eval/cases/` (a case's pack is the `pack` field of its `case.json`), both new ones and the M0 ones (`django-ror-api-548`, `django-thunderstore-1369`, committed with only `case.json`), which the PR may complete because they have no recorded runs on the base branch. Completing a case may add files (`truth.json` and the like) and may change only `notes` and `checks` in its `case.json`; the pinned fields (`id`, `pack`, `repo_url`, `base_commit`, `merge_commit`, `pr_url`, `source`, `target`, `tags`, `license`) stay byte-identical. The PR may never remove a pending case, its own pack's or another's; that goes through D15's exception (b) in a core PR. Also a new line for each new case in the coverage matrix in `eval/cases/README.md` (existing lines may not be edited or deleted); the Django cases' recorded engine and baseline runs under `eval/runs/<django ids>/` (new files only); the seeded repo `eval/seeded/django-tricky/`; and the regenerated `eval/results.md`. No case, run or completion for another pack is allowed. Existing cases (with recorded runs on the base branch) and their runs are add-only on every PR, which M7's `scripts/check-eval-add-only.ts` checks.
 - the adapter's unit tests and fixtures under `test/`
 - docs (`docs/`, `README.md`)
-- the outputs the pack's build and eval regenerate: `plugin/**`, `eval/history/`, `eval/seeded/recall.md` and the new pack's entry in `eval/seeded/ratchet.json`. The drift check guards the generated content, and the ratchet check refuses a lower recorded value.
+- the outputs the pack's build and eval regenerate: `plugin/**`, `eval/history/`, `eval/seeded/recall.md` and the new pack's entry in `eval/seeded/ratchet.json`. The drift check guards the generated content. The ratchet check refuses a lower recorded value, the new entry must equal the measured recall, and other packs' entries may not change. Under `eval/history/`, files may only be added.
 
 The Python language adapter (M2), the text scanner (M2), the staging options (M6) and the `django-upgrade` codemod registry entry (M8) already exist, so none of them count as changes here.
 
-A CI check (`scripts/check-core-untouched.ts`) is an allowlist: it fails the pack PR on any changed file outside the list above, and on more than one changed line in `src/analysis/usages/index.ts`. So everything else is protected, notably all of `src/` apart from the new adapter (including `src/analysis/` risk, sizing, scanner and snippet code, `src/rules/`, `src/schema/` with the match kinds, `src/docs/`, `src/cli/`, `src/tools/` and `src/server.ts`), `prompts/`, `scripts/` (so a pack PR can't loosen the pack lint or the generator it is checked by), and the eval scoring code (`eval/runner.ts`, `eval/metrics.ts`, `eval/baseline/`, `eval/seeded/recall.ts`). If the pack cannot be added without a core change, that is a design bug. Fix it in a separate, reviewed core PR **before** the pack PR, and record the fix in `docs/design.md`.
+A CI check (`scripts/check-core-untouched.ts`) is an allowlist. It runs on every pack PR (a PR that changes anything under `packs/` or `knowledge/`, `docs/design.md` D15) and fails it on any changed file outside the list above, and on more than one changed line in `src/analysis/usages/index.ts`. It also enforces the pack-PR eval rules above: cases, completions and runs only for the PR's own pack, only `notes` and `checks` changed in a completed case's `case.json`, and only added lines in `eval/cases/README.md`. M7's `scripts/check-eval-add-only.ts` runs alongside it, as on every PR. So everything else is protected, notably all of `src/` apart from the new adapter (including `src/analysis/` risk, sizing, scanner and snippet code, `src/rules/`, `src/schema/` with the match kinds, `src/docs/`, `src/cli/`, `src/tools/` and `src/server.ts`), `prompts/`, `scripts/` (so a pack PR can't loosen the pack lint or the generator it is checked by), and the eval scoring code (`eval/runner.ts`, `eval/metrics.ts`, `eval/baseline/`, `eval/seeded/recall.ts`). If the pack cannot be added without a core change, that is a design bug. Fix it in a separate, reviewed core PR **before** the pack PR, and record the fix in `docs/design.md`.
 
 ## Tasks
 
@@ -123,13 +123,22 @@ A CI check (`scripts/check-core-untouched.ts`) is an allowlist: it fails the pac
 
 ## Files and modules
 
-`src/analysis/usages/django.ts`, `src/analysis/usages/index.ts` (one registry line), `knowledge/pypi/django/**`, `packs/django-upgrade/**`, `eval/cases/<django ids>/**`, `eval/seeded/django-tricky/**`, `scripts/check-core-untouched.ts`, `src/pipeline/agentsSnippet.ts`, plus `src/pipeline/ingest.ts`, `src/security/denyList.ts` and `src/verify/checks.ts` (separate PR), `examples/AGENTS.snippet.md`, `CONTRIBUTING.md`, `AI_POLICY.md`, `SECURITY.md`, `CODE_OF_CONDUCT.md`, `.github/ISSUE_TEMPLATE/*`, `plugin/**`, `README.md`, `docs/demo/{script.md,demo.gif}`, `test/unit/{djangoAdapter,agentsSnippet}.test.ts`, `test/permissions/{agents-snippet-cannot-widen,repo-checks-need-trust}.test.ts`.
+`src/analysis/usages/django.ts`, `src/analysis/usages/index.ts` (one registry line), `knowledge/pypi/django/**`, `packs/django-upgrade/**`, `eval/cases/<django ids>/**`, `eval/runs/<django ids>/**`, `eval/seeded/django-tricky/**`, `scripts/check-core-untouched.ts`, `src/pipeline/agentsSnippet.ts`, plus `src/pipeline/ingest.ts`, `src/security/denyList.ts` and `src/verify/checks.ts` (separate PR), `examples/AGENTS.snippet.md`, `CONTRIBUTING.md`, `AI_POLICY.md`, `SECURITY.md`, `CODE_OF_CONDUCT.md`, `.github/ISSUE_TEMPLATE/*`, `plugin/**`, `README.md`, `docs/demo/{script.md,demo.gif}`, `test/unit/{djangoAdapter,agentsSnippet}.test.ts`, `test/permissions/{agents-snippet-cannot-widen,repo-checks-need-trust}.test.ts`.
 
 ## Tests
 
 - **Django adapter:** one test per usage kind, and recall on `django-tricky` is recorded with a ratchet.
 - **Pack:** the M3 lint and generator checks pass for the new pack, and pack versions are recorded per run.
-- **No core changes:** `check-core-untouched` passes for the pack PR.
+- **No core changes:** `check-core-untouched` and `check-eval-add-only` pass for the pack PR, including on M0-style Django case folders with only `case.json` that the PR completes with `truth.json` and recorded runs. On planted changes one of them fails:
+  - a file outside the allowlist, or a second changed line in `src/analysis/usages/index.ts`
+  - an edited or deleted file under `eval/history/`
+  - an edited or deleted existing recorded run under `eval/runs/`, or a new recorded run added under an existing case
+  - in an existing case's folder under `eval/cases/`: an edited file, an added file, a deleted file, or a deleted case folder
+  - a case folder added for another pack, or runs added for, or completion of, a case of another pack
+  - a changed pinned field in the `case.json` of a pending case the PR completes (a change to `notes` and `checks` only passes)
+  - a deleted pending case folder, the pack's own or another pack's
+  - an edited or deleted existing line of `eval/cases/README.md` (an added line passes)
+  - a new ratchet entry that doesn't equal the measured recall, or a changed entry for another pack in `eval/seeded/ratchet.json`
 - **AGENTS.md snippet:**
   - It parses only the dedicated block.
   - `planner_deny` adds entries.
@@ -137,11 +146,11 @@ A CI check (`scripts/check-core-untouched.ts`) is an allowlist: it fails the pac
   - Checks from the snippet are ignored without `--trust-repo-checks`, and CLI flags override them (`repo-checks-need-trust`).
   - A missing file is handled.
 - **Plugin:** the generated bundle matches the packs (drift check).
-- **Regression:** the full eval reruns for both packs. Next.js results must not regress beyond the noise band recorded in M7.
+- **Regression:** the full eval reruns for both packs. The Next.js engine's worst-case pooled recall must not fall below the low end of its noise band in `eval/results.md` on the base branch, first recorded in M7. M7's CI pack gate checks this and the Django baseline comparison (D17): the engine's worst-case pooled recall (each Django case's lowest-recall run, pooled) must be above the baseline's best-case pooled recall (each case's highest-recall run, pooled). Every Django case has the same number N of recorded engine runs under HEAD's prompt version and the same N of baseline runs with HEAD's baseline prompt hash, with N at least 3, all made with the same host agent, and the gate fails on any other count. The Django pack has no band on the base branch, so it is beat-checked whichever PR adds its cases, and the regression check is skipped for it. A later PR that widens it is beat-checked again over all its cases.
 
 ## Acceptance criteria
 
-- The Django pack, adapter and eval cases merge with `check-core-untouched` passing.
+- The Django pack, adapter and eval cases merge with `check-core-untouched` and `check-eval-add-only` passing.
 - `eval/results.md` includes both packs and the baseline comparison, with misses listed, and an L1 run on at least one Django case. The Django pack beats the baseline on recall (`docs/design.md` D17).
 - The Django golden set has at least 3 licensed cases, including at least 2 tagged `lts-to-lts` and at least 1 tagged `messy`, and `npm run cases:verify -- --all` passes.
 - The AGENTS.md snippet works when present, is optional, provably cannot widen the boundary, and cannot add checks without the trust flag.

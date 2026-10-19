@@ -74,8 +74,8 @@
 9. **Store (`src/store/verify.ts`, migration `005b_verify.sql`).** `sandboxes(run_id, path, source_head, created_at)`, `baseline_checks(run_id, check, status, junit_json)`, `stage_attempts(run_id, stage_id, attempt, codemods_json, patch_hash, checks_json, gate7_json, decision)`.
 10. **Verify report (`src/verify/report.ts`, tool `get_verify_report`, CLI `report`).** `verify_report.json` lists, per stage: the decision, attempts, codemods run, checks with durations, gate 7 results, the patch path, and the network-using steps. M9 renders it into `run_report.md`. Applying patches is left to the user (`git apply <out>/<run_id>/patches/*.patch`). The report prints that exact command and never runs it.
 11. **Eval integration.** The runner (M7) gains outcome metrics: first-pass verify rate, mean attempts per stage, the share of stages unresolved, gate 7 incidents, flaky checks, and verify wall time.
-    - Live mode runs L1 on golden cases whose `case.json` declares `checks`.
-    - Replay mode re-scores the recorded `stage_attempts`.
+    - Live mode runs L1 on golden cases whose `case.json` declares `checks`. Each L1 run is recorded under `eval/runs/<case>/<prompt_version>/l1/<n>/`, the case's L1 set: a set of its own that never counts toward N or the pack gate's recall (`docs/design.md` D15, D17). Adding a case's first L1 set is plain adding; adding a run to an L1 set that already has runs fails M7's `check-eval-add-only`.
+    - Replay mode re-scores the `stage_attempts` recorded in those L1 sets.
     - **Patch replay check:** applying all kept patches to a fresh clone of the base commit must reproduce the sandbox's final tree hash.
 12. **CI fixtures.** Two tiny repos the project owns, so CI can run L1 for free:
     - `test/fixtures/l1-node/`: a few Vitest tests and a `tsc` check

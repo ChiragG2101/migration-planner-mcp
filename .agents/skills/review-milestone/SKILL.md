@@ -31,7 +31,7 @@ Check the diff for each one. The common failures:
 
 - A write API or `child_process` import outside `src/security/` (C3). Search for `writeFile`, `mkdir`, `rm`, `rename`, `spawn`, `exec` and `child_process`.
 - A path used without `resolveInside`/`SafePath`, or the deny list bypassed (C4).
-- A tool argument or pack field that can reach `exec.ts` or raise the level (C5, C9).
+- A tool argument, or a pack or knowledge field, that can reach `exec.ts` or raise the level (C5, C9).
 - A network call outside `src/docs/context7.ts`, or repo content in an outbound payload (C6).
 - An LLM SDK or MCP sampling dependency (C7).
 - Data stored outside `src/store/` (C2), or records missing `repo_id` (C10).

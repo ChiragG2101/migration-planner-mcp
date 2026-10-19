@@ -90,6 +90,7 @@ These are enforced in code, not in prose. A change that breaks one of them is wr
 - **Zod schemas in `src/schema/`** produce both the TS types and the MCP JSON Schema.
 - **`snippet_hash`** uses one shared normaliser, which `find_usages`, finding normalisation and gate 1 all reuse.
 - **Regression rule:** any change under `prompts/`, `knowledge/`, `packs/`, `src/rules/`, `src/analysis/` (usage adapters, risk, sizing), `src/pipeline/{aggregate,packets,routing}.ts`, `src/pipeline/gates/` or `src/verify/` (codemod registry, gate 7) requires regenerating `eval/results.md` in the same change. It applies from M7, when the eval runner exists; before that, say in the change that the rerun isn't possible yet.
+- **Eval evidence is add-only.** From M7, existing golden cases and recorded runs are add-only on every PR, not only pack PRs, with two named exceptions (`scripts/check-eval-add-only.ts`, `docs/design.md` D15). The committed `eval/results.md` must equal the re-score of HEAD's tree, so never hand-edit it (D17).
 
 ## Planned tooling (from M1; confirm once it exists)
 

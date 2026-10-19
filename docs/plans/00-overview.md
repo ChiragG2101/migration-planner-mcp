@@ -29,7 +29,7 @@ These come from PRD sections 1, 3 and 7A. A milestone that breaks one of them is
 | M1 | [`01-engine-skeleton-scan-repo-permissions.md`](01-engine-skeleton-scan-repo-permissions.md) | Engine skeleton, CLI and MCP adapters, `scan_repo` (JS/TS and Python), event log with campaign and repo IDs, path boundary, read-only rule | M0 |
 | M2 | [`02-language-adapters-find-usages.md`](02-language-adapters-find-usages.md) | TS and Python language adapters, import graphs, `find_usages` for Next.js, usage index | M1 |
 | M3 | [`03-rule-pack-assess-risk-skill.md`](03-rule-pack-assess-risk-skill.md) | Knowledge and pack schema (per-library releases, version schemes, range composition), Next.js knowledge and pack, `get_rule_pack`, `assess_risk`, sizing and scope (`propose_scope`, `set_scope`), generated skill, release drafter and pack update report | M1, M2 |
-| M4 | [`04-context7-docs-cache.md`](04-context7-docs-cache.md) | Context7 integration, retrieval log, cache | M1 (M3 for the fallback content) |
+| M4 | [`04-context7-docs-cache.md`](04-context7-docs-cache.md) | Context7 integration, retrieval log, cache | M1 (M3 for the fallback content and `officialUrl.ts`) |
 | M5 | [`05-finding-schema-prompt-lenses.md`](05-finding-schema-prompt-lenses.md) | Finding schema, `plan_migration` prompt, four lenses | M2, M3, M4 |
 | M6 | [`06-merge-findings-validate-plan.md`](06-merge-findings-validate-plan.md) | `merge_findings`, `validate_plan` gates 1 to 6, emit | M5 |
 | M7 | [`07-eval-runner-golden-baseline.md`](07-eval-runner-golden-baseline.md) | Eval runner, 5 Next.js golden cases, baseline run, golden-case finder and re-checker | M6 |
@@ -38,7 +38,7 @@ These come from PRD sections 1, 3 and 7A. A milestone that breaks one of them is
 | M10 | [`10-django-pack-readme-oss-demo.md`](10-django-pack-readme-oss-demo.md) | Django pack (no core changes), README, open-source files, plugin bundle, demo, name decided | M3, M7, M8, M9 |
 | M11 | (this file, section below) | npm publish, tag v0.1 | M10 |
 
-M4 can run in parallel with M2 and M3 once M1 lands. Everything else runs in order.
+M4 can run in parallel with M2 and M3 once M1 lands, except that M4's `official` labelling needs `src/docs/officialUrl.ts` from M3 task 7, so that file lands before M4's labelling. Everything else runs in order.
 
 **Cut order if behind:** server-side Context7 (a stretch goal anyway), then container sandbox mode (keep the clone sandbox), then the depth of the Django pack (fewer rules, same golden cases and the same "no core changes" check). **Never cut** the gates (M6 and gate 7 in M8), the permissions rules (M1 and every later milestone), the eval (M7) or the clone-based verify loop (M8).
 
@@ -100,11 +100,11 @@ src/
   security/                 # pathBoundary.ts, denyList.ts, level.ts, safeWrite.ts, exec.ts, network.ts
   schema/                   # finding.ts, plan.ts, knowledge.ts, pack.ts, match.ts, scope.ts, events.ts, verify.ts
   store/                    # db.ts, migrations/, campaigns.ts, events.ts, usages.ts, docs.ts
-  docs/                     # context7.ts, cache.ts
+  docs/                     # context7.ts, cache.ts, officialUrl.ts (shared URL check, M3)
 knowledge/<ecosystem>/<library>/   # library.json, CHANGELOG.md, releases/<release>.json (facts per release; source of truth)
 packs/<pack>/               # pack.json (which libraries, how to plan), CHANGELOG.md, generated SKILL.md, references/
 prompts/                    # plan_migration.v1.md (+ later versions, never overwritten)
-eval/                       # cases/, seeded/, baseline/, runner.ts, results.md
+eval/                       # cases/, seeded/, baseline/, runs/ (recorded runs), dryruns/ (M5 dry run), history/, runner.ts, results.md
 examples/AGENTS.snippet.md
 test/                       # unit/, permissions/, fixtures/
 ```

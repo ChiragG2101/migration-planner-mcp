@@ -53,7 +53,7 @@
 6. **`record_feedback` (core, tool `src/tools/recordFeedback.ts`, CLI `feedback`).**
    - Input: `run_id`, `finding_id?` or `stage_id?`, `kind` (`wrong`, `missing`, `severity_wrong`, `bad_patch` or `other`), `note`, and optional `file` and `line` for `missing`.
    - Stores to `feedback` (migration `006_feedback.sql`) with the run.
-   - Exports to `eval/feedback/<run_id>-<n>.json` under the output dir, in a format `eval/runner.ts` can turn into a seeded case or a golden-case annotation. `scripts/feedback-to-case.ts` is manual and reviewed.
+   - Exports to `eval/feedback/<run_id>-<n>.json` under the output dir, in a format `eval/runner.ts` can turn into a seeded case or a golden-case annotation. `scripts/feedback-to-case.ts` is manual and reviewed. On an existing golden case it may only append new entries to `annotations.json` (or add the file with its first entries); existing entries are frozen, and headline metrics stay on raw truth (`docs/design.md` D15, INV-30).
    - No training and no network.
    - For `missing`, the file and line go through `SafePath` (the user cannot point outside the repo).
 

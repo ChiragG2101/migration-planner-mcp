@@ -33,6 +33,7 @@
 
    - **Combined (`small` runs only):** one packet with what all four lenses would get, still size-bounded. A `small` run has at most `--small-max-usages` usages, so this stays small. `get_lens_packet` refuses `combined` unless the run's size is `small`, and refuses the four separate lenses for a `none` run.
    - Fetching the first packet freezes the run's scope (M3).
+   - Usages the scope excluded are left out of every packet (`docs/design.md` D16).
 
    A packet never includes other lenses' findings, which keeps the lenses independent (PRD section 6.3). Packets contain file:line plus a bounded context, deny-list checked.
 3. **Prompt (`prompts/plan_migration.v1.md`, registered as an MCP prompt).**
@@ -50,14 +51,14 @@
      - gives a rollback and a verify step for anything rated high or above
      - prefers a codemod step where the pack lists one, and states what the codemod leaves for manual work
    - **Contains no instruction to edit files or run commands.** This does not replace the code enforcement (C3); it only avoids prompting for it.
-   - Prompts are versioned files. `v1` is never edited after release, and changes create `v2`. A test enforces this by comparing a hash recorded in `prompts/manifest.json`.
+   - Prompts are versioned files. `v1` is never edited after release, and changes create `v2`. A test enforces this by comparing a hash recorded in `prompts/manifest.json`. The manifest also names the current version, the only one M7's eval scores (`docs/design.md` D17).
 4. **`submit_findings` tool (`src/tools/submitFindings.ts`).**
-   - Input: `run_id`, `lens`, `findings[]` and `out_of_scope[] {usage_id, reason}`. An `out_of_scope` entry must name a usage ID from this lens's packet and give a non-empty reason. It is stored with `written_by` set to the lens (`docs/design.md` D16).
+   - Input: `run_id`, `lens`, `findings[]` and `out_of_scope[] {usage_id, reason}`. An `out_of_scope` entry must name a usage ID from this lens's packet and give a non-empty reason. It is stored with `written_by` set to the lens (`docs/design.md` D16). A submission in which the lens both marks a usage out of scope and writes a finding on it is invalid output: the whole submission is rejected, no item from it is stored, and it counts toward the retry policy below.
    - Parses each finding with Zod and normalises evidence: it re-reads the file through `SafePath` and recomputes `snippet_hash`. A mismatch is flagged here and gate 1 checks it again later.
-   - Valid findings are stored. For invalid output it returns the exact Zod errors and allows **one** retry per lens. After that it records a `lens.gap` event and moves on (reliability layer).
+   - Valid findings are stored. For invalid output (an invalid finding, an invalid `out_of_scope` entry, or a usage the lens both marks and covers) it returns the exact Zod errors and allows **one** retry per lens. After that it records a `lens.gap` event and moves on (reliability layer). Usages left uncovered by the gap stay uncovered unless another lens's finding or an out-of-scope entry covers them, and gate 2 sends them to `unresolved` (M6).
    - Stores findings both before and after normalisation as events (audit trail).
 5. **Store (`src/store/findings.ts`, migration `004_findings.sql`).** `findings(run_id, id, lens, json, status, round)`.
-6. **Real-repo dry run.** Pick one public Next.js repo from the M0 golden list. Run the full flow in Claude Code or Cursor and save the transcript and findings under `eval/runs/m5-dryrun/` (outside the target repo).
+6. **Real-repo dry run.** Pick one public Next.js repo from the M0 golden list. Run the full flow in Claude Code or Cursor and save the transcript and findings under `eval/dryruns/m5/` (outside the target repo).
 
 ## Files and modules
 
@@ -66,8 +67,9 @@
 ## Tests
 
 - **Schema:** valid and invalid fixtures for every enum. A `codemod` step with an ID the rule's library doesn't list is rejected, and evidence with a different `repo_id` is rejected. `agent_judgment` with no evidence is rejected. `confidence` must be within 0 to 1.
-- **Lens out of scope:** an entry naming a usage outside the lens's packet, or with an empty reason, is rejected; a valid one is stored with `written_by` set to the lens.
+- **Lens out of scope:** an entry naming a usage outside the lens's packet, or with an empty reason, is rejected and counts toward the retry policy, and so is a submission in which the lens both marks a usage out of scope and writes a finding on it, which stores none of its findings or entries; a valid entry is stored with `written_by` set to the lens.
 - **Packet isolation:** the packet for lens A contains no finding IDs from lens B, even after lens B has submitted.
+- **Packet scope:** a usage the scope excluded appears in no lens packet, including the combined one.
 - **Packet bounds:** the maximum size is respected, and truncation is reported in the packet, never silent.
 - **Retry policy:** the first invalid submit returns errors, the second invalid submit records `lens.gap`, and a third attempt is refused.
 - **Prompt immutability:** editing `plan_migration.v1.md` fails the test.
