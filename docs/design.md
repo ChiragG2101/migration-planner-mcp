@@ -500,3 +500,37 @@ Why:
 - `src/pipeline/ingest.ts` realpathed and stat'ed the repo folder itself. That moved to `resolveRepoRoot` in `src/security/pathBoundary.ts`, with the same messages, so the allowlist stays at the two engine-file reads.
 - The planted-lint test in `single-write-point.test.ts` that allowed reads anywhere now plants its read in `src/security/`, since reads elsewhere are refused.
 - Libraries that read their own package files (web-tree-sitter loading its WASM) are outside `src/` and outside the rule; they never get a repo path.
+
+### D26 - The Python grammar is vendored; TypeScript stays on 6.0
+
+**Decision (maintainer's choice):** the tree-sitter Python grammar is committed as a prebuilt `.wasm` (`src/lang/python/grammar/`, from `tree-sitter-python` 0.25.0, MIT) with its version and sha256 in a README; `test/unit/lang/python.test.ts` checks the checksum. It is loaded by `web-tree-sitter` 0.27.1. TypeScript stays at 6.0.3 and moves to runtime `dependencies`.
+
+Why:
+
+- The `tree-sitter-python` npm package runs `node-gyp-build` on install for a native binding the engine never uses. Depending on it would put an install script and a possible native build on every user's machine, which C3's spirit and D2 ruled out.
+- TypeScript 7.0.2 is released, but its compiler API is still published only under `unstable/*` (D21's revisit point). M2 needs the stable compiler API.
+
+Cost: grammar upgrades are a manual copy (the README says how), not a Dependabot PR. Revisit when TypeScript 7 publishes a stable API, or if a grammar package ships the `.wasm` without an install step.
+
+### D27 - The Next.js usage list, checked against the official guides
+
+**Decision:** the Next.js adapter's targets were checked on 2026-10-19 against nextjs.org's version-15 and version-16 upgrade guides and react.dev's React 19 upgrade guide (primary sources, D11), and the plan's draft list was extended to match. The checked list is in `docs/plans/02-language-adapters-find-usages.md` task 8. A usage carries the plan's fields plus `module`, `match_kind` (the M3 match kind it can satisfy) and `labels` (`indirect`, `type_only`, `awaited`, `peer_conflict`, `optional_peer`, `passed_to_client`, `cache_option`).
+
+- **Peer conflicts (maintainer's choice):** every peer range on `next`, `react` and `react-dom` in npm, pnpm and yarn berry lockfiles is a `peer_dependency` usage; it is labelled `peer_conflict` when the range excludes a known target. In M2 the only known target is the run's own (`next`); M3 passes the companion targets it composes (React) into the same `targets` map. A yarn v1 lockfile records no peer ranges, so the summary lists it in `peer_data_unavailable`.
+- **Wrappers are followed only where callers must change:** a helper around `cookies()`, `headers()` or `draftMode()` makes its callers usages, transitively (they must await it once it is async). Wrappers around `fetch`, `revalidateTag` or the React removals are not followed: the change is at the call inside the wrapper.
+- **Seeded repo versions (maintainer's choice):** `next-tricky` is a Next.js 14.2 / React 18 app, two majors behind 16.4, so its cases cover both the 15 and 16 changes.
+
+Why: a draft from memory would miss the Next.js 16 removals (AMP, runtime config, `next lint`, the `middleware` rename) and the React 19 type changes. Revisit when a new Next.js major ships: the list and `next-tricky` change together.
+
+### D28 - Smaller M2 choices
+
+- **Parsing:** each TS/JS file is parsed in its own Program (`noResolve`, `noLib`), so the checker scopes names inside the file and the facts depend only on the file's content. That makes them cacheable by sha256 (`file_facts`, keyed by adapter, version and script kind). Cross-file resolution is done on the facts (`src/lang/graph.ts`). A per-file Program measured 3.4 ms per file, the same as one batched Program. Imports resolve with the package's tsconfig (`paths`, `baseUrl`, `moduleResolution`; Bundler when unset) through a host that sees only walked files; a workspace package imported by name resolves to its folder, since its `node_modules` link is deny-listed.
+- **The language interface returns resolutions separately:** `imports(tree)` returns imports as written and `resolver(ctx)` turns them into edges, because resolution needs the whole repo and must not be cached per file. A Python from-import that binds a submodule (`from . import views`) gets an edge to that file too.
+- **Syntax errors:** the file is listed in `unparsed_files` with `partial: true`, and the facts the parser recovered are kept. Both parsers recover, so dropping the facts would lower recall without making anything safer, and listing the file still keeps M3's size from being `none`.
+- **Python string refs:** dotted strings of identifiers are heuristic `string_ref` edges; one trailing name is stripped to find the module (`app.middleware.Auth` -> `app/middleware.py`). Strings ending in a file extension or a common host suffix (`base.html`, `example.com`) are skipped.
+- **Build output** (`.next/`, `.vercel/`, `.turbo/`) is not analysed and is listed in `skipped_generated`; generated chunks would bury the real usages.
+- **Selecting the adapter:** until M3's `pack.json` names `usage_adapter`, the adapter comes from the run's source library (`next` -> `nextjs`). A library with no pack yet (Django until M10) gets the graph-only adapter: the import graph and symbols are stored and no usages are reported.
+- **Pagination:** a `find_usages` call without a cursor recomputes the index (unchanged files come from the cache) and stores it under a new generation; a cursor pages through that generation and is refused once stale or used with other filters. The result always gives the total and says when it is one page of several. The CLI keeps no state, so `usages` ingests first (idempotent) and returns the first page.
+- **Usage IDs:** the plan's hash of repo, file, start line, kind and symbol. Two usages with the same kind and symbol on one line are one usage, with their labels merged.
+- **Recall matching:** a usage matches a ground-truth entry when its file and kind are equal and its lines include the entry's line. CI checks the ratchet against the PR base (or the previous push) with `npm run recall -- --check --base`, and `npm test` checks the floor and that `recall.md` is current.
+- **Files outside the plan's list:** `src/schema/usage.ts` (the Zod schemas), `src/lang/index.ts` (the language registry), `src/lang/graph.ts`, `src/analysis/usages/trace.ts`, `parsePeerRanges` in `src/analysis/manifests/node.ts`, `resolveRepoRoot` in `src/security/pathBoundary.ts` (D25), and the test helpers `test/usages.ts` and `test/permissions/parser-boundary.test.ts`.

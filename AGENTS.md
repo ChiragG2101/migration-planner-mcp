@@ -4,7 +4,7 @@ Instructions for coding agents working in this repository (Claude Code, Codex, C
 
 ## Current state
 
-**M1 done (2026-10-19); M2 is next.** The engine skeleton exists: the security layer, the SQLite event spine, ingest, `scan_repo`, and the CLI and MCP adapters. The repo holds the engine in `src/`, its tests in `test/`, the spec, the per-milestone plans, the spine docs and the golden-case records:
+**M1 done (2026-10-19). M2 built (2026-10-19), awaiting its independent review.** The engine has the security layer, the SQLite event spine, ingest, `scan_repo`, the TS and Python language adapters with the import graph, the Next.js usage adapter, `find_usages`, the seeded-defect repo `eval/seeded/next-tricky/` with its recall ratchet, and the CLI and MCP adapters. The repo holds the engine in `src/`, its tests in `test/`, the spec, the per-milestone plans, the spine docs and the golden-case records:
 
 - `docs/PRD.md`: the product requirements and build spec. This is the source of truth.
 - `docs/plans/00-overview.md`: the cross-cutting constraints (C1 to C10), the tech decisions, the per-milestone gates, the cut order and the target source layout.
@@ -94,17 +94,18 @@ These are enforced in code, not in prose. A change that breaks one of them is wr
 
 ## Tooling
 
-Node 22.13 or later so `node:sqlite` needs no flag (`docs/design.md` D18), TypeScript 6.0 strict (not 7, D21), ESM, npm, Vitest, ESLint (flat `eslint.config.js`), the official MCP TS SDK v2 (`@modelcontextprotocol/server` 2.3.1, pinned), Zod. Licence Apache-2.0. Planned for M2: the `typescript` compiler API and `web-tree-sitter` with the Python grammar.
+Node 22.13 or later so `node:sqlite` needs no flag (`docs/design.md` D18), TypeScript 6.0 strict (not 7, D21), ESM, npm, Vitest, ESLint (flat `eslint.config.js`), the official MCP TS SDK v2 (`@modelcontextprotocol/server` 2.3.1, pinned), Zod. Licence Apache-2.0. The `typescript` compiler API (6.0.3, a runtime dependency) parses TS/JS; `web-tree-sitter` 0.27.1 with the vendored Python grammar in `src/lang/python/grammar/` parses Python (D26).
 
 Commands that exist now:
 
 - `npm install`, then `npm run build` (to `dist/`), `npm test`, `npm run test:permissions`, `npm run typecheck`, `npm run lint`.
 - One test: `npx vitest run <path>` or `npx vitest run -t "<name>"`.
 - Repo hash (INV-1): `npx tsx scripts/repo-hash.ts <root>`.
-- CI (`.github/workflows/ci.yml`) runs typecheck, lint, `npm test`, the build, `check-spine.sh` and `check-agent-skills.sh` on every push and PR, on Linux and macOS (Windows is experimental and non-blocking). Dependabot (`.github/dependabot.yml`) opens weekly update PRs; never merge one that fails CI, and re-read the MCP SDK changelog before merging an SDK bump (D23).
-- The CLI from a build: `node dist/cli/index.js scan <repo> --source <lib> --target <lib@ver> [--out <dir>] [--format text]`, and `node dist/cli/index.js mcp` for the MCP server. Host wiring for Claude Code and Cursor is in `docs/design.md` (M1 task 10).
+- Seeded recall (the smoke eval until M7): `npm run recall` regenerates `eval/seeded/recall.md`; `npm run recall -- --check [--base <git ref>]` fails below a floor in `eval/seeded/ratchet.json`, on a stale `recall.md`, or (with `--base`) on a lowered, removed or wrongly started floor (INV-50).
+- CI (`.github/workflows/ci.yml`) runs typecheck, lint, `npm test`, the recall ratchet against the PR base, the build, `check-spine.sh` and `check-agent-skills.sh` on every push and PR, on Linux and macOS (Windows is experimental and non-blocking). Dependabot (`.github/dependabot.yml`) opens weekly update PRs; never merge one that fails CI, and re-read the MCP SDK changelog before merging an SDK bump (D23).
+- The CLI from a build: `node dist/cli/index.js scan <repo> --source <lib> --target <lib@ver> [--out <dir>] [--format text]`, `node dist/cli/index.js usages <repo> --source <lib> --target <lib@ver> [--kind <k>] [--file <f>] [--symbol <s>] [--limit <n>] [--cursor <c>] [--format text]`, and `node dist/cli/index.js mcp` for the MCP server. Host wiring for Claude Code and Cursor is in `docs/design.md` (M1 task 10).
 
-Planned scripts: `npm run lint` gains `scripts/lint-packs.ts` (M3); `npm run build:packs`, `npm run eval:smoke`, and `npm run eval -- --tier all`. Maintainer tools (network, manual): `npm run knowledge:draft -- <library> <release>`, `npm run pack:report -- <pack>`, `npm run cases:find -- <pack> --from <v> --to <v>` and `npm run cases:verify -- <id>|--all`. The CLI's commands mirror the tools; after `scan` come `usages`, `pack`, `risk`, `scope`, `docs`, `merge`, `validate`, `emit`, `verify`, `report` and `feedback`.
+Planned scripts: `npm run lint` gains `scripts/lint-packs.ts` (M3); `npm run build:packs`, `npm run eval:smoke`, and `npm run eval -- --tier all`. Maintainer tools (network, manual): `npm run knowledge:draft -- <library> <release>`, `npm run pack:report -- <pack>`, `npm run cases:find -- <pack> --from <v> --to <v>` and `npm run cases:verify -- <id>|--all`. The CLI's commands mirror the tools; after `scan` and `usages` come `pack`, `risk`, `scope`, `docs`, `merge`, `validate`, `emit`, `verify`, `report` and `feedback`.
 
 ## Definition of done per milestone
 
