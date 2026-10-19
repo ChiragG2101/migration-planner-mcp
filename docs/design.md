@@ -556,3 +556,37 @@ Why: a draft from memory would miss the Next.js 16 removals (AMP, runtime config
 - **The update report's output** goes to `.private/` and to the maintainer until the M3 pull request exists.
 
 Why: the range covers `next-tricky` (14.2) without an "older than checked" note, and 14 adds only a few rules. A partial old file is the only way to keep the rule's dates true without making 13's knowledge complete. A rule's author can't be its reviewer (`add-release-knowledge`). Leaving undetectable rules out would understate what the pack checks.
+
+## 2026-10-19: M3 build decisions
+
+### D30 - How a rule's match binds to a usage
+
+The plan types each rule's `match` but doesn't say when a usage counts as matched. `src/rules/match.ts` decides it, and `assess_risk`, sizing, gate 1 and the lint all use it.
+
+**Decision:** a usage binds to a rule when the usage's `match_kind` equals the match's `kind` and:
+
+| Kind | Binds when |
+| --- | --- |
+| `import {module, name?}` | the usage's module is `module` or a subpath of it (`@next/font/google` under `@next/font`), and, when `name` is given, the symbol is `<usage module>.<name>` |
+| `call {module, name}` | the module is exactly `module` and the symbol is `<module>.<name>`; a global (`fetch`) has `module: null` and the symbol is the bare name |
+| `attribute {module, path}` | the module is `module` and the symbol is `path` (`NextRequest.geo`) |
+| `config_key {file_kind, path}` | the module is the config file kind (`next.config`, `segment`, `tsconfig`) and the symbol is `path` or a key under it |
+| `dependency {package, range}` | the module is `package`; `range` documents the affected versions and is not checked |
+| `file_convention {glob, symbol?}` | the file matches `glob`, anchored at a path-segment boundary as if it began with `**/`, and, when `symbol` is given, the symbol is equal |
+| `setting`, `string_ref`, `template_tag`, `template_filter` | the symbol equals the name or dotted path (M10 may tighten these when the Django adapter exists) |
+
+Values are not checked: any `runtime` segment export binds a `runtime` rule, and any declared `@types/react` binds a rule on old `@types/react`. Code already in the target form therefore still binds, and a lens marks it out of scope (D16). An unresolved dynamic import binds nothing, so it stays unmapped for the lenses and gate 2.
+
+To make `config_key` work, the Next.js adapter now reports route segment config with module `segment`, not `next`, so a `next.config` rule never binds an `export const runtime`. That's a D29 finder change: the adapter's `version` goes from 1 to 2.
+
+Why: binding on the fields the adapter already writes keeps the matcher data-driven, with no per-rule code. The glob anchoring lets one rule cover `app/`, `src/app/` and workspace apps. Accepting value-level over-matching follows the PRD's "flagging is the safe direction".
+
+### D31 - Smaller M3 build choices
+
+- **The engine's own data is read in `src/security/dataFiles.ts`.** It reads only `.json` and `.md` under the bundled `knowledge/` and `packs/`, refuses symlinks, and lists any other file with no text so the loader refuses it. It sits in `src/security/`, so D25's allowlist outside it stays at two entries.
+- **The loader fails closed at engine start.** Bad JSON, a schema failure, an ID that doesn't match its folder, a version outside its file's release, a duplicate rule ID, an event for an unknown or not-earlier rule, a `requires` on an unknown library or an invalid range, a pack naming a library with no knowledge, an unknown `usage_adapter`, or a `usage_kinds` list that misses or invents one of the adapter's kinds: any of these stops the engine from starting. A usage kind with no lens would reach no lens in M5, so the check lives in the loader rather than only in the lint.
+- **A run records its pack, and `find_usages` refuses a mismatch.** `runs.versions_json` gains `ecosystem`, `pack` (`name@version#hash`, or null) and `companions` (installed companion versions from lockfiles). The pack ref replaces the `none` placeholder in the idempotency key, so new knowledge gives a new run. `find_usages` refuses a run whose recorded pack differs from the loaded one (`pack_changed`), and a run recorded before M3 (`old_run`), rather than reading it without its pack.
+- **A pre-release companion is refused too.** A lockfile pinning `react@19.0.0-rc-…` can't be composed, so ingest refuses it with the pre-release message naming the package, the same as for the source. The refusal names which version it was (`(target next 16.0.0-canary.1)`).
+- **`release_notes` sections are `{heading, event?}` with `*` for the document itself, plus a `skip` list.** Next.js's upgrade guides make every top-level heading a change, while React's nest changes two levels deep. The templates are optional when per-release overrides cover every release (React's guides have no version in their URL).
+- **Codemod IDs are `<tool>:<transform>`:** `next-codemod:…`, `react-codemod:…` (with `react-codemod:migration-recipe-19` for the codemod.com recipe that react.dev gives) and `types-react-codemod:…`, listed in `src/verify/codemodIds.ts` from the official lists on 2026-10-19.
+- **The bundled data is loaded once per process.** It can't change while the engine runs, and tests create many engines.
