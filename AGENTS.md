@@ -30,7 +30,7 @@ These apply to every change, in any tool.
 
 ## Contributor skills
 
-Skills live in `.agents/skills/` (see `.agents/README.md`). Claude Code users run `scripts/link-agent-skills.sh` once, and again after pulling new skills. `scripts/check-agent-skills.sh` checks the skills follow the rules.
+Skills live in `.agents/skills/` (see `.agents/README.md`). Claude Code users run `scripts/link-agent-skills.sh` once, and again after pulling new skills. `scripts/check-agent-skills.sh` checks the skills follow the rules. `scripts/check-spine.sh` checks the cross-references between the spine docs and the plans; run it after any change to `docs/`. A diff with no code is reviewed with the plan-review procedure in the `review-milestone` skill.
 
 | Skill | Use it to |
 | --- | --- |

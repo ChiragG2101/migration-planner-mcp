@@ -17,6 +17,8 @@ The plan is the contract. Build what it says, nothing more, and prove it with it
 
 If a dependency milestone is not done, stop and tell the user. Do not build on top of missing pieces.
 
+If the milestone file has an `## Open items` section (left there by a capped plan review), settle each item with the user before writing code. Record each decision in `docs/design.md`, update the plan, and remove the item.
+
 ## 2. Write a short plan first
 
 Before writing code, write out:
@@ -56,7 +58,7 @@ All of these must hold before you say the milestone is done (overview, "Per-mile
 2. The typecheck and the lint pass.
 3. The eval smoke set passes.
 4. The target-repo hash is unchanged after the milestone's demo command.
-5. The spine docs are updated: run the `update-spine-docs` skill.
+5. The spine docs are updated: run the `update-spine-docs` skill, and `scripts/check-spine.sh` passes.
 
 Use the commands in `AGENTS.md` ("Planned tooling"). If a command does not exist yet, say so plainly. Never report a gate as passed without running it.
 

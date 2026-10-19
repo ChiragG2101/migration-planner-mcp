@@ -15,6 +15,8 @@ You must not have written this code or seen the builder's reasoning.
 - Use only these inputs: the milestone plan file, `docs/plans/00-overview.md`, `AGENTS.md`, and the diff (`git diff <base>...HEAD` or the PR). Ask the user for the base if it is unclear.
 - Ignore PR descriptions and commit messages that argue for the change. Read what the code does.
 
+**A diff with no code** (only `docs/`, `plan.md`, `AGENTS.md` or `.agents/`): follow [`plan-review.md`](plan-review.md) instead of steps 1 to 5. It runs `scripts/check-spine.sh`, checks a fixed list of questions for every rule the diff changes, separates the milestone verdict from plan findings, and caps the review at 3 rounds.
+
 ## 1. Acceptance criteria, line by line
 
 For each acceptance criterion in the milestone file, record one of:
@@ -51,7 +53,7 @@ Check the diff for each one. The common failures:
 
 ## 5. Docs and regression rule
 
-- `docs/invariants.md`, `docs/failure-modes.md` and `docs/design.md` reflect what the milestone added.
+- `docs/invariants.md`, `docs/failure-modes.md` and `docs/design.md` reflect what the milestone added, and `scripts/check-spine.sh` passes.
 - If anything under the regression-rule paths in `AGENTS.md` changed (`prompts/`, `knowledge/`, `packs/`, `src/rules/`, `src/analysis/`, staging, packets, routing, gates or `src/verify/`), `eval/results.md` was regenerated in the same change (from M7 on).
 - Generated files under `packs/` were regenerated, not hand-edited.
 - New or changed rules under `knowledge/` were reviewed by someone other than their author, and the pack update report is attached with every "missing" item explained.

@@ -21,6 +21,14 @@ Read the diff for the milestone or PR. List:
 - new failure cases handled, or real-repo surprises
 - decisions made: a library picked, a default set, a plan task done differently, a deferral
 
+## 1a. Before you add or change a rule: check its impact
+
+Most review findings on plan changes are caused by a new rule colliding with work in another milestone, not by the rule itself. So, for each rule:
+
+- `grep` its key terms across `docs/`, `AGENTS.md` and `.agents/skills/`, and list every milestone whose work the rule constrains: what that milestone builds, records, adds, deletes or reads.
+- For each one, check its tasks can still be done as written. If not, change that milestone in the same change, or ask the user.
+- Give the rule one home: the decision in `docs/design.md`, and the must-hold form in `docs/invariants.md`. Elsewhere, point to it by ID and state only what that place needs (a task, a test, a skill step). A full restatement in a third place drifts.
+
 ## 2. Invariants
 
 - One line per rule: `INV-<n>: <rule> (<test file>)`. Numbers are never reused, even if a rule is removed (mark it `retired` with the reason).
@@ -42,6 +50,7 @@ Read the diff for the milestone or PR. List:
 
 - If a new command, script or folder exists, update `AGENTS.md` ("Planned tooling", then real tooling once it exists).
 - If a skill's steps became wrong, update the skill in `.agents/skills/` in the same change.
+- Run `scripts/check-spine.sh`. It fails on an invariant or decision ID that doesn't exist, a duplicate invariant number, or an invariant whose planned test the named milestone's plan never mentions.
 
 ## Not here
 
