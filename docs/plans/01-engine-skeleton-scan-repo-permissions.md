@@ -23,7 +23,7 @@ The security layer is built here, first, so that every later tool inherits it ra
 4. **CLI adapter (`src/cli/`).**
    - Commands mirror tools: `scan <repo> --source <lib@ver> --target <lib@ver>` in M1, others added per milestone. Output is JSON by default, with `--format text` for people.
    - Shared flags:
-     - `--out <dir>`: default `.migration-planner/`, resolved outside the source tree, for example a sibling of the repo or under the user's cache dir. The engine refuses to start if `--out` resolves inside a repo passed at ingest.
+     - `--out <dir>`: default `.migration-planner/`, resolved outside the source tree, for example a sibling of the repo or under the user's cache dir. The engine refuses to start if `--out` resolves inside a repo passed at ingest. The CLI knows the repo at startup, so it exits. The MCP server learns the repo only when a tool call ingests it, so it refuses that ingest with the same error and creates no run. The store (`<out>/store.sqlite`) is opened only after this check passes, so a refused `--out` never creates a file inside the repo.
      - `--level <0|1>`: default 0. Passing 2 is refused with "not built in v0.1". Level 1 is accepted but every exec still refuses until M8.
      - `--db <path>`: default `<out>/store.sqlite`.
    - `mcp` subcommand starts the MCP adapter with the same flags, so one binary covers both.
@@ -48,6 +48,7 @@ The security layer is built here, first, so that every later tool inherits it ra
    - Test setup: the test runner from dependencies and config files (Jest, Vitest, Playwright, pytest, `pytest-django`, Django's runner), the test globs, and the `test` script **as text** (it is never executed).
    - Config: `tsconfig.json` chain, `module`, `target` and paths; `pyproject.toml` tool sections relevant to tests and typing.
    - Size limits: max files, max bytes per file, and total bytes. Skipped files are listed explicitly with a reason (failure matrix: Context builder).
+   - Refused reads during the walk: an entry that `resolveInside` rejects (for example a symlink pointing outside the root) or that `isDenied` matches is not read. It is skipped, listed in the same skipped list with the reason `outside_root` or `denied` (its path only, never its contents), and the scan carries on. A refused read of a path passed directly to a read API still throws `PermissionError` and records a `tool.error` event. **Decision to record** in `docs/design.md`: skip-and-list on a walk, throw on a direct read.
    - Output: structured JSON, also stored in SQLite under the run.
 8. **Event spine (`src/store/`):**
    - Tables: `campaigns(id, created_at, name)`, `repos(id, campaign_id, root_realpath)`, `runs(id, campaign_id, repo_id, created_at, input_json, versions_json, idem_key, status)`, `events(id, run_id, ts, step, kind, payload_json, tokens_in, tokens_out)`, `files(run_id, repo_id, path, sha256, size)`.
@@ -64,14 +65,15 @@ The security layer is built here, first, so that every later tool inherits it ra
 
 - **Permissions suite (`test/permissions/`, which gates every milestone from now on):**
   - `no-repo-write`: every tool and CLI command runs against both fixtures, and the repo hash is identical before and after.
-  - `write-outside-out-dir`: `safeWrite` to `../x`, to an absolute path and into the repo root all throw `PermissionError`.
+  - `write-outside-out-dir`: `safeWrite` to `../x`, to an absolute path and into the repo root all throw `PermissionError`. The repo-root case places the repo *inside* `outDir` (for example `outDir = <tmp>/work`, repo `<tmp>/work/app`), so only the registered-repo check can stop it. With the repo beside `outDir`, `resolveInside(outDir, …)` rejects the write first, and removing the registered-repo check would go unnoticed.
   - `path-escape`: `..` traversal, an absolute path, a symlink to `/etc` and a symlink to a sibling directory are all rejected by `resolveInside`.
   - `deny-list`: `.env`, `.env.local`, `id_rsa`, `*.pem` and `.pypirc` are never read, even when requested directly by path.
+  - `scan-walk-refusals`: `scan_repo` on a fixture holding a symlink out of the root and a `.env.local` completes, lists both as skipped with reasons `outside_root` and `denied`, and neither file's contents appear in the output or in SQLite.
   - `no-exec`: a static test asserts that `child_process` is not imported anywhere except `src/security/exec.ts`. The lint rule exists and fails on a planted violation. Calling `exec.ts` at level 0 and level 1 both throw in M1.
   - `single-write-point`: a static test asserts that no `node:fs` write API (`writeFile`, `appendFile`, `mkdir`, `rm`, `rename`, `copyFile`, `createWriteStream` and their promise forms) is imported anywhere except `src/security/safeWrite.ts`. The lint rule fails on a planted violation.
   - `level-2-refused`: `--level 2` exits non-zero with the "not built" message.
   - `level-not-raisable`: no tool input schema has a level field, and a tool call carrying `level: 1` at level 0 leaves the level at 0, so `assertLevel(1)` still throws.
-  - `out-inside-repo-refused`: the engine refuses to start.
+  - `out-inside-repo-refused`: the CLI refuses to start, an MCP ingest of a repo that contains `--out` is refused with no run created, and in both cases the repo hash is unchanged (no `store.sqlite` or output folder appears in the repo).
   - `multi-repo-refused`: ingest with two repo paths returns the "not built in v0.1" error.
 - **Store only (`test/unit/store-only.test.ts`):** a static test asserts that `node:sqlite` and `better-sqlite3` are imported only under `src/store/`, and that `package.json` has no other database or vector-store dependency.
 - **Unit tests:** lockfile parsing for npm, pnpm, yarn, uv, poetry and requirements; workspace detection; Django settings detection; ambiguity questions; vague-input rejection; idempotent run IDs; the size-limit skip list.
