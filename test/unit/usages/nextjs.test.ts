@@ -251,7 +251,7 @@ describe('Next.js adapter: React 19 changes', () => {
       'src/ok.tsx': "import { useRef } from 'react';\nimport type { JSX } from 'react';\nexport const D = (): JSX.Element => { useRef(null); return <i />; };\n",
     });
     const u = ofKind(b.usages, 'react_types');
-    expect(brief(u)).toEqual(['src/t.tsx:3 react_types JSX', 'src/t.tsx:4 react_types react.MutableRefObject', 'src/t.tsx:4 react_types useRef()']);
+    expect(brief(u)).toEqual(['src/t.tsx:3 react_types JSX', 'src/t.tsx:4 react_types react.MutableRefObject', 'src/t.tsx:4 react_types react.useRef']);
     expect(u.find((x) => x.symbol === 'react.MutableRefObject')!.labels).toEqual(['type_only']);
   });
 });

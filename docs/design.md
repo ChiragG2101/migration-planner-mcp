@@ -545,7 +545,7 @@ Why: a draft from memory would miss the Next.js 16 removals (AMP, runtime config
 - **Supported range: Next.js 14 to 16.** On 2026-10-19 the latest releases are `next` 16.4.2 and `react` 19.3.1. `knowledge/npm/next/` is complete from 14 (`covered_from: 14`), with release files for 14, 15 and 16, and `packs/nextjs-upgrade/pack.json` has `supported {from: 14, to: 16}`. React's knowledge is complete from 18, with release files for 18 and 19. Next 16's peer range still accepts React 18 (`^18.2.0 || ^19.0.0`), so "needs React 19" is a conditional `peer_requirement` tied to the app router (D13).
 - **A rule whose first event is older than `covered_from` lives in that older release's file.** For example, a change deprecated in 13.2 and removed in 15 is defined in `releases/13.json`, with its removal in `15.json`. A release file older than `covered_from` is *partial*: it may hold only rules that have at least one event at or after `covered_from`, and the lint enforces that. This keeps each rule's first event true.
 - **Rules are reviewed in a fresh agent session.** The builder drafts and completes the rules, then a separate session started by the maintainer reviews each one against its `source` with the `add-release-knowledge` skill and flips it to `reviewed`. This happens before the M3 milestone review, which then checks the review happened rather than redoing it.
-- **Usage-finder gaps are closed in the finder.** When a rule needs a usage the M2 Next.js adapter can't yet find, M3 adds the detection to `src/analysis/usages/nextjs.ts` (outside M3's file list), bumps the adapter's `version`, and lists each addition here. The planted case must then be found, so the recall ratchet still holds.
+- **Usage-finder gaps are closed in the finder.** When a rule needs a usage the M2 Next.js adapter can't yet find, M3 adds the detection to `src/analysis/usages/nextjs.ts` (outside M3's file list), bumps the adapter's `version`, and lists each addition here. The planted case must then be found, so the recall ratchet still holds. The one addition so far: a no-argument `useRef()` from `react` is reported as symbol `react.useRef` (a `call` match), and the adapter version is 3. Recall still matches on file, kind and line.
 
 **Smaller choices (builder's, not objected to):**
 
@@ -577,7 +577,7 @@ The plan types each rule's `match` but doesn't say when a usage counts as matche
 
 Values are not checked: any `runtime` segment export binds a `runtime` rule, and any declared `@types/react` binds a rule on old `@types/react`. Code already in the target form therefore still binds, and a lens marks it out of scope (D16). An unresolved dynamic import binds nothing, so it stays unmapped for the lenses and gate 2.
 
-To make `config_key` work, the Next.js adapter now reports route segment config with module `segment`, not `next`, so a `next.config` rule never binds an `export const runtime`. That's a D29 finder change: the adapter's `version` goes from 1 to 2.
+To make `config_key` work, the Next.js adapter reports route segment config with module `segment`, not `next`, so a `next.config` rule never binds an `export const runtime`. That finder change took the adapter to version 2; the `useRef` symbol change in D29 takes it to version 3.
 
 Why: binding on the fields the adapter already writes keeps the matcher data-driven, with no per-rule code. The glob anchoring lets one rule cover `app/`, `src/app/` and workspace apps. Accepting value-level over-matching follows the PRD's "flagging is the safe direction".
 
@@ -590,3 +590,24 @@ Why: binding on the fields the adapter already writes keeps the matcher data-dri
 - **`release_notes` sections are `{heading, event?}` with `*` for the document itself, plus a `skip` list.** Next.js's upgrade guides make every top-level heading a change, while React's nest changes two levels deep. The templates are optional when per-release overrides cover every release (React's guides have no version in their URL).
 - **Codemod IDs are `<tool>:<transform>`:** `next-codemod:…`, `react-codemod:…` (with `react-codemod:migration-recipe-19` for the codemod.com recipe that react.dev gives) and `types-react-codemod:…`, listed in `src/verify/codemodIds.ts` from the official lists on 2026-10-19.
 - **The bundled data is loaded once per process.** It can't change while the engine runs, and tests create many engines.
+- **`scope --answers` is read in `src/security/operatorFile.ts`.** The path is one the operator named, not a repo walk, so D25's allowlist outside `src/security/` stays at two entries.
+
+### D32 - How suggested severity and size are computed
+
+**Decision:** `assess_risk` starts at the matched rule's `default_severity` (or `info` when nothing matches) and only moves up. The floors are: a `peer_conflict` label is `blocker`; `no_equivalent`, an async request API (`request_api` or `request_props`), a caching usage (`cache_api` or `fetch_call`), or a `changed_behavior` / `changed_default` rule is at least `high`; a `removed` rule, an `internal_import`, a `react_types` usage, or a file imported by five or more files is at least `medium`. A codemod is recorded and does not lower the severity. A usage with no matching rule is `unmapped`. The `fetch_call`, `internal_import`, `react_types` and `removed` floors are what the seeded hard cases need when their rule is still a draft or its own default is `low`; drafts stay drafts.
+
+`none` needs every condition in the plan: no matched rule, a complete scan, no peer conflict, and an install inside `covered_from` and `supported.from`. `small` needs a complete scan, at most `--small-max-usages` matches (default 10), every one of them named by a codemod, and none `high` or `blocker`. Anything else is `full`. `next-tricky` is `full` even with no reviewed rules loaded, because of its unresolved dynamic import.
+
+Why: the plan requires the signals to be explainable, and a codemod must not count as the verification. The floors are the ones the seeded hard cases need; weights stay out until M7.
+
+## 2026-10-20: M3 review fixes
+
+### D33 - Skill frontmatter, reference resources, and the version check in CI
+
+**Decision:**
+
+- Generated `SKILL.md` puts its frontmatter on line 1 and the "do not edit" banner after it. A host only reads a trigger that starts the file. The pack lint checks that the description equals `pack.trigger`.
+- `get_rule_pack` returns reference files as `pack://<pack>/references/<file>` URIs. The MCP server registers each bundled reference and reads it through `src/security/dataFiles.ts`. A URI that is not one of those files reads nothing. D14's versioned `pack://<pack>@<version>/references/<file>` is the recorded doc URL for M4; it is not the resource URI.
+- The CI lint step sets `BASE_SHA` to the PR base, the same way the recall step does, so the pack version-bump check runs on every pull request.
+
+Why: the plan requires a narrow trigger a host can load, references the agent fetches only when it needs them, and the version bump checked against the merge base. None of these changes the rules or the supported range.

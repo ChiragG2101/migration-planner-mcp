@@ -220,7 +220,7 @@ describe('loader: --rules-dir', () => {
     expect(refusedRun.stderr).toContain(`refused: ${THIRD_PARTY_MESSAGE}`);
     const ok = runCli(['scan', repo, '--source', 'next', '--target', 'next@15.1.0', '--out', tmpDir(), '--rules-dir', repoRoot]);
     expect(ok.status).toBe(0);
-    expect(ok.stderr).toMatch(/pack nextjs-upgrade@0\.1\.0#[0-9a-f]{12}: \d+ reviewed rules, \d+ draft rules skipped/);
+    expect(ok.stderr).toMatch(/pack nextjs-upgrade@0\.3\.0#[0-9a-f]{12}: \d+ reviewed rules, \d+ draft rules skipped/);
     expect(ok.stdout).not.toContain('nextjs-upgrade@');
   });
 });

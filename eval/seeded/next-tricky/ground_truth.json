@@ -12,7 +12,8 @@
       "kind": "request_api",
       "expect": "change",
       "indirect": true,
-      "note": "cookies() called through a helper in another module; the caller must await the helper once it is async"
+      "note": "cookies() called through a helper in another module; the caller must await the helper once it is async",
+      "rule_id": "next/async-cookies"
     },
     {
       "id": "nt-cookies-helper",
@@ -21,7 +22,8 @@
       "kind": "request_api",
       "expect": "change",
       "indirect": false,
-      "note": "the helper's own synchronous cookies() call"
+      "note": "the helper's own synchronous cookies() call",
+      "rule_id": "next/async-cookies"
     },
     {
       "id": "nt-params-layout",
@@ -30,7 +32,8 @@
       "kind": "request_props",
       "expect": "change",
       "indirect": false,
-      "note": "params destructured in a layout, accessed synchronously"
+      "note": "params destructured in a layout, accessed synchronously",
+      "rule_id": "next/async-params"
     },
     {
       "id": "nt-params-to-client",
@@ -39,7 +42,8 @@
       "kind": "request_props",
       "expect": "change",
       "indirect": true,
-      "note": "params passed down to a client component"
+      "note": "params passed down to a client component",
+      "rule_id": "next/async-params"
     },
     {
       "id": "nt-get-implicit-cache",
@@ -48,7 +52,8 @@
       "kind": "route_handler",
       "expect": "change",
       "indirect": false,
-      "note": "a GET route handler relying on implicit caching, which Next.js 15 removed"
+      "note": "a GET route handler relying on implicit caching, which Next.js 15 removed",
+      "rule_id": "next/route-handlers"
     },
     {
       "id": "nt-route-fetch",
@@ -57,7 +62,8 @@
       "kind": "fetch_call",
       "expect": "change",
       "indirect": false,
-      "note": "fetch in a route handler, no longer cached by default in Next.js 15"
+      "note": "fetch in a route handler, no longer cached by default in Next.js 15",
+      "rule_id": "next/fetch-requests"
     },
     {
       "id": "nt-headers-via-barrel",
@@ -66,7 +72,8 @@
       "kind": "request_api",
       "expect": "change",
       "indirect": true,
-      "note": "a barrel (server/index.ts) re-exports a wrapper around headers()"
+      "note": "a barrel (server/index.ts) re-exports a wrapper around headers()",
+      "rule_id": "next/async-headers"
     },
     {
       "id": "nt-headers-wrapper",
@@ -75,7 +82,8 @@
       "kind": "request_api",
       "expect": "change",
       "indirect": false,
-      "note": "the wrapper's own synchronous headers() call"
+      "note": "the wrapper's own synchronous headers() call",
+      "rule_id": "next/async-headers"
     },
     {
       "id": "nt-dynamic-page-import",
@@ -93,7 +101,8 @@
       "kind": "request_props",
       "expect": "change",
       "indirect": false,
-      "note": "searchParams read synchronously in a page"
+      "note": "searchParams read synchronously in a page",
+      "rule_id": "next/async-search-params"
     },
     {
       "id": "nt-string-ref-attr",
@@ -102,7 +111,8 @@
       "kind": "react_legacy",
       "expect": "change",
       "indirect": false,
-      "note": "a class component using a string ref (removed in React 19)"
+      "note": "a class component using a string ref (removed in React 19)",
+      "rule_id": "react/removed-string-refs"
     },
     {
       "id": "nt-string-ref-this",
@@ -111,7 +121,8 @@
       "kind": "react_legacy",
       "expect": "change",
       "indirect": false,
-      "note": "this.refs, the other half of the string ref"
+      "note": "this.refs, the other half of the string ref",
+      "rule_id": "react/removed-string-refs"
     },
     {
       "id": "nt-fn-default-props",
@@ -120,7 +131,8 @@
       "kind": "react_legacy",
       "expect": "change",
       "indirect": false,
-      "note": "defaultProps on a function component (removed in React 19)"
+      "note": "defaultProps on a function component (removed in React 19)",
+      "rule_id": "react/removed-proptypes-and-defaultprops-for-functions"
     },
     {
       "id": "nt-peer-excludes-react19",
@@ -129,7 +141,8 @@
       "kind": "peer_dependency",
       "expect": "change",
       "indirect": false,
-      "note": "a dependency whose peer range on react excludes React 19; labelled peer_conflict once M3 supplies the React target"
+      "note": "a dependency whose peer range on react excludes React 19; labelled peer_conflict once M3 supplies the React target",
+      "rule_id": "next/react-19"
     },
     {
       "id": "nt-removed-experimental-flag",
@@ -138,7 +151,8 @@
       "kind": "config_key",
       "expect": "change",
       "indirect": false,
-      "note": "experimental.serverComponentsExternalPackages, renamed to serverExternalPackages in Next.js 15"
+      "note": "experimental.serverComponentsExternalPackages, renamed to serverExternalPackages in Next.js 15",
+      "rule_id": "next/serverexternalpackages"
     },
     {
       "id": "nt-type-only-import",
@@ -147,7 +161,8 @@
       "kind": "react_types",
       "expect": "change",
       "indirect": false,
-      "note": "a type-only import of a type the React 19 types deprecate (MutableRefObject)"
+      "note": "a type-only import of a type the React 19 types deprecate (MutableRefObject)",
+      "rule_id": "react/removed-deprecated-typescript-types"
     },
     {
       "id": "nt-existing-next-font",
@@ -156,7 +171,8 @@
       "kind": "removed_package",
       "expect": "change",
       "indirect": false,
-      "note": "existing state: @next/font, deprecated since 13.2 and never cleaned up, removed in Next.js 15"
+      "note": "existing state: @next/font, deprecated since 13.2 and never cleaned up, removed in Next.js 15",
+      "rule_id": "next/the-next-font-package-has-been-fully-removed-in-favor-of-the"
     },
     {
       "id": "nt-existing-internal-path",
@@ -174,7 +190,8 @@
       "kind": "segment_config",
       "expect": "change",
       "indirect": false,
-      "note": "runtime 'experimental-edge' is an error from Next.js 15"
+      "note": "runtime 'experimental-edge' is an error from Next.js 15",
+      "rule_id": "next/runtime-configuration-breaking-change"
     },
     {
       "id": "nt-middleware-file",
@@ -183,7 +200,8 @@
       "kind": "middleware",
       "expect": "change",
       "indirect": false,
-      "note": "the middleware convention, renamed to proxy in Next.js 16"
+      "note": "the middleware convention, renamed to proxy in Next.js 16",
+      "rule_id": "next/middleware-to-proxy"
     },
     {
       "id": "nt-request-geo",
@@ -192,7 +210,8 @@
       "kind": "request_geo",
       "expect": "change",
       "indirect": false,
-      "note": "NextRequest.geo, removed in Next.js 15"
+      "note": "NextRequest.geo, removed in Next.js 15",
+      "rule_id": "next/nextrequest-geolocation"
     },
     {
       "id": "nt-revalidate-tag-one-arg",
@@ -201,7 +220,8 @@
       "kind": "cache_api",
       "expect": "change",
       "indirect": false,
-      "note": "revalidateTag with one argument, which Next.js 16 deprecates"
+      "note": "revalidateTag with one argument, which Next.js 16 deprecates",
+      "rule_id": "next/revalidatetag"
     },
     {
       "id": "nt-reactdom-render",
@@ -210,7 +230,8 @@
       "kind": "react_removed_api",
       "expect": "change",
       "indirect": false,
-      "note": "ReactDOM.render, removed in React 19"
+      "note": "ReactDOM.render, removed in React 19",
+      "rule_id": "react/removed-reactdom-render"
     },
     {
       "id": "nt-global-jsx",
@@ -219,7 +240,8 @@
       "kind": "react_types",
       "expect": "change",
       "indirect": false,
-      "note": "the global JSX namespace, which the React 19 types remove"
+      "note": "the global JSX namespace, which the React 19 types remove",
+      "rule_id": "react/the-jsx-namespace-in-typescript"
     },
     {
       "id": "nt-sass-tilde",
@@ -228,7 +250,8 @@
       "kind": "sass_tilde_import",
       "expect": "change",
       "indirect": false,
-      "note": "a Sass import with the ~ prefix, which Turbopack (the Next.js 16 default) does not support"
+      "note": "a Sass import with the ~ prefix, which Turbopack (the Next.js 16 default) does not support",
+      "rule_id": "next/sass-node-modules-imports"
     },
     {
       "id": "nt-next-lint-script",
@@ -237,7 +260,8 @@
       "kind": "next_lint_script",
       "expect": "change",
       "indirect": false,
-      "note": "next lint, removed in Next.js 16"
+      "note": "next lint, removed in Next.js 16",
+      "rule_id": "next/next-lint-command"
     },
     {
       "id": "nt-already-awaited",
@@ -246,7 +270,8 @@
       "kind": "request_api",
       "expect": "no_change",
       "indirect": false,
-      "note": "already in the target form: cookies() is awaited; found, then marked out of scope as already migrated"
+      "note": "already in the target form: cookies() is awaited; found, then marked out of scope as already migrated",
+      "rule_id": "next/async-cookies"
     },
     {
       "id": "nt-decoy-local-cookies",
@@ -292,6 +317,366 @@
       "expect": "no_finding",
       "indirect": false,
       "note": "decoy: next/image, not next/legacy/image"
+    },
+    {
+      "id": "nt-next-font-reexport",
+      "file": "utils/fonts.ts",
+      "line": 1,
+      "kind": "removed_package",
+      "expect": "change",
+      "indirect": true,
+      "note": "a barrel re-exports a font from @next/font; its importers reach the removed package through it",
+      "rule_id": "next/the-next-font-package-has-been-fully-removed-in-favor-of-the"
+    },
+    {
+      "id": "nt-draft-mode-helper",
+      "file": "server/preview.ts",
+      "line": 4,
+      "kind": "request_api",
+      "expect": "change",
+      "indirect": false,
+      "note": "the helper's own synchronous draftMode() call",
+      "rule_id": "next/async-draft-mode"
+    },
+    {
+      "id": "nt-draft-mode-via-helper",
+      "file": "app/preview/page.tsx",
+      "line": 4,
+      "kind": "request_api",
+      "expect": "change",
+      "indirect": true,
+      "note": "draftMode() reached through a helper; the caller must await the helper once it is async",
+      "rule_id": "next/async-draft-mode"
+    },
+    {
+      "id": "nt-bundle-pages-externals",
+      "file": "next.config.js",
+      "line": 6,
+      "kind": "config_key",
+      "expect": "change",
+      "indirect": false,
+      "note": "experimental.bundlePagesExternals, renamed to bundlePagesRouterDependencies in Next.js 15",
+      "rule_id": "next/bundlepagesrouterdependencies"
+    },
+    {
+      "id": "nt-use-cache-flag",
+      "file": "next.config.js",
+      "line": 7,
+      "kind": "config_key",
+      "expect": "change",
+      "indirect": false,
+      "note": "experimental.useCache (a Next.js 15 canary flag), removed in Next.js 16",
+      "rule_id": "next/experimental-dynamicio-and-experimental-usecache"
+    },
+    {
+      "id": "nt-images-domains",
+      "file": "next.config.js",
+      "line": 10,
+      "kind": "config_key",
+      "expect": "change",
+      "indirect": false,
+      "note": "images.domains, deprecated in Next.js 16 in favour of images.remotePatterns",
+      "rule_id": "next/images-domains-configuration-deprecated"
+    },
+    {
+      "id": "nt-dev-indicators-build-activity",
+      "file": "next.config.js",
+      "line": 13,
+      "kind": "config_key",
+      "expect": "change",
+      "indirect": false,
+      "note": "devIndicators.buildActivity, removed in Next.js 16",
+      "rule_id": "next/devindicators-options"
+    },
+    {
+      "id": "nt-request-ip",
+      "file": "middleware.ts",
+      "line": 5,
+      "kind": "request_geo",
+      "expect": "change",
+      "indirect": false,
+      "note": "NextRequest.ip, removed in Next.js 15 with geo",
+      "rule_id": "next/async-request-ip"
+    },
+    {
+      "id": "nt-parallel-slot-no-default",
+      "file": "app/@modal/page.tsx",
+      "line": 1,
+      "kind": "parallel_route",
+      "expect": "change",
+      "indirect": false,
+      "note": "a parallel route slot with no default file, which Next.js 16 requires",
+      "rule_id": "next/parallel-routes-default-js-requirement"
+    },
+    {
+      "id": "nt-revalidate-tag-via-barrel",
+      "file": "app/actions.ts",
+      "line": 6,
+      "kind": "cache_api",
+      "expect": "change",
+      "indirect": true,
+      "note": "one-argument revalidateTag reached through a barrel (server/cache.ts) that re-exports it",
+      "rule_id": "next/revalidatetag"
+    },
+    {
+      "id": "nt-cache-life-unstable",
+      "file": "server/cacheProfile.ts",
+      "line": 5,
+      "kind": "renamed_api",
+      "expect": "change",
+      "indirect": false,
+      "note": "unstable_cacheLife (a Next.js 15 API) imported under an alias; the prefix is dropped in Next.js 16",
+      "rule_id": "next/cachelife-and-cachetag"
+    },
+    {
+      "id": "nt-cache-life-via-barrel",
+      "file": "server/teamStats.ts",
+      "line": 5,
+      "kind": "renamed_api",
+      "expect": "change",
+      "indirect": true,
+      "note": "unstable_cacheLife reached through a barrel (server/cache.ts)",
+      "rule_id": "next/cachelife-and-cachetag"
+    },
+    {
+      "id": "nt-legacy-image",
+      "file": "components/LegacyAvatar.tsx",
+      "line": 1,
+      "kind": "deprecated_import",
+      "expect": "change",
+      "indirect": false,
+      "note": "next/legacy/image, deprecated in Next.js 16",
+      "rule_id": "next/next-legacy-image-component-deprecated"
+    },
+    {
+      "id": "nt-legacy-image-reexport",
+      "file": "components/images.ts",
+      "line": 1,
+      "kind": "deprecated_import",
+      "expect": "change",
+      "indirect": true,
+      "note": "a barrel re-exports next/legacy/image; its importers reach it through the barrel",
+      "rule_id": "next/next-legacy-image-component-deprecated"
+    },
+    {
+      "id": "nt-amp-hook",
+      "file": "components/AmpBadge.tsx",
+      "line": 1,
+      "kind": "removed_api",
+      "expect": "change",
+      "indirect": false,
+      "note": "next/amp (useAmp), removed in Next.js 16",
+      "rule_id": "next/amp-support"
+    },
+    {
+      "id": "nt-amp-reexport",
+      "file": "components/amp.ts",
+      "line": 1,
+      "kind": "removed_api",
+      "expect": "change",
+      "indirect": true,
+      "note": "a barrel re-exports useAmp from next/amp",
+      "rule_id": "next/amp-support"
+    },
+    {
+      "id": "nt-get-config",
+      "file": "utils/config.ts",
+      "line": 1,
+      "kind": "runtime_config",
+      "expect": "change",
+      "indirect": false,
+      "note": "getConfig from next/config reading publicRuntimeConfig, removed in Next.js 16",
+      "rule_id": "next/runtime-configuration"
+    },
+    {
+      "id": "nt-get-config-reexport",
+      "file": "utils/runtimeConfig.ts",
+      "line": 1,
+      "kind": "runtime_config",
+      "expect": "change",
+      "indirect": true,
+      "note": "a barrel re-exports getConfig from next/config",
+      "rule_id": "next/runtime-configuration"
+    },
+    {
+      "id": "nt-root-params",
+      "file": "server/rootParams.ts",
+      "line": 4,
+      "kind": "removed_api",
+      "expect": "change",
+      "indirect": false,
+      "note": "unstable_rootParams (a Next.js 15 API), removed in Next.js 16",
+      "rule_id": "next/unstable-rootparams"
+    },
+    {
+      "id": "nt-root-params-via-barrel",
+      "file": "server/region.ts",
+      "line": 4,
+      "kind": "removed_api",
+      "expect": "change",
+      "indirect": true,
+      "note": "unstable_rootParams reached through a barrel (server/nextServer.ts)",
+      "rule_id": "next/unstable-rootparams"
+    },
+    {
+      "id": "nt-use-ref-no-arg",
+      "file": "components/useTimer.ts",
+      "line": 4,
+      "kind": "react_types",
+      "expect": "change",
+      "indirect": false,
+      "note": "useRef() with no argument, which the React 19 types reject",
+      "rule_id": "react/useref-requires-an-argument"
+    },
+    {
+      "id": "nt-use-ref-via-barrel",
+      "file": "components/usePrevious.ts",
+      "line": 4,
+      "kind": "react_types",
+      "expect": "change",
+      "indirect": true,
+      "note": "useRef() with no argument, imported through a barrel (components/reactApis.ts)",
+      "rule_id": "react/useref-requires-an-argument"
+    },
+    {
+      "id": "nt-legacy-context",
+      "file": "components/ThemeProvider.jsx",
+      "line": 5,
+      "kind": "react_legacy",
+      "expect": "change",
+      "indirect": false,
+      "note": "legacy context (childContextTypes and getChildContext), removed in React 19",
+      "rule_id": "react/removed-legacy-context-using-contexttypes-and-getchildcontex"
+    },
+    {
+      "id": "nt-create-factory",
+      "file": "components/factory.ts",
+      "line": 3,
+      "kind": "react_removed_api",
+      "expect": "change",
+      "indirect": false,
+      "note": "React.createFactory, removed in React 19",
+      "rule_id": "react/removed-react-createfactory"
+    },
+    {
+      "id": "nt-create-factory-via-barrel",
+      "file": "components/listFactory.ts",
+      "line": 3,
+      "kind": "react_removed_api",
+      "expect": "change",
+      "indirect": true,
+      "note": "createFactory reached through a barrel (components/reactApis.ts)",
+      "rule_id": "react/removed-react-createfactory"
+    },
+    {
+      "id": "nt-shallow-renderer",
+      "file": "components/shallow.test.tsx",
+      "line": 1,
+      "kind": "react_removed_import",
+      "expect": "change",
+      "indirect": false,
+      "note": "react-test-renderer/shallow, removed in React 19",
+      "rule_id": "react/removed-react-test-renderer-shallow"
+    },
+    {
+      "id": "nt-shallow-renderer-reexport",
+      "file": "components/testing.ts",
+      "line": 1,
+      "kind": "react_removed_import",
+      "expect": "change",
+      "indirect": true,
+      "note": "a test barrel re-exports react-test-renderer/shallow",
+      "rule_id": "react/removed-react-test-renderer-shallow"
+    },
+    {
+      "id": "nt-test-utils-act",
+      "file": "components/testUtils.ts",
+      "line": 1,
+      "kind": "react_removed_import",
+      "expect": "change",
+      "indirect": false,
+      "note": "act from react-dom/test-utils, removed in React 19",
+      "rule_id": "react/removed-react-dom-test-utils"
+    },
+    {
+      "id": "nt-test-utils-reexport",
+      "file": "components/testing.ts",
+      "line": 2,
+      "kind": "react_removed_import",
+      "expect": "change",
+      "indirect": true,
+      "note": "a test barrel re-exports act from react-dom/test-utils",
+      "rule_id": "react/removed-react-dom-test-utils"
+    },
+    {
+      "id": "nt-reactdom-render-via-barrel",
+      "file": "widgets/legacyMount.tsx",
+      "line": 5,
+      "kind": "react_removed_api",
+      "expect": "change",
+      "indirect": true,
+      "note": "render reached through a barrel (widgets/dom.ts) that re-exports react-dom",
+      "rule_id": "react/removed-reactdom-render"
+    },
+    {
+      "id": "nt-reactdom-hydrate",
+      "file": "widgets/hydrate.tsx",
+      "line": 5,
+      "kind": "react_removed_api",
+      "expect": "change",
+      "indirect": false,
+      "note": "ReactDOM.hydrate, removed in React 19",
+      "rule_id": "react/removed-reactdom-hydrate"
+    },
+    {
+      "id": "nt-reactdom-hydrate-via-barrel",
+      "file": "widgets/legacyMount.tsx",
+      "line": 9,
+      "kind": "react_removed_api",
+      "expect": "change",
+      "indirect": true,
+      "note": "hydrate reached through a barrel (widgets/dom.ts)",
+      "rule_id": "react/removed-reactdom-hydrate"
+    },
+    {
+      "id": "nt-unmount-component",
+      "file": "widgets/hydrate.tsx",
+      "line": 9,
+      "kind": "react_removed_api",
+      "expect": "change",
+      "indirect": false,
+      "note": "unmountComponentAtNode, removed in React 19",
+      "rule_id": "react/removed-unmountcomponentatnode"
+    },
+    {
+      "id": "nt-unmount-component-via-barrel",
+      "file": "widgets/legacyMount.tsx",
+      "line": 13,
+      "kind": "react_removed_api",
+      "expect": "change",
+      "indirect": true,
+      "note": "unmountComponentAtNode reached through a barrel (widgets/dom.ts)",
+      "rule_id": "react/removed-unmountcomponentatnode"
+    },
+    {
+      "id": "nt-find-dom-node",
+      "file": "widgets/hydrate.tsx",
+      "line": 13,
+      "kind": "react_removed_api",
+      "expect": "change",
+      "indirect": false,
+      "note": "ReactDOM.findDOMNode, removed in React 19",
+      "rule_id": "react/removed-reactdom-finddomnode"
+    },
+    {
+      "id": "nt-find-dom-node-via-barrel",
+      "file": "widgets/legacyMount.tsx",
+      "line": 17,
+      "kind": "react_removed_api",
+      "expect": "change",
+      "indirect": true,
+      "note": "findDOMNode reached through a barrel (widgets/dom.ts)",
+      "rule_id": "react/removed-reactdom-finddomnode"
     }
   ]
 }

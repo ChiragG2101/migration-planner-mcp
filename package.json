@@ -22,8 +22,11 @@
     "test": "vitest run",
     "test:permissions": "vitest run test/permissions",
     "typecheck": "tsc --noEmit",
-    "lint": "eslint .",
-    "recall": "tsx eval/seeded/recall.ts"
+    "lint": "eslint . && tsx scripts/lint-packs.ts",
+    "recall": "tsx eval/seeded/recall.ts",
+    "build:packs": "tsx scripts/build-pack.ts",
+    "knowledge:draft": "tsx scripts/draft-release.ts",
+    "pack:report": "tsx scripts/pack-docs-report.ts"
   },
   "dependencies": {
     "@modelcontextprotocol/server": "2.3.1",

@@ -93,7 +93,7 @@ describe('find_usages', () => {
     const db = openSession(engine, repo).db;
     const results = listEvents(db, runId).filter((e) => e.kind === 'usages.result');
     const last = JSON.parse(results.at(-1)!.payload_json) as { duration_ms: number; adapter: string };
-    expect(last.adapter).toBe('nextjs@2');
+    expect(last.adapter).toBe('nextjs@3');
     expect(last.duration_ms).toBeGreaterThanOrEqual(0);
     expect(listImports(db, runId)).toContainEqual(expect.objectContaining({ from_file: 'app/a/page.tsx', to_file: 'lib/session.ts', kind: 'import' }));
     expect(listSymbols(db, runId, 'session')).toEqual([{ name: 'session', file: 'lib/session.ts', line: 2, kind: 'variable' }]);
@@ -151,7 +151,7 @@ describe('find_usages takes its adapter and targets from the run\'s pack (D27, D
   };
 
   it('uses the adapter pack.json names', async () => {
-    expect((await findUsages(engine, { run_id: runId })).summary.adapter).toBe('nextjs@2');
+    expect((await findUsages(engine, { run_id: runId })).summary.adapter).toBe('nextjs@3');
   });
 
   it('refuses a run made with a pack other than the loaded one', async () => {

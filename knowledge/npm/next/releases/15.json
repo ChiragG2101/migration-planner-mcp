@@ -1,0 +1,409 @@
+{
+  "library": "npm/next",
+  "release": "15",
+  "rules": [
+    {
+      "id": "next/react-19",
+      "title": "App Router requires React 19",
+      "event": "peer_requirement",
+      "source": "https://nextjs.org/docs/app/guides/upgrading/version-15#react-19",
+      "status": "reviewed",
+      "doc_topics": [
+        "React 19",
+        "App Router"
+      ],
+      "notes": "The Pages Router may stay on React 18. The match is an app-router file, and the engine still applies the requirement when that match finds nothing, with a note that it may not be needed.",
+      "no_equivalent": false,
+      "verify_hint": "Load the affected page or run the build, and confirm the new behaviour.",
+      "rollback_hint": "Return to the previous release of the library.",
+      "default_severity": "high",
+      "concern": "The App Router requires react and react-dom 19. The Pages Router can stay on 18.",
+      "mapping": {
+        "from": "react 18 with the App Router",
+        "to": "react 19"
+      },
+      "requires": {
+        "library": "npm/react",
+        "range": ">=19"
+      },
+      "match": {
+        "kind": "file_convention",
+        "glob": "**/app/**/{page,layout,route,default,template}.{js,jsx,ts,tsx}"
+      }
+    },
+    {
+      "id": "next/runtime-configuration-breaking-change",
+      "title": "runtime configuration (Breaking change)",
+      "event": "removed",
+      "source": "https://nextjs.org/docs/app/guides/upgrading/version-15#runtime-configuration-breaking-change",
+      "status": "reviewed",
+      "doc_topics": [
+        "runtime",
+        "experimental-edge"
+      ],
+      "notes": "",
+      "no_equivalent": false,
+      "verify_hint": "Load the affected page or run the build, and confirm the new behaviour.",
+      "rollback_hint": "Return to the previous release of the library.",
+      "default_severity": "medium",
+      "concern": "Segment config runtime: 'experimental-edge' is rejected; use 'edge'.",
+      "mapping": {
+        "from": "export const runtime = 'experimental-edge'",
+        "to": "export const runtime = 'edge'"
+      },
+      "codemod": "next-codemod:app-dir-runtime-config-experimental-edge",
+      "match": {
+        "kind": "config_key",
+        "file_kind": "segment",
+        "path": "runtime"
+      },
+      "replacement_since": "14"
+    },
+    {
+      "id": "next/fetch-requests",
+      "title": "fetch requests",
+      "event": "changed_default",
+      "source": "https://nextjs.org/docs/app/guides/upgrading/version-15#fetch-requests",
+      "status": "draft",
+      "doc_topics": [
+        "fetch",
+        "cache"
+      ],
+      "notes": "Left draft in the 2026-10-20 review: the section supports the rule, but a call rule needs an indirect seeded case and the finder reports fetch only at the call itself, not at callers of a fetch helper. Close the gap in the finder first (D29).",
+      "no_equivalent": false,
+      "verify_hint": "Load the affected page or run the build, and confirm the new behaviour.",
+      "rollback_hint": "Return to the previous release of the library.",
+      "default_severity": "high",
+      "concern": "fetch is no longer cached by default.",
+      "mapping": {
+        "from": "fetch(url)",
+        "to": "fetch(url, { cache: 'force-cache' }) when the old cached behaviour is required"
+      },
+      "match": {
+        "kind": "call",
+        "module": null,
+        "name": "fetch"
+      }
+    },
+    {
+      "id": "next/route-handlers",
+      "title": "Route Handlers",
+      "event": "changed_default",
+      "source": "https://nextjs.org/docs/app/guides/upgrading/version-15#route-handlers",
+      "status": "reviewed",
+      "doc_topics": [
+        "route handlers",
+        "GET"
+      ],
+      "notes": "",
+      "no_equivalent": false,
+      "verify_hint": "Load the affected page or run the build, and confirm the new behaviour.",
+      "rollback_hint": "Return to the previous release of the library.",
+      "default_severity": "high",
+      "concern": "GET route handlers are no longer cached by default.",
+      "mapping": {
+        "from": "export function GET() {}",
+        "to": "export const dynamic = 'force-static' when the old cached behaviour is required"
+      },
+      "match": {
+        "kind": "file_convention",
+        "glob": "**/route.{js,jsx,ts,tsx}",
+        "symbol": "GET"
+      }
+    },
+    {
+      "id": "next/client-cache",
+      "title": "Client Cache",
+      "event": "changed_default",
+      "source": "https://nextjs.org/docs/app/guides/upgrading/version-15#client-cache",
+      "status": "draft",
+      "doc_topics": [
+        "staleTimes",
+        "client cache"
+      ],
+      "notes": "Left draft in the 2026-10-20 review: the match binds experimental.staleTimes, the opt-in the section offers, so it only finds apps that have already handled the change. The affected code (Link and useRouter navigation) is not reported by the finder.",
+      "no_equivalent": false,
+      "verify_hint": "Load the affected page or run the build, and confirm the new behaviour.",
+      "rollback_hint": "Return to the previous release of the library.",
+      "default_severity": "medium",
+      "concern": "Page segments are no longer reused from the client cache on Link or useRouter navigation.",
+      "mapping": {
+        "from": "the default client cache",
+        "to": "experimental.staleTimes when the old reuse is required"
+      },
+      "match": {
+        "kind": "config_key",
+        "file_kind": "next.config",
+        "path": "experimental.staleTimes"
+      }
+    },
+    {
+      "id": "next/bundlepagesrouterdependencies",
+      "title": "bundlePagesRouterDependencies",
+      "event": "renamed",
+      "source": "https://nextjs.org/docs/app/guides/upgrading/version-15#bundlepagesrouterdependencies",
+      "status": "reviewed",
+      "doc_topics": [
+        "bundlePagesRouterDependencies"
+      ],
+      "notes": "",
+      "no_equivalent": false,
+      "verify_hint": "Load the affected page or run the build, and confirm the new behaviour.",
+      "rollback_hint": "Return to the previous release of the library.",
+      "default_severity": "medium",
+      "concern": "experimental.bundlePagesExternals was renamed to bundlePagesRouterDependencies.",
+      "mapping": {
+        "from": "experimental.bundlePagesExternals",
+        "to": "bundlePagesRouterDependencies"
+      },
+      "match": {
+        "kind": "config_key",
+        "file_kind": "next.config",
+        "path": "experimental.bundlePagesExternals"
+      }
+    },
+    {
+      "id": "next/serverexternalpackages",
+      "title": "serverExternalPackages",
+      "event": "renamed",
+      "source": "https://nextjs.org/docs/app/guides/upgrading/version-15#serverexternalpackages",
+      "status": "reviewed",
+      "doc_topics": [
+        "serverExternalPackages"
+      ],
+      "notes": "",
+      "no_equivalent": false,
+      "verify_hint": "Load the affected page or run the build, and confirm the new behaviour.",
+      "rollback_hint": "Return to the previous release of the library.",
+      "default_severity": "medium",
+      "concern": "experimental.serverComponentsExternalPackages was renamed to serverExternalPackages.",
+      "mapping": {
+        "from": "experimental.serverComponentsExternalPackages",
+        "to": "serverExternalPackages"
+      },
+      "match": {
+        "kind": "config_key",
+        "file_kind": "next.config",
+        "path": "experimental.serverComponentsExternalPackages"
+      }
+    },
+    {
+      "id": "next/speed-insights",
+      "title": "Speed Insights",
+      "event": "changed_behavior",
+      "source": "https://nextjs.org/docs/app/guides/upgrading/version-15#speed-insights",
+      "status": "draft",
+      "notes": "No code pattern the usage finder reports. Left unmatched so a review does not bind it to the wrong usage; the pack report explains the note.",
+      "doc_topics": [
+        "Speed Insights"
+      ]
+    },
+    {
+      "id": "next/nextrequest-geolocation",
+      "title": "NextRequest Geolocation",
+      "event": "removed",
+      "source": "https://nextjs.org/docs/app/guides/upgrading/version-15#nextrequest-geolocation",
+      "status": "reviewed",
+      "doc_topics": [
+        "NextRequest.geo",
+        "NextRequest.ip"
+      ],
+      "notes": "The same removal covers NextRequest.ip. One match binds the geo property; ip is the same section.",
+      "no_equivalent": true,
+      "verify_hint": "Load the affected page or run the build, and confirm the new behaviour.",
+      "rollback_hint": "Return to the previous release of the library.",
+      "default_severity": "high",
+      "concern": "NextRequest.geo and NextRequest.ip were removed. The host provides those values.",
+      "mapping": {
+        "from": "request.geo and request.ip",
+        "to": "the hosting provider, for example geolocation() from @vercel/functions"
+      },
+      "codemod": "next-codemod:next-request-geo-ip",
+      "match": {
+        "kind": "attribute",
+        "module": "next/server",
+        "path": "NextRequest.geo"
+      }
+    },
+    {
+      "id": "next/async-request-ip",
+      "status": "reviewed",
+      "doc_topics": [
+        "NextRequest.ip"
+      ],
+      "notes": "The version 15 geolocation section covers both geo and ip. geo has its own rule; this one binds ip.",
+      "no_equivalent": true,
+      "verify_hint": "Load the affected page or run the build, and confirm the new behaviour.",
+      "rollback_hint": "Return to the previous release of the library.",
+      "title": "NextRequest.ip is removed",
+      "event": "removed",
+      "source": "https://nextjs.org/docs/app/guides/upgrading/version-15#nextrequest-geolocation",
+      "default_severity": "high",
+      "concern": "NextRequest.ip was removed along with geo.",
+      "mapping": {
+        "from": "request.ip",
+        "to": "the hosting provider"
+      },
+      "codemod": "next-codemod:next-request-geo-ip",
+      "match": {
+        "kind": "attribute",
+        "module": "next/server",
+        "path": "NextRequest.ip"
+      }
+    },
+    {
+      "id": "next/async-cookies",
+      "status": "reviewed",
+      "doc_topics": [
+        "cookies",
+        "async request APIs"
+      ],
+      "notes": "",
+      "no_equivalent": false,
+      "verify_hint": "Load the affected page or run the build, and confirm the new behaviour.",
+      "rollback_hint": "Return to the previous release of the library.",
+      "title": "cookies() is async",
+      "event": "changed_behavior",
+      "source": "https://nextjs.org/docs/app/guides/upgrading/version-15#async-request-apis-breaking-change",
+      "replacement_since": "15",
+      "default_severity": "high",
+      "concern": "cookies() from next/headers is asynchronous. A synchronous call warns, and the warning becomes an error in 16.",
+      "mapping": {
+        "from": "const cookieStore = cookies()",
+        "to": "const cookieStore = await cookies()"
+      },
+      "codemod": "next-codemod:next-async-request-api",
+      "match": {
+        "kind": "call",
+        "module": "next/headers",
+        "name": "cookies"
+      }
+    },
+    {
+      "id": "next/async-headers",
+      "status": "reviewed",
+      "doc_topics": [
+        "headers",
+        "async request APIs"
+      ],
+      "notes": "",
+      "no_equivalent": false,
+      "verify_hint": "Load the affected page or run the build, and confirm the new behaviour.",
+      "rollback_hint": "Return to the previous release of the library.",
+      "title": "headers() is async",
+      "event": "changed_behavior",
+      "source": "https://nextjs.org/docs/app/guides/upgrading/version-15#async-request-apis-breaking-change",
+      "replacement_since": "15",
+      "default_severity": "high",
+      "concern": "headers() from next/headers is asynchronous.",
+      "mapping": {
+        "from": "const headersList = headers()",
+        "to": "const headersList = await headers()"
+      },
+      "codemod": "next-codemod:next-async-request-api",
+      "match": {
+        "kind": "call",
+        "module": "next/headers",
+        "name": "headers"
+      }
+    },
+    {
+      "id": "next/async-draft-mode",
+      "status": "reviewed",
+      "doc_topics": [
+        "draftMode"
+      ],
+      "notes": "",
+      "no_equivalent": false,
+      "verify_hint": "Load the affected page or run the build, and confirm the new behaviour.",
+      "rollback_hint": "Return to the previous release of the library.",
+      "title": "draftMode() is async",
+      "event": "changed_behavior",
+      "source": "https://nextjs.org/docs/app/guides/upgrading/version-15#async-request-apis-breaking-change",
+      "replacement_since": "15",
+      "default_severity": "high",
+      "concern": "draftMode() from next/headers is asynchronous.",
+      "mapping": {
+        "from": "const { isEnabled } = draftMode()",
+        "to": "const { isEnabled } = await draftMode()"
+      },
+      "codemod": "next-codemod:next-async-request-api",
+      "match": {
+        "kind": "call",
+        "module": "next/headers",
+        "name": "draftMode"
+      }
+    },
+    {
+      "id": "next/async-params",
+      "status": "reviewed",
+      "doc_topics": [
+        "params"
+      ],
+      "notes": "",
+      "no_equivalent": false,
+      "verify_hint": "Load the affected page or run the build, and confirm the new behaviour.",
+      "rollback_hint": "Return to the previous release of the library.",
+      "title": "params is a Promise",
+      "event": "changed_behavior",
+      "source": "https://nextjs.org/docs/app/guides/upgrading/version-15#async-request-apis-breaking-change",
+      "replacement_since": "15",
+      "default_severity": "high",
+      "concern": "params in page, layout and route props is a Promise.",
+      "mapping": {
+        "from": "const { slug } = params",
+        "to": "const { slug } = await params"
+      },
+      "codemod": "next-codemod:next-async-request-api",
+      "match": {
+        "kind": "file_convention",
+        "glob": "**/{page,layout,route,default,opengraph-image,twitter-image,icon,apple-icon}.{js,jsx,ts,tsx}",
+        "symbol": "params"
+      }
+    },
+    {
+      "id": "next/async-search-params",
+      "status": "reviewed",
+      "doc_topics": [
+        "searchParams"
+      ],
+      "notes": "",
+      "no_equivalent": false,
+      "verify_hint": "Load the affected page or run the build, and confirm the new behaviour.",
+      "rollback_hint": "Return to the previous release of the library.",
+      "title": "searchParams is a Promise",
+      "event": "changed_behavior",
+      "source": "https://nextjs.org/docs/app/guides/upgrading/version-15#async-request-apis-breaking-change",
+      "replacement_since": "15",
+      "default_severity": "high",
+      "concern": "searchParams in page props is a Promise.",
+      "mapping": {
+        "from": "const { q } = searchParams",
+        "to": "const { q } = await searchParams"
+      },
+      "codemod": "next-codemod:next-async-request-api",
+      "match": {
+        "kind": "file_convention",
+        "glob": "**/page.{js,jsx,ts,tsx}",
+        "symbol": "searchParams"
+      }
+    },
+    {
+      "id": "next/next-font",
+      "title": "next/font",
+      "event": "removed",
+      "source": "https://nextjs.org/docs/app/guides/upgrading/version-15#next-font",
+      "status": "draft",
+      "notes": "The same removal is defined in release 14 (next/the-next-font-package-has-been-fully-removed-in-favor-of-the). This file records it again as a later removed event, so an install already on 14 still sees it. This draft has no match of its own.",
+      "doc_topics": [
+        "next/font"
+      ]
+    }
+  ],
+  "events": [
+    {
+      "rule": "next/the-next-font-package-has-been-fully-removed-in-favor-of-the",
+      "event": "removed"
+    }
+  ]
+}

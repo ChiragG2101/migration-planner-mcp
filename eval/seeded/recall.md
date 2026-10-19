@@ -6,25 +6,31 @@ Recall counts the `change` and `no_change` entries: usages `find_usages` must fi
 
 ## next-tricky
 
-Adapter `nextjs@2`, `next` 14.2.35 to 16.0.0. Overall recall **27/27 (100.0%)**: direct 24/24 (100.0%), indirect 3/3 (100.0%). Floor: 1.0000.
+Adapter `nextjs@3`, `next` 14.2.35 to 16.0.0. Overall recall **63/63 (100.0%)**: direct 44/44 (100.0%), indirect 19/19 (100.0%). Floor: 1.0000.
 
 | Kind | Direct | Indirect |
 | --- | --- | --- |
-| `cache_api` | 1/1 | - |
-| `config_key` | 1/1 | - |
+| `cache_api` | 1/1 | 1/1 |
+| `config_key` | 5/5 | - |
+| `deprecated_import` | 1/1 | 1/1 |
 | `fetch_call` | 1/1 | - |
 | `internal_import` | 1/1 | - |
 | `middleware` | 1/1 | - |
 | `next_lint_script` | 1/1 | - |
+| `parallel_route` | 1/1 | - |
 | `peer_dependency` | 1/1 | - |
-| `react_legacy` | 3/3 | - |
-| `react_removed_api` | 1/1 | - |
-| `react_types` | 2/2 | - |
-| `removed_package` | 1/1 | - |
-| `request_api` | 3/3 | 2/2 |
-| `request_geo` | 1/1 | - |
+| `react_legacy` | 4/4 | - |
+| `react_removed_api` | 5/5 | 5/5 |
+| `react_removed_import` | 2/2 | 2/2 |
+| `react_types` | 3/3 | 1/1 |
+| `removed_api` | 2/2 | 2/2 |
+| `removed_package` | 1/1 | 1/1 |
+| `renamed_api` | 1/1 | 1/1 |
+| `request_api` | 4/4 | 3/3 |
+| `request_geo` | 2/2 | - |
 | `request_props` | 2/2 | 1/1 |
 | `route_handler` | 1/1 | - |
+| `runtime_config` | 1/1 | 1/1 |
 | `sass_tilde_import` | 1/1 | - |
 | `segment_config` | 1/1 | - |
 | `unresolved_dynamic` | 1/1 | - |

@@ -1,0 +1,736 @@
+{
+  "library": "npm/next",
+  "release": "16",
+  "rules": [
+    {
+      "id": "next/node-js-runtime-and-browser-support",
+      "title": "Node.js runtime and browser support",
+      "event": "changed_behavior",
+      "source": "https://nextjs.org/docs/app/guides/upgrading/version-16#node-js-runtime-and-browser-support",
+      "status": "draft",
+      "notes": "No code pattern the usage finder reports. Left unmatched so a review does not bind it to the wrong usage; the pack report explains the note.",
+      "doc_topics": [
+        "Node.js runtime and browser support"
+      ]
+    },
+    {
+      "id": "next/async-parameters-for-icon-and-open-graph-image-breaking-chan",
+      "title": "Async parameters for icon, and open-graph Image (Breaking change)",
+      "event": "changed_behavior",
+      "source": "https://nextjs.org/docs/app/guides/upgrading/version-16#async-parameters-for-icon-and-open-graph-image-breaking-change",
+      "status": "draft",
+      "notes": "No code pattern the usage finder reports. Left unmatched so a review does not bind it to the wrong usage; the pack report explains the note.",
+      "doc_topics": [
+        "Async parameters for icon, and open-graph Image (Breaking change)"
+      ]
+    },
+    {
+      "id": "next/async-id-parameter-for-sitemap-breaking-change",
+      "title": "Async id parameter for sitemap (Breaking change)",
+      "event": "changed_behavior",
+      "source": "https://nextjs.org/docs/app/guides/upgrading/version-16#async-id-parameter-for-sitemap-breaking-change",
+      "status": "draft",
+      "notes": "No code pattern the usage finder reports. Left unmatched so a review does not bind it to the wrong usage; the pack report explains the note.",
+      "doc_topics": [
+        "Async id parameter for sitemap (Breaking change)"
+      ]
+    },
+    {
+      "id": "next/react-19-2",
+      "title": "React 19.2",
+      "event": "changed_behavior",
+      "source": "https://nextjs.org/docs/app/guides/upgrading/version-16#react-19-2",
+      "status": "draft",
+      "notes": "No code pattern the usage finder reports. Left unmatched so a review does not bind it to the wrong usage; the pack report explains the note.",
+      "doc_topics": [
+        "React 19.2"
+      ]
+    },
+    {
+      "id": "next/react-compiler-support",
+      "title": "React Compiler Support",
+      "event": "changed_behavior",
+      "source": "https://nextjs.org/docs/app/guides/upgrading/version-16#react-compiler-support",
+      "status": "draft",
+      "notes": "No code pattern the usage finder reports. Left unmatched so a review does not bind it to the wrong usage; the pack report explains the note.",
+      "doc_topics": [
+        "React Compiler Support"
+      ]
+    },
+    {
+      "id": "next/enhanced-routing-and-navigation",
+      "title": "Enhanced Routing and Navigation",
+      "event": "changed_behavior",
+      "source": "https://nextjs.org/docs/app/guides/upgrading/version-16#enhanced-routing-and-navigation",
+      "status": "draft",
+      "notes": "No code pattern the usage finder reports. Left unmatched so a review does not bind it to the wrong usage; the pack report explains the note.",
+      "doc_topics": [
+        "Enhanced Routing and Navigation"
+      ]
+    },
+    {
+      "id": "next/partial-prerendering-ppr",
+      "title": "Partial Prerendering (PPR)",
+      "event": "changed_behavior",
+      "source": "https://nextjs.org/docs/app/guides/upgrading/version-16#partial-prerendering-ppr",
+      "status": "draft",
+      "notes": "No code pattern the usage finder reports. Left unmatched so a review does not bind it to the wrong usage; the pack report explains the note.",
+      "doc_topics": [
+        "Partial Prerendering (PPR)"
+      ]
+    },
+    {
+      "id": "next/middleware-to-proxy",
+      "title": "middleware to proxy",
+      "event": "deprecated",
+      "source": "https://nextjs.org/docs/app/guides/upgrading/version-16#middleware-to-proxy",
+      "status": "reviewed",
+      "doc_topics": [
+        "middleware",
+        "proxy"
+      ],
+      "notes": "",
+      "no_equivalent": false,
+      "verify_hint": "Load the affected page or run the build, and confirm the new behaviour.",
+      "rollback_hint": "Return to the previous release of the library.",
+      "default_severity": "high",
+      "concern": "The middleware file is deprecated and renamed to proxy. The edge runtime is not supported in proxy.",
+      "mapping": {
+        "from": "middleware.ts",
+        "to": "proxy.ts"
+      },
+      "codemod": "next-codemod:middleware-to-proxy",
+      "match": {
+        "kind": "file_convention",
+        "glob": "**/middleware.{js,jsx,ts,tsx,mjs}",
+        "symbol": "middleware"
+      },
+      "replacement_since": "16"
+    },
+    {
+      "id": "next/concurrent-dev-and-build",
+      "title": "Concurrent dev and build",
+      "event": "changed_behavior",
+      "source": "https://nextjs.org/docs/app/guides/upgrading/version-16#concurrent-dev-and-build",
+      "status": "draft",
+      "notes": "No code pattern the usage finder reports. Left unmatched so a review does not bind it to the wrong usage; the pack report explains the note.",
+      "doc_topics": [
+        "Concurrent dev and build"
+      ]
+    },
+    {
+      "id": "next/parallel-routes-default-js-requirement",
+      "title": "Parallel Routes default.js requirement",
+      "event": "changed_behavior",
+      "source": "https://nextjs.org/docs/app/guides/upgrading/version-16#parallel-routes-default-js-requirement",
+      "status": "reviewed",
+      "doc_topics": [
+        "parallel routes",
+        "default.js"
+      ],
+      "notes": "",
+      "no_equivalent": false,
+      "verify_hint": "Load the affected page or run the build, and confirm the new behaviour.",
+      "rollback_hint": "Return to the previous release of the library.",
+      "default_severity": "high",
+      "concern": "Every parallel route slot needs an explicit default.js. The build fails without it.",
+      "mapping": {
+        "from": "a parallel slot with no default file",
+        "to": "default.js that calls notFound() or returns null"
+      },
+      "match": {
+        "kind": "file_convention",
+        "glob": "**/@*/**"
+      }
+    },
+    {
+      "id": "next/eslint-flat-config",
+      "title": "ESLint Flat Config",
+      "event": "changed_behavior",
+      "source": "https://nextjs.org/docs/app/guides/upgrading/version-16#eslint-flat-config",
+      "status": "draft",
+      "notes": "No code pattern the usage finder reports. Left unmatched so a review does not bind it to the wrong usage; the pack report explains the note.",
+      "doc_topics": [
+        "ESLint Flat Config"
+      ]
+    },
+    {
+      "id": "next/scroll-behavior-override",
+      "title": "Scroll Behavior Override",
+      "event": "changed_behavior",
+      "source": "https://nextjs.org/docs/app/guides/upgrading/version-16#scroll-behavior-override",
+      "status": "draft",
+      "notes": "No code pattern the usage finder reports. Left unmatched so a review does not bind it to the wrong usage; the pack report explains the note.",
+      "doc_topics": [
+        "Scroll Behavior Override"
+      ]
+    },
+    {
+      "id": "next/performance-improvements",
+      "title": "Performance Improvements",
+      "event": "changed_behavior",
+      "source": "https://nextjs.org/docs/app/guides/upgrading/version-16#performance-improvements",
+      "status": "draft",
+      "notes": "No code pattern the usage finder reports. Left unmatched so a review does not bind it to the wrong usage; the pack report explains the note.",
+      "doc_topics": [
+        "Performance Improvements"
+      ]
+    },
+    {
+      "id": "next/build-adapters-api-alpha",
+      "title": "Build Adapters API (alpha)",
+      "event": "changed_behavior",
+      "source": "https://nextjs.org/docs/app/guides/upgrading/version-16#build-adapters-api-alpha",
+      "status": "draft",
+      "notes": "No code pattern the usage finder reports. Left unmatched so a review does not bind it to the wrong usage; the pack report explains the note.",
+      "doc_topics": [
+        "Build Adapters API (alpha)"
+      ]
+    },
+    {
+      "id": "next/modern-sass-api",
+      "title": "Modern Sass API",
+      "event": "changed_behavior",
+      "source": "https://nextjs.org/docs/app/guides/upgrading/version-16#modern-sass-api",
+      "status": "draft",
+      "notes": "No code pattern the usage finder reports. Left unmatched so a review does not bind it to the wrong usage; the pack report explains the note.",
+      "doc_topics": [
+        "Modern Sass API"
+      ]
+    },
+    {
+      "id": "next/opting-out-of-turbopack",
+      "title": "Opting out of Turbopack",
+      "event": "changed_behavior",
+      "source": "https://nextjs.org/docs/app/guides/upgrading/version-16#opting-out-of-turbopack",
+      "status": "draft",
+      "notes": "No code pattern the usage finder reports. Left unmatched so a review does not bind it to the wrong usage; the pack report explains the note.",
+      "doc_topics": [
+        "Opting out of Turbopack"
+      ]
+    },
+    {
+      "id": "next/turbopack-configuration-location",
+      "title": "Turbopack configuration location",
+      "event": "changed_behavior",
+      "source": "https://nextjs.org/docs/app/guides/upgrading/version-16#turbopack-configuration-location",
+      "status": "draft",
+      "notes": "No code pattern the usage finder reports. Left unmatched so a review does not bind it to the wrong usage; the pack report explains the note.",
+      "doc_topics": [
+        "Turbopack configuration location"
+      ]
+    },
+    {
+      "id": "next/resolve-alias-fallback",
+      "title": "Resolve alias fallback",
+      "event": "changed_behavior",
+      "source": "https://nextjs.org/docs/app/guides/upgrading/version-16#resolve-alias-fallback",
+      "status": "draft",
+      "notes": "No code pattern the usage finder reports. Left unmatched so a review does not bind it to the wrong usage; the pack report explains the note.",
+      "doc_topics": [
+        "Resolve alias fallback"
+      ]
+    },
+    {
+      "id": "next/sass-node-modules-imports",
+      "title": "Sass node_modules imports",
+      "event": "removed",
+      "source": "https://nextjs.org/docs/app/guides/upgrading/version-16#sass-node-modules-imports",
+      "status": "reviewed",
+      "doc_topics": [
+        "sass",
+        "turbopack"
+      ],
+      "notes": "",
+      "no_equivalent": false,
+      "verify_hint": "Load the affected page or run the build, and confirm the new behaviour.",
+      "rollback_hint": "Return to the previous release of the library.",
+      "default_severity": "medium",
+      "concern": "Turbopack does not support the tilde prefix on Sass imports.",
+      "mapping": {
+        "from": "@import '~bootstrap/dist/css/bootstrap.min.css'",
+        "to": "@import 'bootstrap/dist/css/bootstrap.min.css'"
+      },
+      "match": {
+        "kind": "file_convention",
+        "glob": "**/*.{scss,sass}",
+        "symbol": "~"
+      }
+    },
+    {
+      "id": "next/turbopack-file-system-caching",
+      "title": "Turbopack File System Caching",
+      "event": "changed_behavior",
+      "source": "https://nextjs.org/docs/app/guides/upgrading/version-16#turbopack-file-system-caching",
+      "status": "draft",
+      "notes": "No code pattern the usage finder reports. Left unmatched so a review does not bind it to the wrong usage; the pack report explains the note.",
+      "doc_topics": [
+        "Turbopack File System Caching"
+      ]
+    },
+    {
+      "id": "next/revalidatetag",
+      "title": "revalidateTag",
+      "event": "changed_behavior",
+      "source": "https://nextjs.org/docs/app/guides/upgrading/version-16#revalidatetag",
+      "status": "reviewed",
+      "doc_topics": [
+        "revalidateTag",
+        "cacheLife"
+      ],
+      "notes": "",
+      "no_equivalent": false,
+      "verify_hint": "Load the affected page or run the build, and confirm the new behaviour.",
+      "rollback_hint": "Return to the previous release of the library.",
+      "default_severity": "high",
+      "concern": "revalidateTag now requires a cacheLife profile as its second argument. The one-argument form is deprecated.",
+      "mapping": {
+        "from": "revalidateTag('posts')",
+        "to": "revalidateTag('posts', 'max')"
+      },
+      "match": {
+        "kind": "call",
+        "module": "next/cache",
+        "name": "revalidateTag"
+      }
+    },
+    {
+      "id": "next/updatetag",
+      "title": "updateTag",
+      "event": "changed_behavior",
+      "source": "https://nextjs.org/docs/app/guides/upgrading/version-16#updatetag",
+      "status": "draft",
+      "notes": "No code pattern the usage finder reports. Left unmatched so a review does not bind it to the wrong usage; the pack report explains the note.",
+      "doc_topics": [
+        "updateTag"
+      ]
+    },
+    {
+      "id": "next/refresh",
+      "title": "refresh",
+      "event": "changed_behavior",
+      "source": "https://nextjs.org/docs/app/guides/upgrading/version-16#refresh",
+      "status": "draft",
+      "notes": "No code pattern the usage finder reports. Left unmatched so a review does not bind it to the wrong usage; the pack report explains the note.",
+      "doc_topics": [
+        "refresh"
+      ]
+    },
+    {
+      "id": "next/cachelife-and-cachetag",
+      "title": "cacheLife and cacheTag",
+      "event": "renamed",
+      "source": "https://nextjs.org/docs/app/guides/upgrading/version-16#cachelife-and-cachetag",
+      "status": "reviewed",
+      "doc_topics": [
+        "cacheLife",
+        "cacheTag"
+      ],
+      "notes": "",
+      "no_equivalent": false,
+      "verify_hint": "Load the affected page or run the build, and confirm the new behaviour.",
+      "rollback_hint": "Return to the previous release of the library.",
+      "replacement_since": "16",
+      "default_severity": "medium",
+      "concern": "unstable_cacheLife and unstable_cacheTag are stable; drop the unstable_ prefix.",
+      "mapping": {
+        "from": "unstable_cacheLife and unstable_cacheTag",
+        "to": "cacheLife and cacheTag"
+      },
+      "codemod": "next-codemod:remove-unstable-prefix",
+      "match": {
+        "kind": "import",
+        "module": "next/cache",
+        "name": "unstable_cacheLife"
+      }
+    },
+    {
+      "id": "next/local-images-with-query-strings-breaking-change",
+      "title": "Local Images with Query Strings (Breaking change)",
+      "event": "changed_behavior",
+      "source": "https://nextjs.org/docs/app/guides/upgrading/version-16#local-images-with-query-strings-breaking-change",
+      "status": "draft",
+      "doc_topics": [
+        "images.localPatterns"
+      ],
+      "notes": "Left draft in the 2026-10-20 review: the match binds images.localPatterns, the remedy, not the affected code (a local image src with a query string), which the finder does not report.",
+      "no_equivalent": false,
+      "verify_hint": "Load the affected page or run the build, and confirm the new behaviour.",
+      "rollback_hint": "Return to the previous release of the library.",
+      "default_severity": "medium",
+      "concern": "A local image source with a query string needs images.localPatterns.search.",
+      "mapping": {
+        "from": "a local image src with a query string",
+        "to": "images.localPatterns with a search pattern"
+      },
+      "match": {
+        "kind": "config_key",
+        "file_kind": "next.config",
+        "path": "images.localPatterns"
+      }
+    },
+    {
+      "id": "next/minimumcachettl-default-breaking-change",
+      "title": "minimumCacheTTL Default (Breaking change)",
+      "event": "changed_default",
+      "source": "https://nextjs.org/docs/app/guides/upgrading/version-16#minimumcachettl-default-breaking-change",
+      "status": "draft",
+      "doc_topics": [
+        "images.minimumCacheTTL"
+      ],
+      "notes": "Left draft in the 2026-10-20 review: the match binds an explicit images.minimumCacheTTL, which a default change does not affect. Apps relying on the default are not found.",
+      "no_equivalent": false,
+      "verify_hint": "Load the affected page or run the build, and confirm the new behaviour.",
+      "rollback_hint": "Return to the previous release of the library.",
+      "default_severity": "medium",
+      "concern": "images.minimumCacheTTL has a new default.",
+      "mapping": {
+        "from": "the previous minimumCacheTTL default",
+        "to": "an explicit images.minimumCacheTTL when the old value is required"
+      },
+      "match": {
+        "kind": "config_key",
+        "file_kind": "next.config",
+        "path": "images.minimumCacheTTL"
+      }
+    },
+    {
+      "id": "next/imagesizes-default-breaking-change",
+      "title": "imageSizes Default (Breaking change)",
+      "event": "changed_default",
+      "source": "https://nextjs.org/docs/app/guides/upgrading/version-16#imagesizes-default-breaking-change",
+      "status": "draft",
+      "doc_topics": [
+        "images.imageSizes"
+      ],
+      "notes": "Left draft in the 2026-10-20 review: the match binds an explicit images.imageSizes, which a default change does not affect. Apps relying on the default are not found.",
+      "no_equivalent": false,
+      "verify_hint": "Load the affected page or run the build, and confirm the new behaviour.",
+      "rollback_hint": "Return to the previous release of the library.",
+      "default_severity": "low",
+      "concern": "images.imageSizes has a new default.",
+      "mapping": {
+        "from": "the previous imageSizes default",
+        "to": "an explicit images.imageSizes when the old value is required"
+      },
+      "match": {
+        "kind": "config_key",
+        "file_kind": "next.config",
+        "path": "images.imageSizes"
+      }
+    },
+    {
+      "id": "next/qualities-default-breaking-change",
+      "title": "qualities Default (Breaking change)",
+      "event": "changed_default",
+      "source": "https://nextjs.org/docs/app/guides/upgrading/version-16#qualities-default-breaking-change",
+      "status": "draft",
+      "doc_topics": [
+        "images.qualities"
+      ],
+      "notes": "Left draft in the 2026-10-20 review: the match binds an explicit images.qualities, which a default change does not affect. Apps relying on the default (quality props outside [75]) are not found.",
+      "no_equivalent": false,
+      "verify_hint": "Load the affected page or run the build, and confirm the new behaviour.",
+      "rollback_hint": "Return to the previous release of the library.",
+      "default_severity": "low",
+      "concern": "images.qualities has a new default.",
+      "mapping": {
+        "from": "the previous qualities default",
+        "to": "an explicit images.qualities when the old value is required"
+      },
+      "match": {
+        "kind": "config_key",
+        "file_kind": "next.config",
+        "path": "images.qualities"
+      }
+    },
+    {
+      "id": "next/local-ip-restriction-breaking-change",
+      "title": "Local IP Restriction (Breaking change)",
+      "event": "changed_behavior",
+      "source": "https://nextjs.org/docs/app/guides/upgrading/version-16#local-ip-restriction-breaking-change",
+      "status": "draft",
+      "doc_topics": [
+        "images",
+        "local IP"
+      ],
+      "notes": "Left draft in the 2026-10-20 review: the match binds images.dangerouslyAllowLocalIP, the opt-out that first exists in 16, so it never finds code written for an earlier release.",
+      "no_equivalent": false,
+      "verify_hint": "Load the affected page or run the build, and confirm the new behaviour.",
+      "rollback_hint": "Return to the previous release of the library.",
+      "default_severity": "medium",
+      "concern": "Optimising local IP image sources is restricted.",
+      "mapping": {
+        "from": "an image src on a local IP",
+        "to": "images.localPatterns or images.dangerouslyAllowLocalIP when that is intended"
+      },
+      "match": {
+        "kind": "config_key",
+        "file_kind": "next.config",
+        "path": "images.dangerouslyAllowLocalIP"
+      }
+    },
+    {
+      "id": "next/maximum-redirects-breaking-change",
+      "title": "Maximum Redirects (Breaking change)",
+      "event": "changed_default",
+      "source": "https://nextjs.org/docs/app/guides/upgrading/version-16#maximum-redirects-breaking-change",
+      "status": "draft",
+      "doc_topics": [
+        "images.maximumRedirects"
+      ],
+      "notes": "Left draft in the 2026-10-20 review: the match binds an explicit images.maximumRedirects, which a default change does not affect. Apps relying on the default are not found.",
+      "no_equivalent": false,
+      "verify_hint": "Load the affected page or run the build, and confirm the new behaviour.",
+      "rollback_hint": "Return to the previous release of the library.",
+      "default_severity": "low",
+      "concern": "The image optimiser follows a different maximum number of redirects.",
+      "mapping": {
+        "from": "the previous redirect limit",
+        "to": "an explicit images.maximumRedirects when the old value is required"
+      },
+      "match": {
+        "kind": "config_key",
+        "file_kind": "next.config",
+        "path": "images.maximumRedirects"
+      }
+    },
+    {
+      "id": "next/next-legacy-image-component-deprecated",
+      "title": "next/legacy/image Component (deprecated)",
+      "event": "deprecated",
+      "source": "https://nextjs.org/docs/app/guides/upgrading/version-16#next-legacy-image-component-deprecated",
+      "status": "reviewed",
+      "doc_topics": [
+        "next/legacy/image"
+      ],
+      "notes": "",
+      "no_equivalent": false,
+      "verify_hint": "Load the affected page or run the build, and confirm the new behaviour.",
+      "rollback_hint": "Return to the previous release of the library.",
+      "default_severity": "medium",
+      "concern": "next/legacy/image is deprecated.",
+      "mapping": {
+        "from": "import Image from 'next/legacy/image'",
+        "to": "import Image from 'next/image'"
+      },
+      "match": {
+        "kind": "import",
+        "module": "next/legacy/image"
+      }
+    },
+    {
+      "id": "next/images-domains-configuration-deprecated",
+      "title": "images.domains Configuration (deprecated)",
+      "event": "deprecated",
+      "source": "https://nextjs.org/docs/app/guides/upgrading/version-16#images-domains-configuration-deprecated",
+      "status": "reviewed",
+      "doc_topics": [
+        "images.domains",
+        "images.remotePatterns"
+      ],
+      "notes": "",
+      "no_equivalent": false,
+      "verify_hint": "Load the affected page or run the build, and confirm the new behaviour.",
+      "rollback_hint": "Return to the previous release of the library.",
+      "default_severity": "medium",
+      "concern": "images.domains is deprecated in favour of images.remotePatterns.",
+      "mapping": {
+        "from": "images.domains",
+        "to": "images.remotePatterns"
+      },
+      "match": {
+        "kind": "config_key",
+        "file_kind": "next.config",
+        "path": "images.domains"
+      }
+    },
+    {
+      "id": "next/amp-support",
+      "title": "AMP Support",
+      "event": "removed",
+      "source": "https://nextjs.org/docs/app/guides/upgrading/version-16#amp-support",
+      "status": "reviewed",
+      "doc_topics": [
+        "AMP",
+        "next/amp"
+      ],
+      "notes": "",
+      "no_equivalent": true,
+      "verify_hint": "Load the affected page or run the build, and confirm the new behaviour.",
+      "rollback_hint": "Return to the previous release of the library.",
+      "default_severity": "high",
+      "concern": "AMP support is removed, including the next/amp import, the amp config and the pages amp config export.",
+      "mapping": {
+        "from": "import { useAmp } from 'next/amp'",
+        "to": "no AMP API"
+      },
+      "match": {
+        "kind": "import",
+        "module": "next/amp"
+      }
+    },
+    {
+      "id": "next/next-lint-command",
+      "title": "next lint Command",
+      "event": "removed",
+      "source": "https://nextjs.org/docs/app/guides/upgrading/version-16#next-lint-command",
+      "status": "reviewed",
+      "doc_topics": [
+        "next lint",
+        "eslint"
+      ],
+      "notes": "",
+      "no_equivalent": false,
+      "verify_hint": "Load the affected page or run the build, and confirm the new behaviour.",
+      "rollback_hint": "Return to the previous release of the library.",
+      "default_severity": "medium",
+      "concern": "The next lint command is removed. Use ESLint or Biome directly. next build no longer runs lint.",
+      "mapping": {
+        "from": "next lint",
+        "to": "the ESLint CLI"
+      },
+      "codemod": "next-codemod:next-lint-to-eslint-cli",
+      "match": {
+        "kind": "file_convention",
+        "glob": "**/package.json",
+        "symbol": "next lint"
+      }
+    },
+    {
+      "id": "next/runtime-configuration",
+      "title": "Runtime Configuration",
+      "event": "removed",
+      "source": "https://nextjs.org/docs/app/guides/upgrading/version-16#runtime-configuration",
+      "status": "reviewed",
+      "doc_topics": [
+        "serverRuntimeConfig",
+        "publicRuntimeConfig"
+      ],
+      "notes": "",
+      "no_equivalent": false,
+      "verify_hint": "Load the affected page or run the build, and confirm the new behaviour.",
+      "rollback_hint": "Return to the previous release of the library.",
+      "default_severity": "high",
+      "concern": "serverRuntimeConfig and publicRuntimeConfig are removed. Use environment variables.",
+      "mapping": {
+        "from": "publicRuntimeConfig",
+        "to": "an environment variable, with the NEXT_PUBLIC_ prefix when the client reads it"
+      },
+      "match": {
+        "kind": "import",
+        "module": "next/config"
+      }
+    },
+    {
+      "id": "next/devindicators-options",
+      "title": "devIndicators Options",
+      "event": "removed",
+      "source": "https://nextjs.org/docs/app/guides/upgrading/version-16#devindicators-options",
+      "status": "reviewed",
+      "doc_topics": [
+        "devIndicators"
+      ],
+      "notes": "",
+      "no_equivalent": false,
+      "verify_hint": "Load the affected page or run the build, and confirm the new behaviour.",
+      "rollback_hint": "Return to the previous release of the library.",
+      "default_severity": "low",
+      "concern": "devIndicators options appIsrStatus, buildActivity and buildActivityPosition are removed.",
+      "mapping": {
+        "from": "devIndicators.buildActivity",
+        "to": "the remaining devIndicators indicator"
+      },
+      "match": {
+        "kind": "config_key",
+        "file_kind": "next.config",
+        "path": "devIndicators"
+      }
+    },
+    {
+      "id": "next/experimental-dynamicio-and-experimental-usecache",
+      "title": "experimental.dynamicIO and experimental.useCache",
+      "event": "removed",
+      "source": "https://nextjs.org/docs/app/guides/upgrading/version-16#experimental-dynamicio-and-experimental-usecache",
+      "status": "reviewed",
+      "doc_topics": [
+        "cacheComponents",
+        "useCache"
+      ],
+      "notes": "",
+      "no_equivalent": false,
+      "verify_hint": "Load the affected page or run the build, and confirm the new behaviour.",
+      "rollback_hint": "Return to the previous release of the library.",
+      "default_severity": "high",
+      "concern": "experimental.dynamicIO and experimental.useCache are removed. cacheComponents is the replacement, and it is not a rename-only change.",
+      "mapping": {
+        "from": "experimental.useCache",
+        "to": "cacheComponents, after adopting the Cache Components model"
+      },
+      "match": {
+        "kind": "config_key",
+        "file_kind": "next.config",
+        "path": "experimental.useCache"
+      }
+    },
+    {
+      "id": "next/unstable-rootparams",
+      "title": "unstable_rootParams",
+      "event": "removed",
+      "source": "https://nextjs.org/docs/app/guides/upgrading/version-16#unstable-rootparams",
+      "status": "reviewed",
+      "doc_topics": [
+        "unstable_rootParams",
+        "root-params"
+      ],
+      "notes": "",
+      "no_equivalent": false,
+      "verify_hint": "Load the affected page or run the build, and confirm the new behaviour.",
+      "rollback_hint": "Return to the previous release of the library.",
+      "default_severity": "high",
+      "concern": "unstable_rootParams is removed. Use next/root-params.",
+      "mapping": {
+        "from": "unstable_rootParams from next/server",
+        "to": "next/root-params"
+      },
+      "match": {
+        "kind": "import",
+        "module": "next/server",
+        "name": "unstable_rootParams"
+      }
+    },
+    {
+      "id": "next/async-request-apis-breaking-change",
+      "title": "Async Request APIs (Breaking change)",
+      "event": "removed",
+      "source": "https://nextjs.org/docs/app/guides/upgrading/version-16#async-request-apis-breaking-change",
+      "status": "draft",
+      "notes": "Synchronous access is removed in 16. That is a later removed event on next/async-cookies, next/async-headers, next/async-draft-mode, next/async-params and next/async-search-params, which are defined in release 15. This draft has no match of its own.",
+      "doc_topics": [
+        "async request APIs"
+      ]
+    }
+  ],
+  "events": [
+    {
+      "rule": "next/async-cookies",
+      "event": "removed"
+    },
+    {
+      "rule": "next/async-headers",
+      "event": "removed"
+    },
+    {
+      "rule": "next/async-draft-mode",
+      "event": "removed"
+    },
+    {
+      "rule": "next/async-params",
+      "event": "removed"
+    },
+    {
+      "rule": "next/async-search-params",
+      "event": "removed"
+    }
+  ]
+}

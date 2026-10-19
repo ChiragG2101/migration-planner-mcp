@@ -1,0 +1,24 @@
+{
+  "library": "npm/react",
+  "release": "19",
+  "rules": [
+    {
+      "id": "react/render",
+      "title": "render is gone",
+      "event": "removed",
+      "source": "https://example.org/docs/19#x",
+      "status": "reviewed",
+      "match": { "kind": "call", "module": "react", "name": "f" },
+      "concern": "c",
+      "default_severity": "high",
+      "mapping": { "from": "a", "to": "b" },
+      "no_equivalent": false,
+      "notes": "",
+      "verify_hint": "v",
+      "rollback_hint": "r",
+      "doc_topics": ["t"],
+      "codemod": "next-codemod:upgrade"
+    }
+  ],
+  "events": []
+}

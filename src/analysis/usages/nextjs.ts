@@ -441,7 +441,7 @@ function detect(ctx: UsageContext): DetectResult {
     for (const u of l.use_ref_no_arg) {
       const o = ctx.graph.resolveLocal(file, u.callee.split('.')[0]!);
       const fromReact = (o.kind === 'external' || o.kind === 'namespace') && o.module === 'react';
-      if (fromReact) add({ file, line_start: u.line, line_end: u.line, kind: 'react_types', symbol: 'useRef()', module: 'react', match_kind: 'call' });
+      if (fromReact) add({ file, line_start: u.line, line_end: u.line, kind: 'react_types', symbol: 'react.useRef', module: 'react', match_kind: 'call' });
     }
   }
 
@@ -622,7 +622,7 @@ function isTypeOnlyBinding(ctx: UsageContext, file: string, ref: Ref): boolean {
 
 export const nextjsAdapter: UsageAdapter = {
   id: 'nextjs',
-  version: 2,
+  version: 3,
   languages: ['ts'],
   match_kinds: ['import', 'call', 'attribute', 'config_key', 'dependency', 'file_convention'],
   usage_kinds: [

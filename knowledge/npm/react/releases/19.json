@@ -1,0 +1,541 @@
+{
+  "library": "npm/react",
+  "release": "19",
+  "rules": [
+    {
+      "id": "react/errors-in-render-are-not-re-thrown",
+      "title": "Errors in render are not re-thrown",
+      "event": "changed_behavior",
+      "source": "https://react.dev/blog/2024/04/25/react-19-upgrade-guide#errors-in-render-are-not-re-thrown",
+      "status": "draft",
+      "notes": "No code pattern the usage finder reports. Left unmatched so a review does not bind it to the wrong usage; the pack report explains the note.",
+      "doc_topics": [
+        "Errors in render are not re-thrown"
+      ]
+    },
+    {
+      "id": "react/deprecated-element-ref",
+      "title": "Deprecated: element.ref",
+      "event": "deprecated",
+      "source": "https://react.dev/blog/2024/04/25/react-19-upgrade-guide#deprecated-element-ref",
+      "status": "draft",
+      "notes": "No code pattern the usage finder reports. Left unmatched so a review does not bind it to the wrong usage; the pack report explains the note.",
+      "doc_topics": [
+        "Deprecated: element.ref"
+      ]
+    },
+    {
+      "id": "react/deprecated-react-test-renderer",
+      "title": "Deprecated: react-test-renderer",
+      "event": "deprecated",
+      "source": "https://react.dev/blog/2024/04/25/react-19-upgrade-guide#deprecated-react-test-renderer",
+      "status": "draft",
+      "notes": "No code pattern the usage finder reports. Left unmatched so a review does not bind it to the wrong usage; the pack report explains the note.",
+      "doc_topics": [
+        "Deprecated: react-test-renderer"
+      ]
+    },
+    {
+      "id": "react/strictmode-changes",
+      "title": "StrictMode changes",
+      "event": "changed_behavior",
+      "source": "https://react.dev/blog/2024/04/25/react-19-upgrade-guide#strict-mode-improvements",
+      "status": "draft",
+      "notes": "No code pattern the usage finder reports. Left unmatched so a review does not bind it to the wrong usage; the pack report explains the note.",
+      "doc_topics": [
+        "StrictMode changes"
+      ]
+    },
+    {
+      "id": "react/improvements-to-suspense",
+      "title": "Improvements to Suspense",
+      "event": "changed_behavior",
+      "source": "https://react.dev/blog/2024/04/25/react-19-upgrade-guide#improvements-to-suspense",
+      "status": "draft",
+      "notes": "No code pattern the usage finder reports. Left unmatched so a review does not bind it to the wrong usage; the pack report explains the note.",
+      "doc_topics": [
+        "Improvements to Suspense"
+      ]
+    },
+    {
+      "id": "react/umd-builds-removed",
+      "title": "UMD builds removed",
+      "event": "changed_behavior",
+      "source": "https://react.dev/blog/2024/04/25/react-19-upgrade-guide#umd-builds-removed",
+      "status": "draft",
+      "notes": "No code pattern the usage finder reports. Left unmatched so a review does not bind it to the wrong usage; the pack report explains the note.",
+      "doc_topics": [
+        "UMD builds removed"
+      ]
+    },
+    {
+      "id": "react/libraries-depending-on-react-internals-may-block-upgrades",
+      "title": "Libraries depending on React internals may block upgrades",
+      "event": "changed_behavior",
+      "source": "https://react.dev/blog/2024/04/25/react-19-upgrade-guide#libraries-depending-on-react-internals-may-block-upgrades",
+      "status": "draft",
+      "notes": "No code pattern the usage finder reports. Left unmatched so a review does not bind it to the wrong usage; the pack report explains the note.",
+      "doc_topics": [
+        "Libraries depending on React internals may block upgrades"
+      ]
+    },
+    {
+      "id": "react/ref-cleanups-required",
+      "title": "ref cleanups required",
+      "event": "changed_behavior",
+      "source": "https://react.dev/blog/2024/04/25/react-19-upgrade-guide#ref-cleanup-required",
+      "status": "draft",
+      "notes": "No code pattern the usage finder reports. Left unmatched so a review does not bind it to the wrong usage; the pack report explains the note.",
+      "doc_topics": [
+        "ref cleanups required"
+      ]
+    },
+    {
+      "id": "react/useref-requires-an-argument",
+      "title": "useRef requires an argument",
+      "event": "changed_behavior",
+      "source": "https://react.dev/blog/2024/04/25/react-19-upgrade-guide#useref-requires-argument",
+      "status": "reviewed",
+      "doc_topics": [
+        "useRef",
+        "MutableRefObject"
+      ],
+      "notes": "",
+      "no_equivalent": false,
+      "verify_hint": "Load the affected page or run the build, and confirm the new behaviour.",
+      "rollback_hint": "Return to the previous release of the library.",
+      "default_severity": "medium",
+      "concern": "useRef requires an argument, and MutableRefObject is deprecated in favour of RefObject.",
+      "mapping": {
+        "from": "useRef()",
+        "to": "useRef(undefined), or useRef(null)"
+      },
+      "codemod": "types-react-codemod:refobject-defaults",
+      "match": {
+        "kind": "call",
+        "module": "react",
+        "name": "useRef"
+      }
+    },
+    {
+      "id": "react/changes-to-the-reactelement-typescript-type",
+      "title": "Changes to the ReactElement TypeScript type",
+      "event": "changed_behavior",
+      "source": "https://react.dev/blog/2024/04/25/react-19-upgrade-guide#changes-to-the-reactelement-typescript-type",
+      "status": "draft",
+      "notes": "No code pattern the usage finder reports. Left unmatched so a review does not bind it to the wrong usage; the pack report explains the note.",
+      "doc_topics": [
+        "Changes to the ReactElement TypeScript type"
+      ]
+    },
+    {
+      "id": "react/the-jsx-namespace-in-typescript",
+      "title": "The JSX namespace in TypeScript",
+      "event": "removed",
+      "source": "https://react.dev/blog/2024/04/25/react-19-upgrade-guide#the-jsx-namespace-in-typescript",
+      "status": "reviewed",
+      "doc_topics": [
+        "JSX namespace"
+      ],
+      "notes": "",
+      "no_equivalent": false,
+      "verify_hint": "Load the affected page or run the build, and confirm the new behaviour.",
+      "rollback_hint": "Return to the previous release of the library.",
+      "default_severity": "medium",
+      "concern": "The global JSX namespace is removed. Use React.JSX.",
+      "mapping": {
+        "from": "JSX.Element",
+        "to": "React.JSX.Element"
+      },
+      "codemod": "types-react-codemod:preset-19",
+      "match": {
+        "kind": "file_convention",
+        "glob": "**/*.{ts,tsx}",
+        "symbol": "JSX"
+      }
+    },
+    {
+      "id": "react/better-usereducer-typings",
+      "title": "Better useReducer typings",
+      "event": "changed_behavior",
+      "source": "https://react.dev/blog/2024/04/25/react-19-upgrade-guide#better-usereducer-typings",
+      "status": "draft",
+      "notes": "No code pattern the usage finder reports. Left unmatched so a review does not bind it to the wrong usage; the pack report explains the note.",
+      "doc_topics": [
+        "Better useReducer typings"
+      ]
+    },
+    {
+      "id": "react/react-dom-error-for-javascript-urls-in-src-and-href-26507",
+      "title": "react-dom: Error for javascript URLs in src and href #26507",
+      "event": "changed_behavior",
+      "source": "https://react.dev/blog/2024/04/25/react-19-upgrade-guide#react-dom-error-for-javascript-urls-in-src-and-href-26507",
+      "status": "draft",
+      "notes": "No code pattern the usage finder reports. Left unmatched so a review does not bind it to the wrong usage; the pack report explains the note.",
+      "doc_topics": [
+        "react-dom: Error for javascript URLs in src and href #26507"
+      ]
+    },
+    {
+      "id": "react/react-dom-remove-errorinfo-digest-from-onrecoverableerror-28",
+      "title": "react-dom: Remove errorInfo.digest from onRecoverableError #28222",
+      "event": "changed_behavior",
+      "source": "https://react.dev/blog/2024/04/25/react-19-upgrade-guide#react-dom-remove-errorinfo-digest-from-onrecoverableerror-28222",
+      "status": "draft",
+      "notes": "No code pattern the usage finder reports. Left unmatched so a review does not bind it to the wrong usage; the pack report explains the note.",
+      "doc_topics": [
+        "react-dom: Remove errorInfo.digest from onRecoverableError #28222"
+      ]
+    },
+    {
+      "id": "react/react-dom-remove-unstable-flushcontrolled-26397",
+      "title": "react-dom: Remove unstable_flushControlled #26397",
+      "event": "changed_behavior",
+      "source": "https://react.dev/blog/2024/04/25/react-19-upgrade-guide#react-dom-remove-unstable-flushcontrolled-26397",
+      "status": "draft",
+      "notes": "No code pattern the usage finder reports. Left unmatched so a review does not bind it to the wrong usage; the pack report explains the note.",
+      "doc_topics": [
+        "react-dom: Remove unstable_flushControlled #26397"
+      ]
+    },
+    {
+      "id": "react/react-dom-remove-unstable-createeventhandle-28271",
+      "title": "react-dom: Remove unstable_createEventHandle #28271",
+      "event": "changed_behavior",
+      "source": "https://react.dev/blog/2024/04/25/react-19-upgrade-guide#react-dom-remove-unstable-createeventhandle-28271",
+      "status": "draft",
+      "notes": "No code pattern the usage finder reports. Left unmatched so a review does not bind it to the wrong usage; the pack report explains the note.",
+      "doc_topics": [
+        "react-dom: Remove unstable_createEventHandle #28271"
+      ]
+    },
+    {
+      "id": "react/react-dom-remove-unstable-rendersubtreeintocontainer-28271",
+      "title": "react-dom: Remove unstable_renderSubtreeIntoContainer #28271",
+      "event": "changed_behavior",
+      "source": "https://react.dev/blog/2024/04/25/react-19-upgrade-guide#react-dom-remove-unstable-rendersubtreeintocontainer-28271",
+      "status": "draft",
+      "notes": "No code pattern the usage finder reports. Left unmatched so a review does not bind it to the wrong usage; the pack report explains the note.",
+      "doc_topics": [
+        "react-dom: Remove unstable_renderSubtreeIntoContainer #28271"
+      ]
+    },
+    {
+      "id": "react/react-dom-remove-unstable-runwithpriority-28271",
+      "title": "react-dom: Remove unstable_runWithPriority #28271",
+      "event": "changed_behavior",
+      "source": "https://react.dev/blog/2024/04/25/react-19-upgrade-guide#react-dom-remove-unstable-runwithpriority-28271",
+      "status": "draft",
+      "notes": "No code pattern the usage finder reports. Left unmatched so a review does not bind it to the wrong usage; the pack report explains the note.",
+      "doc_topics": [
+        "react-dom: Remove unstable_runWithPriority #28271"
+      ]
+    },
+    {
+      "id": "react/react-is-remove-deprecated-methods-from-react-is-28224",
+      "title": "react-is: Remove deprecated methods from react-is 28224",
+      "event": "changed_behavior",
+      "source": "https://react.dev/blog/2024/04/25/react-19-upgrade-guide#react-is-remove-deprecated-methods-from-react-is-28224",
+      "status": "draft",
+      "notes": "No code pattern the usage finder reports. Left unmatched so a review does not bind it to the wrong usage; the pack report explains the note.",
+      "doc_topics": [
+        "react-is: Remove deprecated methods from react-is 28224"
+      ]
+    },
+    {
+      "id": "react/removed-proptypes-and-defaultprops-for-functions",
+      "title": "Removed: propTypes and defaultProps for functions",
+      "event": "removed",
+      "source": "https://react.dev/blog/2024/04/25/react-19-upgrade-guide#removed-proptypes-and-defaultprops",
+      "status": "reviewed",
+      "doc_topics": [
+        "defaultProps",
+        "propTypes"
+      ],
+      "notes": "The match binds defaultProps on function components. The section's prop-types-typescript codemod covers propTypes only, so it is not named here.",
+      "no_equivalent": false,
+      "verify_hint": "Load the affected page or run the build, and confirm the new behaviour.",
+      "rollback_hint": "Return to the previous release of the library.",
+      "default_severity": "high",
+      "concern": "propTypes are ignored and defaultProps on function components are removed. Class components still support defaultProps.",
+      "mapping": {
+        "from": "Component.defaultProps = { text: \"Hello\" }",
+        "to": "a default parameter"
+      },
+      "match": {
+        "kind": "file_convention",
+        "glob": "**/*.{js,jsx,ts,tsx}",
+        "symbol": "defaultProps"
+      }
+    },
+    {
+      "id": "react/removed-legacy-context-using-contexttypes-and-getchildcontex",
+      "title": "Removed: Legacy Context using contextTypes and getChildContext",
+      "event": "removed",
+      "source": "https://react.dev/blog/2024/04/25/react-19-upgrade-guide#removed-removing-legacy-context",
+      "status": "reviewed",
+      "doc_topics": [
+        "legacy context"
+      ],
+      "notes": "",
+      "no_equivalent": false,
+      "verify_hint": "Load the affected page or run the build, and confirm the new behaviour.",
+      "rollback_hint": "Return to the previous release of the library.",
+      "default_severity": "high",
+      "concern": "Legacy context (contextTypes, childContextTypes, getChildContext) is removed.",
+      "mapping": {
+        "from": "contextTypes and getChildContext",
+        "to": "contextType or createContext"
+      },
+      "match": {
+        "kind": "file_convention",
+        "glob": "**/*.{js,jsx,ts,tsx}",
+        "symbol": "legacy_context"
+      }
+    },
+    {
+      "id": "react/removed-string-refs",
+      "title": "Removed: string refs",
+      "event": "removed",
+      "source": "https://react.dev/blog/2024/04/25/react-19-upgrade-guide#removed-string-refs",
+      "status": "reviewed",
+      "doc_topics": [
+        "string refs"
+      ],
+      "notes": "",
+      "no_equivalent": false,
+      "verify_hint": "Load the affected page or run the build, and confirm the new behaviour.",
+      "rollback_hint": "Return to the previous release of the library.",
+      "default_severity": "high",
+      "concern": "String refs are removed.",
+      "mapping": {
+        "from": "<div ref=\"input\" />",
+        "to": "a ref callback or a ref object"
+      },
+      "codemod": "react-codemod:replace-string-ref",
+      "match": {
+        "kind": "file_convention",
+        "glob": "**/*.{js,jsx,ts,tsx}",
+        "symbol": "string_ref"
+      }
+    },
+    {
+      "id": "react/removed-module-pattern-factories",
+      "title": "Removed: Module pattern factories",
+      "event": "removed",
+      "source": "https://react.dev/blog/2024/04/25/react-19-upgrade-guide#removed-module-pattern-factories",
+      "status": "draft",
+      "notes": "No code pattern the usage finder reports. Left unmatched so a review does not bind it to the wrong usage; the pack report explains the note.",
+      "doc_topics": [
+        "Removed: Module pattern factories"
+      ]
+    },
+    {
+      "id": "react/removed-react-createfactory",
+      "title": "Removed: React.createFactory",
+      "event": "removed",
+      "source": "https://react.dev/blog/2024/04/25/react-19-upgrade-guide#removed-createfactory",
+      "status": "reviewed",
+      "doc_topics": [
+        "createFactory"
+      ],
+      "notes": "",
+      "no_equivalent": false,
+      "verify_hint": "Load the affected page or run the build, and confirm the new behaviour.",
+      "rollback_hint": "Return to the previous release of the library.",
+      "default_severity": "high",
+      "concern": "React.createFactory is removed.",
+      "mapping": {
+        "from": "React.createFactory(Component)",
+        "to": "the component itself, as JSX"
+      },
+      "match": {
+        "kind": "call",
+        "module": "react",
+        "name": "createFactory"
+      }
+    },
+    {
+      "id": "react/removed-react-test-renderer-shallow",
+      "title": "Removed: react-test-renderer/shallow",
+      "event": "removed",
+      "source": "https://react.dev/blog/2024/04/25/react-19-upgrade-guide#removed-react-test-renderer-shallow",
+      "status": "reviewed",
+      "doc_topics": [
+        "react-test-renderer"
+      ],
+      "notes": "",
+      "no_equivalent": false,
+      "verify_hint": "Load the affected page or run the build, and confirm the new behaviour.",
+      "rollback_hint": "Return to the previous release of the library.",
+      "default_severity": "medium",
+      "concern": "react-test-renderer/shallow is removed. Import react-shallow-renderer directly.",
+      "mapping": {
+        "from": "import ShallowRenderer from 'react-test-renderer/shallow'",
+        "to": "import ShallowRenderer from 'react-shallow-renderer'"
+      },
+      "match": {
+        "kind": "import",
+        "module": "react-test-renderer/shallow"
+      }
+    },
+    {
+      "id": "react/removed-react-dom-test-utils",
+      "title": "Removed: react-dom/test-utils",
+      "event": "removed",
+      "source": "https://react.dev/blog/2024/04/25/react-19-upgrade-guide#removed-react-dom-test-utils",
+      "status": "reviewed",
+      "doc_topics": [
+        "act",
+        "react-dom/test-utils"
+      ],
+      "notes": "",
+      "no_equivalent": false,
+      "verify_hint": "Load the affected page or run the build, and confirm the new behaviour.",
+      "rollback_hint": "Return to the previous release of the library.",
+      "default_severity": "high",
+      "concern": "react-dom/test-utils is removed. Import act from react.",
+      "mapping": {
+        "from": "import { act } from 'react-dom/test-utils'",
+        "to": "import { act } from 'react'"
+      },
+      "codemod": "react-codemod:replace-act-import",
+      "match": {
+        "kind": "import",
+        "module": "react-dom/test-utils"
+      }
+    },
+    {
+      "id": "react/removed-reactdom-render",
+      "title": "Removed: ReactDOM.render",
+      "event": "removed",
+      "source": "https://react.dev/blog/2024/04/25/react-19-upgrade-guide#removed-reactdom-render",
+      "status": "reviewed",
+      "doc_topics": [
+        "createRoot",
+        "ReactDOM.render"
+      ],
+      "notes": "",
+      "no_equivalent": false,
+      "verify_hint": "Load the affected page or run the build, and confirm the new behaviour.",
+      "rollback_hint": "Return to the previous release of the library.",
+      "default_severity": "high",
+      "concern": "ReactDOM.render is removed. Use createRoot.",
+      "mapping": {
+        "from": "ReactDOM.render(element, container)",
+        "to": "createRoot(container).render(element)"
+      },
+      "codemod": "react-codemod:replace-reactdom-render",
+      "match": {
+        "kind": "call",
+        "module": "react-dom",
+        "name": "render"
+      }
+    },
+    {
+      "id": "react/removed-reactdom-hydrate",
+      "title": "Removed: ReactDOM.hydrate",
+      "event": "removed",
+      "source": "https://react.dev/blog/2024/04/25/react-19-upgrade-guide#removed-reactdom-hydrate",
+      "status": "reviewed",
+      "doc_topics": [
+        "hydrateRoot"
+      ],
+      "notes": "",
+      "no_equivalent": false,
+      "verify_hint": "Load the affected page or run the build, and confirm the new behaviour.",
+      "rollback_hint": "Return to the previous release of the library.",
+      "default_severity": "high",
+      "concern": "ReactDOM.hydrate is removed. Use hydrateRoot.",
+      "mapping": {
+        "from": "ReactDOM.hydrate(element, container)",
+        "to": "hydrateRoot(container, element)"
+      },
+      "codemod": "react-codemod:replace-reactdom-render",
+      "match": {
+        "kind": "call",
+        "module": "react-dom",
+        "name": "hydrate"
+      }
+    },
+    {
+      "id": "react/removed-unmountcomponentatnode",
+      "title": "Removed: unmountComponentAtNode",
+      "event": "removed",
+      "source": "https://react.dev/blog/2024/04/25/react-19-upgrade-guide#removed-unmountcomponentatnode",
+      "status": "reviewed",
+      "doc_topics": [
+        "unmountComponentAtNode"
+      ],
+      "notes": "",
+      "no_equivalent": false,
+      "verify_hint": "Load the affected page or run the build, and confirm the new behaviour.",
+      "rollback_hint": "Return to the previous release of the library.",
+      "default_severity": "high",
+      "concern": "unmountComponentAtNode is removed. Use root.unmount().",
+      "mapping": {
+        "from": "unmountComponentAtNode(container)",
+        "to": "root.unmount()"
+      },
+      "codemod": "react-codemod:replace-reactdom-render",
+      "match": {
+        "kind": "call",
+        "module": "react-dom",
+        "name": "unmountComponentAtNode"
+      }
+    },
+    {
+      "id": "react/removed-reactdom-finddomnode",
+      "title": "Removed: ReactDOM.findDOMNode",
+      "event": "removed",
+      "source": "https://react.dev/blog/2024/04/25/react-19-upgrade-guide#removed-reactdom-finddomnode",
+      "status": "reviewed",
+      "doc_topics": [
+        "findDOMNode"
+      ],
+      "notes": "",
+      "no_equivalent": false,
+      "verify_hint": "Load the affected page or run the build, and confirm the new behaviour.",
+      "rollback_hint": "Return to the previous release of the library.",
+      "default_severity": "high",
+      "concern": "findDOMNode is removed.",
+      "mapping": {
+        "from": "findDOMNode(component)",
+        "to": "a ref on the DOM node"
+      },
+      "match": {
+        "kind": "call",
+        "module": "react-dom",
+        "name": "findDOMNode"
+      }
+    },
+    {
+      "id": "react/removed-deprecated-typescript-types",
+      "title": "Removed deprecated TypeScript types",
+      "event": "removed",
+      "source": "https://react.dev/blog/2024/04/25/react-19-upgrade-guide#removed-deprecated-typescript-types",
+      "status": "draft",
+      "doc_topics": [
+        "MutableRefObject",
+        "@types/react"
+      ],
+      "notes": "Left draft in the 2026-10-20 review: the section names no type. MutableRefObject, the match, is documented in the useRef section, as deprecated rather than removed.",
+      "no_equivalent": false,
+      "verify_hint": "Load the affected page or run the build, and confirm the new behaviour.",
+      "rollback_hint": "Return to the previous release of the library.",
+      "default_severity": "medium",
+      "concern": "TypeScript types for the removed APIs are gone. MutableRefObject is deprecated; see the useRef section.",
+      "mapping": {
+        "from": "a removed React type",
+        "to": "the type the types-react-codemod preset names"
+      },
+      "codemod": "types-react-codemod:preset-19",
+      "match": {
+        "kind": "import",
+        "module": "react",
+        "name": "MutableRefObject"
+      }
+    }
+  ],
+  "events": []
+}

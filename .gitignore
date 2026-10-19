@@ -181,6 +181,10 @@ downloads/
 eggs/
 .eggs/
 lib/
+# The pack maintainer tools live in scripts/lib/ (the plan's path). The rule above
+# would drop that folder from git.
+!scripts/lib/
+!scripts/lib/**
 lib64/
 parts/
 sdist/

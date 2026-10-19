@@ -175,7 +175,7 @@ describe('IDs', () => {
     db.close();
     const rec = JSON.parse(row.versions_json) as Record<string, unknown>;
     expect(rec.pack).toBe(engine.bundle.packs.get('nextjs-upgrade')!.ref);
-    expect(rec.pack).toMatch(/^nextjs-upgrade@0\.1\.0#[0-9a-f]{12}$/);
+    expect(rec.pack).toMatch(/^nextjs-upgrade@0\.3\.0#[0-9a-f]{12}$/);
     expect(rec.companions).toEqual({ 'npm/react': '18.3.1' });
     expect(rec.ecosystem).toBe('node');
     const git = { is_repo: false, head_ref: null, head_commit: null, dirty: 'unknown' } as const;

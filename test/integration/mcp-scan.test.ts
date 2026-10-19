@@ -2,6 +2,7 @@
 // the run and the calls are rows in SQLite with campaign and repo IDs.
 import path from 'node:path';
 import { describe, expect, it } from 'vitest';
+import { listPackReferences } from '../../src/core/index.js';
 import { ScanRepoOutput } from '../../src/schema/scan.js';
 import { openDb } from '../../src/store/db.js';
 import { copyFixture, runCli, tmpDir } from '../helpers.js';
@@ -118,6 +119,20 @@ describe('CLI usages and MCP find_usages give the same JSON', () => {
       expect(strip(res.structuredContent)).toEqual(fromCli);
     } finally {
       await stdio.close();
+    }
+  });
+
+  it('serves the pack references as resources', async () => {
+    const mcp = await inMemoryClient({ out: tmpDir() });
+    try {
+      const listed = await mcp.client.listResources();
+      const uris = listed.resources.map((r) => r.uri);
+      for (const ref of listPackReferences()) expect(uris).toContain(ref.uri);
+      const read = await mcp.client.readResource({ uri: 'pack://nextjs-upgrade/references/codemods.md' });
+      const body = read.contents[0];
+      expect(body && 'text' in body ? body.text : '').toContain('# Codemods');
+    } finally {
+      await mcp.close();
     }
   });
 });

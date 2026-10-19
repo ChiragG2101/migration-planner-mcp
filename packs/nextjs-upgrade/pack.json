@@ -1,6 +1,6 @@
 {
   "name": "nextjs-upgrade",
-  "version": "0.1.0",
+  "version": "0.3.0",
   "kind": "upgrade",
   "language": "ts",
   "trigger": "Use when planning a Next.js major version upgrade in a TypeScript or JavaScript repo.",

@@ -1,0 +1,210 @@
+{
+  "library": "npm/react",
+  "release": "18",
+  "rules": [
+    {
+      "id": "react/updates-to-client-rendering-apis",
+      "title": "Updates to Client Rendering APIs",
+      "event": "changed_behavior",
+      "source": "https://react.dev/blog/2022/03/08/react-18-upgrade-guide#updates-to-client-rendering-apis",
+      "status": "draft",
+      "notes": "No code pattern the usage finder reports. Left unmatched so a review does not bind it to the wrong usage; the pack report explains the note.",
+      "doc_topics": [
+        "Updates to Client Rendering APIs"
+      ]
+    },
+    {
+      "id": "react/rendertonodestream-deprecated",
+      "title": "renderToNodeStream: Deprecated ⛔️️",
+      "event": "changed_behavior",
+      "source": "https://react.dev/blog/2022/03/08/react-18-upgrade-guide#rendertonodestream-deprecated",
+      "status": "draft",
+      "notes": "No code pattern the usage finder reports. Left unmatched so a review does not bind it to the wrong usage; the pack report explains the note.",
+      "doc_topics": [
+        "renderToNodeStream: Deprecated ⛔️️"
+      ]
+    },
+    {
+      "id": "react/rendertopipeablestream-new",
+      "title": "renderToPipeableStream: New ✨",
+      "event": "changed_behavior",
+      "source": "https://react.dev/blog/2022/03/08/react-18-upgrade-guide#rendertopipeablestream-new",
+      "status": "draft",
+      "notes": "No code pattern the usage finder reports. Left unmatched so a review does not bind it to the wrong usage; the pack report explains the note.",
+      "doc_topics": [
+        "renderToPipeableStream: New ✨"
+      ]
+    },
+    {
+      "id": "react/rendertoreadablestream-new",
+      "title": "renderToReadableStream: New ✨",
+      "event": "changed_behavior",
+      "source": "https://react.dev/blog/2022/03/08/react-18-upgrade-guide#rendertoreadablestream-new",
+      "status": "draft",
+      "notes": "No code pattern the usage finder reports. Left unmatched so a review does not bind it to the wrong usage; the pack report explains the note.",
+      "doc_topics": [
+        "renderToReadableStream: New ✨"
+      ]
+    },
+    {
+      "id": "react/rendertostring-limited",
+      "title": "renderToString: Limited ⚠️",
+      "event": "changed_behavior",
+      "source": "https://react.dev/blog/2022/03/08/react-18-upgrade-guide#rendertostring-limited",
+      "status": "draft",
+      "notes": "No code pattern the usage finder reports. Left unmatched so a review does not bind it to the wrong usage; the pack report explains the note.",
+      "doc_topics": [
+        "renderToString: Limited ⚠️"
+      ]
+    },
+    {
+      "id": "react/rendertostaticmarkup-limited",
+      "title": "renderToStaticMarkup: Limited ⚠️",
+      "event": "changed_behavior",
+      "source": "https://react.dev/blog/2022/03/08/react-18-upgrade-guide#rendertostaticmarkup-limited",
+      "status": "draft",
+      "notes": "No code pattern the usage finder reports. Left unmatched so a review does not bind it to the wrong usage; the pack report explains the note.",
+      "doc_topics": [
+        "renderToStaticMarkup: Limited ⚠️"
+      ]
+    },
+    {
+      "id": "react/rendertostaticnodestream",
+      "title": "renderToStaticNodeStream",
+      "event": "changed_behavior",
+      "source": "https://react.dev/blog/2022/03/08/react-18-upgrade-guide#rendertostaticnodestream",
+      "status": "draft",
+      "notes": "No code pattern the usage finder reports. Left unmatched so a review does not bind it to the wrong usage; the pack report explains the note.",
+      "doc_topics": [
+        "renderToStaticNodeStream"
+      ]
+    },
+    {
+      "id": "react/react-dom-reactdom-render-has-been-deprecated-using-it-will-",
+      "title": "react-dom: ReactDOM.render has been deprecated. Using it will warn and run your app in React 17 mode.",
+      "event": "deprecated",
+      "source": "https://react.dev/blog/2022/03/08/react-18-upgrade-guide#react-dom-reactdom-render-has-been-deprecated-using-it-will-warn-and-run-your-app-in-react-17-mode",
+      "status": "draft",
+      "doc_topics": [
+        "ReactDOM.render",
+        "createRoot"
+      ],
+      "notes": "Left draft in the 2026-10-20 review: it has the same match as react/removed-reactdom-render, so one usage would bind two rules. The plan models a later removal as an events[] entry on the earlier rule. Its 18 event is also never inside a run: Next.js 14 and later need React 18.",
+      "no_equivalent": false,
+      "verify_hint": "Load the affected page or run the build, and confirm the new behaviour.",
+      "rollback_hint": "Return to the previous release of the library.",
+      "default_severity": "high",
+      "concern": "ReactDOM.render is deprecated in 18 and removed in 19. It runs the app in React 17 mode.",
+      "mapping": {
+        "from": "ReactDOM.render(element, container)",
+        "to": "createRoot(container).render(element)"
+      },
+      "codemod": "react-codemod:replace-reactdom-render",
+      "match": {
+        "kind": "call",
+        "module": "react-dom",
+        "name": "render"
+      }
+    },
+    {
+      "id": "react/react-dom-reactdom-hydrate-has-been-deprecated-using-it-will",
+      "title": "react-dom: ReactDOM.hydrate has been deprecated. Using it will warn and run your app in React 17 mode.",
+      "event": "deprecated",
+      "source": "https://react.dev/blog/2022/03/08/react-18-upgrade-guide#react-dom-reactdom-hydrate-has-been-deprecated-using-it-will-warn-and-run-your-app-in-react-17-mode",
+      "status": "draft",
+      "notes": "No code pattern the usage finder reports. Left unmatched so a review does not bind it to the wrong usage; the pack report explains the note.",
+      "doc_topics": [
+        "react-dom: ReactDOM.hydrate has been deprecated. Using it will warn and run your app in React 17 mode."
+      ]
+    },
+    {
+      "id": "react/react-dom-reactdom-unmountcomponentatnode-has-been-deprecate",
+      "title": "react-dom: ReactDOM.unmountComponentAtNode has been deprecated.",
+      "event": "deprecated",
+      "source": "https://react.dev/blog/2022/03/08/react-18-upgrade-guide#react-dom-reactdom-unmountcomponentatnode-has-been-deprecated",
+      "status": "draft",
+      "notes": "No code pattern the usage finder reports. Left unmatched so a review does not bind it to the wrong usage; the pack report explains the note.",
+      "doc_topics": [
+        "react-dom: ReactDOM.unmountComponentAtNode has been deprecated."
+      ]
+    },
+    {
+      "id": "react/react-dom-reactdom-rendersubtreeintocontainer-has-been-depre",
+      "title": "react-dom: ReactDOM.renderSubtreeIntoContainer has been deprecated.",
+      "event": "deprecated",
+      "source": "https://react.dev/blog/2022/03/08/react-18-upgrade-guide#react-dom-reactdom-rendersubtreeintocontainer-has-been-deprecated",
+      "status": "draft",
+      "notes": "No code pattern the usage finder reports. Left unmatched so a review does not bind it to the wrong usage; the pack report explains the note.",
+      "doc_topics": [
+        "react-dom: ReactDOM.renderSubtreeIntoContainer has been deprecated."
+      ]
+    },
+    {
+      "id": "react/react-dom-server-reactdomserver-rendertonodestream-has-been-",
+      "title": "react-dom/server: ReactDOMServer.renderToNodeStream has been deprecated.",
+      "event": "deprecated",
+      "source": "https://react.dev/blog/2022/03/08/react-18-upgrade-guide#react-dom-server-reactdomserver-rendertonodestream-has-been-deprecated",
+      "status": "draft",
+      "notes": "No code pattern the usage finder reports. Left unmatched so a review does not bind it to the wrong usage; the pack report explains the note.",
+      "doc_topics": [
+        "react-dom/server: ReactDOMServer.renderToNodeStream has been deprecated."
+      ]
+    },
+    {
+      "id": "react/consistent-useeffect-timing-react-now-always-synchronously-f",
+      "title": "Consistent useEffect timing: React now always synchronously flushes effect functions if the update was triggered during a discrete user input event such as a click or a keydown event. Previously, the behavior wasn't always predictable or consistent.",
+      "event": "changed_behavior",
+      "source": "https://react.dev/blog/2022/03/08/react-18-upgrade-guide#consistent-useeffect-timing-react-now-always-synchronously-flushes-effect-functions-if-the-update-was-triggered-during-a-discrete-user-input-event-such-as-a-click-or-a-keydown-event-previously-the-behavior-wasn-t-always-predictable-or-consistent",
+      "status": "draft",
+      "notes": "No code pattern the usage finder reports. Left unmatched so a review does not bind it to the wrong usage; the pack report explains the note.",
+      "doc_topics": [
+        "Consistent useEffect timing: React now always synchronously flushes effect functions if the update was triggered during "
+      ]
+    },
+    {
+      "id": "react/stricter-hydration-errors-hydration-mismatches-due-to-missin",
+      "title": "Stricter hydration errors",
+      "event": "changed_behavior",
+      "source": "https://react.dev/blog/2022/03/08/react-18-upgrade-guide#stricter-hydration-errors-hydration-mismatches-due-to-missing-or-extra-text-content-are-now-treated-like-errors-instead-of-warnings-react-will-no-longer-attempt-to-patch-up-individual-nodes-by-inserting-or-deleting-a-node-on-the-client-in-an-attempt-to-match-the-server-markup-and-will-revert-to-client-rendering-up-to-the-closest-suspense-boundary-in-the-tree-this-ensures-the-hydrated-tree-is-consistent-and-avoids-potential-privacy-and-security-holes-that-can-be-caused-by-hydration-mismatches",
+      "status": "draft",
+      "notes": "No code pattern the usage finder reports. Left unmatched so a review does not bind it to the wrong usage; the pack report explains the note.",
+      "doc_topics": [
+        "Stricter hydration errors: Hydration mismatches due to missing or extra text content are now treated like errors instead"
+      ]
+    },
+    {
+      "id": "react/suspense-trees-are-always-consistent-if-a-component-suspends",
+      "title": "Suspense trees are always consistent: If a component suspends before it's fully added to the tree, React will not add it to the tree in an incomplete state or fire its effects. Instead, React will throw away the new tree completely, wait for the asynchronous operation to finish, and then retry rendering again from scratch. React will render the retry attempt concurrently, and without blocking the browser.",
+      "event": "changed_behavior",
+      "source": "https://react.dev/blog/2022/03/08/react-18-upgrade-guide#suspense-trees-are-always-consistent-if-a-component-suspends-before-it-s-fully-added-to-the-tree-react-will-not-add-it-to-the-tree-in-an-incomplete-state-or-fire-its-effects-instead-react-will-throw-away-the-new-tree-completely-wait-for-the-asynchronous-operation-to-finish-and-then-retry-rendering-again-from-scratch-react-will-render-the-retry-attempt-concurrently-and-without-blocking-the-browser",
+      "status": "draft",
+      "notes": "No code pattern the usage finder reports. Left unmatched so a review does not bind it to the wrong usage; the pack report explains the note.",
+      "doc_topics": [
+        "Suspense trees are always consistent: If a component suspends before it's fully added to the tree, React will not add it"
+      ]
+    },
+    {
+      "id": "react/layout-effects-with-suspense-when-a-tree-re-suspends-and-rev",
+      "title": "Layout Effects with Suspense: When a tree re-suspends and reverts to a fallback, React will now clean up layout effects, and then re-create them when the content inside the boundary is shown again. This fixes an issue which prevented component libraries from correctly measuring layout when used with Suspense.",
+      "event": "changed_behavior",
+      "source": "https://react.dev/blog/2022/03/08/react-18-upgrade-guide#layout-effects-with-suspense-when-a-tree-re-suspends-and-reverts-to-a-fallback-react-will-now-clean-up-layout-effects-and-then-re-create-them-when-the-content-inside-the-boundary-is-shown-again-this-fixes-an-issue-which-prevented-component-libraries-from-correctly-measuring-layout-when-used-with-suspense",
+      "status": "draft",
+      "notes": "No code pattern the usage finder reports. Left unmatched so a review does not bind it to the wrong usage; the pack report explains the note.",
+      "doc_topics": [
+        "Layout Effects with Suspense: When a tree re-suspends and reverts to a fallback, React will now clean up layout effects,"
+      ]
+    },
+    {
+      "id": "react/new-js-environment-requirements-react-now-depends-on-modern-",
+      "title": "New JS Environment Requirements: React now depends on modern browsers features including Promise, Symbol, and Object.assign. If you support older browsers and devices such as Internet Explorer which do not provide modern browser features natively or have non-compliant implementations, consider including a global polyfill in your bundled application.",
+      "event": "changed_behavior",
+      "source": "https://react.dev/blog/2022/03/08/react-18-upgrade-guide#new-js-environment-requirements-react-now-depends-on-modern-browsers-features-including-promise-symbol-and-object-assign-if-you-support-older-browsers-and-devices-such-as-internet-explorer-which-do-not-provide-modern-browser-features-natively-or-have-non-compliant-implementations-consider-including-a-global-polyfill-in-your-bundled-application",
+      "status": "draft",
+      "notes": "No code pattern the usage finder reports. Left unmatched so a review does not bind it to the wrong usage; the pack report explains the note.",
+      "doc_topics": [
+        "New JS Environment Requirements: React now depends on modern browsers features including Promise, Symbol, and Object.ass"
+      ]
+    }
+  ],
+  "events": []
+}

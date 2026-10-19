@@ -1,0 +1,95 @@
+{
+  "library": "npm/next",
+  "release": "14",
+  "rules": [
+    {
+      "id": "next/the-minimum-node-js-version-has-been-bumped-from-16-14-to-18",
+      "title": "The minimum Node.js version has been bumped from 16.14 to 18.17, since 16.x has reached end-of-life.",
+      "event": "changed_behavior",
+      "source": "https://nextjs.org/docs/app/guides/upgrading/version-14#the-minimum-node-js-version-has-been-bumped-from-16-14-to-18-17-since-16-x-has-reached-end-of-life",
+      "status": "draft",
+      "notes": "No code pattern the usage finder reports. Left unmatched so a review does not bind it to the wrong usage; the pack report explains the note.",
+      "doc_topics": [
+        "The minimum Node.js version has been bumped from 16.14 to 18.17, since 16.x has reached end-of-life."
+      ]
+    },
+    {
+      "id": "next/the-next-export-command-has-been-removed-in-favor-of-output-",
+      "title": "The next export command has been removed in favor of output: 'export' config. Please see the docs for more information.",
+      "event": "changed_behavior",
+      "source": "https://nextjs.org/docs/app/guides/upgrading/version-14#the-next-export-command-has-been-removed-in-favor-of-output-export-config-please-see-the-docs-for-more-information",
+      "status": "draft",
+      "notes": "No code pattern the usage finder reports. Left unmatched so a review does not bind it to the wrong usage; the pack report explains the note.",
+      "doc_topics": [
+        "The next export command has been removed in favor of output: 'export' config. Please see the docs for more information."
+      ]
+    },
+    {
+      "id": "next/the-next-server-import-for-imageresponse-was-renamed-to-next",
+      "title": "The next/server import for ImageResponse was renamed to next/og. A codemod is available to safely and automatically rename your imports.",
+      "event": "renamed",
+      "source": "https://nextjs.org/docs/app/guides/upgrading/version-14#the-next-server-import-for-imageresponse-was-renamed-to-next-og-a-codemod-is-available-to-safely-and-automatically-rename-your-imports",
+      "status": "draft",
+      "doc_topics": [
+        "ImageResponse",
+        "next/og"
+      ],
+      "notes": "Left draft in the 2026-10-20 review: the usage finder does not report ImageResponse imports from next/server, so no seeded case can be found. Close the gap in the finder first (D29).",
+      "no_equivalent": false,
+      "verify_hint": "Load the affected page or run the build, and confirm the new behaviour.",
+      "rollback_hint": "Return to the previous release of the library.",
+      "replacement_since": "14",
+      "default_severity": "medium",
+      "concern": "Importing ImageResponse from next/server no longer works.",
+      "mapping": {
+        "from": "import { ImageResponse } from 'next/server'",
+        "to": "import { ImageResponse } from 'next/og'"
+      },
+      "codemod": "next-codemod:next-og-import",
+      "match": {
+        "kind": "import",
+        "module": "next/server",
+        "name": "ImageResponse"
+      }
+    },
+    {
+      "id": "next/the-next-font-package-has-been-fully-removed-in-favor-of-the",
+      "title": "The @next/font package has been fully removed in favor of the built-in next/font. A codemod is available to safely and automatically rename your imports.",
+      "event": "removed",
+      "source": "https://nextjs.org/docs/app/guides/upgrading/version-14#the-next-font-package-has-been-fully-removed-in-favor-of-the-built-in-next-font-a-codemod-is-available-to-safely-and-automatically-rename-your-imports",
+      "status": "reviewed",
+      "doc_topics": [
+        "next/font",
+        "@next/font"
+      ],
+      "notes": "",
+      "no_equivalent": false,
+      "verify_hint": "Load the affected page or run the build, and confirm the new behaviour.",
+      "rollback_hint": "Return to the previous release of the library.",
+      "replacement_since": "13.2",
+      "default_severity": "high",
+      "concern": "The @next/font package is gone; the built-in next/font replaces it.",
+      "mapping": {
+        "from": "import { Inter } from '@next/font/google'",
+        "to": "import { Inter } from 'next/font/google'"
+      },
+      "codemod": "next-codemod:built-in-next-font",
+      "match": {
+        "kind": "import",
+        "module": "@next/font"
+      }
+    },
+    {
+      "id": "next/the-wasm-target-for-next-swc-has-been-removed",
+      "title": "The WASM target for next-swc has been removed.",
+      "event": "changed_behavior",
+      "source": "https://nextjs.org/docs/app/guides/upgrading/version-14#the-wasm-target-for-next-swc-has-been-removed",
+      "status": "draft",
+      "notes": "No code pattern the usage finder reports. Left unmatched so a review does not bind it to the wrong usage; the pack report explains the note.",
+      "doc_topics": [
+        "The WASM target for next-swc has been removed."
+      ]
+    }
+  ],
+  "events": []
+}

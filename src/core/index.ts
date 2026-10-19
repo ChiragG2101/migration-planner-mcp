@@ -2,6 +2,13 @@
 export { closeEngine, createEngine, ENGINE_VERSION, errorPayload, type Engine, type EngineOptions } from './engine.js';
 export { ingest, scanRepo, type IngestOutput } from './scanRepo.js';
 export { findUsages } from './findUsages.js';
+export { getRulePack } from './getRulePack.js';
+export { listPackReferences, readPackReference } from './packReferences.js';
+export { assessRisk } from './assessRisk.js';
+export { proposeScope, setScope } from './proposeScope.js';
+export { GetRulePackInput } from '../schema/rulePack.js';
+export { AssessRiskInput } from '../schema/risk.js';
+export { ProposeScopeInput, SetScopeInput } from '../schema/scope.js';
 export { InputError, NotBuiltError, PermissionError } from '../security/errors.js';
 export { parseLevel, type Level } from '../security/level.js';
 export { IngestInput } from '../schema/ingest.js';

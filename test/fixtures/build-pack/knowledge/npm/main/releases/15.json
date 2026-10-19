@@ -1,0 +1,31 @@
+{
+  "library": "npm/main",
+  "release": "15",
+  "rules": [
+    {
+      "id": "main/cookies",
+      "title": "cookies are async",
+      "event": "removed",
+      "source": "https://example.org/docs/15#x",
+      "status": "reviewed",
+      "match": { "kind": "call", "module": "main", "name": "f" },
+      "concern": "c",
+      "default_severity": "high",
+      "mapping": { "from": "a", "to": "b" },
+      "no_equivalent": false,
+      "notes": "",
+      "verify_hint": "v",
+      "rollback_hint": "r",
+      "doc_topics": ["t"],
+      "codemod": "next-codemod:upgrade"
+    },
+    {
+      "id": "main/draft",
+      "title": "skip me",
+      "event": "removed",
+      "source": "https://example.org/docs/15#d",
+      "status": "draft"
+    }
+  ],
+  "events": []
+}

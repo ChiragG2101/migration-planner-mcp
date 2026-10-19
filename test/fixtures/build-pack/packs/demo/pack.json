@@ -1,0 +1,18 @@
+{
+  "name": "demo",
+  "version": "0.1.0",
+  "kind": "upgrade",
+  "language": "ts",
+  "trigger": "Use when upgrading main.",
+  "libraries": [
+    { "id": "npm/main", "role": "primary" },
+    { "id": "npm/react", "role": "companion" }
+  ],
+  "supported": { "from": "14", "to": "15" },
+  "usage_adapter": "nextjs",
+  "usage_kinds": [{ "kind": "dependency", "lens": "dependency_build" }],
+  "staging": "leaf_first",
+  "checks_hint": "your tests",
+  "references": [],
+  "seeded": "demo"
+}
