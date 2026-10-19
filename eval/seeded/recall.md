@@ -6,7 +6,7 @@ Recall counts the `change` and `no_change` entries: usages `find_usages` must fi
 
 ## next-tricky
 
-Adapter `nextjs@1`, `next` 14.2.35 to 16.0.0. Overall recall **27/27 (100.0%)**: direct 24/24 (100.0%), indirect 3/3 (100.0%). Floor: 1.0000.
+Adapter `nextjs@2`, `next` 14.2.35 to 16.0.0. Overall recall **27/27 (100.0%)**: direct 24/24 (100.0%), indirect 3/3 (100.0%). Floor: 1.0000.
 
 | Kind | Direct | Indirect |
 | --- | --- | --- |

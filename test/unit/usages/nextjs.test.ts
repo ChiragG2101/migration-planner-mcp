@@ -113,6 +113,8 @@ describe('Next.js adapter: file conventions', () => {
       'src/app/page.tsx:1 segment_config dynamic',
       'src/app/page.tsx:2 segment_config runtime',
     ]);
+    // The config file kind, so a rule's config_key {file_kind: 'segment'} never binds next.config keys (D30).
+    expect(new Set(ofKind(b.usages, 'segment_config').map((u) => `${u.match_kind}:${u.module}`))).toEqual(new Set(['config_key:segment']));
   });
 
   it('fetch_call: global fetch in server code, not in client components or the pages router, nor a local fetch', async () => {

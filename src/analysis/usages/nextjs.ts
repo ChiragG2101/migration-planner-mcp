@@ -492,7 +492,7 @@ function detect(ctx: UsageContext): DetectResult {
         for (const s of l.segment_exports) {
           if (s.name === 'config' && !inPages) continue;
           if (s.name !== 'config' && !appRoot) continue;
-          add({ file, line_start: s.line, line_end: s.line, kind: 'segment_config', symbol: s.name, module: 'next', match_kind: 'config_key' });
+          add({ file, line_start: s.line, line_end: s.line, kind: 'segment_config', symbol: s.name, module: 'segment', match_kind: 'config_key' });
         }
       }
       // fetch in server code: not a client component, not the pages router.
@@ -622,7 +622,7 @@ function isTypeOnlyBinding(ctx: UsageContext, file: string, ref: Ref): boolean {
 
 export const nextjsAdapter: UsageAdapter = {
   id: 'nextjs',
-  version: 1,
+  version: 2,
   languages: ['ts'],
   match_kinds: ['import', 'call', 'attribute', 'config_key', 'dependency', 'file_convention'],
   usage_kinds: [

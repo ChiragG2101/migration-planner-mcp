@@ -50,7 +50,7 @@ export const UnresolvedDynamic = z.object({
 export type UnresolvedDynamic = z.infer<typeof UnresolvedDynamic>;
 
 export const UsageSummary = z.object({
-  adapter: z.string().describe('The usage adapter and its version, for example nextjs@1; none@1 builds only the import graph.'),
+  adapter: z.string().describe('The usage adapter and its version, for example nextjs@2; none@1 builds only the import graph.'),
   total: z.number().int(),
   by_kind: z.record(z.string(), z.number().int()),
   files: z.object({
