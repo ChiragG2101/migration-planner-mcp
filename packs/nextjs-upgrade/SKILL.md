@@ -15,7 +15,7 @@ Plan the migration with the engine, in this order. The engine is read-only at le
 4. `assess_risk`
 5. `propose_scope`
 6. ask the user, then `set_scope`
-7. `plan_migration` for each lens, which registers its docs with `get_migration_docs`
+7. `plan_migration` (v1) for each lens, which registers its docs with `get_migration_docs`
 8. `merge_findings`
 9. `validate_plan`
 10. `emit_plan`

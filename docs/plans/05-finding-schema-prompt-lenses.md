@@ -57,12 +57,12 @@
    - Parses each finding with Zod and normalises evidence: it re-reads the file through `SafePath` and recomputes `snippet_hash`. A mismatch is flagged here and gate 1 checks it again later.
    - Valid findings are stored. For invalid output (an invalid finding, an invalid `out_of_scope` entry, or a usage the lens both marks and covers) it returns the exact Zod errors and allows **one** retry per lens. After that it records a `lens.gap` event and moves on (reliability layer). Usages left uncovered by the gap stay uncovered unless another lens's finding or an out-of-scope entry covers them, and gate 2 sends them to `unresolved` (M6).
    - Stores findings both before and after normalisation as events (audit trail).
-5. **Store (`src/store/findings.ts`, migration `004_findings.sql`).** `findings(run_id, id, lens, json, status, round)`.
+5. **Store (`src/store/findings.ts`, migration `005_findings.sql`).** `findings(run_id, id, lens, json, status, round)`. `004` is the doc cache from M4.
 6. **Real-repo dry run.** Pick one public Next.js repo from the M0 golden list. Run the full flow in Claude Code or Cursor and save the transcript and findings under `eval/dryruns/m5/` (outside the target repo).
 
 ## Files and modules
 
-`src/schema/{finding,plan}.ts`, `src/pipeline/packets.ts`, `src/tools/{getLensPacket,submitFindings}.ts`, `src/store/findings.ts`, `src/store/migrations/004_findings.sql`, `prompts/plan_migration.v1.md`, `prompts/manifest.json`, `src/server.ts` (prompt and resource registration), `test/unit/{finding,packets,submitFindings,promptsImmutable}.test.ts`.
+`src/schema/{finding,plan,packet}.ts`, `src/pipeline/packets.ts`, `src/core/{getLensPacket,submitFindings}.ts`, `src/tools/{getLensPacket,submitFindings}.ts`, `src/store/findings.ts`, `src/store/migrations/005_findings.sql` (004 is the doc cache from M4), `src/security/promptFile.ts`, `prompts/plan_migration.v1.md`, `prompts/manifest.json`, `src/server.ts` (prompt and resource registration), `scripts/lib/build-pack.ts` (embeds the prompt version), `test/unit/{finding,packets,submitFindings,promptsImmutable}.test.ts`, `test/permissions/findings-read.test.ts`.
 
 ## Tests
 

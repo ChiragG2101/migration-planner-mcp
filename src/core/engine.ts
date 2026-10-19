@@ -6,6 +6,7 @@ import { randomBytes as cryptoRandomBytes } from 'node:crypto';
 import { readFileSync } from 'node:fs';
 import path from 'node:path';
 import { DEFAULT_LIMITS } from '../analysis/scanner.js';
+import { PACKET_MAX_CHARS } from '../pipeline/packets.js';
 import { describeBundle, loadBundled, type Bundle } from '../rules/loader.js';
 import type { ScanLimits } from '../schema/scan.js';
 import { InputError, NotBuiltError, PermissionError } from '../security/errors.js';
@@ -48,6 +49,8 @@ export interface EngineOptions {
     cacheMaxBytes?: number;
     protectRuns?: number;
   };
+  /** Lens packet JSON stays within this many characters. Truncation is reported. */
+  packetMaxChars?: number;
 }
 
 export interface Session {
@@ -66,6 +69,8 @@ export interface Engine {
   readonly sessions: Map<string, Session>;
   /** The loaded knowledge and packs; loading fails closed, so the engine never starts on knowledge it couldn't read. */
   readonly bundle: Bundle;
+  /** Lens packets are cut to this size, and the cut is reported on the packet. */
+  readonly packetMaxChars: number;
 }
 
 export function createEngine(options: EngineOptions = {}): Engine {
@@ -81,6 +86,7 @@ export function createEngine(options: EngineOptions = {}): Engine {
     options,
     sessions: new Map(),
     bundle,
+    packetMaxChars: options.packetMaxChars ?? PACKET_MAX_CHARS,
   };
 }
 
