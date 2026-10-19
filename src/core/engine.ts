@@ -6,6 +6,7 @@ import { randomBytes as cryptoRandomBytes } from 'node:crypto';
 import { readFileSync } from 'node:fs';
 import path from 'node:path';
 import { DEFAULT_LIMITS } from '../analysis/scanner.js';
+import { describeBundle, loadBundled, type Bundle } from '../rules/loader.js';
 import type { ScanLimits } from '../schema/scan.js';
 import { InputError, NotBuiltError, PermissionError } from '../security/errors.js';
 import { initLevel, type Level } from '../security/level.js';
@@ -30,6 +31,8 @@ export interface EngineOptions {
   randomBytes?: (n: number) => Uint8Array;
   /** Where human-readable notes go (the adapters pass stderr). */
   log?: (message: string) => void;
+  /** Knowledge and packs folder. Only the bundled one is accepted in v0.1. */
+  rulesDir?: string;
 }
 
 export interface Session {
@@ -46,17 +49,23 @@ export interface Engine {
   readonly log: (message: string) => void;
   readonly options: Readonly<EngineOptions>;
   readonly sessions: Map<string, Session>;
+  /** The loaded knowledge and packs; loading fails closed, so the engine never starts on knowledge it couldn't read. */
+  readonly bundle: Bundle;
 }
 
 export function createEngine(options: EngineOptions = {}): Engine {
   initLevel(options.level ?? 0);
+  const log = options.log ?? (() => {});
+  const bundle = loadBundled(options.rulesDir);
+  for (const line of describeBundle(bundle)) log(line);
   return {
     limits: { ...DEFAULT_LIMITS, ...options.limits },
     now: options.now ?? (() => new Date()),
     randomBytes: options.randomBytes ?? ((n) => cryptoRandomBytes(n)),
-    log: options.log ?? (() => {}),
+    log,
     options,
     sessions: new Map(),
+    bundle,
   };
 }
 

@@ -5,10 +5,12 @@
 // one page of several.
 import { z } from 'zod';
 import { analyzeRepo } from '../analysis/scanner.js';
-import { buildUsageIndex, usageAdapterFor } from '../analysis/usages/index.js';
-import { resolveRepo } from '../pipeline/ingest.js';
+import { buildUsageIndex, graphOnlyAdapter, usageAdapterById } from '../analysis/usages/index.js';
+import { packForRun, readRunVersions, resolveRepo } from '../pipeline/ingest.js';
+import { composePack } from '../rules/compose.js';
+import type { PackBundle } from '../rules/loader.js';
+import type { RunVersions } from '../schema/ingest.js';
 import { FindUsagesInput, type FindUsagesOutput } from '../schema/usage.js';
-import type { Versions } from '../schema/ingest.js';
 import { InputError } from '../security/errors.js';
 import { repoRoot } from '../store/campaigns.js';
 import { getRun, setRunStatus } from '../store/runs.js';
@@ -33,6 +35,12 @@ function decodeCursor(raw: string): Cursor {
     // Falls through to the error below.
   }
   throw new InputError('bad_cursor', 'cursor is not one this tool returned');
+}
+
+/** Target versions by package for the adapter's peer_conflict labels: the run's target plus each composed companion (D27). */
+function composedTargets(pack: PackBundle, versions: RunVersions): Record<string, string> {
+  const primary = pack.pack.libraries.find((l) => l.role === 'primary')!.id;
+  return composePack(pack.pack, pack.libs, { installed: { ...versions.companions, [primary]: versions.source.version }, target: versions.target.version }).targets;
 }
 
 const sameFilter = (a: UsageFilter, b: UsageFilter): boolean => a.kind === b.kind && a.file === b.file && a.symbol === b.symbol;
@@ -63,8 +71,9 @@ export async function findUsages(engine: Engine, raw: unknown): Promise<FindUsag
       if (!root) throw new InputError('unknown_repo', `run ${run.id} has no recorded repo`);
       const repo = resolveRepo(root);
       if (repo.repoId !== run.repo_id) throw new InputError('repo_moved', `the repo for run ${run.id} is no longer at ${root}`);
-      const versions = JSON.parse(run.versions_json) as Versions;
-      const adapter = usageAdapterFor(versions.source.name);
+      const versions = readRunVersions(run.id, run.versions_json);
+      const pack = packForRun(engine.bundle, run.id, versions);
+      const adapter = pack ? usageAdapterById(pack.pack.usage_adapter)! : graphOnlyAdapter;
       const started = engine.now().getTime();
       const facts = analyzeRepo(repo.root, repo.repoId, engine.limits);
       const built = await buildUsageIndex({
@@ -72,8 +81,7 @@ export async function findUsages(engine: Engine, raw: unknown): Promise<FindUsag
         repoId: repo.repoId,
         repo: facts,
         adapter,
-        // M2 knows the run's own target; M3 adds the companion targets it composes from knowledge.
-        targets: { [versions.target.name]: versions.target.version },
+        targets: pack ? composedTargets(pack, versions) : { [versions.target.name]: versions.target.version },
         cache: { get: (e, sha) => getFileFacts(session.db, e, sha), put: (e, sha, json) => putFileFacts(session.db, e, sha, json) },
       });
       const summary = { ...built.summary, duration_ms: engine.now().getTime() - started };

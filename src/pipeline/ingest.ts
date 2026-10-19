@@ -1,21 +1,28 @@
 // Ingest: one repo, a named source and target, the installed version from
 // lockfiles only, git state read from files (never by running git), and a run
 // ID under a campaign and repo ID. Vague or ambiguous input gets a question,
-// never a guess.
+// never a guess. Pre-release versions and targets newer than the pack's
+// checked range are refused here, so they never get a run.
 import { createHash } from 'node:crypto';
 import type { Candidate, PackageFacts, Walk } from '../analysis/scanner.js';
 import { normalizePyName } from '../analysis/manifests/python.js';
-import type { GitState, IngestInput, Question, RunRef, Versions } from '../schema/ingest.js';
-import { NotBuiltError } from '../security/errors.js';
+import { checkTarget } from '../rules/compose.js';
+import { packForLibrary, type Bundle, type PackBundle, type RepoEcosystem } from '../rules/loader.js';
+import { parseVersion, PRE_RELEASE_MESSAGE } from '../rules/versions.js';
+import { RunVersions, type GitState, type IngestInput, type Question, type RunRef, type Versions } from '../schema/ingest.js';
+import type { VersionScheme } from '../schema/knowledge.js';
+import { InputError, NotBuiltError } from '../security/errors.js';
 import { resolveInside, resolveRepoRoot } from '../security/pathBoundary.js';
 import { readText } from '../security/safeRead.js';
 import { ensureCampaign, ensureRepo } from '../store/campaigns.js';
 import type { Db } from '../store/db.js';
 import { findRunByIdemKey, insertRun } from '../store/runs.js';
 
-/** Pack and prompt versions join the idempotency key once they exist (M3, M5). */
-export const PACK_VERSION = 'none';
+/** The prompt version joins the idempotency key once it exists (M5). */
 export const PROMPT_VERSION = 'none';
+
+/** The scheme for a library no pack covers, from the ecosystem that declares it (D29). */
+const SCHEME_OF: Record<RepoEcosystem, VersionScheme> = { node: 'semver', python: 'pep440' };
 
 export function singleRepoPath(repoPath: string | readonly string[]): string {
   if (typeof repoPath === 'string') return repoPath;
@@ -78,29 +85,26 @@ function versionMatches(given: string, resolved: string): boolean {
   return g.every((part, i) => part === r[i]);
 }
 
-export type Decision = { versions: Versions; sources: Candidate[] } | { question: Question };
+export interface Decided {
+  versions: Versions;
+  sources: Candidate[];
+  ecosystem: RepoEcosystem;
+  /** The pack whose primary library is the source, or null (graph-only, D29). */
+  pack: PackBundle | null;
+  /** Installed companion versions by library ID; null when the lockfiles pin no single version. */
+  companions: Record<string, string | null>;
+}
 
-/** Checks the source and target and resolves the installed source version from lockfiles. */
-export function decideVersions(input: IngestInput, packages: readonly PackageFacts[]): Decision {
-  const { source, target } = input;
-  if (!source?.name) return question('vague_input', 'source.name', 'Name the library you are upgrading from, for example "next" or "django".');
-  if (!target?.name) return question('vague_input', 'target.name', 'Name the library you are upgrading to, for example "next" or "django".');
-  if (!target.version) return question('vague_input', 'target.version', `Give the target version of ${target.name}, for example ${target.name}@<version>.`);
+export type Decision = Decided | { question: Question };
 
-  // Known means declared in this repo's manifests; M3 adds the pack check on top (docs/design.md D20).
-  const same = (eco: PackageFacts['ecosystem'], a: string, b: string): boolean =>
-    eco === 'python' ? normalizePyName(a) === normalizePyName(b) : a === b;
-  const declaring = (name: string): PackageFacts[] => packages.filter((p) => p.dependencies.some((d) => same(p.ecosystem, d.name, name)));
-  for (const [field, name] of [['source.name', source.name], ['target.name', target.name]] as const) {
-    if (!declaring(name).length) {
-      return question('vague_input', field, `"${name}" is not a dependency declared in this repo's manifests. Name a library the repo uses.`);
-    }
-  }
+const same = (eco: PackageFacts['ecosystem'], a: string, b: string): boolean => (eco === 'python' ? normalizePyName(a) === normalizePyName(b) : a === b);
 
+/** Every lockfile version of `name` in the packages that declare it, grouped by version. */
+function lockedVersions(packages: readonly PackageFacts[], name: string): { found: Candidate[]; candidates: Question['candidates'] } {
   const found: Candidate[] = [];
-  for (const p of declaring(source.name)) {
+  for (const p of packages) {
     for (const d of p.dependencies) {
-      if (!same(p.ecosystem, d.name, source.name)) continue;
+      if (!same(p.ecosystem, d.name, name)) continue;
       for (const c of d.candidates) found.push({ version: c.version, where: `${c.where} (package ${p.path})` });
     }
   }
@@ -110,6 +114,46 @@ export function decideVersions(input: IngestInput, packages: readonly PackageFac
     byVersion.get(c.version)!.add(c.where);
   }
   const candidates = [...byVersion].map(([value, where]) => ({ value, where: [...where].sort() })).sort((a, b) => (a.value < b.value ? -1 : 1));
+  return { found, candidates };
+}
+
+/** Parses a version in the run's scheme; a pre-release is refused, naming which version it was. */
+function releaseVersion(scheme: VersionScheme, raw: string, what: string): void {
+  try {
+    parseVersion(scheme, raw);
+  } catch (err) {
+    if (err instanceof NotBuiltError) throw new NotBuiltError(`${PRE_RELEASE_MESSAGE} (${what} ${raw})`);
+    if (err instanceof InputError) throw new InputError(err.code, `${what}: ${err.message}`);
+    throw err;
+  }
+}
+
+/**
+ * Checks the source and target, resolves the installed source version from
+ * lockfiles, and picks the pack: pre-releases are refused in the pack's
+ * scheme (the ecosystem's when no pack covers the library), and a target
+ * newer than the pack's checked range is refused.
+ */
+export function decideVersions(input: IngestInput, packages: readonly PackageFacts[], bundle: Bundle): Decision {
+  const { source, target } = input;
+  if (!source?.name) return question('vague_input', 'source.name', 'Name the library you are upgrading from, for example "next" or "django".');
+  if (!target?.name) return question('vague_input', 'target.name', 'Name the library you are upgrading to, for example "next" or "django".');
+  if (!target.version) return question('vague_input', 'target.version', `Give the target version of ${target.name}, for example ${target.name}@<version>.`);
+
+  // Known means declared in this repo's manifests (docs/design.md D20); the pack check follows.
+  const declaring = (name: string): PackageFacts[] => packages.filter((p) => p.dependencies.some((d) => same(p.ecosystem, d.name, name)));
+  for (const [field, name] of [['source.name', source.name], ['target.name', target.name]] as const) {
+    if (!declaring(name).length) {
+      return question('vague_input', field, `"${name}" is not a dependency declared in this repo's manifests. Name a library the repo uses.`);
+    }
+  }
+  const ecosystem = declaring(source.name)[0]!.ecosystem;
+  const pack = packForLibrary(bundle, source.name, ecosystem) ?? null;
+  const scheme = pack ? pack.primary.library.version_scheme : SCHEME_OF[ecosystem];
+  if (source.version) releaseVersion(scheme, source.version, `source ${source.name}`);
+  releaseVersion(scheme, target.version, `target ${target.name}`);
+
+  const { found, candidates } = lockedVersions(declaring(source.name), source.name);
   if (candidates.length === 0) {
     return question(
       'unresolved_version',
@@ -129,10 +173,45 @@ export function decideVersions(input: IngestInput, packages: readonly PackageFac
       [...candidates, { value: source.version, where: ['input'] }],
     );
   }
+  releaseVersion(scheme, installed, `installed ${source.name}`);
+  const companions: Record<string, string | null> = {};
+  if (pack) {
+    checkTarget(pack.pack, pack.primary.library, target.version);
+    for (const ref of pack.pack.libraries.filter((l) => l.role === 'companion')) {
+      const lib = pack.libs.get(ref.id)!.library;
+      const locked = lockedVersions(packages, lib.packages[0]!).candidates;
+      const version = locked.length === 1 ? locked[0]!.value : null;
+      if (version !== null) releaseVersion(lib.version_scheme, version, `installed ${lib.packages[0]}`);
+      companions[ref.id] = version;
+    }
+  }
   return {
     versions: { source: { name: source.name, version: installed }, target: { name: target.name, version: target.version } },
     sources: found,
+    ecosystem,
+    pack,
+    companions,
   };
+}
+
+/** A run's recorded versions; a run recorded before packs existed is refused rather than read without one. */
+export function readRunVersions(runId: string, json: string): RunVersions {
+  const parsed = RunVersions.safeParse(JSON.parse(json));
+  if (!parsed.success) throw new InputError('old_run', `run ${runId} was recorded without its pack; call scan_repo again for a new run`);
+  return parsed.data;
+}
+
+/** The pack a run was made with. Refused when the loaded pack differs, since its knowledge changed after ingest. */
+export function packForRun(bundle: Bundle, runId: string, rec: RunVersions): PackBundle | null {
+  const current = packForLibrary(bundle, rec.source.name, rec.ecosystem) ?? null;
+  const now = current?.ref ?? null;
+  if (now !== rec.pack) {
+    throw new InputError(
+      'pack_changed',
+      `run ${runId} was made with pack ${rec.pack ?? 'none'}, but ${now ?? 'no pack'} is loaded now; call scan_repo again for a run on the loaded pack`,
+    );
+  }
+  return current;
 }
 
 const crockford = '0123456789ABCDEFGHJKMNPQRSTVWXYZ';
@@ -160,13 +239,13 @@ export function ulid(ms: number, random: Uint8Array): string {
   return time + rand;
 }
 
-export function idemKey(root: string, git: GitState, versions: Versions): string {
+export function idemKey(root: string, git: GitState, versions: Versions, packRef: string | null): string {
   const parts = [
     root,
     git.head_commit ?? 'unknown',
     `${versions.source.name}@${versions.source.version}`,
     `${versions.target.name}@${versions.target.version}`,
-    PACK_VERSION,
+    packRef ?? 'none',
     PROMPT_VERSION,
   ];
   return createHash('sha256').update(JSON.stringify(parts)).digest('hex');
@@ -184,9 +263,10 @@ export function createOrReuseRun(
   input: IngestInput,
   repo: Repo,
   git: GitState,
-  decided: { versions: Versions; sources: Candidate[] },
+  decided: Decided,
 ): { ref: RunRef; reused: boolean; idemKey: string } {
-  const key = idemKey(repo.root, git, decided.versions);
+  const packRef = decided.pack?.ref ?? null;
+  const key = idemKey(repo.root, git, decided.versions, packRef);
   const existing = findRunByIdemKey(deps.db, key);
   if (existing) return { ref: { run_id: existing.id, campaign_id: existing.campaign_id, repo_id: existing.repo_id }, reused: true, idemKey: key };
   const now = deps.now();
@@ -201,7 +281,14 @@ export function createOrReuseRun(
     repo_id: repo.repoId,
     created_at: ts,
     input_json: JSON.stringify(input),
-    versions_json: JSON.stringify({ ...decided.versions, source_resolved_from: decided.sources, git }),
+    versions_json: JSON.stringify({
+      ...decided.versions,
+      ecosystem: decided.ecosystem,
+      pack: packRef,
+      companions: decided.companions,
+      source_resolved_from: decided.sources,
+      git,
+    } satisfies RunVersions & Record<string, unknown>),
     idem_key: key,
     status: 'ingested',
   });

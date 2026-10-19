@@ -2,8 +2,12 @@
 // lockfiles only, git state without running git, and idempotent run IDs.
 import path from 'node:path';
 import { afterAll, beforeAll, describe, expect, it } from 'vitest';
-import { closeEngine, createEngine, ingest, InputError, type Engine } from '../../src/core/index.js';
-import { ulid } from '../../src/pipeline/ingest.js';
+import { analyzeRepo, DEFAULT_LIMITS } from '../../src/analysis/scanner.js';
+import { nextjsAdapter } from '../../src/analysis/usages/nextjs.js';
+import { closeEngine, createEngine, ingest, InputError, NotBuiltError, type Engine } from '../../src/core/index.js';
+import { decideVersions, idemKey, resolveRepo, ulid, type Decided } from '../../src/pipeline/ingest.js';
+import { loadBundle, type Bundle } from '../../src/rules/loader.js';
+import { PRE_RELEASE_MESSAGE } from '../../src/rules/versions.js';
 import { openDb } from '../../src/store/db.js';
 import { copyFixture, tmpDir, writeTree } from '../helpers.js';
 
@@ -163,11 +167,142 @@ describe('IDs', () => {
     db.close();
   });
 
+  it('records the pack ref and the companion versions, and the pack ref is part of the key', async () => {
+    const repo = copyFixture('next-basic');
+    const res = await ingest(engine, req(repo, { name: 'next' }, { name: 'next', version: '15.1.0' }));
+    const db = openDb(path.join(out, 'store.sqlite'));
+    const row = db.prepare('SELECT versions_json FROM runs WHERE id = ?').get(res.run!.run_id) as { versions_json: string };
+    db.close();
+    const rec = JSON.parse(row.versions_json) as Record<string, unknown>;
+    expect(rec.pack).toBe(engine.bundle.packs.get('nextjs-upgrade')!.ref);
+    expect(rec.pack).toMatch(/^nextjs-upgrade@0\.1\.0#[0-9a-f]{12}$/);
+    expect(rec.companions).toEqual({ 'npm/react': '18.3.1' });
+    expect(rec.ecosystem).toBe('node');
+    const git = { is_repo: false, head_ref: null, head_commit: null, dirty: 'unknown' } as const;
+    const v = { source: { name: 'next', version: '14.2.35' }, target: { name: 'next', version: '15.1.0' } };
+    expect(idemKey(repo, git, v, 'p@1#a')).not.toBe(idemKey(repo, git, v, 'p@1#b'));
+  });
+
+  it('records no pack for a library no pack covers', async () => {
+    const res = await ingest(engine, req(copyFixture('django-basic'), { name: 'django' }, { name: 'django', version: '4.2.30' }));
+    const db = openDb(path.join(out, 'store.sqlite'));
+    const row = db.prepare('SELECT versions_json FROM runs WHERE id = ?').get(res.run!.run_id) as { versions_json: string };
+    db.close();
+    expect(JSON.parse(row.versions_json)).toMatchObject({ pack: null, companions: {}, ecosystem: 'python' });
+  });
+
   it('ulid is 26 Crockford characters and sorts by time', () => {
     const a = ulid(1_700_000_000_000, new Uint8Array(10));
     const b = ulid(1_700_000_000_001, new Uint8Array(10).fill(255));
     expect(a).toMatch(/^[0-9A-HJKMNP-TV-Z]{26}$/);
     expect(a < b).toBe(true);
     expect(ulid(0, new Uint8Array(10))).toBe('0'.repeat(26));
+  });
+});
+
+describe('pre-releases are refused at ingest, in the run\'s scheme (INV-38)', () => {
+  it('refuses a pre-release target or given source for a pack library (semver)', async () => {
+    const run = (s: object, t: object) => ingest(engine, req(next, s, t));
+    await expect(run({ name: 'next' }, { name: 'next', version: '16.0.0-canary.1' })).rejects.toThrow(NotBuiltError);
+    await expect(run({ name: 'next' }, { name: 'next', version: '16.0.0-canary.1' })).rejects.toThrow(PRE_RELEASE_MESSAGE);
+    // Refused before the lockfile comparison, so it is not mistaken for a mismatch question.
+    await expect(run({ name: 'next', version: '14.3.0-canary.2' }, { name: 'next', version: '15.1.0' })).rejects.toThrow(PRE_RELEASE_MESSAGE);
+  });
+
+  it('refuses a pre-release target for a library no pack covers, using the ecosystem\'s scheme (pep440)', async () => {
+    const django = copyFixture('django-basic');
+    for (const version of ['5.2a1', '==5.2a1', '5.2rc1', '5.2.dev3']) {
+      await expect(ingest(engine, req(django, { name: 'django' }, { name: 'django', version }))).rejects.toThrow(PRE_RELEASE_MESSAGE);
+    }
+    expect((await ingest(engine, req(django, { name: 'django' }, { name: 'django', version: '5.2.post1' }))).status).toBe('ok');
+  });
+
+  it('refuses a pre-release installed in the lockfile, for the source and for a companion', async () => {
+    const lock = (next: string, react: string) => ({
+      'package.json': pkg({ dependencies: { next: '^15.0.0', react: '^19.0.0' } }),
+      'package-lock.json': JSON.stringify({ lockfileVersion: 3, packages: { 'node_modules/next': { version: next }, 'node_modules/react': { version: react } } }),
+    });
+    const a = tmpDir();
+    writeTree(a, lock('15.0.0-canary.5', '19.0.0'));
+    await expect(ingest(engine, req(a, { name: 'next' }, { name: 'next', version: '16.0.0' }))).rejects.toThrow(`${PRE_RELEASE_MESSAGE} (installed next 15.0.0-canary.5)`);
+    const b = tmpDir();
+    writeTree(b, lock('15.0.3', '19.0.0-rc-66855b96-20241106'));
+    await expect(ingest(engine, req(b, { name: 'next' }, { name: 'next', version: '16.0.0' }))).rejects.toThrow(`${PRE_RELEASE_MESSAGE} (installed react`);
+  });
+
+  it('a version that does not parse is bad input, not a refusal', async () => {
+    await expect(ingest(engine, req(next, { name: 'next' }, { name: 'next', version: 'latest' }))).rejects.toThrow(InputError);
+  });
+});
+
+describe('the pack\'s supported range bounds the target, by release unit', () => {
+  // Fake packs checked up to 15 and 5.2, so the bundled pack's own range doesn't matter here.
+  let bundle: Bundle;
+  beforeAll(() => {
+    const lib = (id: string, eco: string, scheme: string, unit: string, covered: string, packages: string[]) => ({
+      id,
+      ecosystem: eco,
+      packages,
+      language: eco === 'npm' ? 'ts' : 'python',
+      version_scheme: scheme,
+      release_unit: unit,
+      covered_from: covered,
+      doc_sources: ['https://example.org/docs/'],
+      release_notes: { fetch: 'https://example.org/{version}.md', page: 'https://example.org/docs/{version}', format: 'md', sections: [{ heading: '*' }], skip: [] },
+      codemods: [],
+    });
+    const pack = (name: string, primary: string, from: string, to: string, companions: string[]) => ({
+      name,
+      version: '0.1.0',
+      kind: 'upgrade',
+      language: 'ts',
+      trigger: `Use when upgrading ${name}.`,
+      libraries: [{ id: primary, role: 'primary' }, ...companions.map((id) => ({ id, role: 'companion' }))],
+      supported: { from, to },
+      usage_adapter: 'nextjs',
+      usage_kinds: nextjsAdapter.usage_kinds.map((kind) => ({ kind, lens: 'api' })),
+      staging: 'leaf_first',
+      checks_hint: 'your tests',
+      references: [],
+      seeded: 'next-tricky',
+    });
+    const root = tmpDir('mp-fake-knowledge-');
+    const files = {
+      'knowledge/npm/next/library.json': lib('npm/next', 'npm', 'semver', 'major', '13', ['next']),
+      'knowledge/npm/react/library.json': lib('npm/react', 'npm', 'semver', 'major', '18', ['react', 'react-dom']),
+      'knowledge/pypi/django/library.json': lib('pypi/django', 'pypi', 'pep440', 'minor', '4.2', ['django']),
+      'packs/next-fake/pack.json': pack('next-fake', 'npm/next', '14', '15', ['npm/react']),
+      'packs/django-fake/pack.json': pack('django-fake', 'pypi/django', '4.2', '5.2', []),
+    };
+    writeTree(root, Object.fromEntries(Object.entries(files).map(([p, v]) => [p, JSON.stringify(v)])));
+    bundle = loadBundle(root);
+  });
+
+  const decide = (fixture: string, name: string, version: string) => {
+    const repo = copyFixture(fixture);
+    const facts = analyzeRepo(repo, resolveRepo(repo).repoId, DEFAULT_LIMITS);
+    return () => decideVersions({ repo_path: repo, source: { name }, target: { name, version } }, facts.packages, bundle);
+  };
+
+  it('refuses a target newer than supported.to and accepts patch releases inside it (semver, by major)', () => {
+    expect(decide('next-basic', 'next', '16.0.0')).toThrow(NotBuiltError);
+    expect(decide('next-basic', 'next', '16.0.0')).toThrow('target 16.0.0 is newer than this pack has been checked for (up to 15)');
+    const ok = decide('next-basic', 'next', '15.3.2')() as Decided;
+    expect(ok.pack?.pack.name).toBe('next-fake');
+    expect(ok.companions).toEqual({ 'npm/react': '18.3.1' });
+  });
+
+  it('refuses a target newer than supported.to and accepts patch releases inside it (pep440, by X.Y)', () => {
+    expect(decide('django-basic', 'django', '6.0')).toThrow('target 6.0 is newer than this pack has been checked for (up to 5.2)');
+    expect(decide('django-basic', 'django', '==6.0')).toThrow(NotBuiltError);
+    const ok = decide('django-basic', 'django', '5.2.7')() as Decided;
+    expect(ok.pack?.pack.name).toBe('django-fake');
+    expect(ok.versions.target.version).toBe('5.2.7');
+  });
+
+  it('the bundled Next.js pack refuses a target past 16', async () => {
+    await expect(ingest(engine, req(next, { name: 'next' }, { name: 'next', version: '17.0.0' }))).rejects.toThrow(
+      'target 17.0.0 is newer than this pack has been checked for (up to 16)',
+    );
   });
 });

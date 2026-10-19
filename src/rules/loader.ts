@@ -7,6 +7,7 @@
 // JSON file of its libraries.
 import { createHash } from 'node:crypto';
 import { z } from 'zod';
+import { usageAdapterById } from '../analysis/usages/index.js';
 import { Library, ReleaseFile, type LaterEvent, type ReviewedRule } from '../schema/knowledge.js';
 import { Pack } from '../schema/pack.js';
 import { assertBundledRulesDir, BUNDLED_ROOT, readDataTree, type DataFile } from '../security/dataFiles.js';
@@ -193,6 +194,13 @@ export function loadBundle(root: string): Bundle {
     }
     const primary = packLibs.get(pack.libraries.find((l) => l.role === 'primary')!.id)!;
     for (const v of [pack.supported.from, pack.supported.to]) checkVersion(f.path, primary.library.version_scheme, v, 'supported');
+    const adapter = usageAdapterById(pack.usage_adapter);
+    if (!adapter) throw bad(f.path, `usage_adapter ${pack.usage_adapter} is not a registered usage adapter`);
+    const mapped = new Set(pack.usage_kinds.map((k) => k.kind));
+    const unmapped = adapter.usage_kinds.filter((k) => !mapped.has(k));
+    if (unmapped.length) throw bad(f.path, `usage_kinds gives no lens for ${unmapped.join(', ')}, which ${adapter.id} reports`);
+    const unknown = [...mapped].filter((k) => !adapter.usage_kinds.includes(k));
+    if (unknown.length) throw bad(f.path, `usage_kinds names ${unknown.join(', ')}, which ${adapter.id} never reports`);
     const hashed = [f, ...pack.libraries.flatMap((ref) => libs.get(ref.id)!.files)].sort((a, b) => (a.path < b.path ? -1 : 1));
     const h = createHash('sha256');
     for (const x of hashed) h.update(`${x.path}\0${x.text}\0`);
@@ -207,12 +215,18 @@ export function loadBundle(root: string): Bundle {
 /** The bundled knowledge and packs. A --rules-dir is accepted only when it is the bundled data. */
 export function loadBundled(rulesDir?: string): Bundle {
   if (rulesDir !== undefined) assertBundledRulesDir(rulesDir);
-  return loadBundle(BUNDLED_ROOT);
+  return (bundled ??= loadBundle(BUNDLED_ROOT));
 }
 
-/** The pack whose primary library covers the package `name` (the run's source library), if any. */
-export function packForLibrary(bundle: Bundle, name: string): PackBundle | undefined {
-  return [...bundle.packs.values()].find((p) => p.primary.library.packages.includes(name));
+// The bundled files don't change while the process runs, so every engine shares one load.
+let bundled: Bundle | undefined;
+
+export type RepoEcosystem = 'node' | 'python';
+const ECOSYSTEM_OF: Record<RepoEcosystem, Library['ecosystem']> = { node: 'npm', python: 'pypi' };
+
+/** The pack whose primary library covers package `name` in `ecosystem` (the run's source library), if any. */
+export function packForLibrary(bundle: Bundle, name: string, ecosystem: RepoEcosystem): PackBundle | undefined {
+  return [...bundle.packs.values()].find((p) => p.primary.library.ecosystem === ECOSYSTEM_OF[ecosystem] && p.primary.library.packages.includes(name));
 }
 
 /** One line per pack for the startup log. */

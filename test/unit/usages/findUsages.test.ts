@@ -135,3 +135,41 @@ describe('find_usages', () => {
     expect(listImports(db, scan.run!.run_id).filter((i) => i.to_file !== null).length).toBeGreaterThan(0);
   });
 });
+
+describe('find_usages takes its adapter and targets from the run\'s pack (D27, D28)', () => {
+  const editRun = (dir: string, id: string, edit: (rec: Record<string, unknown>) => void): void => {
+    const db = openSession(engine, dir).db;
+    const row = db.prepare('SELECT versions_json FROM runs WHERE id = ?').get(id) as { versions_json: string };
+    const rec = JSON.parse(row.versions_json) as Record<string, unknown>;
+    edit(rec);
+    db.prepare('UPDATE runs SET versions_json = ? WHERE id = ?').run(JSON.stringify(rec), id);
+  };
+  const freshRun = async (fixture: string, input: object): Promise<{ dir: string; id: string }> => {
+    const dir = copyFixture(fixture);
+    const scan = await scanRepo(engine, { repo_path: dir, ...input });
+    return { dir, id: scan.run!.run_id };
+  };
+
+  it('uses the adapter pack.json names', async () => {
+    expect((await findUsages(engine, { run_id: runId })).summary.adapter).toBe('nextjs@1');
+  });
+
+  it('refuses a run made with a pack other than the loaded one', async () => {
+    const { dir, id } = await freshRun('next-basic', target);
+    editRun(dir, id, (rec) => (rec.pack = 'nextjs-upgrade@0.0.9#000000000000'));
+    await expectInputError(findUsages(engine, { run_id: id }), 'pack_changed');
+    const dj = await freshRun('django-basic', { source: { name: 'django' }, target: { name: 'django', version: '4.2.30' } });
+    editRun(dj.dir, dj.id, (rec) => (rec.pack = 'django-upgrade@0.1.0#000000000000'));
+    await expectInputError(findUsages(engine, { run_id: dj.id }), 'pack_changed');
+  });
+
+  it('refuses a run recorded before packs existed, rather than reading it without one', async () => {
+    const { dir, id } = await freshRun('next-basic', target);
+    editRun(dir, id, (rec) => {
+      delete rec.pack;
+      delete rec.companions;
+      delete rec.ecosystem;
+    });
+    await expectInputError(findUsages(engine, { run_id: id }), 'old_run');
+  });
+});

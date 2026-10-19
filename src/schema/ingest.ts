@@ -49,6 +49,16 @@ export const Versions = z.object({
 });
 export type Versions = z.infer<typeof Versions>;
 
+/** What a run records about its versions (`runs.versions_json`); other recorded keys are ignored here. */
+export const RunVersions = Versions.extend({
+  ecosystem: z.enum(['node', 'python']),
+  /** `name@version#hash` of the pack the run was made with, or null when no pack covers the library. */
+  pack: z.string().nullable(),
+  /** Installed version of each companion library the pack names, by library ID; null when no single lockfile version. */
+  companions: z.record(z.string(), z.string().nullable()),
+});
+export type RunVersions = z.infer<typeof RunVersions>;
+
 export const GitState = z.object({
   is_repo: z.boolean(),
   head_ref: z.string().nullable(),

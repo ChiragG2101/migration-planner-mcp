@@ -27,7 +27,6 @@ export const usageAdapters: readonly UsageAdapter[] = [nextjsAdapter];
 export const graphOnlyAdapter: UsageAdapter = {
   id: 'none',
   version: 1,
-  libraries: [],
   languages: [],
   match_kinds: [],
   usage_kinds: [],
@@ -35,9 +34,9 @@ export const graphOnlyAdapter: UsageAdapter = {
   detect: () => ({ usages: [], peer_data_unavailable: [] }),
 };
 
-/** The adapter for a run's source library. M3 replaces this with the pack's `usage_adapter`. */
-export function usageAdapterFor(library: string): UsageAdapter {
-  return usageAdapters.find((a) => a.libraries.includes(library)) ?? graphOnlyAdapter;
+/** The adapter a pack names in `usage_adapter`, or undefined for an unknown ID. */
+export function usageAdapterById(id: string): UsageAdapter | undefined {
+  return usageAdapters.find((a) => a.id === id);
 }
 
 export interface FactsCache {

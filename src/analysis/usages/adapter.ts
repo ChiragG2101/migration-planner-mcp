@@ -55,8 +55,6 @@ export interface UsageAdapter {
   readonly id: string;
   /** Bumped when detection changes, so cached per-file facts are recomputed. */
   readonly version: number;
-  /** Source libraries this adapter serves until M3's pack.json names it. */
-  readonly libraries: readonly string[];
   readonly languages: readonly Lang[];
   readonly match_kinds: readonly MatchKind[];
   readonly usage_kinds: readonly string[];

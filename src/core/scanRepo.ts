@@ -41,14 +41,14 @@ async function withIngest<T>(engine: Engine, raw: unknown, step: string, then: (
   return runTool(engine, session, step, input, (call) => {
     const facts = analyzeRepo(repo.root, repo.repoId, engine.limits);
     const git = readGitState(repo.root, repo.repoId, facts.walk);
-    const decided = decideVersions(input, facts.packages);
+    const decided = decideVersions(input, facts.packages, engine.bundle);
     if ('question' in decided) {
       call.event('ingest.question', decided.question);
       return then({ input, repo, session, facts, git, question: decided.question, run: null, versions: null }, call);
     }
     const run = createOrReuseRun({ db: session.db, now: engine.now, randomBytes: engine.randomBytes }, input, repo, git, decided);
     call.attachRun(run.ref.run_id);
-    call.event('ingest.run', { reused: run.reused, idem_key: run.idemKey, versions: decided.versions });
+    call.event('ingest.run', { reused: run.reused, idem_key: run.idemKey, versions: decided.versions, pack: decided.pack?.ref ?? null, companions: decided.companions });
     return then({ input, repo, session, facts, git, question: null, run: run.ref, versions: decided.versions }, call);
   });
 }

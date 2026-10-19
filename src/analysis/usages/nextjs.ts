@@ -623,7 +623,6 @@ function isTypeOnlyBinding(ctx: UsageContext, file: string, ref: Ref): boolean {
 export const nextjsAdapter: UsageAdapter = {
   id: 'nextjs',
   version: 1,
-  libraries: ['next'],
   languages: ['ts'],
   match_kinds: ['import', 'call', 'attribute', 'config_key', 'dependency', 'file_convention'],
   usage_kinds: [

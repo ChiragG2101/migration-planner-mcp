@@ -3,10 +3,11 @@
 // a message naming the file. Drafts are skipped and counted, not loaded.
 import path from 'node:path';
 import { describe, expect, it } from 'vitest';
+import { nextjsAdapter } from '../../src/analysis/usages/nextjs.js';
 import { loadBundle, loadBundled, packForLibrary } from '../../src/rules/loader.js';
 import { THIRD_PARTY_MESSAGE } from '../../src/security/dataFiles.js';
 import { InputError, NotBuiltError, PermissionError } from '../../src/security/errors.js';
-import { repoRoot, symlink, tmpDir, writeTree } from '../helpers.js';
+import { copyFixture, repoRoot, runCli, symlink, tmpDir, writeTree } from '../helpers.js';
 
 type Tree = Record<string, unknown>;
 
@@ -54,7 +55,7 @@ const pack = (over: Record<string, unknown> = {}) => ({
   ],
   supported: { from: '2', to: '3' },
   usage_adapter: 'nextjs',
-  usage_kinds: [{ kind: 'dependency', lens: 'dependency_build' }],
+  usage_kinds: nextjsAdapter.usage_kinds.map((kind) => ({ kind, lens: 'api' })),
   staging: 'leaf_first',
   checks_hint: 'your tests',
   references: [],
@@ -112,8 +113,9 @@ describe('loader: a valid tree', () => {
     expect(p.rules).toBe(4);
     expect(p.drafts).toBe(1);
     expect(p.ref).toMatch(/^main-upgrade@0\.1\.0#[0-9a-f]{12}$/);
-    expect(packForLibrary(b, 'main')?.pack.name).toBe('main-upgrade');
-    expect(packForLibrary(b, 'peer')).toBeUndefined();
+    expect(packForLibrary(b, 'main', 'node')?.pack.name).toBe('main-upgrade');
+    expect(packForLibrary(b, 'main', 'python')).toBeUndefined();
+    expect(packForLibrary(b, 'peer', 'node')).toBeUndefined();
   });
 
   it('changes the pack hash when a knowledge file of its libraries changes, and only then', () => {
@@ -130,7 +132,7 @@ describe('loader: a valid tree', () => {
     const p = b.packs.get('nextjs-upgrade')!;
     expect(p.pack.usage_adapter).toBe('nextjs');
     expect([...p.libs.keys()]).toEqual(['npm/next', 'npm/react']);
-    expect(packForLibrary(b, 'next')?.pack.name).toBe('nextjs-upgrade');
+    expect(packForLibrary(b, 'next', 'node')?.pack.name).toBe('nextjs-upgrade');
   });
 });
 
@@ -192,6 +194,13 @@ describe('loader: refusals', () => {
     refused({ ...base(), 'packs/main-upgrade/pack.json': pack({ libraries: [{ id: 'npm/main', role: 'primary' }, { id: 'npm/nope', role: 'companion' }] }) }, 'pack.json', /npm\/nope has no knowledge/);
     refused({ ...base(), 'packs/main-upgrade/pack.json': pack({ supported: { from: '2', to: 'three' } }) }, 'pack.json', /plain version[\s\S]*supported\.to/);
   });
+
+  it('refuses an unknown usage adapter, and a lens map that misses or invents a usage kind', () => {
+    refused({ ...base(), 'packs/main-upgrade/pack.json': pack({ usage_adapter: 'nope' }) }, 'pack.json', /usage_adapter nope is not a registered/);
+    const kinds = nextjsAdapter.usage_kinds.map((kind) => ({ kind, lens: 'api' }));
+    refused({ ...base(), 'packs/main-upgrade/pack.json': pack({ usage_kinds: kinds.filter((k) => k.kind !== 'fetch_call') }) }, 'pack.json', /no lens for fetch_call/);
+    refused({ ...base(), 'packs/main-upgrade/pack.json': pack({ usage_kinds: [...kinds, { kind: 'made_up', lens: 'api' }] }) }, 'pack.json', /names made_up, which nextjs never reports/);
+  });
 });
 
 describe('loader: --rules-dir', () => {
@@ -202,5 +211,16 @@ describe('loader: --rules-dir', () => {
     expect(() => loadBundled(other)).toThrow(NotBuiltError);
     expect(() => loadBundled(other)).toThrow(THIRD_PARTY_MESSAGE);
     expect(() => loadBundled(path.join(other, 'missing'))).toThrow(THIRD_PARTY_MESSAGE);
+  });
+
+  it('the CLI refuses another --rules-dir (exit 2) and logs the loaded pack to stderr only', () => {
+    const repo = copyFixture('next-basic');
+    const refusedRun = runCli(['scan', repo, '--source', 'next', '--target', 'next@15.1.0', '--out', tmpDir(), '--rules-dir', write(base())]);
+    expect(refusedRun.status).toBe(2);
+    expect(refusedRun.stderr).toContain(`refused: ${THIRD_PARTY_MESSAGE}`);
+    const ok = runCli(['scan', repo, '--source', 'next', '--target', 'next@15.1.0', '--out', tmpDir(), '--rules-dir', repoRoot]);
+    expect(ok.status).toBe(0);
+    expect(ok.stderr).toMatch(/pack nextjs-upgrade@0\.1\.0#[0-9a-f]{12}: \d+ reviewed rules, \d+ draft rules skipped/);
+    expect(ok.stdout).not.toContain('nextjs-upgrade@');
   });
 });

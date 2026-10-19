@@ -32,6 +32,7 @@ Shared flags:
   --out <dir>      output folder (default: .migration-planner/ next to the repo; never inside it)
   --level <0|1>    autonomy level (default 0; 2 is not built in v0.1)
   --db <path>      SQLite store (default: <out>/store.sqlite)
+  --rules-dir <d>  knowledge and packs (only the bundled ones in v0.1)
 `;
 
 const err = (message: string): void => void process.stderr.write(`${message}\n`);
@@ -44,6 +45,7 @@ async function main(argv: string[]): Promise<number> {
       out: { type: 'string' },
       level: { type: 'string' },
       db: { type: 'string' },
+      'rules-dir': { type: 'string' },
       source: { type: 'string' },
       target: { type: 'string' },
       campaign: { type: 'string' },
@@ -64,6 +66,7 @@ async function main(argv: string[]): Promise<number> {
   const options: EngineOptions = { level: parseLevel(values.level), log: err };
   if (values.out) options.out = values.out;
   if (values.db) options.db = values.db;
+  if (values['rules-dir']) options.rulesDir = values['rules-dir'];
 
   switch (command) {
     case 'scan': {
