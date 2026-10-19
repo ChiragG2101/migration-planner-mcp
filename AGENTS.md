@@ -30,7 +30,7 @@ These apply to every change, in any tool.
 
 ## Contributor skills
 
-Skills live in `.agents/skills/` (see `.agents/README.md`). Claude Code users run `scripts/link-agent-skills.sh` once, and again after pulling new skills. `scripts/check-agent-skills.sh` checks the skills follow the rules. `scripts/check-spine.sh` checks the cross-references between the spine docs and the plans; run it after any change to `docs/`. A diff with no code is reviewed with the plan-review procedure in the `review-milestone` skill.
+Skills live in `.agents/skills/` (see `.agents/README.md`). Claude Code users run `scripts/link-agent-skills.sh` once, and again after pulling new skills. If your tool doesn't load them on its own, read the skill's `SKILL.md` directly before the task it covers (for example `.agents/skills/implement-milestone/SKILL.md` before building a milestone). `scripts/check-agent-skills.sh` checks the skills follow the rules. `scripts/check-spine.sh` checks the cross-references between the spine docs and the plans; run it after any change to `docs/`. A diff with no code is reviewed with the plan-review procedure in the `review-milestone` skill.
 
 | Skill | Use it to |
 | --- | --- |
@@ -104,6 +104,12 @@ Commands that exist now:
 - Seeded recall (the smoke eval until M7): `npm run recall` regenerates `eval/seeded/recall.md`; `npm run recall -- --check [--base <git ref>]` fails below a floor in `eval/seeded/ratchet.json`, on a stale `recall.md`, or (with `--base`) on a lowered, removed or wrongly started floor (INV-50).
 - CI (`.github/workflows/ci.yml`) runs typecheck, lint, `npm test`, the recall ratchet against the PR base, the build, `check-spine.sh` and `check-agent-skills.sh` on every push and PR, on Linux and macOS (Windows is experimental and non-blocking). Dependabot (`.github/dependabot.yml`) opens weekly update PRs; never merge one that fails CI, and re-read the MCP SDK changelog before merging an SDK bump (D23).
 - The CLI from a build: `node dist/cli/index.js scan <repo> --source <lib> --target <lib@ver> [--out <dir>] [--format text]`, `node dist/cli/index.js usages <repo> --source <lib> --target <lib@ver> [--kind <k>] [--file <f>] [--symbol <s>] [--limit <n>] [--cursor <c>] [--format text]`, and `node dist/cli/index.js mcp` for the MCP server. Host wiring for Claude Code and Cursor is in `docs/design.md` (M1 task 10).
+
+Pitfalls found while building:
+
+- `.gitignore` (from GitHub's Python and Node templates) ignores folders named `lib/`, `out/`, `build/` and `dist/` at any depth, and `.env.*` files. A committed fixture or seeded repo that uses those names silently loses those files from git. Use other names (`server/`, `utils/`), or create such files at test time.
+- `find_usages` caches each file's facts by its sha256, keyed by the adapter's `version`. When a change alters what a language or usage adapter extracts, bump that adapter's `version`, or stale cached facts are reused.
+- Seeded repos under `eval/seeded/<repo>/` hold deliberately old code: the lint ignores them and the typecheck covers only `eval/seeded/*.ts`. Never "fix" the planted cases; `ground_truth.json` lines must keep pointing at them.
 
 Planned scripts: `npm run lint` gains `scripts/lint-packs.ts` (M3); `npm run build:packs`, `npm run eval:smoke`, and `npm run eval -- --tier all`. Maintainer tools (network, manual): `npm run knowledge:draft -- <library> <release>`, `npm run pack:report -- <pack>`, `npm run cases:find -- <pack> --from <v> --to <v>` and `npm run cases:verify -- <id>|--all`. The CLI's commands mirror the tools; after `scan` and `usages` come `pack`, `risk`, `scope`, `docs`, `merge`, `validate`, `emit`, `verify`, `report` and `feedback`.
 
