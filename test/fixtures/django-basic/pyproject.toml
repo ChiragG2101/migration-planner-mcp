@@ -1,0 +1,18 @@
+[project]
+name = "django-basic"
+version = "0.1.0"
+requires-python = ">=3.10"
+dependencies = ["Django>=3.2,<4.0", "djangorestframework>=3.14"]
+
+[project.scripts]
+basic-report = "mysite.cli:main"
+
+[tool.pytest.ini_options]
+DJANGO_SETTINGS_MODULE = "mysite.settings"
+python_files = ["tests.py", "test_*.py"]
+
+[tool.mypy]
+plugins = ["mypy_django_plugin.main"]
+
+[tool.black]
+line-length = 100
