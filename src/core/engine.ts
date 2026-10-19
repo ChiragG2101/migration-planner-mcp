@@ -12,6 +12,7 @@ import { InputError, NotBuiltError, PermissionError } from '../security/errors.j
 import { initLevel, type Level } from '../security/level.js';
 import { isWithin, realpathAllowMissing } from '../security/pathBoundary.js';
 import { assertOutsideRepos, enclosingRepoTop, openOutDir, registerRepoRoot, type OutWriter } from '../security/safeWrite.js';
+import type { DocsTransport } from '../docs/context7.js';
 import { openDb, type Db } from '../store/db.js';
 import { appendEvent, type NewEvent } from '../store/events.js';
 import { getRun } from '../store/runs.js';
@@ -33,6 +34,20 @@ export interface EngineOptions {
   log?: (message: string) => void;
   /** Knowledge and packs folder. Only the bundled one is accepted in v0.1. */
   rulesDir?: string;
+  /**
+   * Context7. A transport counts as configured. `apiKey: null` forces it off
+   * even when CONTEXT7_API_KEY is set. Otherwise the env key is used.
+   */
+  docs?: {
+    transport?: DocsTransport;
+    apiKey?: string | null;
+    fetch?: typeof fetch;
+    timeoutMs?: number;
+    sleep?: (ms: number) => Promise<void>;
+    freshForMs?: number;
+    cacheMaxBytes?: number;
+    protectRuns?: number;
+  };
 }
 
 export interface Session {

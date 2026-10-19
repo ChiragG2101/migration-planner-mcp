@@ -10,7 +10,7 @@ A milestone is done only when every per-milestone gate holds (overview, "Per-mil
 | M1 | Engine skeleton, CLI + MCP adapters, `scan_repo`, event log, path boundary, read-only rule | [01](docs/plans/01-engine-skeleton-scan-repo-permissions.md) | done (review approved 2026-10-19, round-2 item fixed and signed off by the maintainer) |
 | M2 | Language adapters (TS, Python), import graphs, `find_usages` (Next.js), usage index | [02](docs/plans/02-language-adapters-find-usages.md) | done (review approved 2026-10-19) |
 | M3 | Knowledge and pack schema, Next.js knowledge and pack, `get_rule_pack`, `assess_risk`, sizing and scope, generated skill, release drafter and pack update report | [03](docs/plans/03-rule-pack-assess-risk-skill.md) | done (review approved 2026-10-20, round 2) |
-| M4 | Context7 integration, retrieval log, cache | [04](docs/plans/04-context7-docs-cache.md) | not started |
+| M4 | Context7 integration, retrieval log, cache | [04](docs/plans/04-context7-docs-cache.md) | done (review approved 2026-10-20, round 2) |
 | M5 | Finding schema, `plan_migration` prompt, four lenses | [05](docs/plans/05-finding-schema-prompt-lenses.md) | not started |
 | M6 | `merge_findings`, `validate_plan` gates 1–6, emit | [06](docs/plans/06-merge-findings-validate-plan.md) | not started |
 | M7 | Eval runner, 5 Next.js golden cases, baseline run, golden-case finder and re-checker | [07](docs/plans/07-eval-runner-golden-baseline.md) | not started |

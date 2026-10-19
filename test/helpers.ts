@@ -63,11 +63,11 @@ export interface CliResult {
 }
 
 /** Runs the CLI from source in a child process (tests may spawn; the engine may not). */
-export function runCli(args: string[], opts: { cwd?: string } = {}): CliResult {
+export function runCli(args: string[], opts: { cwd?: string; env?: NodeJS.ProcessEnv } = {}): CliResult {
   const res = spawnSync(process.execPath, ['--import', 'tsx', cliEntry, ...args], {
     cwd: opts.cwd ?? repoRoot,
     encoding: 'utf8',
-    env: { ...process.env, NODE_NO_WARNINGS: '1' },
+    env: { ...process.env, NODE_NO_WARNINGS: '1', ...opts.env },
   });
   return { status: res.status, stdout: res.stdout, stderr: res.stderr };
 }

@@ -1,0 +1,3 @@
+- Title: Next.js
+- Library ID: /vercel/next.js
+- Versions: /vercel/next.js/v14.2.35, /vercel/next.js/v15.1.0

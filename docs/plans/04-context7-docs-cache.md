@@ -19,7 +19,7 @@ Both modes fall back in the same order: the fresh cache, then the stale cache (m
 
 ## Tasks
 
-1. **Store (`src/store/docs.ts`, migration `003_docs.sql`).** Tables:
+1. **Store (`src/store/docs.ts`, migration `004_docs.sql`).** `003` is the scope migration from M3. Tables:
    - `doc_cache(doc_id, library, version, topic, url, content, fetched_at, source)`: global across runs and keyed by library@version so it can be reused offline.
    - `run_docs(run_id, doc_id, mode, status, fetched_by, official)`: per-run and used by gate 3, where status is `fresh`, `stale` or `unverified`. `fetched_by` is `engine` (server-side mode), `agent` (registered by the agent) or `knowledge` (a rule's `source` link or a generated reference, used as a fallback). `official` says whether the URL falls under one of the `doc_sources` in the `library.json` of a library the pack uses (M3).
 2. **`get_migration_docs` (`src/core/getMigrationDocs.ts`, tool `src/tools/getMigrationDocs.ts`, CLI `docs`).**
@@ -44,7 +44,7 @@ Both modes fall back in the same order: the fresh cache, then the stale cache (m
 
 ## Files and modules
 
-`src/core/getMigrationDocs.ts`, `src/tools/getMigrationDocs.ts`, `src/cli/docs.ts`, `src/docs/{context7,cache,format}.ts` (reusing `src/docs/officialUrl.ts` from M3), `src/security/network.ts`, `src/store/docs.ts`, `src/store/migrations/003_docs.sql`, `test/unit/docs/*.test.ts`, `test/fixtures/context7/` (recorded responses).
+`src/core/getMigrationDocs.ts`, `src/tools/getMigrationDocs.ts`, `src/cli/docs.ts`, `src/docs/{context7,cache,format}.ts` (reusing `src/docs/officialUrl.ts` from M3), `src/security/network.ts`, `src/store/docs.ts`, `src/store/migrations/004_docs.sql`, `test/unit/docs/*.test.ts`, `test/fixtures/context7/` (recorded responses).
 
 ## Tests
 

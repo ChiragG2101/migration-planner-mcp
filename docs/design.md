@@ -611,3 +611,23 @@ Why: the plan requires the signals to be explainable, and a codemod must not cou
 - The CI lint step sets `BASE_SHA` to the PR base, the same way the recall step does, so the pack version-bump check runs on every pull request.
 
 Why: the plan requires a narrow trigger a host can load, references the agent fetches only when it needs them, and the version bump checked against the merge base. None of these changes the rules or the supported range.
+
+## 2026-10-20: M4 docs cache
+
+### D34 - How docs are cached, pinned and fetched
+
+**Decision:**
+
+- The docs tables are migration `004_docs.sql`. `003_scope.sql` already belonged to M3.
+- A cached engine or agent doc is fresh for 7 days and stale after that. The cache keeps 8 MiB of content. Docs cited by the 20 newest runs are not evicted.
+- A version is accepted when its major.minor matches the installed version or the effective target, or when it is exactly a release unit from the installed unit through that target. `stop_at` replaces the target. The refusal names those versions.
+- Server-side Context7 uses the MCP client against `https://mcp.context7.com/mcp` when `CONTEXT7_API_KEY` is set. It does not spawn a local package. The recorded payload is `{library, version, symbol}`. The MCP arguments are derived only from those: `resolve-library-id` then `query-docs`, and the query text is the symbol. Tool names were re-checked on 2026-10-20.
+- A query symbol is accepted only when `symbolOf` produces it from the run's composed rules. The refusal names that list. The version sent is the pin endpoint the query matches (installed or effective target), or the release-unit text when the query is exactly a unit in range. A raw string such as `15.1.0+deadbeef` is not sent.
+- `connect` uses the same timeout as `callTool`. The first failed attempt in a call is the last one: later queries in that call use the cache and the rules. A 429 is still tried once more before that stop. `context7Fetch` checks the host before the underlying fetch.
+- `docRefAccepted` in `src/store/docs.ts` is the citation check gate 3 (M6) applies. `docsUnverifiedBadge` in `src/docs/format.ts` is the badge M5 and M9 consume. It is on when every cited doc is stale or unverified, and off when the finding cites nothing.
+- A non-allowlisted URL throws `PermissionError` with code `network`.
+
+Why: M3 had already taken migration 003. The plan left the freshness window, the cache cap and the exact version match open. Context7's tools take a query string, so the symbol is that query and nothing from the repo is added. Spawning a local Context7 package would be a second spawn point (C3).
+
+What would change it: a Context7 tool rename, or a cache that has to keep docs for longer than the newest 20 runs because gate 3 started re-reading runs older than that. Until then an evicted row is simply a cache miss, and the run's own docs stay because the run is one of the newest.
+

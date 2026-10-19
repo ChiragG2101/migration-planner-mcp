@@ -6,6 +6,7 @@ import type { z } from 'zod';
 import { errorPayload, type Engine } from '../core/index.js';
 import { assessRiskTool } from './assessRisk.js';
 import { findUsagesTool } from './findUsages.js';
+import { getMigrationDocsTool } from './getMigrationDocs.js';
 import { getRulePackTool } from './getRulePack.js';
 import { proposeScopeTool } from './proposeScope.js';
 import { scanRepoTool } from './scanRepo.js';
@@ -20,7 +21,7 @@ export interface ToolDef {
   handler: (engine: Engine, input: unknown) => Promise<unknown>;
 }
 
-export const tools: readonly ToolDef[] = [scanRepoTool, findUsagesTool, getRulePackTool, assessRiskTool, proposeScopeTool, setScopeTool];
+export const tools: readonly ToolDef[] = [scanRepoTool, findUsagesTool, getRulePackTool, assessRiskTool, proposeScopeTool, setScopeTool, getMigrationDocsTool];
 
 export function registerTools(server: McpServer, engine: Engine): void {
   for (const tool of tools) {

@@ -9,6 +9,7 @@ import {
   createEngine,
   ENGINE_VERSION,
   findUsages,
+  getMigrationDocs,
   getRulePack,
   ingest,
   InputError,
@@ -23,6 +24,7 @@ import {
 import { SetScopeInput } from '../schema/scope.js';
 import { readOperatorFile } from '../security/operatorFile.js';
 import { startMcpServer } from '../server.js';
+import { formatDocsText } from './docs.js';
 import { formatPackText } from './pack.js';
 import { formatRiskText } from './risk.js';
 import { formatScanText, scanInput } from './scan.js';
@@ -38,6 +40,7 @@ Usage:
   migration-planner-mcp pack <repo> --source <lib@ver> --target <lib@ver> [--format json|text]
   migration-planner-mcp risk <repo> --source <lib@ver> --target <lib@ver> [--format json|text]
   migration-planner-mcp scope <repo> --source <lib@ver> --target <lib@ver> [--answers <file.json>] [--small-max <n>] [--format json|text]
+  migration-planner-mcp docs <repo> --source <lib@ver> --target <lib@ver> [--register <file.json>] [--query <file.json>] [--format json|text]
   migration-planner-mcp mcp
 
 Shared flags:
@@ -48,6 +51,17 @@ Shared flags:
 `;
 
 const err = (message: string): void => void process.stderr.write(`${message}\n`);
+
+function readJsonArray(file: string, flag: string): unknown[] {
+  let parsed: unknown;
+  try {
+    parsed = JSON.parse(readOperatorFile(file));
+  } catch (e) {
+    throw new InputError('bad_json', `could not read ${flag}: ${e instanceof Error ? e.message : String(e)}`);
+  }
+  if (!Array.isArray(parsed)) throw new InputError('bad_json', `${flag} must be a JSON array`);
+  return parsed;
+}
 
 async function main(argv: string[]): Promise<number> {
   const { values, positionals } = parseArgs({
@@ -69,6 +83,8 @@ async function main(argv: string[]): Promise<number> {
       format: { type: 'string', default: 'json' },
       answers: { type: 'string' },
       'small-max': { type: 'string' },
+      register: { type: 'string' },
+      query: { type: 'string' },
       help: { type: 'boolean', short: 'h' },
     },
   });
@@ -162,6 +178,28 @@ async function main(argv: string[]): Promise<number> {
     case 'mcp':
       await startMcpServer(options);
       return -1;
+    case 'docs': {
+      if (values.format !== 'json' && values.format !== 'text') throw new InputError('bad_format', '--format must be json or text');
+      if (rest.length === 0) throw new InputError('missing_repo', 'docs needs a repo path');
+      const engine = createEngine(options);
+      try {
+        const scan = await scanRepo(engine, scanInput(rest, values));
+        if (scan.status !== 'ok' || !scan.run) {
+          process.stdout.write(`${JSON.stringify(scan, null, 2)}\n`);
+          return 3;
+        }
+        const run_id = scan.run.run_id;
+        await findUsages(engine, { run_id });
+        await getRulePack(engine, { run_id });
+        const register = values.register ? readJsonArray(values.register, '--register') : undefined;
+        const query = values.query ? readJsonArray(values.query, '--query') : undefined;
+        const out = await getMigrationDocs(engine, { run_id, ...(register ? { register } : {}), ...(query ? { query } : {}) });
+        process.stdout.write(values.format === 'text' ? `${formatDocsText(out)}\n` : `${JSON.stringify(out, null, 2)}\n`);
+        return 0;
+      } finally {
+        closeEngine(engine);
+      }
+    }
     default:
       throw new InputError('unknown_command', `unknown command "${command}"\n\n${usage}`);
   }

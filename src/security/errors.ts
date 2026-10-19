@@ -9,7 +9,8 @@ export type PermissionCode =
   | 'write_inside_repo'
   | 'out_inside_repo'
   | 'level'
-  | 'exec_unavailable';
+  | 'exec_unavailable'
+  | 'network';
 
 export class PermissionError extends Error {
   override readonly name = 'PermissionError';
