@@ -68,10 +68,14 @@ The security layer is built here, first, so that every later tool inherits it ra
   - `path-escape`: `..` traversal, an absolute path, a symlink to `/etc` and a symlink to a sibling directory are all rejected by `resolveInside`.
   - `deny-list`: `.env`, `.env.local`, `id_rsa`, `*.pem` and `.pypirc` are never read, even when requested directly by path.
   - `no-exec`: a static test asserts that `child_process` is not imported anywhere except `src/security/exec.ts`. The lint rule exists and fails on a planted violation. Calling `exec.ts` at level 0 and level 1 both throw in M1.
+  - `single-write-point`: a static test asserts that no `node:fs` write API (`writeFile`, `appendFile`, `mkdir`, `rm`, `rename`, `copyFile`, `createWriteStream` and their promise forms) is imported anywhere except `src/security/safeWrite.ts`. The lint rule fails on a planted violation.
   - `level-2-refused`: `--level 2` exits non-zero with the "not built" message.
+  - `level-not-raisable`: no tool input schema has a level field, and a tool call carrying `level: 1` at level 0 leaves the level at 0, so `assertLevel(1)` still throws.
   - `out-inside-repo-refused`: the engine refuses to start.
   - `multi-repo-refused`: ingest with two repo paths returns the "not built in v0.1" error.
+- **Store only (`test/unit/store-only.test.ts`):** a static test asserts that `node:sqlite` and `better-sqlite3` are imported only under `src/store/`, and that `package.json` has no other database or vector-store dependency.
 - **Unit tests:** lockfile parsing for npm, pnpm, yarn, uv, poetry and requirements; workspace detection; Django settings detection; ambiguity questions; vague-input rejection; idempotent run IDs; the size-limit skip list.
+- **stdout (`test/unit/stdout-protocol-only.test.ts`):** the MCP server is started over stdio and `scan_repo` is called; every line on stdout parses as a JSON-RPC message, and the startup banner and the logs appear on stderr.
 - **Integration:** an MCP client (the SDK's in-memory or stdio client) calls `scan_repo` on both fixtures and checks the result and the events in SQLite. The CLI `scan` command on the same fixtures produces the same JSON.
 
 ## Acceptance criteria

@@ -101,7 +101,7 @@
   - `patch-escape-refused`: patch paths with `../`, absolute paths, a deny-listed file or a symlink pointing outside the sandbox are refused, and nothing is written.
   - `dirty-tree-refused`: L1 on a dirty fixture refuses with the "verifies HEAD" message.
   - `level-2-refused` (from M1) still passes.
-- **Gate 7:** each fixture pair in `test/fixtures/g7/` must fail with its exact reason: a deleted assertion, an added `.skip`, an added `@pytest.mark.skip`, a deleted snapshot, a lowered coverage threshold, a deleted test file, a changed `test` script. A source-only change passes. A test update that adds assertions passes. Mutation check: disabling any single rule makes its fixture pass, which the test detects.
+- **Gate 7 (`test/unit/verify/testIntegrity.test.ts`):** each fixture pair in `test/fixtures/g7/` must fail with its exact reason: a deleted assertion, an added `.skip`, an added `@pytest.mark.skip`, a deleted snapshot, a lowered coverage threshold, a deleted test file, a changed `test` script. A source-only change passes. A test update that adds assertions passes. Mutation check: disabling any single rule makes its fixture pass, which the test detects.
 - **Loop:**
   - after three failed attempts the stage is `unresolved` and the sandbox tree hash equals the stage start
   - a rollback restores the exact tree hash
