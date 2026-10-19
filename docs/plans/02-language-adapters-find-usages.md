@@ -15,7 +15,8 @@
 
 ## Tasks
 
-1. **Language adapter interface (`src/lang/adapter.ts`).** `LanguageAdapter { id, extensions, parse(SafePath) => SyntaxTree, imports(tree) => ImportEdge[], symbols(tree) => Symbol[] }`. Files are read only through `SafePath` and the deny list, so the M1 boundary holds inside every parser. The M1 size limits apply.
+1. **Language adapter interface (`src/lang/adapter.ts`).** `LanguageAdapter { id, extensions, parse(SafePath) => SyntaxTree, imports(tree) => ImportEdge[], symbols(tree) => Symbol[] }`. Files are read only through `SafePath` and the deny list, using M1's `src/security/safeRead.ts`, so the M1 boundary holds inside every parser. The M1 size limits apply.
+   - **Single read point (gap found in M1).** M1 checks INV-4 with tests but not with the lint: nothing stops new code calling `readFileSync` on a repo path directly, and M2's parsers are where that would happen. Extend M1's restricted imports in `eslint.config.js`: `node:fs` read APIs (`readFile*`, `readdir*`, `opendir*`, `stat*`, `lstat*`, `realpath*`, `exists*`, `access*`, `createReadStream`, `open*`, `watch*`) are allowed only in `src/security/`, plus the two reads of the engine's own files (`src/store/db.ts` for the migrations, `src/core/engine.ts` for the package version). **Decision to record** in `docs/design.md`: the exact allowlist.
 2. **TS/JS adapter (`src/lang/ts/`).** Build a TypeScript `Program` from the repo's tsconfig, or an inferred config for JS (`allowJs`, `checkJs: false`, JSX enabled). A custom `CompilerHost` reads only through `SafePath`.
    - Imports: `import`/`export ... from`, `require()`, `import()` with a string literal, and barrel re-exports (`export * from`). Path aliases from tsconfig `paths` are resolved, but only to targets inside the root.
 3. **Python adapter (`src/lang/python/`).** tree-sitter WASM with the Python grammar, loaded from the package (no network, no native build).
@@ -70,7 +71,7 @@
 - **Python adapter:** absolute, relative and `importlib` imports resolve; a dotted settings string becomes a `string_ref` edge; a non-literal `import_module` is unresolved; syntax errors put the file in `unparsed_files` instead of failing the run.
 - **Next.js adapter:** one test per usage kind, using small inline fixtures.
 - **Snippet hash stability:** CRLF vs LF and trailing spaces give the same hash, and a real edit changes the hash, for both TS and Python files.
-- **Permissions:** the full suite still passes. A deny-listed file is never parsed even when imported. Neither `CompilerHost` nor the Python adapter can read outside the root (a test plants a tsconfig `paths` entry and a Python relative import pointing at `../outside`).
+- **Permissions:** the full suite still passes. `single-read-point` (`test/permissions/single-read-point.test.ts`): a static test, like M1's `single-write-point`, asserts no `node:fs` read API is imported under `src/` outside the allowlist, and the lint fails on a planted read in `src/lang/`. A deny-listed file is never parsed even when imported. Neither `CompilerHost` nor the Python adapter can read outside the root (a test plants a tsconfig `paths` entry and a Python relative import pointing at `../outside`).
 - **Recall:** this is the smoke eval. CI fails if overall recall on `next-tricky` drops below its value in `eval/seeded/ratchet.json`, or if a change lowers that value (a ratchet that only moves up). A new entry that doesn't equal the measured recall also fails.
 
 ## Acceptance criteria
@@ -90,7 +91,7 @@
 
 ## Dependencies
 
-- M1: `SafePath`, the deny list, the store, campaign and repo IDs and run IDs.
+- M1: `SafePath`, `safeRead`, the deny list, the store, campaign and repo IDs and run IDs, and the scan's size limits (`DEFAULT_LIMITS` in `src/analysis/scanner.ts`).
 
 ## Must not break
 

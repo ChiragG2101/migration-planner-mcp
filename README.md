@@ -1,6 +1,6 @@
 # migration-planner-mcp (working name)
 
-**Status: currently building. Planning stage only; there is no code yet.**
+**Status: currently building.** Only the first milestone exists: a read-only `scan_repo` over a CLI and an MCP server. It does not plan migrations yet.
 
 A local-first migration engine for upgrading and migrating codebases. It reads a repo plus a migration target and returns a staged plan. Every step cites code and docs and carries a risk rating, a rollback note and a verification check. The plan is checked by deterministic gates, not by another LLM. With an explicit flag, each stage is also applied and verified in a throwaway sandbox copy of the repo, and handed back as patches you apply yourself.
 

@@ -4,7 +4,7 @@ Instructions for coding agents working in this repository (Claude Code, Codex, C
 
 ## Current state
 
-**Pre-code: M0 done, no `package.json` or test setup yet.** M0 (spine docs and golden cases) is complete; code starts at M1. The repo holds the spec, the per-milestone plans, the spine docs and the golden-case records:
+**M1 built, awaiting its independent review.** The engine skeleton exists: the security layer, the SQLite event spine, ingest, `scan_repo`, and the CLI and MCP adapters. The repo holds the engine in `src/`, its tests in `test/`, the spec, the per-milestone plans, the spine docs and the golden-case records:
 
 - `docs/PRD.md`: the product requirements and build spec. This is the source of truth.
 - `docs/plans/00-overview.md`: the cross-cutting constraints (C1 to C10), the tech decisions, the per-milestone gates, the cut order and the target source layout.
@@ -92,11 +92,18 @@ These are enforced in code, not in prose. A change that breaks one of them is wr
 - **Regression rule:** any change under `prompts/`, `knowledge/`, `packs/`, `src/rules/`, `src/analysis/` (usage adapters, risk, sizing), `src/pipeline/{aggregate,packets,routing}.ts`, `src/pipeline/gates/` or `src/verify/` (codemod registry, gate 7) requires regenerating `eval/results.md` in the same change. It applies from M7, when the eval runner exists; before that, say in the change that the rerun isn't possible yet.
 - **Eval evidence is add-only.** From M7, existing golden cases and recorded runs are add-only on every PR, not only pack PRs, with two named exceptions (`scripts/check-eval-add-only.ts`, `docs/design.md` D15). The committed `eval/results.md` must equal the re-score of HEAD's tree, so never hand-edit it (D17).
 
-## Planned tooling (from M1; confirm once it exists)
+## Tooling
 
-Node 22 LTS, 22.13 or later so `node:sqlite` needs no flag (`docs/design.md` D18), TypeScript strict, ESM, npm, Vitest, ESLint, the official MCP TS SDK v2 (`@modelcontextprotocol/server`, pinned version), the `typescript` compiler API, `web-tree-sitter` with the Python grammar, Zod. Licence Apache-2.0.
+Node 22.13 or later so `node:sqlite` needs no flag (`docs/design.md` D18), TypeScript 6.0 strict (not 7, D21), ESM, npm, Vitest, ESLint (flat `eslint.config.js`), the official MCP TS SDK v2 (`@modelcontextprotocol/server` 2.3.1, pinned), Zod. Licence Apache-2.0. Planned for M2: the `typescript` compiler API and `web-tree-sitter` with the Python grammar.
 
-Planned scripts: `npm run build`, `npm test`, `npm run typecheck`, `npm run lint` (which includes `scripts/lint-packs.ts`), `npm run test:permissions`, `npm run build:packs`, `npm run eval:smoke`, and `npm run eval -- --tier all`. Maintainer tools (network, manual): `npm run knowledge:draft -- <library> <release>`, `npm run pack:report -- <pack>`, `npm run cases:find -- <pack> --from <v> --to <v>` and `npm run cases:verify -- <id>|--all`. The CLI's commands mirror the tools (`scan`, `usages`, `pack`, `risk`, `scope`, `docs`, `merge`, `validate`, `emit`, `verify`, `report`, `feedback`), and `mcp` starts the MCP adapter. To run a single test, use `npx vitest run <path>` or `-t "<name>"`.
+Commands that exist now:
+
+- `npm install`, then `npm run build` (to `dist/`), `npm test`, `npm run test:permissions`, `npm run typecheck`, `npm run lint`.
+- One test: `npx vitest run <path>` or `npx vitest run -t "<name>"`.
+- Repo hash (INV-1): `npx tsx scripts/repo-hash.ts <root>`.
+- The CLI from a build: `node dist/cli/index.js scan <repo> --source <lib> --target <lib@ver> [--out <dir>] [--format text]`, and `node dist/cli/index.js mcp` for the MCP server. Host wiring for Claude Code and Cursor is in `docs/design.md` (M1 task 10).
+
+Planned scripts: `npm run lint` gains `scripts/lint-packs.ts` (M3); `npm run build:packs`, `npm run eval:smoke`, and `npm run eval -- --tier all`. Maintainer tools (network, manual): `npm run knowledge:draft -- <library> <release>`, `npm run pack:report -- <pack>`, `npm run cases:find -- <pack> --from <v> --to <v>` and `npm run cases:verify -- <id>|--all`. The CLI's commands mirror the tools; after `scan` come `usages`, `pack`, `risk`, `scope`, `docs`, `merge`, `validate`, `emit`, `verify`, `report` and `feedback`.
 
 ## Definition of done per milestone
 

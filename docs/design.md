@@ -371,3 +371,78 @@ Why:
 - The pre-M1 quiz found real gaps, all of one kind: a guard that could be removed, or never reached, with no test failing. Running the mutation check on every guard catches that kind directly, and a reviewer can run it.
 - Uncapped rounds can loop, as the plan reviews showed (hence the 3-round cap in `plan-review.md`). Code reviews get a 2-round cap, and only "must fix" blocks; "noticed" items go on the user's list, as AGENTS.md rule 1 already does for the builder.
 - Rule 3 (never weaken a gate) still holds for tests, constraints and thresholds. This is the maintainer's decision on a process gate, and the mutation check gets stricter: every new guard instead of at least one.
+
+## 2026-10-19: M1 build decisions
+
+Choices M1 made where the plan left a question open. D20 records the three the maintainer decided before the build; D21 and D22 record the builder's smaller ones.
+
+### D20 - Ingest: what "known" means, dirty state, and where output goes by default
+
+**Decision:**
+
+- **A known library is one declared in the repo's manifests** (`package.json`, `pyproject.toml`, `requirements*.txt`; Python names compared after PEP 503 normalisation). An unknown source or target gets a `vague_input` question. M3 adds the pack check on top; until then there is no library list in core code.
+- **The installed version comes from lockfiles only.** No lockfile pin gives an `unresolved_version` question, lockfiles or workspace packages that disagree give `ambiguous_version` with every candidate, and a user-given source version that disagrees with the lockfile gives `version_mismatch`. A given version matches when each of its parts equals the lockfile's, so `14` and `14.2` match `14.2.35`.
+- **Dirty state is always `unknown` in v0.1.** HEAD and refs are read as files, and git is never run.
+- **The default `--out` is `.migration-planner/` beside the repo** (`<repo's parent>/.migration-planner/`), never inside it. The MCP server, which learns the repo only at ingest, uses the same default per repo.
+
+Why:
+
+- A built-in list of libraries would put pack data in core code for one milestone. "Declared in the repo" needs no data, and it is a check the agent can't satisfy by guessing.
+- A real dirty check would mean hashing every tracked file, including any tracked `.env`, which the deny list forbids, and parsing `.gitignore` for untracked files. Reporting `unknown` is honest and costs nothing. Revisit if a later milestone needs the answer.
+- Beside the repo is easy to find and matches the PRD's example; runs from several repos in one parent folder share a store, keyed by repo ID. The user's cache folder was the alternative: never near code, but it hides the plan from the user.
+
+### D21 - Tooling pins for M1
+
+**Decision:** TypeScript 6.0.3, not 7. `@modelcontextprotocol/server` 2.3.1 (the stable v2 line), with `@modelcontextprotocol/client` 2.3.1 for tests. ESLint 10 with a flat `eslint.config.js` instead of the plan's `.eslintrc.*`. `yaml` and `smol-toml` (pure JS) parse pnpm lockfiles and TOML.
+
+Why:
+
+- TypeScript 7 is the native port; its JS API is published under `unstable/*`, and M2 needs the stable compiler API. typescript-eslint supports TypeScript below 6.1.
+- ESLint 9 dropped `.eslintrc`, so the flat config is the only current form. The rule itself is as planned.
+- Lockfile and `pyproject.toml` formats need real YAML and TOML parsers. Both packages are pure JS, so there is no native build (C3's spirit, D2).
+- Revisit TypeScript at M2 if TypeScript 7 stabilises its API.
+
+### D22 - Smaller M1 choices
+
+- **Walk refusals are skipped and listed; direct reads throw** (the plan's "decision to record"). During the `scan_repo` walk, an entry that `resolveInside` rejects or the deny list matches is listed in `skipped` with `outside_root` or `denied` (path only) and the walk carries on. A deny-listed folder (`node_modules/`, `.git/`, `.venv/`) is listed once, not walked. A path passed directly to a read API throws `PermissionError`, which the tool wrapper records as `tool.error`.
+- **`--db` gets the same refusal as `--out`.** Both are checked before anything is created, so a refused flag leaves no file in the repo.
+- **`resolveInside` also rejects a relative path whose `..` climbs above the root and comes back** (`../repo/x`), and an absolute path outside the root that a symlink leads back in. The deny list checks both the requested name and where it really points.
+- **Events before a run have no run ID.** A question or a refusal after the store opens is still recorded, with `run_id` null. A refusal before the store opens (multi-repo, `--out` inside the repo) is returned but can't be recorded: there is nowhere safe to write it.
+- **The idempotency key uses `none` for the pack and prompt versions** until M3 and M5 add them. Re-ingesting returns the existing run with its campaign, even if a different `campaign_id` is passed; the key does not include the campaign, as the plan specifies.
+- **`scan_repo` re-scans on every call** and replaces the run's `files` rows, since the dirty state is unknown and the files may have changed under the same HEAD. Each scan appends a `scan.result` event.
+- **The tool output is one object with a `status`** (`ok` or `question`) rather than a union, because the SDK wants an object root for `outputSchema`.
+- **Unparseable manifests are reported in `manifest_errors`**, never dropped. `setup.py`, `setup.cfg` and `Pipfile` are reported as unrecognised manifests, except a `setup.py` inside a Python package (an `__init__.py` beside it), which is a module such as a Django command.
+- **Next.js `app/` and `pages/` count as entrypoints only in a package that uses Next.js** (a `next` dependency or a `next.config.*`), so a docs folder named `pages/` isn't mislabelled.
+- **CLI exit codes:** 0 ok, 1 bad input or error, 2 refused (`PermissionError`, not built), 3 a question to answer.
+
+### Host wiring (M1 task 10)
+
+The CLI and the MCP server are one binary. Until the npm publish (M11), run it from a checkout after `npm install && npm run build`; afterwards `npx migration-planner-mcp` replaces `node <checkout>/dist/cli/index.js`.
+
+CLI:
+
+```sh
+node <checkout>/dist/cli/index.js scan <repo> --source next --target next@15.1.0
+node <checkout>/dist/cli/index.js scan <repo> --source django --target django==4.2.30 --format text --out /tmp/mp
+```
+
+Claude Code:
+
+```sh
+claude mcp add migration-planner -- node <checkout>/dist/cli/index.js mcp
+```
+
+Cursor (`.cursor/mcp.json` in the project, or `~/.cursor/mcp.json`):
+
+```json
+{
+  "mcpServers": {
+    "migration-planner": {
+      "command": "node",
+      "args": ["<checkout>/dist/cli/index.js", "mcp"]
+    }
+  }
+}
+```
+
+Add `"--out", "<dir>"` to the arguments to keep every run's output in one folder; without it, output goes to `.migration-planner/` beside each repo. The server logs its banner and output folder to stderr; stdout is the protocol channel.
