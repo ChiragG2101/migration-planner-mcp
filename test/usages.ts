@@ -5,6 +5,7 @@ import path from 'node:path';
 import { analyzeRepo, DEFAULT_LIMITS } from '../src/analysis/scanner.js';
 import type { UsageAdapter, UsageContext } from '../src/analysis/usages/adapter.js';
 import { buildUsageIndex, graphOnlyAdapter, type BuildResult, type FactsCache } from '../src/analysis/usages/index.js';
+import { nextjsAdapter } from '../src/analysis/usages/nextjs.js';
 import { repoIdFor } from '../src/pipeline/ingest.js';
 import { resolveRepoRoot } from '../src/security/pathBoundary.js';
 import type { Usage } from '../src/schema/usage.js';
@@ -42,6 +43,17 @@ export async function build(
     cache,
   });
   return { ...result, root, ctx: ctx!, cache: cache.map };
+}
+
+/** A Next.js app: package.json with next and react, plus `files`. */
+export async function buildNext(files: Record<string, string>, targets: Record<string, string> = {}): Promise<Built> {
+  return build(
+    {
+      'package.json': JSON.stringify({ name: 'app', dependencies: { next: '14.2.35', react: '18.3.1', 'react-dom': '18.3.1' } }, null, 2),
+      ...files,
+    },
+    { adapter: nextjsAdapter, targets },
+  );
 }
 
 /** `file:line kind symbol` for each usage, for compact assertions. */

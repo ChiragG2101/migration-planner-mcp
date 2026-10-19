@@ -16,8 +16,9 @@ import type { ImportRow, SymbolRow } from '../../store/usages.js';
 import type { RepoFacts } from '../scanner.js';
 import { sliceLines, snippetHash } from '../snippet.js';
 import type { UsageAdapter, UsageContext, UsageDraft } from './adapter.js';
+import { nextjsAdapter } from './nextjs.js';
 
-export const usageAdapters: readonly UsageAdapter[] = [];
+export const usageAdapters: readonly UsageAdapter[] = [nextjsAdapter];
 
 /**
  * For a library no pack covers yet (Django until M10): the import graph and

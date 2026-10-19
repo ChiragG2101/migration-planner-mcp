@@ -205,3 +205,65 @@ export function parseTsConfig(text: string): TsConfigFile {
     paths,
   };
 }
+
+export interface PeerEntry {
+  name: string;
+  version: string;
+  /** The text to find the entry's line by in the lockfile. */
+  key: string;
+  peers: Record<string, string>;
+  optional: string[];
+}
+
+/**
+ * The peer ranges a lockfile records for its packages. Returns null for a
+ * format that records none (yarn v1, npm lockfile v1), so the caller reports
+ * that peer conflicts could not be checked rather than finding none.
+ */
+export function parsePeerRanges(kind: 'npm' | 'pnpm' | 'yarn', text: string): PeerEntry[] | null {
+  const out: PeerEntry[] = [];
+  const peersOf = (entry: Record<string, unknown>): { peers: Record<string, string>; optional: string[] } => {
+    const peers: Record<string, string> = {};
+    if (isObj(entry.peerDependencies)) for (const [k, v] of Object.entries(entry.peerDependencies)) if (typeof v === 'string') peers[k] = v;
+    const meta = isObj(entry.peerDependenciesMeta) ? entry.peerDependenciesMeta : {};
+    const optional = Object.entries(meta)
+      .filter(([, m]) => isObj(m) && m.optional === true)
+      .map(([k]) => k);
+    return { peers, optional };
+  };
+  if (kind === 'npm') {
+    const lock = JSON.parse(text) as unknown;
+    if (!isObj(lock) || !isObj(lock.packages)) return null;
+    for (const [key, entry] of Object.entries(lock.packages)) {
+      if (!key || !isObj(entry) || typeof entry.version !== 'string') continue;
+      const name = key.slice(key.lastIndexOf('node_modules/') + 'node_modules/'.length);
+      out.push({ name, version: entry.version, key: `"${key}"`, ...peersOf(entry) });
+    }
+    return out;
+  }
+  if (kind === 'pnpm') {
+    const lock = parseYaml(text) as unknown;
+    if (!isObj(lock) || !isObj(lock.packages)) return null;
+    for (const [key, entry] of Object.entries(lock.packages)) {
+      if (!isObj(entry)) continue;
+      // "/next@14.2.3" (v6), "next@14.2.3" (v9), possibly with a "(peer@x)" suffix.
+      const bare = key.replace(/^\//, '').split('(')[0]!;
+      const at = bare.lastIndexOf('@');
+      if (at <= 0) continue;
+      out.push({ name: bare.slice(0, at), version: bare.slice(at + 1), key, ...peersOf(entry) });
+    }
+    return out;
+  }
+  // yarn: only berry (with __metadata) records peer ranges.
+  if (!/^__metadata:/m.test(text)) return null;
+  const lock = parseYaml(text) as unknown;
+  if (!isObj(lock)) return null;
+  for (const [key, entry] of Object.entries(lock)) {
+    if (key === '__metadata' || !isObj(entry) || typeof entry.version !== 'string') continue;
+    const first = key.split(',')[0]!.trim();
+    const at = first.lastIndexOf('@');
+    if (at <= 0) continue;
+    out.push({ name: first.slice(0, at), version: entry.version, key: first, ...peersOf(entry) });
+  }
+  return out;
+}

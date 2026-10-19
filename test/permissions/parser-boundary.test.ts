@@ -5,6 +5,7 @@
 // up in the symbols, the usages or the facts cache.
 import path from 'node:path';
 import { describe, expect, it } from 'vitest';
+import { nextjsAdapter } from '../../src/analysis/usages/nextjs.js';
 import { tmpDir, writeTree } from '../helpers.js';
 import { build, type Built } from '../usages.js';
 
@@ -13,6 +14,7 @@ const marker = `import { cookies } from 'next/headers';\nfunction ${TOKEN}() { r
 
 function neverParsed(b: Built): void {
   expect(b.symbols.map((s) => s.name)).not.toContain(TOKEN);
+  expect(b.usages.filter((u) => u.kind === 'request_api')).toEqual([]);
   for (const json of b.cache.values()) expect(json).not.toContain(TOKEN);
 }
 
@@ -26,7 +28,7 @@ describe('parsers stay inside the root', () => {
         'tsconfig.json': JSON.stringify({ compilerOptions: { baseUrl: '.', paths: { '@out/*': ['../outside/*'] }, rootDir: '..' } }),
         'app/page.tsx': "import a from '@out/secret';\nimport b from '../outside/secret';\nexport default function Page() { return a() + b(); }\n",
       },
-      { root: path.join(base, 'repo') },
+      { root: path.join(base, 'repo'), adapter: nextjsAdapter },
     );
     expect(b.imports.filter((i) => i.from_file === 'app/page.tsx').map((i) => i.to_file)).toEqual([null, null]);
     neverParsed(b);
@@ -54,7 +56,7 @@ describe('parsers stay inside the root', () => {
         'py/.env.py': `def ${TOKEN}():\n    pass\n`,
         'py/use.py': 'from .env import thing\n',
       },
-      {},
+      { adapter: nextjsAdapter },
     );
     expect(b.imports.filter((i) => i.from_file === 'app/page.tsx').map((i) => i.to_file)).toEqual([null, null]);
     expect(b.imports.filter((i) => i.from_file === 'py/use.py').map((i) => i.to_file)).toEqual([null]);
@@ -68,7 +70,7 @@ describe('parsers stay inside the root', () => {
     writeTree(root, { 'package.json': JSON.stringify({ name: 'app', dependencies: { next: '14.2.35' } }) });
     const { symlink } = await import('../helpers.js');
     symlink(path.join(base, 'outside', 'secret.ts'), path.join(root, 'lib', 'secret.ts'));
-    const b = await build({ 'app/page.tsx': "import a from '../lib/secret';\na();\n" }, { root });
+    const b = await build({ 'app/page.tsx': "import a from '../lib/secret';\na();\n" }, { root, adapter: nextjsAdapter });
     expect(b.imports.find((i) => i.from_file === 'app/page.tsx')?.to_file).toBeNull();
     neverParsed(b);
   });
