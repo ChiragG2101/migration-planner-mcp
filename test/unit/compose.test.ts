@@ -22,7 +22,7 @@ function library(s: Scheme, id: string, covered: number): Library {
     release_unit: s === 'semver' ? 'major' : 'minor',
     covered_from: rel(s, covered),
     doc_sources: ['https://example.org/docs/'],
-    release_notes: { fetch: 'https://example.org/{version}.md', page: 'https://example.org/docs/{version}', format: 'md', sections: ['Changes'] },
+    release_notes: { fetch: 'https://example.org/{version}.md', page: 'https://example.org/docs/{version}', format: 'md', sections: [{ heading: '*' }], skip: [] },
     codemods: [],
   };
 }

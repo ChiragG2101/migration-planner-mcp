@@ -1,0 +1,49 @@
+{
+  "id": "npm/react",
+  "ecosystem": "npm",
+  "packages": ["react", "react-dom"],
+  "language": "ts",
+  "version_scheme": "semver",
+  "release_unit": "major",
+  "covered_from": "18",
+  "doc_sources": ["https://react.dev/", "https://github.com/reactjs/react/"],
+  "release_notes": {
+    "overrides": {
+      "18": {
+        "fetch": "https://raw.githubusercontent.com/reactjs/react.dev/main/src/content/blog/2022/03/08/react-18-upgrade-guide.md",
+        "page": "https://react.dev/blog/2022/03/08/react-18-upgrade-guide"
+      },
+      "19": {
+        "fetch": "https://raw.githubusercontent.com/reactjs/react.dev/main/src/content/blog/2024/04/25/react-19-upgrade-guide.md",
+        "page": "https://react.dev/blog/2024/04/25/react-19-upgrade-guide"
+      }
+    },
+    "format": "md",
+    "sections": [
+      { "heading": "Breaking changes" },
+      { "heading": "Removed deprecated React APIs", "event": "removed" },
+      { "heading": "Removed deprecated React DOM APIs", "event": "removed" },
+      { "heading": "Removed deprecated TypeScript types", "event": "removed" },
+      { "heading": "New deprecations", "event": "deprecated" },
+      { "heading": "Notable changes" },
+      { "heading": "TypeScript changes" },
+      { "heading": "Other breaking changes" },
+      { "heading": "Updates to Client Rendering APIs" },
+      { "heading": "Updates to Server Rendering APIs" },
+      { "heading": "Deprecations", "event": "deprecated" },
+      { "heading": "Other Breaking Changes" }
+    ],
+    "skip": ["Installing", "Codemods", "Run all React 19 codemods", "Changelog", "Other notable changes", "Other Notable Changes"]
+  },
+  "codemods": [
+    { "id": "react-codemod:migration-recipe-19", "notes": "The React 19 codemod.com recipe; runs the react-codemod transforms below." },
+    { "id": "react-codemod:replace-reactdom-render", "notes": "Replaces ReactDOM.render, hydrate and unmountComponentAtNode with createRoot and hydrateRoot." },
+    { "id": "react-codemod:replace-string-ref", "notes": "Replaces string refs with ref callbacks." },
+    { "id": "react-codemod:replace-act-import", "notes": "Imports act from react instead of react-dom/test-utils." },
+    { "id": "react-codemod:replace-use-form-state", "notes": "Replaces ReactDOM.useFormState with React.useActionState." },
+    { "id": "react-codemod:prop-types-typescript", "notes": "Turns propTypes into TypeScript types." },
+    { "id": "types-react-codemod:preset-19", "notes": "Migrates the type changes in @types/react 19 (removed types, the JSX namespace, useRef)." },
+    { "id": "types-react-codemod:no-implicit-ref-callback-return", "notes": "Makes ref callbacks return nothing implicitly (part of preset-19)." },
+    { "id": "types-react-codemod:refobject-defaults", "notes": "Updates RefObject and MutableRefObject uses (part of preset-19)." }
+  ]
+}

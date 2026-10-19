@@ -13,7 +13,9 @@
   "files": [
     "dist",
     "src/store/migrations",
-    "src/lang/python/grammar"
+    "src/lang/python/grammar",
+    "knowledge",
+    "packs"
   ],
   "scripts": {
     "build": "tsc -p tsconfig.build.json",

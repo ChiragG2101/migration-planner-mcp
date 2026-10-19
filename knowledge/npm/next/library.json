@@ -1,0 +1,47 @@
+{
+  "id": "npm/next",
+  "ecosystem": "npm",
+  "packages": ["next"],
+  "language": "ts",
+  "version_scheme": "semver",
+  "release_unit": "major",
+  "covered_from": "14",
+  "doc_sources": ["https://nextjs.org/docs/", "https://nextjs.org/blog/", "https://github.com/vercel/next.js/"],
+  "release_notes": {
+    "fetch": "https://raw.githubusercontent.com/vercel/next.js/canary/docs/01-app/02-guides/upgrading/version-{version}.mdx",
+    "page": "https://nextjs.org/docs/app/guides/upgrading/version-{version}",
+    "format": "mdx",
+    "sections": [
+      { "heading": "*" },
+      { "heading": "v14 Summary" },
+      { "heading": "Turbopack by default" },
+      { "heading": "Caching APIs" },
+      { "heading": "`next/image` changes" },
+      { "heading": "Removals", "event": "removed" }
+    ],
+    "skip": [
+      "Upgrading from 13 to 14",
+      "Upgrading from 14 to 15",
+      "Use a coding agent (recommended)",
+      "Or upgrade manually",
+      "Set up AI agent docs",
+      "Using the codemod",
+      "Install packages manually",
+      "Troubleshooting",
+      "Review migration checklist"
+    ]
+  },
+  "codemods": [
+    { "id": "next-codemod:upgrade", "notes": "Upgrades next, react and react-dom and runs the codemods for the versions in between." },
+    { "id": "next-codemod:remove-experimental-ppr", "notes": "Removes the experimental_ppr route segment config (16)." },
+    { "id": "next-codemod:remove-unstable-prefix", "notes": "Drops the unstable_ prefix from APIs stabilised in 16, such as cacheLife and cacheTag." },
+    { "id": "next-codemod:middleware-to-proxy", "notes": "Renames the middleware file convention to proxy (16)." },
+    { "id": "next-codemod:next-lint-to-eslint-cli", "notes": "Replaces next lint with the ESLint CLI (16)." },
+    { "id": "next-codemod:app-dir-runtime-config-experimental-edge", "notes": "Changes runtime 'experimental-edge' to 'edge' in app router segment config (15)." },
+    { "id": "next-codemod:next-async-request-api", "notes": "Awaits cookies, headers, draftMode, params and searchParams, or wraps them with React.use (15)." },
+    { "id": "next-codemod:next-request-geo-ip", "notes": "Replaces NextRequest geo and ip with @vercel/functions (15)." },
+    { "id": "next-codemod:next-og-import", "notes": "Moves ImageResponse imports from next/server to next/og (14)." },
+    { "id": "next-codemod:metadata-to-viewport-export", "notes": "Moves viewport fields from metadata to a viewport export (14)." },
+    { "id": "next-codemod:built-in-next-font", "notes": "Replaces the @next/font package with the built-in next/font (13.2)." }
+  ]
+}

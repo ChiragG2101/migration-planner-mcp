@@ -47,13 +47,19 @@ export const Library = z
     doc_sources: z.array(z.string().min(1)).min(1).describe('Official doc locations, as https:// URL prefixes ending in /.'),
     release_notes: z
       .object({
-        fetch: z.string().min(1).describe('URL template of the raw notes file, with {version}.'),
-        page: z.string().min(1).describe('URL template of the public page the notes come from, with {version}.'),
+        fetch: z.string().min(1).optional().describe('URL template of the raw notes file, with {version}.'),
+        page: z.string().min(1).optional().describe('URL template of the public page the notes come from, with {version}.'),
         overrides: z.record(VersionText, NotesLocation).optional().describe('Releases whose notes do not follow the templates.'),
         format: z.enum(['md', 'mdx', 'rst']),
-        sections: z.array(Text).min(1).describe('Headings whose items list breaking changes, removals and deprecations.'),
+        sections: z
+          .array(z.object({ heading: Text, event: z.enum(['removed', 'deprecated', 'changed']).optional() }).strict())
+          .min(1)
+          .describe('Headings whose child headings (or bullets, when they have none) are change items; "*" is the document itself.'),
+        skip: z.array(Text).describe('Headings that are not changes (install steps, troubleshooting); never drafted or reported.'),
       })
-      .strict(),
+      .strict()
+      .refine((n) => (n.fetch === undefined) === (n.page === undefined), 'fetch and page templates come together')
+      .refine((n) => n.fetch !== undefined || Object.keys(n.overrides ?? {}).length > 0, 'templates or per-release overrides'),
     codemods: z.array(Codemod),
   })
   .strict();
