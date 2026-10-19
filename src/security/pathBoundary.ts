@@ -1,9 +1,9 @@
 // C4: every path the engine touches is resolved here. Both the root and the
 // target are realpathed, so `..`, absolute paths and symlinks that leave the
 // root are all rejected the same way.
-import { realpathSync } from 'node:fs';
+import { realpathSync, statSync } from 'node:fs';
 import path from 'node:path';
-import { PermissionError } from './errors.js';
+import { InputError, PermissionError } from './errors.js';
 
 declare const safePathBrand: unique symbol;
 
@@ -83,4 +83,16 @@ export function resolveInside(root: string, p: string, repoId: string | null = n
   const safe = Object.freeze({ root: rootReal, abs, rel: toPosix(rel), requested: toPosix(lexicalRel), repoId });
   issued.add(safe);
   return safe as unknown as SafePath;
+}
+
+/** Realpath of a repo folder given at ingest; the root every later read is resolved against. */
+export function resolveRepoRoot(repoPath: string): string {
+  let root: string;
+  try {
+    root = realpathSync.native(repoPath);
+  } catch {
+    throw new InputError('repo_not_found', `repo path does not exist: ${repoPath}`);
+  }
+  if (!statSync(root).isDirectory()) throw new InputError('repo_not_dir', `repo path is not a folder: ${repoPath}`);
+  return root;
 }

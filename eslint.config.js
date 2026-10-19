@@ -1,5 +1,6 @@
-// ESLint flat config. The two restricted-import blocks enforce C3 inside the
-// engine (src/): only src/security/ may import fs write APIs, and only
+// ESLint flat config. The restricted-import blocks enforce C3 and C4 inside the
+// engine (src/): only src/security/ may import fs write or read APIs (reads
+// also in the two allowlisted reads of the engine's own files, D25), and only
 // src/security/exec.ts may spawn a process. scripts/ and eval/ are outside the
 // engine and are kept out of src/ by the import lint (M3).
 import js from '@eslint/js';
@@ -64,19 +65,69 @@ const fsPromisesWriteApis = [
   'chmod',
 ];
 
+// Reads of the repo go through src/security/safeRead.ts (INV-4). Namespace and
+// default imports are already refused by the write lists above.
+const fsReadApis = [
+  'readFile',
+  'readFileSync',
+  'readdir',
+  'readdirSync',
+  'opendir',
+  'opendirSync',
+  'stat',
+  'statSync',
+  'lstat',
+  'lstatSync',
+  'statfs',
+  'statfsSync',
+  'realpath',
+  'realpathSync',
+  'exists',
+  'existsSync',
+  'access',
+  'accessSync',
+  'createReadStream',
+  'openAsBlob',
+  'read',
+  'readSync',
+  'readv',
+  'readvSync',
+  'glob',
+  'globSync',
+  'watch',
+  'watchFile',
+];
+
+const fsPromisesReadApis = ['readFile', 'readdir', 'opendir', 'stat', 'lstat', 'statfs', 'realpath', 'access', 'glob', 'watch'];
+
+/** Each file outside src/security/ that may read its own engine files, and the names it may import (D25). */
+const engineFileReads = {
+  'src/store/db.ts': ['readdirSync', 'readFileSync'],
+  'src/core/engine.ts': ['readFileSync'],
+};
+
 const fsWriteMessage = 'C3: only src/security/ may write files. Use src/security/safeWrite.ts.';
 const spawnMessage = 'C3: only src/security/exec.ts may spawn a process.';
 
-const fsWritePaths = ['fs', 'node:fs'].map((name) => ({
-  name,
-  importNames: fsWriteApis,
-  message: fsWriteMessage,
-}));
-const fsPromisesWritePaths = ['fs/promises', 'node:fs/promises'].map((name) => ({
-  name,
-  importNames: fsPromisesWriteApis,
-  message: fsWriteMessage,
-}));
+const fsReadMessage = 'C4: only src/security/ may read files. Use src/security/safeRead.ts with a SafePath.';
+const tsSysMessage = 'C4: ts.sys reads files directly. Use a CompilerHost that reads through src/security/safeRead.ts.';
+
+/** The fs restrictions for a file outside src/security/ that may import only the `allowed` read names. */
+const fsPaths = (allowed = []) => [
+  ...['fs', 'node:fs'].map((name) => ({
+    name,
+    importNames: [...fsWriteApis, ...fsReadApis.filter((n) => !allowed.includes(n))],
+    message: `${fsWriteMessage} ${fsReadMessage}`,
+  })),
+  ...['fs/promises', 'node:fs/promises'].map((name) => ({
+    name,
+    importNames: [...fsPromisesWriteApis, ...fsPromisesReadApis],
+    message: `${fsWriteMessage} ${fsReadMessage}`,
+  })),
+  { name: 'typescript', importNames: ['sys'], message: tsSysMessage },
+];
+const tsSysProperty = { object: 'ts', property: 'sys', message: tsSysMessage };
+
 const spawnPaths = ['child_process', 'node:child_process', 'execa', 'worker_threads', 'node:worker_threads'].map(
   (name) => ({ name, message: spawnMessage }),
 );
@@ -87,11 +138,19 @@ export default tseslint.config(
   ...tseslint.configs.recommended,
   {
     files: ['src/**/*.ts'],
-    ignores: ['src/security/**'],
+    ignores: ['src/security/**', ...Object.keys(engineFileReads)],
     rules: {
-      'no-restricted-imports': ['error', { paths: [...fsWritePaths, ...fsPromisesWritePaths, ...spawnPaths] }],
+      'no-restricted-imports': ['error', { paths: [...fsPaths(), ...spawnPaths] }],
+      'no-restricted-properties': ['error', tsSysProperty],
     },
   },
+  ...Object.entries(engineFileReads).map(([file, allowed]) => ({
+    files: [file],
+    rules: {
+      'no-restricted-imports': ['error', { paths: [...fsPaths(allowed), ...spawnPaths] }],
+      'no-restricted-properties': ['error', tsSysProperty],
+    },
+  })),
   {
     files: ['src/security/**/*.ts'],
     ignores: ['src/security/exec.ts'],

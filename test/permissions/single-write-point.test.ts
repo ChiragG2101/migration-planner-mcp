@@ -60,8 +60,9 @@ describe('single write point', () => {
     expect(await lintAs('src/tools/planted.ts', "import { promises } from 'node:fs';\npromises.writeFile('x', '');\n")).not.toEqual([]);
   });
 
-  it('the lint rule allows fs reads anywhere and writes in src/security/', async () => {
-    expect(await lintAs('src/core/planted.ts', "import { readFileSync } from 'node:fs';\nreadFileSync('x');\n")).toEqual([]);
+  // Reads outside src/security/ are refused since M2 (single-read-point.test.ts).
+  it('the lint rule allows fs reads and writes in src/security/', async () => {
+    expect(await lintAs('src/security/planted.ts', "import { readFileSync } from 'node:fs';\nreadFileSync('x');\n")).toEqual([]);
     expect(await lintAs(writeFile, "import { writeFileSync } from 'node:fs';\nwriteFileSync('x', '');\n")).toEqual([]);
   });
 });

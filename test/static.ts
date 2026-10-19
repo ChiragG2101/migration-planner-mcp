@@ -77,9 +77,9 @@ export function allImports(): ImportUse[] {
   return sourceFiles().flatMap(collectImports);
 }
 
-/** Lints `code` as if it lived at `relPath` under the repo, with the project's ESLint config. */
-export async function lintAs(relPath: string, code: string): Promise<string[]> {
+/** Lints `code` as if it lived at `relPath` under the repo, with the project's ESLint config; returns `rule`'s messages. */
+export async function lintAs(relPath: string, code: string, rule = 'no-restricted-imports'): Promise<string[]> {
   const eslint = new ESLint({ cwd: repoRoot });
   const [result] = await eslint.lintText(code, { filePath: path.join(repoRoot, relPath) });
-  return (result?.messages ?? []).filter((m) => m.ruleId === 'no-restricted-imports').map((m) => m.message);
+  return (result?.messages ?? []).filter((m) => m.ruleId === rule).map((m) => m.message);
 }

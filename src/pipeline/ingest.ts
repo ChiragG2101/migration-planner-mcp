@@ -3,12 +3,11 @@
 // ID under a campaign and repo ID. Vague or ambiguous input gets a question,
 // never a guess.
 import { createHash } from 'node:crypto';
-import { realpathSync, statSync } from 'node:fs';
 import type { Candidate, PackageFacts, Walk } from '../analysis/scanner.js';
 import { normalizePyName } from '../analysis/manifests/python.js';
 import type { GitState, IngestInput, Question, RunRef, Versions } from '../schema/ingest.js';
-import { InputError, NotBuiltError } from '../security/errors.js';
-import { resolveInside } from '../security/pathBoundary.js';
+import { NotBuiltError } from '../security/errors.js';
+import { resolveInside, resolveRepoRoot } from '../security/pathBoundary.js';
 import { readText } from '../security/safeRead.js';
 import { ensureCampaign, ensureRepo } from '../store/campaigns.js';
 import type { Db } from '../store/db.js';
@@ -34,13 +33,7 @@ export function repoIdFor(realpath: string): string {
 }
 
 export function resolveRepo(repoPath: string): Repo {
-  let root: string;
-  try {
-    root = realpathSync.native(repoPath);
-  } catch {
-    throw new InputError('repo_not_found', `repo path does not exist: ${repoPath}`);
-  }
-  if (!statSync(root).isDirectory()) throw new InputError('repo_not_dir', `repo path is not a folder: ${repoPath}`);
+  const root = resolveRepoRoot(repoPath);
   return { root, repoId: repoIdFor(root) };
 }
 

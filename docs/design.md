@@ -480,3 +480,23 @@ Why:
 
 Accepted limit: if the user's home folder is itself a git repo (a dotfiles setup), the top is the home folder, so the default lands beside it and any `--out` under the home folder is refused. The fix is an `--out` elsewhere (for example under `/tmp`). Revisit if this is reported.
 
+
+## 2026-10-19: M2 build decisions
+
+### D25 - The single read point and its allowlist
+
+**Decision:** within `src/`, only `src/security/` may import a `node:fs` read API (`readFile*`, `readdir*`, `opendir*`, `stat*`, `lstat*`, `statfs*`, `realpath*`, `exists*`, `access*`, `createReadStream`, `openAsBlob`, `read*`, `readv*`, `glob*`, `watch*`; `open*` and namespace or default imports were already refused as writes). The allowlist outside it is exactly two reads of the engine's own files:
+
+| File | Names | Reads |
+| --- | --- | --- |
+| `src/store/db.ts` | `readdirSync`, `readFileSync` | the SQL migrations under `src/store/migrations/` |
+| `src/core/engine.ts` | `readFileSync` | the package's own `package.json`, for the version |
+
+Nothing under `src/` may use `ts.sys` (a named `sys` import from `typescript`, or `ts.sys`), because it reads files directly; the TS adapter's `CompilerHost` reads through `safeRead`. The ESLint rule and `test/permissions/single-read-point.test.ts` enforce both.
+
+Why:
+
+- M1 checked INV-4 with tests but not with the lint, so nothing stopped new code reading a repo path directly, and M2's parsers are where that would happen.
+- `src/pipeline/ingest.ts` realpathed and stat'ed the repo folder itself. That moved to `resolveRepoRoot` in `src/security/pathBoundary.ts`, with the same messages, so the allowlist stays at the two engine-file reads.
+- The planted-lint test in `single-write-point.test.ts` that allowed reads anywhere now plants its read in `src/security/`, since reads elsewhere are refused.
+- Libraries that read their own package files (web-tree-sitter loading its WASM) are outside `src/` and outside the rule; they never get a repo path.
