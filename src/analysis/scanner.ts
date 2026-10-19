@@ -1,13 +1,10 @@
-// scan_repo's analysis: a bounded walk of the repo, then packages, versions,
-// entrypoints, test setup and config, all from files read through the path
+// scan_repo's analysis: the bounded walk (walk.ts), then packages, versions,
+// workspaces and lockfiles, with entrypoints, test setup and config from the
+// per-ecosystem modules in packages/. All from files read through the path
 // boundary. Deterministic: every list is sorted.
-import { createHash } from 'node:crypto';
-import path from 'node:path';
-import { PermissionError } from '../security/errors.js';
-import { isDenied } from '../security/denyList.js';
 import { resolveInside } from '../security/pathBoundary.js';
-import { listDir, readBytes, readText, statPath } from '../security/safeRead.js';
-import type { Dependency, Entrypoint, Lockfile, Package, ScanLimits, Skipped, TestSetup, TsConfigInfo, Workspace } from '../schema/scan.js';
+import { readText } from '../security/safeRead.js';
+import type { Dependency, Lockfile, Package, ScanLimits, Workspace } from '../schema/scan.js';
 import {
   type DeclaredDep,
   type LockLookup,
@@ -15,113 +12,14 @@ import {
   parsePackageLock,
   parsePnpmLock,
   parsePnpmWorkspace,
-  parseTsConfig,
   parseYarnLock,
 } from './manifests/node.js';
-import {
-  djangoSettingsModule,
-  normalizePyName,
-  parsePackageListLock,
-  parsePyproject,
-  parseRequirements,
-  pinnedVersion,
-  pytestIniPythonFiles,
-} from './manifests/python.js';
+import { normalizePyName, parsePackageListLock, parsePyproject, parseRequirements, pinnedVersion } from './manifests/python.js';
+import { nodeEntrypoints, nodeTests, tsChain } from './packages/node.js';
+import { pythonEntrypoints, pythonTests } from './packages/python.js';
+import { baseOf, byName, dirOf, isAncestorOrSelf, shownDir, under, type Walk, walkRepo } from './walk.js';
 
-export const DEFAULT_LIMITS: ScanLimits = {
-  max_files: 20_000,
-  max_file_bytes: 8 * 1024 * 1024,
-  max_total_bytes: 256 * 1024 * 1024,
-};
-
-export interface WalkedFile {
-  path: string;
-  size: number;
-  sha256: string;
-}
-
-export interface Walk {
-  files: WalkedFile[];
-  skipped: Skipped[];
-  bytes: number;
-}
-
-const byName = (a: string, b: string): number => (a < b ? -1 : a > b ? 1 : 0);
-
-/**
- * Walks the repo. An entry the boundary rejects or the deny list matches is
- * skipped and listed (path only), never read; the walk carries on.
- */
-export function walkRepo(root: string, repoId: string, limits: ScanLimits): Walk {
-  const files: WalkedFile[] = [];
-  const skipped: Skipped[] = [];
-  const seenDirs = new Set<string>();
-  let bytes = 0;
-
-  const visit = (dirRel: string): void => {
-    const dir = resolveInside(root, dirRel || '.', repoId);
-    if (seenDirs.has(dir.abs)) return;
-    seenDirs.add(dir.abs);
-    const entries = listDir(dir).sort((a, b) => byName(a.name, b.name));
-    for (const entry of entries) {
-      const rel = dirRel ? `${dirRel}/${entry.name}` : entry.name;
-      const shown = entry.isDirectory() ? `${rel}/` : rel;
-      let sp;
-      try {
-        sp = resolveInside(root, rel, repoId);
-      } catch (err) {
-        if (err instanceof PermissionError && err.code === 'outside_root') {
-          skipped.push({ path: shown, reason: 'outside_root' });
-          continue;
-        }
-        throw err;
-      }
-      if (isDenied(sp)) {
-        skipped.push({ path: shown, reason: 'denied' });
-        continue;
-      }
-      let st;
-      try {
-        st = statPath(sp);
-      } catch {
-        skipped.push({ path: shown, reason: 'unreadable' });
-        continue;
-      }
-      if (st.isDirectory()) {
-        visit(rel);
-        continue;
-      }
-      if (!st.isFile()) continue;
-      if (files.length >= limits.max_files) {
-        skipped.push({ path: rel, reason: 'max_files' });
-      } else if (st.size > limits.max_file_bytes) {
-        skipped.push({ path: rel, reason: 'too_large' });
-      } else if (bytes + st.size > limits.max_total_bytes) {
-        skipped.push({ path: rel, reason: 'max_total_bytes' });
-      } else {
-        const content = readBytes(sp);
-        bytes += content.length;
-        files.push({ path: rel, size: content.length, sha256: createHash('sha256').update(content).digest('hex') });
-      }
-    }
-  };
-
-  visit('');
-  return { files, skipped: skipped.sort((a, b) => byName(a.path, b.path)), bytes };
-}
-
-const posix = path.posix;
-const dirOf = (rel: string): string => (rel.includes('/') ? rel.slice(0, rel.lastIndexOf('/')) : '');
-const baseOf = (rel: string): string => rel.slice(rel.lastIndexOf('/') + 1);
-const under = (dir: string, rel: string): string => (dir ? `${dir}/${rel}` : rel);
-const isAncestorOrSelf = (dir: string, of: string): boolean => dir === '' || of === dir || of.startsWith(`${dir}/`);
-const shownDir = (dir: string): string => dir || '.';
-
-/** A package-relative path from a manifest, normalised to the repo; null if it leaves the root. */
-function inRepo(dir: string, value: string): string | null {
-  const p = posix.normalize(under(dir, value.replace(/^\.\//, '')));
-  return p.startsWith('..') || posix.isAbsolute(p) ? null : p.replace(/\/$/, '');
-}
+export { DEFAULT_LIMITS, type Walk, type WalkedFile, walkRepo } from './walk.js';
 
 /** Workspace globs: `*` within a segment, `**` across segments, `!` negates. */
 function matchesWorkspace(patterns: readonly string[], rel: string): boolean {
@@ -175,12 +73,6 @@ const pyLockKinds = new Set(['uv', 'poetry']);
 const unrecognisedNames = new Set(['setup.py', 'setup.cfg', 'Pipfile', 'Pipfile.lock']);
 const isRequirementsFile = (rel: string): boolean =>
   /^requirements[^/]*\.txt$/.test(baseOf(rel)) || (baseOf(dirOf(rel)) === 'requirements' && rel.endsWith('.txt'));
-
-const jestDefaultGlobs = ['**/__tests__/**/*.[jt]s?(x)', '**/?(*.)+(spec|test).[jt]s?(x)'];
-const vitestDefaultGlobs = ['**/*.{test,spec}.?(c|m)[jt]s?(x)'];
-const playwrightDefaultGlobs = ['**/*.@(spec|test).?(c|m)[jt]s?(x)'];
-const pytestDefaultGlobs = ['test_*.py', '*_test.py'];
-const configExts = ['js', 'mjs', 'cjs', 'ts', 'mts', 'cts', 'json'];
 
 export function analyzeRepo(root: string, repoId: string, limits: ScanLimits): RepoFacts {
   const walk = walkRepo(root, repoId, limits);
@@ -358,192 +250,4 @@ export function analyzeRepo(root: string, repoId: string, limits: ScanLimits): R
     ),
     manifestErrors: manifestErrors.sort((a, b) => byName(a.path, b.path)),
   };
-}
-
-function sortEntrypoints(list: Entrypoint[]): Entrypoint[] {
-  return list.sort((a, b) => byName(a.kind, b.kind) || byName(a.path ?? '', b.path ?? '') || byName(a.value ?? '', b.value ?? ''));
-}
-
-function nodeEntrypoints(
-  dir: string,
-  manifest: string,
-  pkg: ReturnType<typeof parsePackageJson>,
-  depNames: Set<string>,
-  files: readonly string[],
-  exists: (rel: string) => boolean,
-): Entrypoint[] {
-  const out: Entrypoint[] = [];
-  const declared = (kind: string, value: string, field: string): void => {
-    out.push({ kind, path: inRepo(dir, value), value, source: `${manifest}#${field}`, confidence: 'exact' });
-  };
-  if (pkg.main) declared('main', pkg.main, 'main');
-  if (pkg.module) declared('module', pkg.module, 'module');
-  for (const e of pkg.exports) declared('exports', e.value, e.key ? `exports.${e.key}` : 'exports');
-  for (const b of pkg.bin) declared('bin', b.value, b.name ? `bin.${b.name}` : 'bin');
-
-  const nextConfigs = ['js', 'mjs', 'cjs', 'ts', 'mts'].map((e) => under(dir, `next.config.${e}`)).filter(exists);
-  for (const c of nextConfigs) out.push({ kind: 'next_config', path: c, value: null, source: c, confidence: 'exact' });
-  // App and pages folders count as Next.js markers only in a package that uses Next.js.
-  if (depNames.has('next') || nextConfigs.length) {
-    for (const prefix of [dir, under(dir, 'src')]) {
-      const app = under(prefix, 'app');
-      const appFile = files.find((f) => f.startsWith(`${app}/`) && /^(page|layout|route)\.(jsx?|tsx?|mdx?)$/.test(baseOf(f)));
-      if (appFile) out.push({ kind: 'next_app_router', path: app, value: null, source: appFile, confidence: 'exact' });
-      const pages = under(prefix, 'pages');
-      const pageFile = files.find((f) => f.startsWith(`${pages}/`) && /\.(jsx?|tsx?|mdx?)$/.test(f));
-      if (pageFile) out.push({ kind: 'next_pages_router', path: pages, value: null, source: pageFile, confidence: 'exact' });
-    }
-  }
-  for (const prefix of [dir, under(dir, 'src')]) {
-    for (const ext of ['js', 'mjs', 'cjs', 'ts', 'mts']) {
-      const f = under(prefix, `server.${ext}`);
-      if (exists(f)) out.push({ kind: 'server', path: f, value: null, source: 'file name', confidence: 'heuristic' });
-    }
-  }
-  return sortEntrypoints(out);
-}
-
-function nodeTests(dir: string, pkg: ReturnType<typeof parsePackageJson>, depNames: Set<string>, exists: (rel: string) => boolean): TestSetup {
-  const runners: TestSetup['runners'] = [];
-  const globs = new Set<string>();
-  const configs = (stem: string): string[] => configExts.map((e) => under(dir, `${stem}.${e}`)).filter(exists);
-  const detect = (name: string, deps: string[], configStems: string[], extra: string[], defaults: readonly string[]): void => {
-    const evidence = [...deps.filter((d) => depNames.has(d)).map((d) => `dependency ${d}`), ...configStems.flatMap(configs), ...extra];
-    if (evidence.length) {
-      runners.push({ name, evidence });
-      defaults.forEach((g) => globs.add(g));
-    }
-  };
-  detect('jest', ['jest'], ['jest.config'], pkg.jestTestMatch ? [`${under(dir, 'package.json')}#jest`] : [], pkg.jestTestMatch ?? jestDefaultGlobs);
-  detect('vitest', ['vitest'], ['vitest.config', 'vitest.workspace'], [], vitestDefaultGlobs);
-  detect('playwright', ['@playwright/test', 'playwright'], ['playwright.config'], [], playwrightDefaultGlobs);
-  return { runners, globs: [...globs].sort(byName), test_script: pkg.scripts.test ?? null };
-}
-
-/** Finds the file for a dotted module, trying each base folder; null when none exists. */
-function moduleFile(module: string, bases: readonly string[], exists: (rel: string) => boolean): string | null {
-  const rel = module.replace(/\./g, '/');
-  for (const base of bases) {
-    for (const cand of [under(base, `${rel}.py`), under(base, `${rel}/__init__.py`)]) if (exists(cand)) return cand;
-  }
-  return null;
-}
-
-function pythonEntrypoints(
-  dir: string,
-  scripts: readonly { name: string; value: string; source: string }[],
-  ownFiles: readonly string[],
-  exists: (rel: string) => boolean,
-  read: (rel: string) => string,
-): Entrypoint[] {
-  const out: Entrypoint[] = [];
-  const bases = [dir, under(dir, 'src')];
-  for (const s of scripts) {
-    const module = s.value.split(':')[0]!.trim();
-    out.push({ kind: 'script', path: moduleFile(module, bases, exists), value: `${s.name} = ${s.value}`, source: s.source, confidence: 'exact' });
-  }
-  const settingsSeen = new Set<string>();
-  for (const f of ownFiles) {
-    const base = baseOf(f);
-    if (base !== 'manage.py' && base !== 'wsgi.py' && base !== 'asgi.py') continue;
-    if (base === 'manage.py') out.push({ kind: 'django_manage', path: f, value: null, source: f, confidence: 'exact' });
-    else out.push({ kind: base === 'wsgi.py' ? 'wsgi' : 'asgi', path: f, value: null, source: 'file name', confidence: 'heuristic' });
-    let text: string;
-    try {
-      text = read(f);
-    } catch {
-      continue;
-    }
-    const module = djangoSettingsModule(text);
-    if (module && !settingsSeen.has(module)) {
-      settingsSeen.add(module);
-      const manageDir = base === 'manage.py' ? dirOf(f) : dirOf(dirOf(f));
-      out.push({
-        kind: 'django_settings',
-        path: moduleFile(module, [manageDir, ...bases], exists),
-        value: module,
-        source: f,
-        confidence: 'heuristic',
-      });
-    }
-  }
-  return sortEntrypoints(out);
-}
-
-function pythonTests(
-  dir: string,
-  tools: Record<string, unknown>,
-  pyprojectPythonFiles: string[] | null,
-  depNames: Set<string>,
-  ownFiles: readonly string[],
-  exists: (rel: string) => boolean,
-  read: (rel: string) => string,
-): TestSetup {
-  const runners: TestSetup['runners'] = [];
-  const globs = new Set<string>();
-  const pytestIni = under(dir, 'pytest.ini');
-  const iniFiles = exists(pytestIni) ? pytestIniPythonFiles(read(pytestIni)) : null;
-  const pytestEvidence = [
-    ...(depNames.has('pytest') ? ['dependency pytest'] : []),
-    ...(exists(pytestIni) ? [pytestIni] : []),
-    ...(exists(under(dir, 'conftest.py')) ? [under(dir, 'conftest.py')] : []),
-    ...('pytest' in tools ? [`${under(dir, 'pyproject.toml')}#tool.pytest`] : []),
-  ];
-  if (pytestEvidence.length) {
-    runners.push({ name: 'pytest', evidence: pytestEvidence });
-    (iniFiles ?? pyprojectPythonFiles ?? pytestDefaultGlobs).forEach((g) => globs.add(g));
-  }
-  if (depNames.has('pytest-django')) runners.push({ name: 'pytest-django', evidence: ['dependency pytest-django'] });
-  const manage = ownFiles.find((f) => baseOf(f) === 'manage.py');
-  if (manage && depNames.has('django')) {
-    runners.push({ name: 'django', evidence: [manage, 'dependency django'] });
-    globs.add('test*.py');
-  }
-  return { runners, globs: [...globs].sort(byName), test_script: null };
-}
-
-function tsChain(
-  start: string,
-  exists: (rel: string) => boolean,
-  read: (rel: string) => string,
-  onError: (rel: string, message: string) => void,
-): TsConfigInfo {
-  const chain: string[] = [];
-  const unresolved: string[] = [];
-  const seen = new Set<string>();
-  type Merged = { module: string | null; target: string | null; paths: Record<string, string[]> | null };
-  const load = (rel: string): Merged => {
-    seen.add(rel);
-    chain.push(rel);
-    let cfg;
-    try {
-      cfg = parseTsConfig(read(rel));
-    } catch (err) {
-      onError(rel, err instanceof Error ? err.message : String(err));
-      throw err;
-    }
-    let merged: Merged = { module: null, target: null, paths: null };
-    for (const ext of cfg.extends) {
-      let base = ext.startsWith('.') ? posix.normalize(under(dirOf(rel), ext)) : null;
-      if (base && !base.endsWith('.json')) base += '.json';
-      if (!base || base.startsWith('..') || !exists(base) || seen.has(base)) {
-        unresolved.push(ext);
-        continue;
-      }
-      try {
-        const parent = load(base);
-        merged = { module: parent.module ?? merged.module, target: parent.target ?? merged.target, paths: parent.paths ?? merged.paths };
-      } catch {
-        unresolved.push(ext);
-      }
-    }
-    return { module: cfg.module ?? merged.module, target: cfg.target ?? merged.target, paths: cfg.paths ?? merged.paths };
-  };
-  let merged: Merged = { module: null, target: null, paths: null };
-  try {
-    merged = load(start);
-  } catch {
-    // Reported through onError; the chain stays as far as it got.
-  }
-  return { chain, unresolved_extends: unresolved, module: merged.module, target: merged.target, paths: merged.paths ?? {} };
 }
