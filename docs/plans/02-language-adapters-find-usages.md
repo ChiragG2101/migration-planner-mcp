@@ -60,10 +60,11 @@
       - decoys: old-style code the target still supports, for example a still-supported legacy pattern or a lint-level smell [`no_finding`]
 13. **Python adapter fixture (`test/fixtures/python-imports/`).** A small package with absolute, relative, `importlib` and settings-string references, used only for adapter unit tests. The Django seeded repo comes in M10.
 14. **Recall script (`eval/seeded/recall.ts`).** Compares `find_usages` output with the ground truth and prints recall per kind and overall, plus the misses. Recall counts `change` and `no_change` entries, since both are usages that must be found. `no_finding` entries are scored at the plan level in M7. Writes `eval/seeded/recall.md`. The ratchet floor for each seeded repo is recorded in `eval/seeded/ratchet.json`, and a new repo's entry starts at the recall it measures. It is pack-independent, so M10 reuses it.
+15. **Split the scanner first (maintenance, `docs/design.md` D23).** `src/analysis/scanner.ts` is about 550 lines after M1 and grows in M2, M3 and M10. Before adding to `src/analysis/`, split it with no change in behaviour: the bounded walk into `src/analysis/walk.ts`, the Node and Python package facts (entrypoints, test setup, tsconfig chain) into `src/analysis/packages/{node,python}.ts`, and keep `scanner.ts` as the orchestration (lockfile resolution and `analyzeRepo`). The parsers in `src/analysis/manifests/` stay as they are. Do it as its own commit, before any other M2 change to `src/analysis/`. The M1 tests pass unchanged and the `scan_repo` output is byte-identical on both fixtures. The regression rule (eval rerun) doesn't apply before M7; say so in the commit.
 
 ## Files and modules
 
-`src/lang/{adapter,text}.ts`, `src/lang/ts/{program,imports,symbols}.ts`, `src/lang/python/{parser,imports,symbols}.ts`, `src/analysis/snippet.ts`, `src/analysis/usages/{adapter,index,nextjs}.ts`, `src/store/usages.ts`, `src/store/migrations/002_usages.sql`, `src/core/findUsages.ts`, `src/tools/findUsages.ts`, `src/cli/usages.ts`, `eval/seeded/next-tricky/**`, `eval/seeded/recall.ts`, `eval/seeded/recall.md`, `eval/seeded/ratchet.json`, `test/fixtures/python-imports/**`, `test/unit/{lang,usages}/*.test.ts`.
+`src/analysis/{walk,scanner}.ts` and `src/analysis/packages/{node,python}.ts` (task 15), `src/lang/{adapter,text}.ts`, `src/lang/ts/{program,imports,symbols}.ts`, `src/lang/python/{parser,imports,symbols}.ts`, `src/analysis/snippet.ts`, `src/analysis/usages/{adapter,index,nextjs}.ts`, `src/store/usages.ts`, `src/store/migrations/002_usages.sql`, `src/core/findUsages.ts`, `src/tools/findUsages.ts`, `src/cli/usages.ts`, `eval/seeded/next-tricky/**`, `eval/seeded/recall.ts`, `eval/seeded/recall.md`, `eval/seeded/ratchet.json`, `test/fixtures/python-imports/**`, `test/unit/{lang,usages}/*.test.ts`.
 
 ## Tests
 
@@ -95,4 +96,4 @@
 
 ## Must not break
 
-The M1 permissions suite, the repo hash check and `scan_repo` output.
+The M1 permissions suite, the repo hash check and `scan_repo` output (byte-identical across the task 15 split). CI (`.github/workflows/ci.yml`) stays green.
