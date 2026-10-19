@@ -4,6 +4,7 @@
 import type { McpServer } from '@modelcontextprotocol/server';
 import type { z } from 'zod';
 import { errorPayload, type Engine } from '../core/index.js';
+import { findUsagesTool } from './findUsages.js';
 import { scanRepoTool } from './scanRepo.js';
 
 export interface ToolDef {
@@ -15,7 +16,7 @@ export interface ToolDef {
   handler: (engine: Engine, input: unknown) => Promise<unknown>;
 }
 
-export const tools: readonly ToolDef[] = [scanRepoTool];
+export const tools: readonly ToolDef[] = [scanRepoTool, findUsagesTool];
 
 export function registerTools(server: McpServer, engine: Engine): void {
   for (const tool of tools) {

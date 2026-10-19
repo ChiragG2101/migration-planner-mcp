@@ -7,6 +7,8 @@ import {
   closeEngine,
   createEngine,
   ENGINE_VERSION,
+  findUsages,
+  ingest,
   InputError,
   NotBuiltError,
   parseLevel,
@@ -16,11 +18,14 @@ import {
 } from '../core/index.js';
 import { startMcpServer } from '../server.js';
 import { formatScanText, scanInput } from './scan.js';
+import { formatUsagesText, usagesFilter } from './usages.js';
 
 const usage = `migration-planner-mcp ${ENGINE_VERSION}
 
 Usage:
   migration-planner-mcp scan <repo> --source <lib@ver> --target <lib@ver> [--campaign <id>] [--format json|text]
+  migration-planner-mcp usages <repo> --source <lib@ver> --target <lib@ver> [--kind <k>] [--file <f>] [--symbol <s>]
+                         [--limit <n>] [--cursor <c>] [--format json|text]
   migration-planner-mcp mcp
 
 Shared flags:
@@ -42,6 +47,11 @@ async function main(argv: string[]): Promise<number> {
       source: { type: 'string' },
       target: { type: 'string' },
       campaign: { type: 'string' },
+      kind: { type: 'string' },
+      file: { type: 'string' },
+      symbol: { type: 'string' },
+      cursor: { type: 'string' },
+      limit: { type: 'string' },
       format: { type: 'string', default: 'json' },
       help: { type: 'boolean', short: 'h' },
     },
@@ -64,6 +74,23 @@ async function main(argv: string[]): Promise<number> {
         const out = await scanRepo(engine, scanInput(rest, values));
         process.stdout.write(values.format === 'text' ? `${formatScanText(out)}\n` : `${JSON.stringify(out, null, 2)}\n`);
         return out.status === 'ok' ? 0 : 3;
+      } finally {
+        closeEngine(engine);
+      }
+    }
+    case 'usages': {
+      if (values.format !== 'json' && values.format !== 'text') throw new InputError('bad_format', '--format must be json or text');
+      if (rest.length === 0) throw new InputError('missing_repo', 'usages needs a repo path');
+      const engine = createEngine(options);
+      try {
+        const ing = await ingest(engine, scanInput(rest, values));
+        if (ing.status !== 'ok' || !ing.run) {
+          process.stdout.write(`${JSON.stringify(ing, null, 2)}\n`);
+          return 3;
+        }
+        const out = await findUsages(engine, { run_id: ing.run.run_id, ...usagesFilter(values) });
+        process.stdout.write(values.format === 'text' ? `${formatUsagesText(out)}\n` : `${JSON.stringify(out, null, 2)}\n`);
+        return 0;
       } finally {
         closeEngine(engine);
       }

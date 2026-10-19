@@ -5,7 +5,7 @@ import { existsSync } from 'node:fs';
 import path from 'node:path';
 import { describe, expect, it } from 'vitest';
 import { repoHash } from '../../scripts/repo-hash.js';
-import { closeEngine, createEngine, ingest, scanRepo } from '../../src/core/index.js';
+import { closeEngine, createEngine, findUsages, ingest, scanRepo } from '../../src/core/index.js';
 import { copyFixture, runCli, tmpDir, writeTree } from '../helpers.js';
 import { callTool, inMemoryClient, stdioClient } from '../mcp.js';
 
@@ -20,13 +20,16 @@ const cases = [
 ];
 
 describe.each(cases)('$fixture is never written', ({ fixture, source, target, input }) => {
-  it('by the core API (ingest, scanRepo, and a question)', async () => {
+  it('by the core API (ingest, scanRepo, findUsages, and a question)', async () => {
     const repo = copyFixture(fixture);
     const before = repoHash(repo);
     const engine = createEngine({ out: tmpDir() });
     try {
       expect((await ingest(engine, { repo_path: repo, ...input })).status).toBe('ok');
-      expect((await scanRepo(engine, { repo_path: repo, ...input })).status).toBe('ok');
+      const scan = await scanRepo(engine, { repo_path: repo, ...input });
+      expect(scan.status).toBe('ok');
+      await findUsages(engine, { run_id: scan.run!.run_id });
+      await findUsages(engine, { run_id: scan.run!.run_id, limit: 1 });
       expect((await scanRepo(engine, { repo_path: repo, target: input.target })).status).toBe('question');
     } finally {
       closeEngine(engine);
@@ -34,10 +37,12 @@ describe.each(cases)('$fixture is never written', ({ fixture, source, target, in
     expect(repoHash(repo)).toBe(before);
   });
 
-  it('by the CLI scan command, json and text', () => {
+  it('by the CLI scan and usages commands, json and text', () => {
     const repo = copyFixture(fixture);
     const before = repoHash(repo);
     const out = tmpDir();
+    expect(runCli(['usages', repo, '--source', source, '--target', target, '--out', out]).status).toBe(0);
+    expect(runCli(['usages', repo, '--source', source, '--target', target, '--out', out, '--format', 'text']).status).toBe(0);
     expect(runCli(['scan', repo, '--source', source, '--target', target, '--out', out]).status).toBe(0);
     expect(runCli(['scan', repo, '--source', source, '--target', target, '--out', out, '--format', 'text']).status).toBe(0);
     expect(runCli(['scan', repo, '--source', source, '--target', target, '--out', out, '--level', '1']).status).toBe(0);
@@ -90,18 +95,23 @@ describe.each(cases)('$fixture is never written', ({ fixture, source, target, in
     expect(repoHash(linked)).toBe(before);
   });
 
-  it('by the MCP scan_repo tool, in memory and over stdio', async () => {
+  it('by the MCP scan_repo and find_usages tools, in memory and over stdio', async () => {
     const repo = copyFixture(fixture);
     const before = repoHash(repo);
+    const runIdOf = (r: Awaited<ReturnType<typeof callTool>>): string => (r.structuredContent as { run: { run_id: string } }).run.run_id;
     const mem = await inMemoryClient({ out: tmpDir() });
     try {
-      expect((await callTool(mem.client, 'scan_repo', { repo_path: repo, ...input })).isError).toBeFalsy();
+      const scan = await callTool(mem.client, 'scan_repo', { repo_path: repo, ...input });
+      expect(scan.isError).toBeFalsy();
+      expect((await callTool(mem.client, 'find_usages', { run_id: runIdOf(scan) })).isError).toBeFalsy();
     } finally {
       await mem.close();
     }
     const stdio = await stdioClient(['--out', tmpDir()]);
     try {
-      expect((await callTool(stdio.client, 'scan_repo', { repo_path: repo, ...input })).isError).toBeFalsy();
+      const scan = await callTool(stdio.client, 'scan_repo', { repo_path: repo, ...input });
+      expect(scan.isError).toBeFalsy();
+      expect((await callTool(stdio.client, 'find_usages', { run_id: runIdOf(scan) })).isError).toBeFalsy();
     } finally {
       await stdio.close();
     }

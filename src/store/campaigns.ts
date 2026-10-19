@@ -15,3 +15,10 @@ export function ensureRepo(db: Db, repoId: string, campaignId: string, rootRealp
     rootRealpath,
   );
 }
+
+export function repoRoot(db: Db, repoId: string, campaignId: string): string | undefined {
+  const row = db.prepare('SELECT root_realpath FROM repos WHERE id = ? AND campaign_id = ?').get(repoId, campaignId) as
+    | { root_realpath: string }
+    | undefined;
+  return row?.root_realpath;
+}

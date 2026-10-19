@@ -13,6 +13,7 @@ import { isWithin, realpathAllowMissing } from '../security/pathBoundary.js';
 import { assertOutsideRepos, enclosingRepoTop, openOutDir, registerRepoRoot, type OutWriter } from '../security/safeWrite.js';
 import { openDb, type Db } from '../store/db.js';
 import { appendEvent, type NewEvent } from '../store/events.js';
+import { getRun } from '../store/runs.js';
 
 // <package>/package.json, from both src/core/ and dist/core/.
 export const ENGINE_VERSION = (JSON.parse(readFileSync(new URL('../../package.json', import.meta.url), 'utf8')) as { version: string })
@@ -91,6 +92,12 @@ export function openSession(engine: Engine, repoRoot: string): Session {
   engine.sessions.set(dbPath, session);
   engine.log(`output folder: ${writer.root} (outside the repo); store: ${dbPath}`);
   return session;
+}
+
+/** The open session whose store holds `runId`, or undefined. */
+export function sessionForRun(engine: Engine, runId: string): Session | undefined {
+  for (const s of engine.sessions.values()) if (getRun(s.db, runId)) return s;
+  return undefined;
 }
 
 export interface ToolCall {

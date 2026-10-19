@@ -93,3 +93,31 @@ describe('CLI and MCP give the same JSON', () => {
     }
   });
 });
+
+describe('CLI usages and MCP find_usages give the same JSON', () => {
+  it.each([
+    ['next-basic', 'next', 'next@16.0.0', { name: 'next', version: '16.0.0' }],
+    ['django-basic', 'django', 'django@4.2.30', { name: 'django', version: '4.2.30' }],
+  ])('%s', async (fixture, source, target, targetRef) => {
+    const repo = copyFixture(fixture);
+    const out = tmpDir();
+    const cli = runCli(['usages', repo, '--source', source, '--target', target, '--out', out]);
+    expect(cli.status).toBe(0);
+    // The timing and the cache counts differ between two computations; everything else must not.
+    const strip = (o: unknown): unknown => {
+      const r = o as { summary: Record<string, unknown> };
+      return { ...r, summary: { ...r.summary, duration_ms: 0, files: null } };
+    };
+    const fromCli = strip(JSON.parse(cli.stdout));
+    const stdio = await stdioClient(['--out', out]);
+    try {
+      const scan = await callTool(stdio.client, 'scan_repo', { repo_path: repo, source: { name: source }, target: targetRef });
+      const runId = (scan.structuredContent as { run: { run_id: string } }).run.run_id;
+      const res = await callTool(stdio.client, 'find_usages', { run_id: runId });
+      expect(res.isError).toBeFalsy();
+      expect(strip(res.structuredContent)).toEqual(fromCli);
+    } finally {
+      await stdio.close();
+    }
+  });
+});
