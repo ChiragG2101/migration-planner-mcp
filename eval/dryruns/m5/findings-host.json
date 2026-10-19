@@ -1,0 +1,173 @@
+{
+  "driver": "host",
+  "host": "Cursor (databricks-claude-sonnet-4-6)",
+  "repo": "tortoise-web-frontend/apps/employer-dashboard",
+  "note": "Private repo on user desktop. Mirror at /tmp/mp-tortoise-workspace-mirror (not committed). Original repo hash e3a6d07cf00edfe38aa3aa0605df543fa47ae82a054b824dd45c14f98b8f0891 unchanged after run.",
+  "source": "next@14.2.35",
+  "target": "next@15",
+  "run_id": "01M5B4R7E5HVFQRQ1HB8WMEA6C",
+  "repo_id": "0cd5ba22a325d84b",
+  "size": "full",
+  "questions": [],
+  "total_usages": 693,
+  "packets": [
+    {
+      "lens": "api",
+      "usages": 11,
+      "rules": 13,
+      "symbols": 26,
+      "truncated": null
+    },
+    {
+      "lens": "dependency_build",
+      "usages": 136,
+      "rules": 3,
+      "symbols": 6,
+      "truncated": {
+        "usages": 544,
+        "rules": 0,
+        "symbols": 0,
+        "note": null
+      }
+    },
+    {
+      "lens": "behavior_runtime",
+      "usages": 2,
+      "rules": 9,
+      "symbols": 18,
+      "truncated": null
+    },
+    {
+      "lens": "verification",
+      "usages": 0,
+      "rules": 0,
+      "symbols": 0,
+      "truncated": null
+    }
+  ],
+  "results": [
+    {
+      "lens": "api",
+      "accepted": true,
+      "retry": false,
+      "gap": false,
+      "stored": 2,
+      "out_of_scope": 2,
+      "errors": []
+    },
+    {
+      "lens": "dependency_build",
+      "accepted": true,
+      "retry": false,
+      "gap": false,
+      "stored": 2,
+      "out_of_scope": 134,
+      "errors": []
+    },
+    {
+      "lens": "behavior_runtime",
+      "accepted": true,
+      "retry": false,
+      "gap": false,
+      "stored": 0,
+      "out_of_scope": 2,
+      "errors": []
+    },
+    {
+      "lens": "verification",
+      "accepted": true,
+      "retry": false,
+      "gap": false,
+      "stored": 0,
+      "out_of_scope": 0,
+      "errors": []
+    }
+  ],
+  "findings": [
+    {
+      "id": "api-async-params",
+      "lens": "api",
+      "source": "rule_pack",
+      "concern": "api_change",
+      "severity": "high",
+      "rule_id": "next/async-params",
+      "step_kind": "codemod",
+      "codemod": "next-codemod:next-async-request-api",
+      "usage_count": 6,
+      "files": [
+        "apps/employer-dashboard/src/app/billing/[invoice_id]/page.jsx",
+        "apps/employer-dashboard/src/app/employees/import/[job_id]/process_import/page.jsx",
+        "apps/employer-dashboard/src/app/employees/import/[job_id]/repairs/page.jsx",
+        "apps/employer-dashboard/src/app/employees/import_old/[import_id]/mapping/page.jsx",
+        "apps/employer-dashboard/src/app/employees/import_old/[import_id]/processed/page.jsx",
+        "apps/employer-dashboard/src/app/employees/import_old/[import_id]/report/page.jsx"
+      ],
+      "action": "Run next-codemod:next-async-request-api to wrap synchronous params destructuring with await in all page/layout files.",
+      "docs_status": "verified"
+    },
+    {
+      "id": "api-async-headers",
+      "lens": "api",
+      "source": "rule_pack",
+      "concern": "api_change",
+      "severity": "high",
+      "rule_id": "next/async-headers",
+      "step_kind": "codemod",
+      "codemod": "next-codemod:next-async-request-api",
+      "usage_count": 2,
+      "files": [
+        "apps/employer-dashboard/src/app/layout.jsx"
+      ],
+      "action": "Run next-codemod:next-async-request-api to add await before headers() in generateMetadata and RootLayout.",
+      "docs_status": "verified"
+    },
+    {
+      "id": "dep-next-bump",
+      "lens": "dependency_build",
+      "source": "usage_scan",
+      "concern": "dependency",
+      "severity": "high",
+      "rule_id": null,
+      "step_kind": "manual",
+      "usage_count": 1,
+      "files": [
+        "apps/employer-dashboard/package.json"
+      ],
+      "action": "Update next from 14.2.35 to 15.x in apps/employer-dashboard/package.json and run pnpm install at the workspace root.",
+      "docs_status": "verified"
+    },
+    {
+      "id": "dep-images-domains-deprecated",
+      "lens": "dependency_build",
+      "source": "usage_scan",
+      "concern": "build",
+      "severity": "medium",
+      "rule_id": null,
+      "step_kind": "manual",
+      "usage_count": 1,
+      "files": [
+        "apps/employer-dashboard/next.config.js"
+      ],
+      "action": "Replace images.domains with images.remotePatterns in next.config.js.",
+      "docs_status": "verified"
+    }
+  ],
+  "marks": [
+    {
+      "lens": "api",
+      "usage_id": "middleware",
+      "reason": "middleware file convention unchanged in Next.js 15"
+    },
+    {
+      "lens": "api",
+      "usage_id": "react_legacy",
+      "reason": "no reviewed rule requires a change in the 14->15 range"
+    },
+    {
+      "lens": "behavior_runtime",
+      "count": 2,
+      "reason": "both fetch_call usages already use { cache: 'no-store' }, the Next.js 15 default"
+    }
+  ],
+  "hash_unchanged": true
+}

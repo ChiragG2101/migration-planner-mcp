@@ -1,0 +1,386 @@
+{
+  "driver": "script",
+  "host": null,
+  "case": "nextjs-bigcommerce-subscription-foundation-51",
+  "base_commit": "6cff8058d722b751cca4961230e8f09af803a88a",
+  "source": "next@14.2.35",
+  "target": "next@15.5.21",
+  "run_id": "01M5B2X8AB33MV1N77SCCVZCAT",
+  "repo_id": "ffc62b931435ce81",
+  "size": "full",
+  "questions": [],
+  "risk_count": 92,
+  "packets": [
+    {
+      "lens": "api",
+      "usages": 37,
+      "rules": 12,
+      "symbols": 24,
+      "truncated": null
+    },
+    {
+      "lens": "dependency_build",
+      "usages": 43,
+      "rules": 4,
+      "symbols": 8,
+      "truncated": null
+    },
+    {
+      "lens": "behavior_runtime",
+      "usages": 0,
+      "rules": 9,
+      "symbols": 18,
+      "truncated": null
+    },
+    {
+      "lens": "verification",
+      "usages": 12,
+      "rules": 0,
+      "symbols": 0,
+      "truncated": null
+    }
+  ],
+  "doc_queries": 50,
+  "doc_queries_refused": [],
+  "results": [
+    {
+      "lens": "api",
+      "accepted": true,
+      "retry": false,
+      "gap": false,
+      "stored": 3,
+      "out_of_scope": 0,
+      "errors": [],
+      "flags": [
+        {
+          "finding_id": "api-jsx-namespace",
+          "file": "src/pages/index.tsx",
+          "line_start": 15,
+          "line_end": 15,
+          "match": true
+        },
+        {
+          "finding_id": "api-useref-argument",
+          "file": "src/components/Products/Panes/ListPane.tsx",
+          "line_start": 34,
+          "line_end": 34,
+          "match": true
+        },
+        {
+          "finding_id": "api-internal-next-import",
+          "file": "shared/handlers/getUserAndStore.ts",
+          "line_start": 2,
+          "line_end": 2,
+          "match": true
+        }
+      ]
+    },
+    {
+      "lens": "dependency_build",
+      "accepted": true,
+      "retry": false,
+      "gap": false,
+      "stored": 3,
+      "out_of_scope": 4,
+      "errors": [],
+      "flags": [
+        {
+          "finding_id": "dep-next-bump",
+          "file": "package.json",
+          "line_start": 54,
+          "line_end": 54,
+          "match": true
+        },
+        {
+          "finding_id": "dep-next-intl-peers",
+          "file": "package-lock.json",
+          "line_start": 7732,
+          "line_end": 7732,
+          "match": true
+        },
+        {
+          "finding_id": "dep-next-intl-peers",
+          "file": "package-lock.json",
+          "line_start": 7732,
+          "line_end": 7732,
+          "match": true
+        },
+        {
+          "finding_id": "dep-eslint-and-types",
+          "file": "package.json",
+          "line_start": 89,
+          "line_end": 89,
+          "match": true
+        }
+      ]
+    },
+    {
+      "lens": "behavior_runtime",
+      "accepted": true,
+      "retry": false,
+      "gap": false,
+      "stored": 0,
+      "out_of_scope": 0,
+      "errors": [],
+      "flags": []
+    },
+    {
+      "lens": "verification",
+      "accepted": true,
+      "retry": false,
+      "gap": false,
+      "stored": 1,
+      "out_of_scope": 0,
+      "errors": [],
+      "flags": [
+        {
+          "finding_id": "verify-dynamic-locales",
+          "file": "src/components/Onboarding/DisplaySettings/index.tsx",
+          "line_start": 172,
+          "line_end": 172,
+          "match": true
+        }
+      ]
+    }
+  ],
+  "findings": [
+    {
+      "id": "api-internal-next-import",
+      "lens": "api",
+      "source": "usage_scan",
+      "concern": "api_change",
+      "severity": "high",
+      "usage_ids": [
+        "14384caf3b77a643c651806c"
+      ],
+      "docs_status": "verified",
+      "evidence": [
+        {
+          "repo_id": "ffc62b931435ce81",
+          "file": "shared/handlers/getUserAndStore.ts",
+          "line_start": 2,
+          "line_end": 2,
+          "snippet_hash": "a930c233eb000bcd3e54b0b45e54e2243d7d302beeca4bc6e1daa3d4e9c5ada9"
+        }
+      ],
+      "rule_id": null,
+      "step_kind": "manual"
+    },
+    {
+      "id": "api-jsx-namespace",
+      "lens": "api",
+      "source": "rule_pack",
+      "concern": "api_change",
+      "severity": "medium",
+      "usage_ids": [
+        "7084ad3b0e3ba2fd0d743e99",
+        "6259f05781279f5736cc5882",
+        "97c95aa04d5a5d91dc2f7962",
+        "bb0bfd658f688854971d333b",
+        "f11361679b07e91e1df43295",
+        "8cd1c7ba94afe65955d713fb",
+        "e9333e43e9213e036a2ed831",
+        "e6de4786df0e0a869fd11d74",
+        "015691a7102e3b0f6b670970",
+        "40ddbddde5388aef3afde558",
+        "13969207006ee34ce9b33b10",
+        "97104897ea85a77225680e97",
+        "afe2de5ac9428f46190306a7",
+        "d2a1e9b68e96b8806bdab78a",
+        "3f2f222012f625ac6271440f",
+        "dfddcb8b0ab417805189e2f3",
+        "bf5d85f9e6fdb55ccdcfc71b",
+        "51f0945950d35bf099d264e0",
+        "2659be2f70f453844a403b79",
+        "976ccdb76bcea63d8de0b424",
+        "0dc9dfd3e14b96d5ca6140cb",
+        "39ad6b5434a3f5e597ff5b3e",
+        "2891f2cf6487ecb60079014e",
+        "848dffaaab6d7be9c19cc741",
+        "f6a161eac927a0b1807d2942",
+        "368d4c77f744495787e2b7ff",
+        "560a1918d5eb1958808303b4",
+        "cd47218b9de1c28fa56dd03d",
+        "9d9b77c74e26da3ae7a96ee7",
+        "f0c7431765070ff79a0ededf",
+        "de26ecc6486858aa1795bb0a",
+        "7ca75e1e87c19004ba15984f",
+        "024a62b735ea015f66e27bd0",
+        "c0e8bc4d86d2608ed2de1b0a",
+        "208339ea319a58b5ebe1cd5c"
+      ],
+      "docs_status": "verified",
+      "evidence": [
+        {
+          "repo_id": "ffc62b931435ce81",
+          "file": "src/pages/index.tsx",
+          "line_start": 15,
+          "line_end": 15,
+          "snippet_hash": "8f08b6533a2336988702a7db9030d6eeffc88fd8a0cbf02b861f9f167df3c8e4"
+        }
+      ],
+      "rule_id": "react/the-jsx-namespace-in-typescript",
+      "step_kind": "codemod"
+    },
+    {
+      "id": "api-useref-argument",
+      "lens": "api",
+      "source": "rule_pack",
+      "concern": "api_change",
+      "severity": "medium",
+      "usage_ids": [
+        "6e80fcae4238cd1ef6aaf006"
+      ],
+      "docs_status": "verified",
+      "evidence": [
+        {
+          "repo_id": "ffc62b931435ce81",
+          "file": "src/components/Products/Panes/ListPane.tsx",
+          "line_start": 34,
+          "line_end": 34,
+          "snippet_hash": "5aaea9f92b31d212ce9eac40f0ed74d6d71631f2c57e5fef2285ed68f38b22b1"
+        }
+      ],
+      "rule_id": "react/useref-requires-an-argument",
+      "step_kind": "codemod"
+    },
+    {
+      "id": "dep-eslint-and-types",
+      "lens": "dependency_build",
+      "source": "usage_scan",
+      "concern": "build",
+      "severity": "medium",
+      "usage_ids": [
+        "34f25ee0e8ed7e6c5c9be981",
+        "796b9c6fad2097f911cd0e8c",
+        "a2a5fd8a074c591ef12ea31a"
+      ],
+      "docs_status": "verified",
+      "evidence": [
+        {
+          "repo_id": "ffc62b931435ce81",
+          "file": "package.json",
+          "line_start": 89,
+          "line_end": 89,
+          "snippet_hash": "35faad6136aadf4afda2fe036a14c20b35ed9ed15a6d46b727bf6d1211cb1482"
+        }
+      ],
+      "rule_id": null,
+      "step_kind": "manual"
+    },
+    {
+      "id": "dep-next-bump",
+      "lens": "dependency_build",
+      "source": "usage_scan",
+      "concern": "dependency",
+      "severity": "high",
+      "usage_ids": [
+        "56b2d6e055427426acd1864a"
+      ],
+      "docs_status": "verified",
+      "evidence": [
+        {
+          "repo_id": "ffc62b931435ce81",
+          "file": "package.json",
+          "line_start": 54,
+          "line_end": 54,
+          "snippet_hash": "98ca48099939d5ae233e769f88a31888917e40a04dbe4ff8ff486493c479e200"
+        }
+      ],
+      "rule_id": null,
+      "step_kind": "manual"
+    },
+    {
+      "id": "dep-next-intl-peers",
+      "lens": "dependency_build",
+      "source": "rule_pack",
+      "concern": "dependency",
+      "severity": "high",
+      "usage_ids": [
+        "32cf31d048156362f2f4290e",
+        "c453d7e0f6613406db194d68",
+        "5cf6a69115e98346ab525b6d",
+        "c1def45d9b45c6898705ffbc"
+      ],
+      "docs_status": "verified",
+      "evidence": [
+        {
+          "repo_id": "ffc62b931435ce81",
+          "file": "package-lock.json",
+          "line_start": 7732,
+          "line_end": 7732,
+          "snippet_hash": "486f2e398ccf3c14e980a3009e5eb3b2df8eb5ccbc4ddf4f48dad5c5c5e0f10a"
+        },
+        {
+          "repo_id": "ffc62b931435ce81",
+          "file": "package-lock.json",
+          "line_start": 7732,
+          "line_end": 7732,
+          "snippet_hash": "486f2e398ccf3c14e980a3009e5eb3b2df8eb5ccbc4ddf4f48dad5c5c5e0f10a"
+        }
+      ],
+      "rule_id": "next/react-19",
+      "step_kind": "manual"
+    },
+    {
+      "id": "verify-dynamic-locales",
+      "lens": "verification",
+      "source": "usage_scan",
+      "concern": "test",
+      "severity": "low",
+      "usage_ids": [
+        "81964c63857e0f4e71208853",
+        "19fabd920ca155becc4dce4e",
+        "451b2e1df87b20a1faab289d",
+        "3b802ad1e383cbc0bda69666",
+        "34d5975e4184208ef0da793a",
+        "68a5dae96568bcb5bd227072",
+        "f88abe694b67edb7d089ed7c",
+        "e08e2204bcedd43f6bc8b141",
+        "de17169bcdc837d64687282f",
+        "37265af64b883345256b7830",
+        "c1959e77fba493175b8d19c5",
+        "d75fc8918da8fd9efb61df41"
+      ],
+      "docs_status": "verified",
+      "evidence": [
+        {
+          "repo_id": "ffc62b931435ce81",
+          "file": "src/components/Onboarding/DisplaySettings/index.tsx",
+          "line_start": 172,
+          "line_end": 172,
+          "snippet_hash": "91b00c58aea9bb9cd1d03d5cbbdc8ec318ac244af440784ef5fdaac018c90001"
+        }
+      ],
+      "rule_id": null,
+      "step_kind": "manual"
+    }
+  ],
+  "marks": [
+    {
+      "lens": "dependency_build",
+      "usage_id": "19e7891abb0bf8a4ebb0dc86",
+      "reason": "The lint script is next lint, and no rule in this packet changes that script for a Next 15 target.",
+      "written_by": "dependency_build"
+    },
+    {
+      "lens": "dependency_build",
+      "usage_id": "afd80a4691d4d27ca108f57f",
+      "reason": "i18n.locales in next.config.js is the Pages Router i18n option, and no rule in this packet removes it.",
+      "written_by": "dependency_build"
+    },
+    {
+      "lens": "dependency_build",
+      "usage_id": "c5a938e4389f419adfdc9eb8",
+      "reason": "i18n in next.config.js is the Pages Router i18n option, and no rule in this packet removes it.",
+      "written_by": "dependency_build"
+    },
+    {
+      "lens": "dependency_build",
+      "usage_id": "e72ff870d371d75ed8f4acb4",
+      "reason": "i18n.defaultLocale in next.config.js is the Pages Router i18n option, and no rule in this packet removes it.",
+      "written_by": "dependency_build"
+    }
+  ],
+  "hash_unchanged": true
+}

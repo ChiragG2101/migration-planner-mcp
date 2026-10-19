@@ -49,7 +49,7 @@
 
 ## Files and modules
 
-`src/pipeline/aggregate.ts`, `src/pipeline/gates/{index,g1-evidence,g2-coverage,g3-doc-refs,g4-rollback-verify,g5-stage-order,g6-schema-ids}.ts`, `src/pipeline/emit.ts`, `src/tools/{mergeFindings,validatePlan,emitPlan}.ts`, `src/store/plans.ts`, `src/store/migrations/005_plans.sql`, `templates/MIGRATION_PLAN.md.hbs` (or a template literal), `test/unit/aggregate.test.ts`, `test/unit/gates/*.test.ts`, `test/fixtures/plans/{good,bad-g1..bad-g6}.json`.
+`src/pipeline/aggregate.ts`, `src/pipeline/gates/{index,g1-evidence,g2-coverage,g3-doc-refs,g4-rollback-verify,g5-stage-order,g6-schema-ids}.ts`, `src/pipeline/emit.ts`, `src/tools/{mergeFindings,validatePlan,emitPlan}.ts`, `src/store/plans.ts`, `src/store/migrations/006_plans.sql`, `templates/MIGRATION_PLAN.md.hbs` (or a template literal), `test/unit/aggregate.test.ts`, `test/unit/gates/*.test.ts`, `test/fixtures/plans/{good,bad-g1..bad-g6}.json`.
 
 ## Tests
 

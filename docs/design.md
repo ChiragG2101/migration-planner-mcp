@@ -631,3 +631,39 @@ Why: M3 had already taken migration 003. The plan left the freshness window, the
 
 What would change it: a Context7 tool rename, or a cache that has to keep docs for longer than the newest 20 runs because gate 3 started re-reading runs older than that. Until then an evicted row is simply a cache miss, and the run's own docs stay because the run is one of the newest.
 
+## 2026-10-20: M5 findings, packets and the prompt
+
+### D35 - How a lens gets its packet and how findings are stored
+
+**Decision:**
+
+- Findings live in migration `005_findings.sql`. `004_docs.sql` already belonged to M4. M6's plan store is `006_plans.sql`, and M9's feedback store is `007_feedback.sql`, so those filenames stay unique. `round` is 1 until `validate_plan`. `status` accepts only `accepted` until a later migration needs more. M8's plan still names `005b_verify.sql`; the migration runner only applies `NNN_*.sql`, so that name will not run until M8 renames it.
+- A finding has no `stage`. M6 assigns stages when it builds the plan. The `Plan` schema is exported now so `schema://plan` exists; M5 does not build plans.
+- `get_lens_packet` and `submit_findings` are MCP only (PRD §11). There is no CLI command for them.
+- Which usage kinds a lens sees is `pack.usage_kinds[].lens`. Bound rules follow those usages. A rule that binds no in-scope packet usage goes to `dependency_build` when its event is `peer_requirement` or its match is `dependency` or `config_key`, to `behavior_runtime` when its event is `changed_behavior` or `changed_default` or its match is `file_convention`, and to `api` otherwise. `combined` is that union and is only for a `small` run. `verification` gets the pack `checks_hint`, rule `verify_hint`s and the test and import graph, not rule bodies, unless a verification-kind usage binds a rule. `dependency_build` and `combined` also get the scan section. `behavior_runtime` and `combined` also get risk signals.
+- The packet JSON stays within 100,000 characters (`EngineOptions.packetMaxChars`). Truncation is a field on the packet, never silent. The usage IDs stored for the lens are the ones left after truncation, so a finding can cite only usages that lens was given.
+- A packet's doc symbols are `symbolOf` of that packet's composed rules, at the library's installed version and effective target. Usage symbols are not queries. `get_migration_docs` accepts exactly those rule symbols, and a usage symbol can be a snippet of repo code.
+- Scope-excluded usages are left out of every packet. A packet never contains finding IDs. Denied and out-of-root usage files are listed as skipped, not included.
+- Lenses run one after another in one host context. Isolation is the packet contents plus one lens per turn. That approximates independence; it is not a separate process per lens.
+- `docs_status` is recomputed with `docsUnverifiedBadge` before the finding is stored. A cited doc that is missing or whose URL does not match is treated as unverified. The badge is on only when every cited doc is stale or unverified, and a finding that cites nothing stays verified. The submitted `snippet_hash` is kept; a mismatch is flagged on `evidence_flags` and on the `findings.normalised` event. Gate 1 (M6) rechecks it.
+- A `codemod` step must name an ID on that rule's `library.json` `codemods` list. The core allowlist (INV-9) is a separate check and lands with execution in M8.
+- The prompt file is read only in `src/security/promptFile.ts`. `prompts/` is in the package `files` list. `v1`'s sha256 is in `prompts/manifest.json`, which also names the current version. The skill generator embeds that version. The engine does not refuse a hash mismatch at runtime; the immutability test does.
+- Invalid output may be retried once per lens. The second invalid submission records `lens.gap`. A later submission throws `lens_closed`. A `PermissionError` while re-reading evidence is rethrown and does not count as a retry. Naming one usage twice in `out_of_scope` is invalid output: the submission is rejected, nothing is stored, and it counts toward that retry.
+- Stored findings are read back with `findingsForRun(engine, runId)`. PRD §11 does not add a third tool for that. `get_lens_packet` and `submit_findings` stay the MCP pair.
+
+Why: the plan left packet routing, the size cap and the migration number open, and it asked for the sequential-lens limit to be recorded. Reusing M4's badge and citation check keeps gate 3 and the badge on one implementation. Storing the submitted hash lets gate 1 still fail a mismatch.
+
+What would change it: a packet that cannot say what it dropped, or a host that can run the four lenses in separate contexts. Until then the cap and the one-lens-per-turn instruction stay.
+
+### D36 - Lens routing for `middleware` and `request_props` in the Next.js pack
+
+**Decision: both `middleware` and `request_props` stay in the `api` lens in `packs/nextjs-upgrade/pack.json`. The core engine is agnostic; lens assignment is pack data only.**
+
+Why: `middleware` and `request_props` (params/searchParams passed into page components) are part of the request API surface — the same surface as `request_api`, `renamed_api`, `removed_api`, and `deprecated_import`. The `api` lens is exactly where the host agent looks for request-API changes. Putting them in `behavior_runtime` would mix request-API findings with caching-semantics and route-handler findings, making the lens less coherent.
+
+The dry run on `tortoise-web-frontend/apps/employer-dashboard` (M5, 2026-10-20) confirmed this: the `api` lens correctly surfaced 6 `params` usages (needing `await`) and 2 `headers()` calls alongside the `next-codemod:next-async-request-api` codemod rule. The `middleware` usage was marked out of scope (unchanged in 15; the rename is a 16 change). The `behavior_runtime` lens correctly received only `fetch_call` usages.
+
+Framework agnosticism: the core engine (`src/pipeline/packets.ts`) reads `pack.usage_kinds[].lens` and routes accordingly. It has no knowledge of Next.js, Django, or any specific kind. A future Django pack will make its own lens assignments in its own `pack.json` without touching the engine.
+
+What would change it: if a pack's `middleware` or `request_props` kinds had findings that were semantically runtime-behavior (not API surface), a pack author could move them to `behavior_runtime` in that pack's data. The engine supports it; no code change is needed.
+

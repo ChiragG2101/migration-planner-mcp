@@ -2,25 +2,37 @@
 // and the reviewed knowledge. Generated files are never edited by hand.
 import { existsSync, readdirSync, readFileSync } from 'node:fs';
 import path from 'node:path';
+import { fileURLToPath } from 'node:url';
 import { ReleaseFile, type Library, type ReviewedRule } from '../../src/schema/knowledge.js';
 import { Pack } from '../../src/schema/pack.js';
 import { compareReleaseUnits, parseVersion } from '../../src/rules/versions.js';
 
 export const banner = (version: string): string => `<!-- do not edit; generated from pack v${version} -->`;
 
-const TOOL_ORDER = [
-  '`scan_repo`',
-  '`find_usages`',
-  '`get_rule_pack`',
-  '`assess_risk`',
-  '`propose_scope`',
-  'ask the user, then `set_scope`',
-  '`plan_migration` for each lens, which registers its docs with `get_migration_docs`',
-  '`merge_findings`',
-  '`validate_plan`',
-  '`emit_plan`',
-  'at level 1 only, `verify_stage`',
-];
+const repoRoot = fileURLToPath(new URL('../..', import.meta.url));
+
+/** The prompt version the skill and `prompts/plan_migration.vN.md` both name. */
+export function currentPromptVersion(): string {
+  const manifest = JSON.parse(readFileSync(path.join(repoRoot, 'prompts', 'manifest.json'), 'utf8')) as { current?: string };
+  if (!manifest.current) throw new Error('prompts/manifest.json has no current version');
+  return manifest.current;
+}
+
+function toolOrder(version: string): string[] {
+  return [
+    '`scan_repo`',
+    '`find_usages`',
+    '`get_rule_pack`',
+    '`assess_risk`',
+    '`propose_scope`',
+    'ask the user, then `set_scope`',
+    `\`plan_migration\` (${version}) for each lens, which registers its docs with \`get_migration_docs\``,
+    '`merge_findings`',
+    '`validate_plan`',
+    '`emit_plan`',
+    'at level 1 only, `verify_stage`',
+  ];
+}
 
 interface LibRules {
   library: Library;
@@ -112,7 +124,7 @@ export function generatedPack(root: string, packName: string): Record<string, st
     '',
     'Plan the migration with the engine, in this order. The engine is read-only at level 0.',
     '',
-    ...TOOL_ORDER.map((step, i) => `${i + 1}. ${step}`),
+    ...toolOrder(currentPromptVersion()).map((step, i) => `${i + 1}. ${step}`),
     '',
     'A finding follows the finding schema. Do not inline API tables; read the references.',
     '',
