@@ -383,7 +383,7 @@ Choices M1 made where the plan left a question open. D20 records the three the m
 - **A known library is one declared in the repo's manifests** (`package.json`, `pyproject.toml`, `requirements*.txt`; Python names compared after PEP 503 normalisation). An unknown source or target gets a `vague_input` question. M3 adds the pack check on top; until then there is no library list in core code.
 - **The installed version comes from lockfiles only.** No lockfile pin gives an `unresolved_version` question, lockfiles or workspace packages that disagree give `ambiguous_version` with every candidate, and a user-given source version that disagrees with the lockfile gives `version_mismatch`. A given version matches when each of its parts equals the lockfile's, so `14` and `14.2` match `14.2.35`.
 - **Dirty state is always `unknown` in v0.1.** HEAD and refs are read as files, and git is never run.
-- **The default `--out` is `.migration-planner/` beside the repo** (`<repo's parent>/.migration-planner/`), never inside it. The MCP server, which learns the repo only at ingest, uses the same default per repo.
+- **The default `--out` is `.migration-planner/` beside the repo** (`<repo's parent>/.migration-planner/`), never inside it. *Revised by D24:* beside the top of the outermost git repo that contains the scanned folder. The MCP server, which learns the repo only at ingest, uses the same default per repo.
 
 Why:
 
@@ -465,4 +465,18 @@ Why:
 - `scanner.ts` is about 550 lines and three milestones add to it. Splitting it now is a mechanical change that the M1 tests check; later it would be tangled with new behaviour.
 
 Revisit: make Windows blocking once it passes; add CI checks from later milestones (the pack lint in M3, the eval gates in M7) to the same workflow.
+
+## 2026-10-19: fixes from the M1 review
+
+### D24 - The default output folder stays out of an enclosing git repo too
+
+**Decision (revises D20's default `--out`):** the engine finds the top of the outermost git working tree that contains the scanned folder (the highest folder holding a `.git` folder or file; only its existence is checked, nothing is read). The default `--out` is `.migration-planner/` beside that top, or beside the scanned folder when it is in no git repo. That top is registered like the scanned folder, so an explicit `--out` or `--db` inside it is refused as well. The maintainer chose that last point, on the reviewer's recommendation; the plan only named the scanned folder.
+
+Why:
+
+- The M1 review found that scanning a package inside a monorepo (`mono/packages/web`) put the store in `mono/packages/.migration-planner/`, inside the user's repo (C3), while the log said "outside the repo".
+- Outermost, not nearest: a submodule (a `.git` file) or a repo cloned inside another repo's tree sits inside the outer working tree, so "beside the nearest repo" would still write into the outer one.
+- An explicit `--out` inside the monorepo writes into the user's repo just as the default would, so the same rule applies.
+
+Accepted limit: if the user's home folder is itself a git repo (a dotfiles setup), the top is the home folder, so the default lands beside it and any `--out` under the home folder is refused. The fix is an `--out` elsewhere (for example under `/tmp`). Revisit if this is reported.
 
