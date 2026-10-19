@@ -5,7 +5,7 @@ import { existsSync } from 'node:fs';
 import path from 'node:path';
 import { describe, expect, it } from 'vitest';
 import { repoHash } from '../../scripts/repo-hash.js';
-import { copyFixture, runCli, tmpDir } from '../helpers.js';
+import { copyFixture, runCli, tmpDir, writeTree } from '../helpers.js';
 import { callTool, inMemoryClient, toolError } from '../mcp.js';
 
 const args = (repo: string): Record<string, unknown> => ({
@@ -43,6 +43,18 @@ describe('--out inside the repo', () => {
     expect(res.stderr).toContain('--db resolves inside the repo');
     expect(existsSync(path.join(repo, 'x.sqlite'))).toBe(false);
     expect(repoHash(repo)).toBe(before);
+  });
+
+  it('the CLI refuses an --out inside the larger git repo that contains the scanned folder', () => {
+    const mono = path.join(tmpDir(), 'mono');
+    writeTree(mono, { '.git/HEAD': 'ref: refs/heads/main\n' });
+    const pkg = copyFixture('next-basic', path.join(mono, 'packages', 'web'));
+    const before = repoHash(mono);
+    const res = runCli(['scan', pkg, '--source', 'next', '--target', 'next@15.1.0', '--out', path.join(mono, 'tmp-out')]);
+    expect(res.status).toBe(2);
+    expect(res.stderr).toContain('--out resolves inside the repo');
+    expect(existsSync(path.join(mono, 'tmp-out'))).toBe(false);
+    expect(repoHash(mono)).toBe(before);
   });
 
   it('an MCP ingest of a repo that contains --out is refused with no run and no store', async () => {

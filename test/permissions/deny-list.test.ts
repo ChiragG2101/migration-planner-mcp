@@ -3,7 +3,7 @@ import path from 'node:path';
 import { beforeAll, describe, expect, it } from 'vitest';
 import { addUserDenies, isDenied, isDeniedRel } from '../../src/security/denyList.js';
 import { resolveInside, type SafePath } from '../../src/security/pathBoundary.js';
-import { readBytes, readText } from '../../src/security/safeRead.js';
+import { listDir, lstatRequested, readBytes, readText, statPath } from '../../src/security/safeRead.js';
 import { expectPermission, symlink, tmpDir, writeTree } from '../helpers.js';
 
 const SECRET = 'TOP_SECRET_VALUE';
@@ -63,6 +63,24 @@ describe('deny list', () => {
   it('refuses a forged SafePath that did not come from resolveInside', () => {
     const forged = { root: repo, abs: path.join(repo, '.env'), rel: 'src/ok.ts', requested: 'src/ok.ts', repoId: null };
     expectPermission(() => readText(forged as unknown as SafePath), 'forged_path');
+  });
+
+  it('statPath, listDir and lstatRequested refuse denied files and folders, and forged paths', () => {
+    for (const rel of ['.env', '.git', 'node_modules']) {
+      const sp = resolveInside(repo, rel);
+      expectPermission(() => statPath(sp), 'denied');
+      expectPermission(() => listDir(sp), 'denied');
+      expectPermission(() => lstatRequested(sp), 'denied');
+    }
+    const forged = { root: repo, abs: path.join(repo, 'src'), rel: 'src', requested: 'src', repoId: null } as unknown as SafePath;
+    expectPermission(() => statPath(forged), 'forged_path');
+    expectPermission(() => listDir(forged), 'forged_path');
+    expectPermission(() => lstatRequested(forged), 'forged_path');
+    // The same calls on an allowed folder work, so the refusals above are the deny list, not an error.
+    const src = resolveInside(repo, 'src');
+    expect(statPath(src).isDirectory()).toBe(true);
+    expect(listDir(src).map((d) => d.name)).toEqual(['ok.ts']);
+    expect(lstatRequested(src).isDirectory()).toBe(true);
   });
 
   it('user entries only add to the defaults', () => {

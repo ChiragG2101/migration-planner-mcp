@@ -6,7 +6,7 @@ import path from 'node:path';
 import { describe, expect, it } from 'vitest';
 import { repoHash } from '../../scripts/repo-hash.js';
 import { closeEngine, createEngine, ingest, scanRepo } from '../../src/core/index.js';
-import { copyFixture, runCli, tmpDir } from '../helpers.js';
+import { copyFixture, runCli, tmpDir, writeTree } from '../helpers.js';
 import { callTool, inMemoryClient, stdioClient } from '../mcp.js';
 
 const cases = [
@@ -51,6 +51,31 @@ describe.each(cases)('$fixture is never written', ({ fixture, source, target, in
     expect(runCli(['scan', repo, '--source', source, '--target', target]).status).toBe(0);
     expect(existsSync(path.join(parent, '.migration-planner', 'store.sqlite'))).toBe(true);
     expect(repoHash(repo)).toBe(before);
+  });
+
+  it('by the default --out when the repo is a package inside a larger git repo', () => {
+    const base = tmpDir();
+    const mono = path.join(base, 'mono');
+    writeTree(mono, { '.git/HEAD': 'ref: refs/heads/main\n', 'README.md': 'outer repo\n' });
+    const pkg = copyFixture(fixture, path.join(mono, 'packages', 'web'));
+    const before = repoHash(mono);
+    const res = runCli(['scan', pkg, '--source', source, '--target', target]);
+    expect(res.status).toBe(0);
+    expect(existsSync(path.join(base, '.migration-planner', 'store.sqlite'))).toBe(true);
+    expect(existsSync(path.join(mono, 'packages', '.migration-planner'))).toBe(false);
+    expect(res.stderr).toContain(`output folder: ${path.join(base, '.migration-planner')}`);
+    expect(repoHash(mono)).toBe(before);
+  });
+
+  it('by the default --out when the repo is a submodule (a .git file) inside an outer repo', () => {
+    const base = tmpDir();
+    const outer = path.join(base, 'outer');
+    writeTree(outer, { '.git/HEAD': 'ref: refs/heads/main\n', 'vendor/lib/.git': 'gitdir: ../../.git/modules/lib\n' });
+    const lib = copyFixture(fixture, path.join(outer, 'vendor', 'lib', 'app'));
+    const before = repoHash(outer);
+    expect(runCli(['scan', lib, '--source', source, '--target', target]).status).toBe(0);
+    expect(existsSync(path.join(base, '.migration-planner', 'store.sqlite'))).toBe(true);
+    expect(repoHash(outer)).toBe(before);
   });
 
   it('by the MCP scan_repo tool, in memory and over stdio', async () => {

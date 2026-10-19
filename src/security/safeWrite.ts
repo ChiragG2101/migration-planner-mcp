@@ -1,6 +1,6 @@
 // C3: the only module that writes files. Writes land under `--out`, never
 // inside a registered repo root, and each write declares the level it needs.
-import { mkdirSync, writeFileSync } from 'node:fs';
+import { lstatSync, mkdirSync, writeFileSync } from 'node:fs';
 import path from 'node:path';
 import { PermissionError } from './errors.js';
 import { assertLevel, type Level } from './level.js';
@@ -11,6 +11,25 @@ const repoRoots = new Set<string>();
 /** Records a repo root (realpathed). Writes and output folders inside it are refused from then on. */
 export function registerRepoRoot(root: string): void {
   repoRoots.add(realpathAllowMissing(root));
+}
+
+/**
+ * The top of the outermost git working tree that contains `root` (a folder
+ * holding a `.git` folder or file), or `root` itself when none does. Only
+ * checks that `.git` exists; nothing is read. Outermost, so a submodule or a
+ * repo cloned inside another repo still maps to the outer tree (D24).
+ */
+export function enclosingRepoTop(root: string): string {
+  let top = realpathAllowMissing(root);
+  for (let dir = top; ; dir = path.dirname(dir)) {
+    try {
+      lstatSync(path.join(dir, '.git'));
+      top = dir;
+    } catch {
+      // No .git here; keep looking upward.
+    }
+    if (path.dirname(dir) === dir) return top;
+  }
 }
 
 /** Throws when `p` resolves inside a registered repo root. `what` names the flag in the message. */

@@ -10,7 +10,7 @@ import type { ScanLimits } from '../schema/scan.js';
 import { InputError, NotBuiltError, PermissionError } from '../security/errors.js';
 import { initLevel, type Level } from '../security/level.js';
 import { isWithin, realpathAllowMissing } from '../security/pathBoundary.js';
-import { assertOutsideRepos, openOutDir, registerRepoRoot, type OutWriter } from '../security/safeWrite.js';
+import { assertOutsideRepos, enclosingRepoTop, openOutDir, registerRepoRoot, type OutWriter } from '../security/safeWrite.js';
 import { openDb, type Db } from '../store/db.js';
 import { appendEvent, type NewEvent } from '../store/events.js';
 
@@ -64,14 +64,19 @@ export function closeEngine(engine: Engine): void {
   engine.sessions.clear();
 }
 
-/** The output folder for a repo: the --out flag, or `.migration-planner/` beside the repo. */
+/**
+ * The output folder for a repo: the --out flag, or `.migration-planner/` beside
+ * the top of the git repo that contains it (beside the folder itself when it
+ * is in no git repo), so the default never lands inside a repo (D24).
+ */
 export function outDirFor(engine: Engine, repoRoot: string): string {
-  return path.resolve(engine.options.out ?? path.join(path.dirname(repoRoot), '.migration-planner'));
+  return path.resolve(engine.options.out ?? path.join(path.dirname(enclosingRepoTop(repoRoot)), '.migration-planner'));
 }
 
-/** Registers the repo, refuses an --out or --db inside it, then opens (or reuses) the output folder and store. */
+/** Registers the repo and its enclosing git repo, refuses an --out or --db inside either, then opens (or reuses) the output folder and store. */
 export function openSession(engine: Engine, repoRoot: string): Session {
   registerRepoRoot(repoRoot);
+  registerRepoRoot(enclosingRepoTop(repoRoot));
   const out = outDirFor(engine, repoRoot);
   const dbPath = path.resolve(engine.options.db ?? path.join(out, 'store.sqlite'));
   // Both checks come before anything is created, so a refused --out or --db leaves no trace.
