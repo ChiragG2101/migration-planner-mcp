@@ -4,7 +4,7 @@ Instructions for coding agents working in this repository (Claude Code, Codex, C
 
 ## Current state
 
-**M1 built, awaiting its independent review.** The engine skeleton exists: the security layer, the SQLite event spine, ingest, `scan_repo`, and the CLI and MCP adapters. The repo holds the engine in `src/`, its tests in `test/`, the spec, the per-milestone plans, the spine docs and the golden-case records:
+**M1 done (2026-10-19); M2 is next.** The engine skeleton exists: the security layer, the SQLite event spine, ingest, `scan_repo`, and the CLI and MCP adapters. The repo holds the engine in `src/`, its tests in `test/`, the spec, the per-milestone plans, the spine docs and the golden-case records:
 
 - `docs/PRD.md`: the product requirements and build spec. This is the source of truth.
 - `docs/plans/00-overview.md`: the cross-cutting constraints (C1 to C10), the tech decisions, the per-milestone gates, the cut order and the target source layout.

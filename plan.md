@@ -7,7 +7,7 @@ A milestone is done only when every per-milestone gate holds (overview, "Per-mil
 | # | Milestone | Plan | Status |
 | --- | --- | --- | --- |
 | M0 | Spine docs and golden cases (pre-code) | [overview §M0](docs/plans/00-overview.md) | done (review approved 2026-10-18) |
-| M1 | Engine skeleton, CLI + MCP adapters, `scan_repo`, event log, path boundary, read-only rule | [01](docs/plans/01-engine-skeleton-scan-repo-permissions.md) | built 2026-10-19, awaiting independent review |
+| M1 | Engine skeleton, CLI + MCP adapters, `scan_repo`, event log, path boundary, read-only rule | [01](docs/plans/01-engine-skeleton-scan-repo-permissions.md) | done (review approved 2026-10-19, round-2 item fixed and signed off by the maintainer) |
 | M2 | Language adapters (TS, Python), import graphs, `find_usages` (Next.js), usage index | [02](docs/plans/02-language-adapters-find-usages.md) | not started |
 | M3 | Knowledge and pack schema, Next.js knowledge and pack, `get_rule_pack`, `assess_risk`, sizing and scope, generated skill, release drafter and pack update report | [03](docs/plans/03-rule-pack-assess-risk-skill.md) | not started |
 | M4 | Context7 integration, retrieval log, cache | [04](docs/plans/04-context7-docs-cache.md) | not started |
