@@ -20,7 +20,7 @@ Why:
 
 Consequences and mitigations:
 
-- The README prerequisites must name Node 22 LTS explicitly and show the `npx` one-liner, so a Python-first user is not surprised.
+- The README prerequisites must name Node 22 LTS (22.13 or later, D18) explicitly and show the `npx` one-liner, so a Python-first user is not surprised.
 - The user's own declared check commands for a Django repo (`python -m pytest`, `tox`, and so on) still run in their environment inside the sandbox at L1; the engine shells out to them through `exec.ts`, it does not provide Python. That is already how C3/C9 are specified.
 - Revisit only if a Django/Python audience materially adopts the tool and the Node prerequisite is the measured blocker. A thin PyPI launcher that shells to `npx` is the cheapest future option; a port is not on the table.
 
@@ -344,3 +344,19 @@ Why:
 - Failing closed on an unfetchable commit stops a case from silently dropping out of the pool, which could lift a pack's figure.
 - A `results.md` that held base-branch verdicts would change when the base moves, so regenerating it on HEAD could not reproduce the committed bytes. Keeping it a function of HEAD's tree, and putting base-dependent verdicts in the CI job output, keeps the hand-edit check exact.
 - A recorded input HEAD rejects is the same situation a live run would be in, so replay follows the live flow rather than dropping the run, and the flag keeps it visible.
+
+## 2026-10-19: Node floor and the per-milestone review
+
+Decisions from the pre-M1 comprehension check, which also added three M1 test details (`scan-walk-refusals`, the MCP case of `out-inside-repo-refused`, and the repo layout in `write-outside-out-dir`).
+
+### D18 - Node 22.13 is the minimum
+
+**Decision: `package.json` sets `engines.node` to `>=22.13`, and `node:sqlite` is the SQLite driver. `better-sqlite3` stays the overview's fallback but is not added.**
+
+Why:
+
+- The floor applies to the machine that runs the engine, not to the project being migrated. The engine reads the repo's files and never runs its Node at L0, so a project pinned to an older Node can still be scanned.
+- `node:sqlite` runs without the `--experimental-sqlite` flag from Node 22.13. A lower floor would need `better-sqlite3`, a native module with the install friction the overview chose the built-in driver to avoid.
+- Node 18 and Node 20 are past end of life (April 2025 and April 2026), so 22 is the oldest supported LTS line. A user whose project needs an older Node can run the engine through a version manager without changing the project.
+- `node:sqlite` still prints an experimental warning on 22.x. It goes to stderr, so INV-14 holds.
+- Revisit only if the Node prerequisite is reported as a real blocker. A standalone executable that bundles Node is the cheapest option and is a packaging choice, not an engine change.

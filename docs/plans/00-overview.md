@@ -59,7 +59,7 @@ M4 can run in parallel with M2 and M3 once M1 lands, except that M4's `official`
 
 | Decision | Default | Why | Fallback |
 | --- | --- | --- | --- |
-| Runtime | Node.js 22 LTS, TypeScript strict, ESM | Matches the MCP TS SDK and the TypeScript compiler API | none |
+| Runtime | Node.js 22 LTS, 22.13 or later (`docs/design.md` D18), TypeScript strict, ESM | Matches the MCP TS SDK and the TypeScript compiler API | none |
 | Engine shape | A core library (`src/core/`) with CLI and MCP adapters | One engine, several delivery surfaces; the CLI serves CI and non-agent users | none |
 | MCP SDK | Official TS SDK v2, `@modelcontextprotocol/server` over stdio | PRD section 9 | Pin the exact version. Re-check the SDK README at each milestone because it moves fast. |
 | SQLite driver | `node:sqlite` (built in, no native build) | Zero install friction, zero cost | `better-sqlite3` if `node:sqlite` is still flagged experimental or missing features on the pinned Node version |

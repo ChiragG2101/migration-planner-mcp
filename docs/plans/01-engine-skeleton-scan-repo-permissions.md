@@ -17,7 +17,7 @@ The security layer is built here, first, so that every later tool inherits it ra
 
 ## Tasks
 
-1. **Project setup.** `package.json` (ESM, Node >= 22, `bin` with the working name), `tsconfig.json` (strict), Vitest, ESLint, `LICENSE` (Apache-2.0), and these scripts: `build`, `test`, `typecheck`, `lint`, `test:permissions`. Pin the MCP SDK version after checking its README.
+1. **Project setup.** `package.json` (ESM, `engines.node` `>=22.13` per `docs/design.md` D18, `bin` with the working name), `tsconfig.json` (strict), Vitest, ESLint, `LICENSE` (Apache-2.0), and these scripts: `build`, `test`, `typecheck`, `lint`, `test:permissions`. Pin the MCP SDK version after checking its README.
 2. **Core API (`src/core/index.ts`).** Plain async functions (`ingest`, `scanRepo`, later `findUsages` and so on) that take typed input and return typed output. The CLI and MCP adapters call only these. No adapter contains logic.
 3. **MCP adapter (`src/server.ts`).** Uses the stdio transport and registers tools from `src/tools/index.ts`, each a thin wrapper that validates input with Zod and calls `src/core/`. The server prints its version, and later the pack name and version, to stderr at startup, never to stdout, which is the protocol channel.
 4. **CLI adapter (`src/cli/`).**
