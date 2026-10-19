@@ -1,22 +1,11 @@
 // find_usages: every usage a pack cares about, with file:line, a snippet hash
 // and how it was reached, plus a summary that lists everything not analysed.
 import { z } from 'zod';
+import { MatchKind } from './match.js';
 import { Confidence } from './scan.js';
 
-/** The typed rule matches M3 defines; a usage adapter declares which of them it can find. */
-export const MatchKind = z.enum([
-  'import',
-  'call',
-  'attribute',
-  'config_key',
-  'setting',
-  'string_ref',
-  'template_tag',
-  'template_filter',
-  'dependency',
-  'file_convention',
-]);
-export type MatchKind = z.infer<typeof MatchKind>;
+/** A usage adapter declares which of the typed rule matches it can find. */
+export { MatchKind };
 
 export const ViaHop = z.object({
   file: z.string(),
