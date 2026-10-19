@@ -80,8 +80,8 @@ Every milestone is done only when all of these hold:
 2. `npm run typecheck` and `npm run lint` pass.
 3. The eval smoke set passes. Before M7 this is the seeded fixture repo. From M7 on it is `npm run eval:smoke`.
 4. The target-repo hash is unchanged after the demo command (`scripts/repo-hash.ts`, added in M1).
-5. **Independent review:** a separate agent session sees only the milestone plan file and the diff, not the builder's reasoning, and signs off against the acceptance criteria.
-6. **Comprehension check:** the builder answers an agent-generated quiz on the new code before starting the next milestone.
+5. **Independent review:** a separate agent session sees only the milestone plan file and the diff, not the builder's reasoning, and signs off against the acceptance criteria. It removes each guard the milestone adds, one at a time, and confirms a test fails (the mutation check). Findings are "must fix" (an unmet criterion, a broken constraint or gate, a guard no test catches) or "noticed", and only "must fix" blocks. The review takes at most 2 rounds; "must fix" items still open after round 2 go to the user as decisions (`docs/design.md` D19).
+6. **Summary for the user:** the reviewer ends with a plain-language summary of about 10 lines: what was built, which guard protects each rule and which test proves it, and any decision the user must make. The user reads it before the next milestone starts. The `quiz-me` quiz is optional, on request (D19).
 7. Spine docs are updated: new invariants, new failure-mode rows and new design decisions.
 
 ## Target source layout (PRD section 13)

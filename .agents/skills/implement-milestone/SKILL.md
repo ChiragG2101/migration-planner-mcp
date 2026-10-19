@@ -43,6 +43,7 @@ Keep each commit to one coherent step, and keep the test suite passing between s
 
 - Never weaken a constraint to make something work. If C1 to C10 or a gate gets in the way, stop and raise it. A constraint change is a design decision for the user, not an implementation detail.
 - No scope creep. Useful extras go in a list for the user ("noticed, not done"), not in the diff.
+- If a fix fails the same gate or test twice in a row, stop and ask the user one clear question instead of trying again (`docs/design.md` D19).
 - Only `src/security/` writes files or spawns processes. Only `src/docs/context7.ts` uses the network.
 - Knowledge and packs are data. Never add an executable field, a command string or a script to either.
 - Prompts are versioned. Never edit a released `prompts/*.vN.md`; add `vN+1`.
@@ -68,8 +69,6 @@ Tell the user:
 
 - What was built, task by task, and the acceptance criteria with evidence (test names, command output).
 - Anything not done, deferred or decided along the way.
-- The two remaining gates, which are theirs to run:
-  - an **independent review**: a fresh session runs `review-milestone`;
-  - a **comprehension check**: the user runs `quiz-me`.
+- The remaining gate, which is theirs to start: an **independent review**, where a fresh session runs `review-milestone` and ends with a short summary for the user (gates 5 and 6). `quiz-me` is optional.
 
 Do not run the review yourself in the same session. The reviewer must not see your reasoning.

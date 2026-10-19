@@ -2,7 +2,7 @@
 
 A short, link-only index of the build. The detail lives in [`docs/plans/`](docs/plans/); the constraints, gates and layout are in [`docs/plans/00-overview.md`](docs/plans/00-overview.md); the spec is [`docs/PRD.md`](docs/PRD.md).
 
-A milestone is done only when every per-milestone gate holds (overview, "Per-milestone gates"): `npm test` (incl. `test/permissions/`), `npm run typecheck`, `npm run lint`, the eval smoke set, the target-repo hash unchanged after the demo, an independent review, a comprehension quiz, and the spine docs updated.
+A milestone is done only when every per-milestone gate holds (overview, "Per-milestone gates"): `npm test` (incl. `test/permissions/`), `npm run typecheck`, `npm run lint`, the eval smoke set, the target-repo hash unchanged after the demo, an independent review (with the mutation check on each new guard), the reviewer's summary for the user, and the spine docs updated.
 
 | # | Milestone | Plan | Status |
 | --- | --- | --- | --- |

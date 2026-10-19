@@ -301,7 +301,7 @@ Write the design, break it into milestones with a written definition of done, an
 - **Spine files in the repo:** `docs/design.md` (this document plus build decisions), `docs/invariants.md` (rules that must always hold, for example "no finding without evidence" and "the target repo is never written"), `docs/failure-modes.md`, `plan.md` (milestones).
 - Each milestone states: files it touches, a demo command, success criteria, and what it must not break.
 - **Gates per milestone:** tests pass, type check, lint, the eval smoke set, and a review by a separate agent session that sees only the milestone definition and the diff, not the builder's reasoning.
-- **Comprehension check:** after each milestone, ask the agent to quiz you on what it wrote, and answer before moving on.
+- **Summary for the maintainer:** after each milestone, the reviewer writes a short plain-language summary of what was built, what guards it and what needs a decision, and the maintainer reads it before moving on. A quiz on the new code is optional, on request (`docs/design.md` D19).
 
 ### Milestones
 

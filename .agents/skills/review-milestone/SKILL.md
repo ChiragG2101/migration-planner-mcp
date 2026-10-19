@@ -41,7 +41,7 @@ Check the diff for each one. The common failures:
 
 ## 3. Gates and tests are real
 
-- Every new gate or permissions rule has a test that **fails** when the guard is removed. Pick at least one guard, remove it locally, and confirm a test fails (the mutation check).
+- Every new gate or permissions rule has a test that **fails** when the guard is removed. Remove each guard the milestone adds, one at a time, locally, and confirm a test fails (the mutation check). A guard no test catches is a must-fix item. Watch for a test that passes for the wrong reason, for example a write into the repo that an earlier check already blocks, so the guard under test never runs.
 - No test was skipped, deleted or weakened to make the suite pass (the same idea as gate 7).
 - No silent truncation or dropped items. Counts and "skipped because" lists are reported.
 
@@ -64,8 +64,9 @@ Write the review as:
 
 1. **Verdict:** approve, approve with follow-ups, or changes required.
 2. **Acceptance criteria table** from step 1.
-3. **Blocking issues:** constraint breaks, unmet criteria, missing tests. Each has a file:line and a concrete fix.
-4. **Non-blocking issues:** style, naming, small simplifications.
+3. **Must fix:** constraint breaks, unmet criteria, missing tests, guards no test catches. Each has a file:line and a concrete fix. Only these block.
+4. **Noticed:** style, naming, small simplifications, ideas. They go on the user's list and never block.
 5. **Out-of-scope changes** found.
+6. **Summary for the user** (gate 6): about 10 lines in plain language, no code. What was built, which guard protects each rule and which test proves it, and any decision the user must make.
 
-Be specific and short. Never approve with a blocking issue open.
+Be specific and short. Never approve with a must-fix item open. A code review takes at most 2 rounds: after round 2, hand the open must-fix items to the user as decisions instead of starting round 3 (`docs/design.md` D19).

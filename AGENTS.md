@@ -36,7 +36,7 @@ Skills live in `.agents/skills/` (see `.agents/README.md`). Claude Code users ru
 | --- | --- |
 | `implement-milestone` | Build a milestone inside its scope and run the gates |
 | `review-milestone` | Review a milestone or PR against its plan, in a fresh session |
-| `quiz-me` | Run the comprehension check after a milestone |
+| `quiz-me` | Quiz yourself on a milestone or diff (optional, on request) |
 | `write-tests` | Write tests, especially permissions and gate tests |
 | `add-pack` | Add a migration pack without touching the core |
 | `add-release-knowledge` | Draft, complete and review the rules for one library release under `knowledge/` |
@@ -108,6 +108,6 @@ A milestone is done when all of these hold:
 - The target-repo hash (`scripts/repo-hash.ts`) is unchanged after the demo.
 - The spine docs are updated: `docs/invariants.md`, `docs/failure-modes.md` and `docs/design.md`.
 
-An independent reviewer session also checks the diff against the milestone plan only.
+An independent reviewer session also checks the diff against the milestone plan only, removes each new guard to confirm a test fails, and ends with a short plain-language summary for the user. It takes at most 2 rounds; open "must fix" items then go to the user (`docs/design.md` D19).
 
 **Cut order if behind:** server-side Context7, then container sandbox mode, then the depth of the Django pack. Never cut the gates (including gate 7), the permissions rules, the eval or the clone-based verify loop.

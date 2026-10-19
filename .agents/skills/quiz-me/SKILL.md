@@ -1,11 +1,11 @@
 ---
 name: quiz-me
-description: Use when the user asks to be quizzed on code, or after a milestone as the comprehension check in docs/plans/00-overview.md. It tests that the human understands what was built before the next milestone starts.
+description: Use when the user asks to be quizzed on code or on a milestone. It is optional; the per-milestone gate is the reviewer's summary (docs/plans/00-overview.md, gate 6). It tests that the human understands what was built.
 ---
 
 # Comprehension check
 
-The builder must understand the code before the next milestone starts (overview, "Per-milestone gates", gate 6). Your job is to find the gaps, not to make the user feel good.
+The user asked to check their understanding of what was built. This is optional: the per-milestone gate is the reviewer's summary (overview, "Per-milestone gates", gate 6). Your job is to find the gaps, not to make the user feel good.
 
 ## 1. Pick the material
 
@@ -40,6 +40,6 @@ At the end, give:
 
 - The score, and which questions were missed.
 - The 2 or 3 concepts to revisit, each with the file to read.
-- A pass or not-yet verdict. Not-yet means the user should reread those files and rerun the quiz before starting the next milestone.
+- A pass or not-yet verdict. Not-yet means the user should reread those files; it does not block the next milestone.
 
 Keep the tone direct and friendly. The point is understanding, not a grade.

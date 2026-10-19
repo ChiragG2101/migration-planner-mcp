@@ -360,3 +360,14 @@ Why:
 - Node 18 and Node 20 are past end of life (April 2025 and April 2026), so 22 is the oldest supported LTS line. A user whose project needs an older Node can run the engine through a version manager without changing the project.
 - `node:sqlite` still prints an experimental warning on 22.x. It goes to stderr, so INV-14 holds.
 - Revisit only if the Node prerequisite is reported as a real blocker. A standalone executable that bundles Node is the cheapest option and is a packaging choice, not an engine change.
+
+### D19 - The reviewer's summary replaces the quiz as gate 6
+
+**Decision: gate 6 is a plain-language summary the reviewer writes for the user, not a quiz. The reviewer removes each guard the milestone adds and confirms a test fails, sorts findings into "must fix" and "noticed", and takes at most 2 rounds. The builder stops and asks the user when a fix fails the same gate or test twice in a row. `quiz-me` stays, optional.**
+
+Why:
+
+- The maintainer oversees the build and does not write the code. A quiz on code tests code reading, which is not the maintainer's job, and it slowed every milestone.
+- The pre-M1 quiz found real gaps, all of one kind: a guard that could be removed, or never reached, with no test failing. Running the mutation check on every guard catches that kind directly, and a reviewer can run it.
+- Uncapped rounds can loop, as the plan reviews showed (hence the 3-round cap in `plan-review.md`). Code reviews get a 2-round cap, and only "must fix" blocks; "noticed" items go on the user's list, as AGENTS.md rule 1 already does for the builder.
+- Rule 3 (never weaken a gate) still holds for tests, constraints and thresholds. This is the maintainer's decision on a process gate, and the mutation check gets stricter: every new guard instead of at least one.
