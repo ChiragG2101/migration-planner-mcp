@@ -78,6 +78,18 @@ describe.each(cases)('$fixture is never written', ({ fixture, source, target, in
     expect(repoHash(outer)).toBe(before);
   });
 
+  it('by the default --out when the outermost marker is only a .git file (a linked worktree)', () => {
+    const base = tmpDir();
+    const linked = path.join(base, 'linked');
+    writeTree(linked, { '.git': 'gitdir: /elsewhere/main/.git/worktrees/linked\n' });
+    const pkg = copyFixture(fixture, path.join(linked, 'packages', 'web'));
+    const before = repoHash(linked);
+    expect(runCli(['scan', pkg, '--source', source, '--target', target]).status).toBe(0);
+    expect(existsSync(path.join(base, '.migration-planner', 'store.sqlite'))).toBe(true);
+    expect(existsSync(path.join(linked, 'packages', '.migration-planner'))).toBe(false);
+    expect(repoHash(linked)).toBe(before);
+  });
+
   it('by the MCP scan_repo tool, in memory and over stdio', async () => {
     const repo = copyFixture(fixture);
     const before = repoHash(repo);
