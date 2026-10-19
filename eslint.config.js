@@ -2,7 +2,7 @@
 // engine (src/): only src/security/ may import fs write or read APIs (reads
 // also in the two allowlisted reads of the engine's own files, D25), and only
 // src/security/exec.ts may spawn a process. scripts/ and eval/ are outside the
-// engine and are kept out of src/ by the import lint (M3).
+// engine and are kept out of src/ by the import patterns below (INV-40).
 import js from '@eslint/js';
 import tseslint from 'typescript-eslint';
 
@@ -132,6 +132,14 @@ const spawnPaths = ['child_process', 'node:child_process', 'execa', 'worker_thre
   (name) => ({ name, message: spawnMessage }),
 );
 
+// INV-40 (C3, C6): the engine never imports the maintainer tools or the eval tooling.
+const outsideEnginePatterns = [
+  {
+    regex: '^(\\.\\./)+(scripts|eval)(/|$)',
+    message: 'INV-40: src/ never imports from scripts/ or eval/; they use the network, write files and run git outside the engine.',
+  },
+];
+
 export default tseslint.config(
   // Seeded-defect repos (eval/seeded/<repo>/) hold deliberately old code; the recall script beside them is linted.
   { ignores: ['dist/**', 'node_modules/**', 'test/fixtures/**', 'eval/seeded/*/**', 'coverage/**', '.private/**'] },
@@ -141,14 +149,14 @@ export default tseslint.config(
     files: ['src/**/*.ts'],
     ignores: ['src/security/**', ...Object.keys(engineFileReads)],
     rules: {
-      'no-restricted-imports': ['error', { paths: [...fsPaths(), ...spawnPaths] }],
+      'no-restricted-imports': ['error', { paths: [...fsPaths(), ...spawnPaths], patterns: outsideEnginePatterns }],
       'no-restricted-properties': ['error', tsSysProperty],
     },
   },
   ...Object.entries(engineFileReads).map(([file, allowed]) => ({
     files: [file],
     rules: {
-      'no-restricted-imports': ['error', { paths: [...fsPaths(allowed), ...spawnPaths] }],
+      'no-restricted-imports': ['error', { paths: [...fsPaths(allowed), ...spawnPaths], patterns: outsideEnginePatterns }],
       'no-restricted-properties': ['error', tsSysProperty],
     },
   })),
@@ -156,7 +164,13 @@ export default tseslint.config(
     files: ['src/security/**/*.ts'],
     ignores: ['src/security/exec.ts'],
     rules: {
-      'no-restricted-imports': ['error', { paths: spawnPaths }],
+      'no-restricted-imports': ['error', { paths: spawnPaths, patterns: outsideEnginePatterns }],
+    },
+  },
+  {
+    files: ['src/security/exec.ts'],
+    rules: {
+      'no-restricted-imports': ['error', { patterns: outsideEnginePatterns }],
     },
   },
   {
