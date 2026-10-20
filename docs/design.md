@@ -667,3 +667,23 @@ Framework agnosticism: the core engine (`src/pipeline/packets.ts`) reads `pack.u
 
 What would change it: if a pack's `middleware` or `request_props` kinds had findings that were semantically runtime-behavior (not API surface), a pack author could move them to `behavior_runtime` in that pack's data. The engine supports it; no code change is needed.
 
+## 2026-10-20: M6 merge, gates and emit
+
+### D37 - Where the round and status live, the gates' no-model lint, and the M6 demo
+
+**Decision (three M6 build choices, settled with the maintainer before coding):**
+
+- **`round` and `status` are columns on the `plans` table (`006_plans.sql`), not fields in the `Plan` Zod schema.** The stored JSON stays the pure `Plan` object (M5's schema), so `schema://plan` and the stored bytes never carry run-loop state. `merge_findings` inserts the plan at `round` 1 with `status` `draft`; `validate_plan` increments `round`, rewrites the plan JSON for that round and sets `status` to `passed`, `failed` or `capped` (after round 3, failures in `unresolved[]`, never `passed`). `emit_plan` refuses unless the latest round has a `validate.result`.
+- **The gates' "no LLM" rule is an ESLint `no-restricted-imports` override on `src/pipeline/gates/**`,** forbidding `src/docs/context7.ts`, `src/docs/cache.ts`, `src/security/network.ts` and any model/SDK package, plus a planted-violation test (`test/permissions/gates-no-model.test.ts`) that lints a forbidden import and asserts it fails. This is stricter than relying on INV-40 alone and matches the acceptance line "enforced by an import lint". The gates import no network or model code; they re-check against real files only through `safeRead`/`resolveInside` and the shared snippet normaliser.
+- **The M6 demo is the CLI `merge` → `validate` → `emit` flow against the seeded `eval/seeded/next-tricky` repo** copied to a temp dir, with `--out` outside it; `scripts/repo-hash.ts` is identical before and after, and the output folder holds only `<run_id>/plan.json`, `<run_id>/MIGRATION_PLAN.md` and the store. A golden-case checkout is left to M7, which builds the eval runner; the seeded repo already sizes as `full` and exercises staging and every gate offline.
+
+Why: keeping run-loop state out of the plan JSON means the committed/replayed plan bytes depend only on the plan, which M7's replay and `results.md` determinism need (D17); the row columns carry the loop. A dedicated gate lint makes "no model in a gate" a mechanical check a reviewer can plant against, not a convention. The seeded repo runs offline and needs no network, so the demo's hash check is reproducible in CI and locally.
+
+The regression rule (INV-25) covers `src/pipeline/aggregate.ts` and `src/pipeline/gates/`, which this milestone adds, but the eval runner does not exist until M7, so `eval/results.md` cannot be regenerated in this change; the handover says so.
+
+### D38 - A `none` plan's behaviour changes ride along as info findings
+
+**Decision:** `aggregateNone` turns each behaviour change from `propose_scope`'s hidden list (`hiddenBehavior`, the `changed_behavior`/`changed_default` rules in range) into an `info`-severity finding with `concern: behavior_change`, no evidence, `source: rule_pack`, placed in the one bump stage. The `Plan` schema gains no new field.
+
+Why: the M6 plan requires the `none` plan to "list the behaviour changes", but the `Plan` schema has no notes field, and adding one would ripple into M5's schema, the emit renderer and M7's replay. An `info` finding with empty evidence is the smallest representation that the existing gates already handle correctly: gate 1 iterates evidence and so passes vacuously, gate 2 sees no `usage_ids`, gate 4 does not require rollback for `info`, and gate 6 places it in a stage. The emit renderer already prints findings per stage, so the behaviour changes appear in `MIGRATION_PLAN.md` with no renderer change. Revisit if a future pack needs richer non-code notes, at which point a dedicated `notes[]` on the plan (with its own gate) would be clearer than overloading findings.
+

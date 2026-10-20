@@ -13,6 +13,9 @@ import { proposeScopeTool } from './proposeScope.js';
 import { scanRepoTool } from './scanRepo.js';
 import { setScopeTool } from './setScope.js';
 import { submitFindingsTool } from './submitFindings.js';
+import { mergeFindingsTool } from './mergeFindings.js';
+import { validatePlanTool } from './validatePlan.js';
+import { emitPlanTool } from './emitPlan.js';
 
 export interface ToolDef {
   name: string;
@@ -33,6 +36,9 @@ export const tools: readonly ToolDef[] = [
   getMigrationDocsTool,
   getLensPacketTool,
   submitFindingsTool,
+  mergeFindingsTool,
+  validatePlanTool,
+  emitPlanTool,
 ];
 
 export function registerTools(server: McpServer, engine: Engine): void {

@@ -7,20 +7,24 @@ import {
   assessRisk,
   closeEngine,
   createEngine,
+  emitPlan,
   ENGINE_VERSION,
   findUsages,
   getMigrationDocs,
   getRulePack,
   ingest,
   InputError,
+  mergeFindings,
   NotBuiltError,
   parseLevel,
   PermissionError,
   proposeScope,
   scanRepo,
   setScope,
+  validatePlan,
   type EngineOptions,
 } from '../core/index.js';
+import { formatMergeText, formatValidateText, formatEmitText } from './plan.js';
 import { SetScopeInput } from '../schema/scope.js';
 import { readOperatorFile } from '../security/operatorFile.js';
 import { startMcpServer } from '../server.js';
@@ -41,6 +45,9 @@ Usage:
   migration-planner-mcp risk <repo> --source <lib@ver> --target <lib@ver> [--format json|text]
   migration-planner-mcp scope <repo> --source <lib@ver> --target <lib@ver> [--answers <file.json>] [--small-max <n>] [--format json|text]
   migration-planner-mcp docs <repo> --source <lib@ver> --target <lib@ver> [--register <file.json>] [--query <file.json>] [--format json|text]
+  migration-planner-mcp merge <repo> --source <lib@ver> --target <lib@ver> [--answers <file.json>] [--format json|text]
+  migration-planner-mcp validate <repo> --source <lib@ver> --target <lib@ver> [--answers <file.json>] [--format json|text]
+  migration-planner-mcp emit <repo> --source <lib@ver> --target <lib@ver> [--answers <file.json>] [--format json|text]
   migration-planner-mcp mcp
 
 Shared flags:
@@ -195,6 +202,52 @@ async function main(argv: string[]): Promise<number> {
         const query = values.query ? readJsonArray(values.query, '--query') : undefined;
         const out = await getMigrationDocs(engine, { run_id, ...(register ? { register } : {}), ...(query ? { query } : {}) });
         process.stdout.write(values.format === 'text' ? `${formatDocsText(out)}\n` : `${JSON.stringify(out, null, 2)}\n`);
+        return 0;
+      } finally {
+        closeEngine(engine);
+      }
+    }
+    case 'merge':
+    case 'validate':
+    case 'emit': {
+      if (values.format !== 'json' && values.format !== 'text') throw new InputError('bad_format', '--format must be json or text');
+      if (rest.length === 0) throw new InputError('missing_repo', `${command} needs a repo path`);
+      const engine = createEngine(options);
+      try {
+        const scan = await scanRepo(engine, scanInput(rest, values));
+        if (scan.status !== 'ok' || !scan.run) {
+          process.stdout.write(`${JSON.stringify(scan, null, 2)}\n`);
+          return 3;
+        }
+        const run_id = scan.run.run_id;
+        await findUsages(engine, { run_id });
+        await getRulePack(engine, { run_id });
+        await proposeScope(engine, { run_id });
+        if (values.answers) {
+          let parsedAnswers: unknown;
+          try {
+            parsedAnswers = JSON.parse(readOperatorFile(values.answers));
+          } catch (e) {
+            throw new InputError('bad_answers', `could not read --answers: ${e instanceof Error ? e.message : String(e)}`);
+          }
+          const answers = SetScopeInput.shape.answers.safeParse(parsedAnswers);
+          if (!answers.success) throw new InputError('bad_answers', 'the answers file must be the answers object, with only the offered question ids');
+          await setScope(engine, { run_id, answers: answers.data });
+        } else {
+          await setScope(engine, { run_id, answers: {} });
+        }
+        const merge = await mergeFindings(engine, { run_id });
+        if (command === 'merge') {
+          process.stdout.write(values.format === 'text' ? `${formatMergeText(merge)}\n` : `${JSON.stringify(merge, null, 2)}\n`);
+          return 0;
+        }
+        const validated = await validatePlan(engine, { run_id });
+        if (command === 'validate') {
+          process.stdout.write(values.format === 'text' ? `${formatValidateText(validated)}\n` : `${JSON.stringify(validated, null, 2)}\n`);
+          return 0;
+        }
+        const emitted = await emitPlan(engine, { run_id });
+        process.stdout.write(values.format === 'text' ? `${formatEmitText(emitted)}\n` : `${JSON.stringify(emitted, null, 2)}\n`);
         return 0;
       } finally {
         closeEngine(engine);

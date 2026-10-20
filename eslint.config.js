@@ -173,6 +173,26 @@ export default tseslint.config(
       'no-restricted-imports': ['error', { patterns: outsideEnginePatterns }],
     },
   },
+  // Gates are deterministic and import no network or model code (M6 acceptance,
+  // D37). This is on top of the fs/spawn and outside-engine rules above.
+  {
+    files: ['src/pipeline/gates/**/*.ts'],
+    rules: {
+      'no-restricted-imports': [
+        'error',
+        {
+          paths: [...fsPaths(), ...spawnPaths],
+          patterns: [
+            ...outsideEnginePatterns,
+            { regex: '(^|/)docs/(context7|cache)(\\.js)?$', message: 'A gate imports no network or docs-fetch code (M6).' },
+            { regex: '(^|/)security/network(\\.js)?$', message: 'A gate imports no network code (M6).' },
+            { group: ['@modelcontextprotocol/*', 'openai', '@anthropic-ai/*', 'ai'], message: 'A gate imports no model or MCP SDK (C7, M6).' },
+          ],
+        },
+      ],
+      'no-restricted-properties': ['error', tsSysProperty],
+    },
+  },
   {
     rules: {
       '@typescript-eslint/no-unused-vars': ['error', { argsIgnorePattern: '^_', varsIgnorePattern: '^_' }],

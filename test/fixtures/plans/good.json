@@ -1,0 +1,90 @@
+{
+  "run_id": "run-good",
+  "campaign_id": "camp",
+  "repo_id": "repo",
+  "pack": "nextjs-upgrade@0.3.0",
+  "prompt_version": "v1",
+  "stages": [
+    {
+      "id": "stage-prep",
+      "order": 0,
+      "title": "Prepare: fixes that work on the current version",
+      "finding_ids": ["f-leaf"],
+      "depends_on": []
+    },
+    {
+      "id": "stage-bump",
+      "order": 1,
+      "title": "Bump the dependency and resolve peer conflicts",
+      "finding_ids": ["engine-bump"],
+      "depends_on": ["stage-prep"]
+    },
+    {
+      "id": "stage-apply",
+      "order": 2,
+      "title": "Apply the changes on the new version",
+      "finding_ids": ["f-page"],
+      "depends_on": ["stage-bump"]
+    }
+  ],
+  "findings": [
+    {
+      "id": "f-leaf",
+      "repo_id": "repo",
+      "lens": "api",
+      "concern": "api_change",
+      "severity": "medium",
+      "evidence": [{ "repo_id": "repo", "file": "app/leaf.ts", "line_start": 1, "line_end": 3, "snippet_hash": "6cd9e2c8d0505c31fce3d05b659e9109b54bc25bd9d977390076f2e902bbdd54" }],
+      "doc_refs": [{ "library": "next", "version": "15", "url": "https://nextjs.org/docs/leaf", "doc_id": "doc-leaf" }],
+      "reasoning": "A source-compatible fix that can land before the bump.",
+      "action": "Rename the helper to the new name.",
+      "step_kind": "manual",
+      "verify": "Run the unit tests for the helper.",
+      "confidence": 0.9,
+      "source": "rule_pack",
+      "usage_ids": ["u-leaf"],
+      "docs_status": "verified",
+      "prompt_version": "v1"
+    },
+    {
+      "id": "engine-bump",
+      "repo_id": "repo",
+      "lens": "combined",
+      "concern": "dependency",
+      "severity": "high",
+      "evidence": [{ "repo_id": "repo", "file": "package.json", "line_start": 4, "line_end": 4, "snippet_hash": "59bf4363a382dbb4a0ca943e86d7beee70384daa582c8707c08e107062889912" }],
+      "doc_refs": [],
+      "reasoning": "Bump next from 14 to 15.",
+      "action": "Change next to 15 and update the lockfile.",
+      "step_kind": "manual",
+      "rollback": "Revert package.json and the lockfile to pin next 14 again.",
+      "verify": "Run the build and the test suite.",
+      "confidence": 1,
+      "source": "rule_pack",
+      "usage_ids": [],
+      "docs_status": "verified",
+      "prompt_version": "v1"
+    },
+    {
+      "id": "f-page",
+      "repo_id": "repo",
+      "lens": "api",
+      "concern": "api_change",
+      "severity": "high",
+      "evidence": [{ "repo_id": "repo", "file": "app/page.tsx", "line_start": 1, "line_end": 1, "snippet_hash": "0c517bbab89d8914726c23424aee8b8438a727cb9526346754be6388b6f4d3a4" }],
+      "doc_refs": [{ "library": "next", "version": "15", "url": "https://nextjs.org/docs/page", "doc_id": "doc-page" }],
+      "reasoning": "The entrypoint must change after the bump.",
+      "action": "Await the request API in the page.",
+      "step_kind": "manual",
+      "rollback": "Restore the synchronous call in app/page.tsx.",
+      "verify": "Load the page and check it renders.",
+      "confidence": 0.8,
+      "source": "rule_pack",
+      "usage_ids": ["u-page"],
+      "docs_status": "verified",
+      "prompt_version": "v1"
+    }
+  ],
+  "out_of_scope": [],
+  "unresolved": []
+}

@@ -57,3 +57,86 @@ export const GetLensPacketInput = z
   })
   .strict();
 export type GetLensPacketInput = z.infer<typeof GetLensPacketInput>;
+
+/** The six gate IDs, in order. The interface is shared with gate 7 (M8). */
+export const GateId = z.enum(['g1_evidence', 'g2_coverage', 'g3_doc_refs', 'g4_rollback_verify', 'g5_stage_order', 'g6_schema_ids']);
+export type GateId = z.infer<typeof GateId>;
+
+/**
+ * One gate observation. `subject` names the finding or stage it is about, or
+ * null for a whole-plan check. `expected`/`actual` make a failure
+ * machine-readable (PRD section 7).
+ */
+export const GateResult = z
+  .object({
+    gate: GateId,
+    subject: z.string().nullable(),
+    pass: z.boolean(),
+    reason: z.string().min(1),
+    expected: z.string().optional(),
+    actual: z.string().optional(),
+  })
+  .strict();
+export type GateResult = z.infer<typeof GateResult>;
+
+export const PlanStatus = z.enum(['draft', 'passed', 'failed', 'capped']);
+export type PlanStatus = z.infer<typeof PlanStatus>;
+
+export const MergeFindingsInput = z.object({ run_id: z.string().min(1) }).strict();
+export type MergeFindingsInput = z.infer<typeof MergeFindingsInput>;
+
+/** A merge conflict kept for the run report: a severity/concern clash or two actions on one span. */
+export const MergeConflict = z
+  .object({
+    kind: z.enum(['severity', 'concern', 'overlapping', 'lens_vs_finding', 'scope_vs_finding']),
+    detail: z.string().min(1),
+  })
+  .strict();
+export type MergeConflict = z.infer<typeof MergeConflict>;
+
+export const MergeFindingsOutput = z
+  .object({
+    run_id: z.string(),
+    round: z.number().int(),
+    size: z.enum(['none', 'small', 'full']),
+    plan: Plan,
+    /** Usage IDs with no covering finding and no out-of-scope entry (gate 2's input). */
+    uncovered_usages: z.array(z.string()),
+    conflicts: z.array(MergeConflict),
+    /** Findings kept out of the plan because scope left them covering no usage. */
+    dropped_findings: z.array(z.string()),
+  })
+  .strict();
+export type MergeFindingsOutput = z.infer<typeof MergeFindingsOutput>;
+
+export const ValidatePlanInput = z.object({ run_id: z.string().min(1) }).strict();
+export type ValidatePlanInput = z.infer<typeof ValidatePlanInput>;
+
+export const ValidatePlanOutput = z
+  .object({
+    run_id: z.string(),
+    round: z.number().int(),
+    status: PlanStatus,
+    passed: z.boolean(),
+    capped: z.boolean().describe('True when round 3 was reached with failures; they are in unresolved and never passed.'),
+    results: z.array(GateResult),
+    unresolved: z.array(Unresolved),
+  })
+  .strict();
+export type ValidatePlanOutput = z.infer<typeof ValidatePlanOutput>;
+
+export const EmitPlanInput = z.object({ run_id: z.string().min(1) }).strict();
+export type EmitPlanInput = z.infer<typeof EmitPlanInput>;
+
+export const EmitPlanOutput = z
+  .object({
+    run_id: z.string(),
+    round: z.number().int(),
+    status: PlanStatus,
+    /** Paths written, relative to the output folder. */
+    plan_json: z.string(),
+    plan_md: z.string(),
+    unresolved: z.number().int(),
+  })
+  .strict();
+export type EmitPlanOutput = z.infer<typeof EmitPlanOutput>;
