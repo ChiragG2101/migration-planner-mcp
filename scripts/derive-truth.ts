@@ -102,19 +102,22 @@ export interface DeriveInput {
 /**
  * The pure core: given base usages and the base..merge diff, compute truth.
  * A true changed usage carries the usage's own file, span and snippet_hash (as
- * found at base), so replay matches it to HEAD by those three (D17). Files with
- * no base usage are excluded from the truth usages but still listed in
+ * found at base), so replay matches it to HEAD by those three (D17). The same
+ * three are also the dedupe key: two usages that share them count once. Files
+ * with no base usage are excluded from the truth usages but still listed in
  * touched_files (file precision) unless they are lockfiles.
  */
 export function deriveTruthFrom(input: DeriveInput): Truth {
   const hunks = parseDiffHunks(input.diffUnified0);
   const changed = input.usages.filter((u) => usageTouched(u, hunks));
-  const changedUsages: UsageSpan[] = changed.map((u) => ({
-    file: u.file,
-    line_start: u.line_start,
-    line_end: u.line_end,
-    snippet_hash: u.snippet_hash,
-  }));
+  const changedUsages: UsageSpan[] = [];
+  const seen = new Set<string>();
+  for (const u of changed) {
+    const key = `${u.file}\0${u.line_start}\0${u.line_end}\0${u.snippet_hash}`;
+    if (seen.has(key)) continue;
+    seen.add(key);
+    changedUsages.push({ file: u.file, line_start: u.line_start, line_end: u.line_end, snippet_hash: u.snippet_hash });
+  }
   const editSize = parseNumstat(input.numstat);
   const touched = [...new Set(hunks.map((h) => h.file))].filter((f) => !isLockfile(f)).sort();
   return Truth.parse({

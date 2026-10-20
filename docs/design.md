@@ -698,3 +698,13 @@ Why: the M6 plan requires the `none` plan to "list the behaviour changes", but t
 
 Why: the deterministic half is the part that must be reproducible in CI and that INV-43/44/45 and INV-25 police; it can be built, tested and reviewed offline today. The live data is genuinely non-deterministic and subscription-gated, and faking it would violate the "report honestly" rule and poison the noise band, so it is split out rather than guessed. Keeping `results.md` a pure function of HEAD's tree with a "pending" state means the regression rule bites from M7 (every policed change regenerates it) without waiting on real runs. Recording the live trigger now fixes the interface the live session fills in, so no engine change is needed later — only data.
 
+### D40 - The case re-checker fetches the merge commit with its parents
+
+**Decision:** `scripts/verify-case.ts` fetches the base commit at depth 1 and the merge commit at depth 2. `parentageHolds` is unchanged: the recorded base must be the merge commit's first parent, and an empty parent list fails.
+
+Why: a depth-1 fetch makes the merge commit a shallow boundary, so `git rev-list --parents` returns no parents and every golden case fails parentage even when the recorded base is the real first parent. The M7 data review confirmed this on all 7 Next.js cases and both Django cases, against `gh api repos/<owner>/<repo>/commits/<merge>`. Depth 2 is enough for those parents to be present.
+
+The same change reads `yarn.lock` and `pnpm-lock.yaml` as well as `package-lock.json` (the shared lockfile parsers), and falls back to a semver named in the root or workspace manifest only when no lockfile pins the library. It reads every lockfile present before deciding: several pins in one file, pins that differ between files, or any lockfile that does not parse stay a failure rather than a guess. `deriveTruthFrom` drops duplicate `changed_usages` that share a file, span and `snippet_hash`. Existing `truth.json` files stay frozen (D15); the duplicate `yarn.lock` span in `nextjs-scaffold-move-43` is left as recorded.
+
+What would change it: a Git that still omits parents at depth 2, or a case whose lockfiles disagree and a manifest fallback would hide that. Then report the parents or the pins instead of guessing.
+

@@ -58,6 +58,29 @@ describe('deriveTruthFrom', () => {
     expect(truth.edit_size).toEqual({ 'app/page.tsx': 6 });
   });
 
+  it('drops a second usage that shares file, span and snippet_hash', () => {
+    const first = usage('yarn.lock', 7727, 7727, 'aa');
+    const dup = { ...usage('yarn.lock', 7727, 7727, 'aa'), id: 'dup', symbol: 'other' };
+    const other = usage('yarn.lock', 9885, 9885, 'bb');
+    const diff = ['--- a/yarn.lock', '+++ b/yarn.lock', '@@ -7727,1 +7727,1 @@', '@@ -9885,1 +9885,1 @@'].join('\n');
+    const truth = deriveTruthFrom({ caseId: 'c', baseCommit: 'b', mergeCommit: 'm', usages: [first, dup, other], diffUnified0: diff, numstat: '' });
+    expect(truth.changed_usages).toEqual([
+      { file: 'yarn.lock', line_start: 7727, line_end: 7727, snippet_hash: 'aa'.padEnd(64, '0') },
+      { file: 'yarn.lock', line_start: 9885, line_end: 9885, snippet_hash: 'bb'.padEnd(64, '0') },
+    ]);
+    expect(truth.touched_files).toEqual([]);
+  });
+
+  it('keeps two usages on the same span when their snippet hashes differ, and an empty usage list stays empty', () => {
+    const left = usage('app/page.tsx', 10, 10, 'aa');
+    const right = usage('app/page.tsx', 10, 10, 'bb');
+    const diff = ['--- a/app/page.tsx', '+++ b/app/page.tsx', '@@ -10,1 +10,1 @@'].join('\n');
+    const truth = deriveTruthFrom({ caseId: 'c', baseCommit: 'b', mergeCommit: 'm', usages: [left, right], diffUnified0: diff, numstat: '1\t1\tapp/page.tsx' });
+    expect(truth.changed_usages.map((u) => u.snippet_hash)).toEqual(['aa'.padEnd(64, '0'), 'bb'.padEnd(64, '0')]);
+    const none = deriveTruthFrom({ caseId: 'c', baseCommit: 'b', mergeCommit: 'm', usages: [], diffUnified0: diff, numstat: '' });
+    expect(none.changed_usages).toEqual([]);
+  });
+
   it('excludes files with no base usage from the truth usages but keeps them in touched_files', () => {
     const usages = [usage('app/page.tsx', 10, 11, 'aa')];
     const diff = ['--- a/app/page.tsx', '+++ b/app/page.tsx', '@@ -10,1 +10,1 @@', '--- a/README.md', '+++ b/README.md', '@@ -1,1 +1,1 @@'].join('\n');

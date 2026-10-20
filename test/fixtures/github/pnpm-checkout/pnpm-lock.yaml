@@ -1,0 +1,7 @@
+lockfileVersion: '9.0'
+importers:
+  .:
+    dependencies:
+      next:
+        specifier: ^14.2.35
+        version: 14.2.35(react@18.3.1)
