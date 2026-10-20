@@ -1,0 +1,11 @@
+# Code owners (M7, docs/design.md D15). A maintainer must review changes to the
+# golden cases and the recorded runs: the eval add-only rule's exceptions
+# (a case removal, a baseline-prompt change) are enforced by GitHub's required
+# code-owner review, not by CI. Branch protection on `main` requires it.
+#
+# GitHub does not let an author approve their own PR, so while there is a single
+# maintainer, a removal or baseline-prompt PR the maintainer opens needs a
+# second code owner. Until there is one, that is a known limit (docs/design.md D15).
+
+/eval/cases/   @chiragg593
+/eval/runs/    @chiragg593

@@ -25,6 +25,13 @@
     "typecheck": "tsc --noEmit",
     "lint": "eslint . && tsx scripts/lint-packs.ts",
     "recall": "tsx eval/seeded/recall.ts",
+    "eval": "tsx eval/runner.ts",
+    "eval:smoke": "tsx eval/runner.ts --smoke",
+    "eval:add-only": "tsx scripts/check-eval-add-only.ts",
+    "eval:pack-gate": "tsx eval/runner.ts --pack-gate",
+    "truth:derive": "tsx scripts/derive-truth.ts",
+    "cases:find": "tsx scripts/find-golden-cases.ts",
+    "cases:verify": "tsx scripts/verify-case.ts",
     "build:packs": "tsx scripts/build-pack.ts",
     "knowledge:draft": "tsx scripts/draft-release.ts",
     "pack:report": "tsx scripts/pack-docs-report.ts"

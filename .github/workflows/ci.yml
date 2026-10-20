@@ -52,6 +52,20 @@ jobs:
         env:
           BASE_SHA: ${{ github.event.pull_request.base.sha || github.event.before }}
         run: npm run recall -- --check --base "$BASE_SHA"
+      - name: Eval smoke (replay, free; no model, no paid service)
+        shell: bash
+        run: npm run eval:smoke
+      - name: Eval add-only (existing cases and runs are add-only, D15)
+        shell: bash
+        env:
+          BASE_SHA: ${{ github.event.pull_request.base.sha || github.event.before }}
+        run: npm run eval:add-only -- --base "$BASE_SHA"
+      - name: Eval pack gate (replay, free; D17)
+        shell: bash
+        run: npm run eval:pack-gate
+      - name: Eval results.md in step with HEAD's tree
+        shell: bash
+        run: npm run eval -- --tier all --check
       - run: npm run build
       - run: npm run build:packs -- --check
       - name: Spine and skills checks

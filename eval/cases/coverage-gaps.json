@@ -1,0 +1,7 @@
+[
+  "nextjs-upgrade: a licensed messy case (revert/partial) is still being sourced; nextjs-chiarel-6-messy is unlicensed and pending removal",
+  "nextjs-upgrade: monorepo with several major hops in one PR: none",
+  "nextjs-upgrade: pages-router-only migration: none",
+  "nextjs-upgrade: a Vitest or Playwright test runner (current cases use jest/tsx): partial",
+  "django-upgrade: pending until the Django pack lands (M10); cases listed as pending"
+]
