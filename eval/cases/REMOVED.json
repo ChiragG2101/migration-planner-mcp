@@ -1,1 +1,7 @@
-[]
+[
+  {
+    "id": "nextjs-chiarel-6-messy",
+    "reason": "Unlicensed source repo (shams96/chiarel has no OSS licence; default copyright), so it fails the add-golden-case licence check and may not be cloned or have truth derived from it (eval/cases/README.md open items; M7 plan task 2 and acceptance; D15 exception b). It was a pending case (no recorded runs). Replaced by the licensed messy case nextjs-annuaire-entreprises-2146-messy (annuaire-entreprises-data-gouv-fr/site PR #2146, MIT, next 15.3.8 -> 16.1.1, a real upgrade -> revert saga).",
+    "pr": "https://github.com/ChiragG2101/migration-planner-mcp/pull/TBD-m7-live-golden-data"
+  }
+]
