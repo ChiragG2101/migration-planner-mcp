@@ -1,0 +1,68 @@
+{
+  "case_id": "nextjs-c-shepherd-speller-16",
+  "base_commit": "720be5330bf4c22dc51bdfcddbe1037d4f0c752d",
+  "merge_commit": "f690691bfcdb0823413427485fabc5f6256c4a68",
+  "changed_usages": [
+    {
+      "file": "package.json",
+      "line_start": 36,
+      "line_end": 36,
+      "snippet_hash": "37697500c4527a79025f6eaf5a8111eef680135e41542fc7032d9099924539e0"
+    },
+    {
+      "file": "package.json",
+      "line_start": 39,
+      "line_end": 39,
+      "snippet_hash": "5a2b4efc5e70192664979c7e80a97d36fe23965eb3eee7ce5cf20437be98a8e3"
+    },
+    {
+      "file": "package.json",
+      "line_start": 40,
+      "line_end": 40,
+      "snippet_hash": "933d92c8bdbb82802030a593ea674b030c98ec5bd3ed9eb26d725c1b687986a3"
+    },
+    {
+      "file": "package.json",
+      "line_start": 52,
+      "line_end": 52,
+      "snippet_hash": "668c62fa1e605a43cc7c6eac2b215f0fceb1af182ff4d0d58aba2923a674e556"
+    },
+    {
+      "file": "package.json",
+      "line_start": 53,
+      "line_end": 53,
+      "snippet_hash": "0289f4e0593b28c3cf5adfd394a83e6d929a464b998b333cc26d536da0619da7"
+    },
+    {
+      "file": "package.json",
+      "line_start": 57,
+      "line_end": 57,
+      "snippet_hash": "c5428e89cfd42d434004cc2efee817e6a914cf56e532ae55d23e9f751fa67566"
+    },
+    {
+      "file": "src/middleware.ts",
+      "line_start": 4,
+      "line_end": 4,
+      "snippet_hash": "8ce7d3ff32fa52324dc3a910a4af4a7d538074f2b1fe2e63f1c97edf7b6449bf"
+    }
+  ],
+  "touched_files": [
+    "e2e/helpers/auth.ts",
+    "e2e/smoke.spec.ts",
+    "package.json",
+    "scripts/audit-gate.mjs",
+    "src/middleware.test.ts",
+    "src/middleware.ts",
+    "tsconfig.json"
+  ],
+  "edit_size": {
+    "e2e/helpers/auth.ts": 2,
+    "e2e/smoke.spec.ts": 2,
+    "package.json": 18,
+    "scripts/audit-gate.mjs": 43,
+    "src/{middleware.test.ts => proxy.test.ts}": 18,
+    "src/{middleware.ts => proxy.ts}": 2,
+    "tsconfig.json": 4
+  },
+  "excluded_files": []
+}

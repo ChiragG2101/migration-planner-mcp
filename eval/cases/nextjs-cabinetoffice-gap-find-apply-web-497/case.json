@@ -1,0 +1,14 @@
+{
+  "id": "nextjs-cabinetoffice-gap-find-apply-web-497",
+  "pack": "nextjs-upgrade",
+  "repo_url": "https://github.com/cabinetoffice/gap-find-apply-web",
+  "base_commit": "db86ff250f3f607845b51156828be69f4eefffda",
+  "merge_commit": "010ab16f17bf4cf3b41e6919e98aa412ad97d024",
+  "pr_url": "https://github.com/cabinetoffice/gap-find-apply-web/pull/497",
+  "source": { "framework": "next", "version": "13.5.6" },
+  "target": { "framework": "next", "version": "15.5.23" },
+  "license": "MIT",
+  "checks": {},
+  "tags": ["several-major-hops", "monorepo", "pages-router", "cypress"],
+  "notes": "Chosen to fill the 'monorepo with several major hops in one PR' coverage cell (eval/cases/coverage-gaps.json). UK Cabinet Office 'gap-find-apply-web', a real government service, is a Yarn-workspaces monorepo with packages/admin and packages/applicant. PR #497 bumps next 13.5.6 -> 15.5.23 in both workspace package.json files (two major hops, 13 -> 14 -> 15 in one PR), read from the package.json diff not the title. Root package.json has no direct next dep; the admin and applicant packages do. Router: packages/admin/src/pages (pages router). Test runner: cypress (no package test script at base); jest/vitest absent. Caveat for the npm-only cases:verify/derive-truth lockfile reader: this repo uses Yarn workspaces (yarn.lock, not package-lock.json), so the automated 'versions' lockfile check in cases:verify reports 'no source version pinned' and the version evidence here comes from the package.json diff instead (recorded in this note per the add-golden-case skill, which reads versions from the lockfile/manifest diff, not the PR title). base_commit is the only parent of the merge commit (parents=1)."
+}

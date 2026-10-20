@@ -1,0 +1,65 @@
+{
+  "case_id": "nextjs-cabinetoffice-gap-find-apply-web-497",
+  "base_commit": "db86ff250f3f607845b51156828be69f4eefffda",
+  "merge_commit": "010ab16f17bf4cf3b41e6919e98aa412ad97d024",
+  "changed_usages": [
+    {
+      "file": "packages/admin/next.config.js",
+      "line_start": 20,
+      "line_end": 20,
+      "snippet_hash": "5af9ae33fea6659216bee659d76aec3a11758ebb64ff75137eba3c63b6731317"
+    },
+    {
+      "file": "packages/admin/package.json",
+      "line_start": 31,
+      "line_end": 31,
+      "snippet_hash": "cbfc98636442c0c3cb0876006024323670b184f8a6653cd8bd56115b38dc98ef"
+    },
+    {
+      "file": "packages/applicant/package.json",
+      "line_start": 35,
+      "line_end": 35,
+      "snippet_hash": "cbfc98636442c0c3cb0876006024323670b184f8a6653cd8bd56115b38dc98ef"
+    },
+    {
+      "file": "yarn.lock",
+      "line_start": 15302,
+      "line_end": 15302,
+      "snippet_hash": "3c000bbd2bdc021c70a0ed3cc4211f2b1caaf4cbf6399f07109b842b4797d91d"
+    },
+    {
+      "file": "yarn.lock",
+      "line_start": 15314,
+      "line_end": 15314,
+      "snippet_hash": "8e93a6618b2ab0b12ab6b6e2a9c1b2b49ebb597f16691f5c7fd9d703a31550b5"
+    },
+    {
+      "file": "yarn.lock",
+      "line_start": 15314,
+      "line_end": 15314,
+      "snippet_hash": "8e93a6618b2ab0b12ab6b6e2a9c1b2b49ebb597f16691f5c7fd9d703a31550b5"
+    },
+    {
+      "file": "yarn.lock",
+      "line_start": 18944,
+      "line_end": 18944,
+      "snippet_hash": "bd915980fcf5041c6b8b11342c5b3add44299e4e8ad7dd85234497e0790a820c"
+    }
+  ],
+  "touched_files": [
+    "package.json",
+    "packages/admin/next-env.d.ts",
+    "packages/admin/next.config.js",
+    "packages/admin/package.json",
+    "packages/applicant/package.json"
+  ],
+  "edit_size": {
+    ".eslintignore": 1,
+    "package.json": 3,
+    "packages/admin/next-env.d.ts": 3,
+    "packages/admin/next.config.js": 2,
+    "packages/admin/package.json": 6,
+    "packages/applicant/package.json": 6
+  },
+  "excluded_files": []
+}

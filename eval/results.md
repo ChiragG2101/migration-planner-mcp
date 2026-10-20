@@ -20,10 +20,9 @@ Cases whose pack is not under `packs/` at HEAD; listed, never scored or failed.
 ## Coverage gaps (known)
 
 - django-upgrade: pending until the Django pack lands (M10); cases listed as pending
-- nextjs-upgrade: a Vitest or Playwright test runner (current cases use jest/tsx): partial
-- nextjs-upgrade: a licensed messy case (revert/partial) is still being sourced; nextjs-chiarel-6-messy is unlicensed and pending removal
-- nextjs-upgrade: monorepo with several major hops in one PR: none
-- nextjs-upgrade: pages-router-only migration: none
+- nextjs-upgrade: a Turbopack-config or next.config.ts-driven migration: none
+- nextjs-upgrade: a reverted/partial migration where the planner is scored on the forward upgrade that landed on an older React (React 18 app-router 14->15 revert): none (annuaire-2146 is a 15->16 app-router revert; chiarel-style 14->15 revert not yet covered)
+- nextjs-upgrade: an app-router 13->14->15 multi-hop (cabinetoffice-497 covers 13->15 but pages-router): none
 
 ## PR missed (annotations)
 
@@ -33,5 +32,7 @@ None.
 
 ## Removed cases
 
-None.
+| Case | Reason | PR |
+| --- | --- | --- |
+| `nextjs-chiarel-6-messy` | Unlicensed source repo (shams96/chiarel has no OSS licence; default copyright), so it fails the add-golden-case licence check and may not be cloned or have truth derived from it (eval/cases/README.md open items; M7 plan task 2 and acceptance; D15 exception b). It was a pending case (no recorded runs). Replaced by the licensed messy case nextjs-annuaire-entreprises-2146-messy (annuaire-entreprises-data-gouv-fr/site PR #2146, MIT, next 15.3.8 -> 16.1.1, a real upgrade -> revert saga). | https://github.com/ChiragG2101/migration-planner-mcp/pull/TBD-m7-live-golden-data |
 

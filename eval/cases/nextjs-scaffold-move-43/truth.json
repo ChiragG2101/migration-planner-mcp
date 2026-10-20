@@ -1,0 +1,49 @@
+{
+  "case_id": "nextjs-scaffold-move-43",
+  "base_commit": "d1e7258962f605c82d05c3d6245708061bb9e079",
+  "merge_commit": "35939a1c51fe9bc9cf8736febe2d260e76196f74",
+  "changed_usages": [
+    {
+      "file": "packages/nextjs/package.json",
+      "line_start": 33,
+      "line_end": 33,
+      "snippet_hash": "382f55d55f00334a7480c68aa204a8e48ba0616eaa9ab0f73b4fb24d94848eeb"
+    },
+    {
+      "file": "packages/nextjs/package.json",
+      "line_start": 57,
+      "line_end": 57,
+      "snippet_hash": "8f214de34d5aa6e6beca3f7fcdd9501eb0a90c4a2c919c96f14ccf0c8c876193"
+    },
+    {
+      "file": "yarn.lock",
+      "line_start": 7727,
+      "line_end": 7727,
+      "snippet_hash": "f83f10f84155f486750d9497860d03136173de2cffde29985c6631e8462e0e48"
+    },
+    {
+      "file": "yarn.lock",
+      "line_start": 7727,
+      "line_end": 7727,
+      "snippet_hash": "f83f10f84155f486750d9497860d03136173de2cffde29985c6631e8462e0e48"
+    },
+    {
+      "file": "yarn.lock",
+      "line_start": 9885,
+      "line_end": 9885,
+      "snippet_hash": "bd915980fcf5041c6b8b11342c5b3add44299e4e8ad7dd85234497e0790a820c"
+    }
+  ],
+  "touched_files": [
+    "package.json",
+    "packages/nextjs/next-env.d.ts",
+    "packages/nextjs/package.json"
+  ],
+  "edit_size": {
+    "package.json": 2,
+    "packages/nextjs/.gitignore": 1,
+    "packages/nextjs/next-env.d.ts": 5,
+    "packages/nextjs/package.json": 6
+  },
+  "excluded_files": []
+}

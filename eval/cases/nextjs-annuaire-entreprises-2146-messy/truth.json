@@ -1,0 +1,149 @@
+{
+  "case_id": "nextjs-annuaire-entreprises-2146-messy",
+  "base_commit": "a31accd785082aeabdcaa85b9595a81731158340",
+  "merge_commit": "2570db77479163b13a115a15f8909beca23cde15",
+  "changed_usages": [
+    {
+      "file": "middleware.ts",
+      "line_start": 60,
+      "line_end": 60,
+      "snippet_hash": "8ce7d3ff32fa52324dc3a910a4af4a7d538074f2b1fe2e63f1c97edf7b6449bf"
+    },
+    {
+      "file": "next.config.ts",
+      "line_start": 25,
+      "line_end": 25,
+      "snippet_hash": "2189253c611b18716440542687cf016d7344c2e6740e55c1e55481f6e411a1d9"
+    },
+    {
+      "file": "package-lock.json",
+      "line_start": 14808,
+      "line_end": 14808,
+      "snippet_hash": "ab8776e1c79ee5fe0152de2b26b4aa8fe9c1771806e96d785e599bfe460816e2"
+    },
+    {
+      "file": "package-lock.json",
+      "line_start": 14808,
+      "line_end": 14808,
+      "snippet_hash": "ab8776e1c79ee5fe0152de2b26b4aa8fe9c1771806e96d785e599bfe460816e2"
+    },
+    {
+      "file": "package-lock.json",
+      "line_start": 14808,
+      "line_end": 14808,
+      "snippet_hash": "ab8776e1c79ee5fe0152de2b26b4aa8fe9c1771806e96d785e599bfe460816e2"
+    },
+    {
+      "file": "package.json",
+      "line_start": 34,
+      "line_end": 34,
+      "snippet_hash": "47af7c6d7fa50e0f2647263005e1e783bd0fc1f6e1b51c22722d947a6bfc4382"
+    },
+    {
+      "file": "package.json",
+      "line_start": 35,
+      "line_end": 35,
+      "snippet_hash": "eda6d10b5f7ac821dc66c4b061cdfbef55a1b087598f72cf0429c86ce353b6a2"
+    },
+    {
+      "file": "package.json",
+      "line_start": 48,
+      "line_end": 48,
+      "snippet_hash": "e25a5007240a398d953ea9afaaf730ebc51d5c93dfa83186c2a1985efee86ece"
+    },
+    {
+      "file": "package.json",
+      "line_start": 53,
+      "line_end": 53,
+      "snippet_hash": "4fc99b4a130934d595be22cf3bd2b25f04014ef0d8f8fbd4e909c9bbd47bf856"
+    },
+    {
+      "file": "package.json",
+      "line_start": 55,
+      "line_end": 55,
+      "snippet_hash": "33fc4cfbd7f179b013b70a3c239b68fbe3cad223fdb4daab3a1beeee16b18d80"
+    }
+  ],
+  "touched_files": [
+    ".github/actions/install-dependencies/action.yml",
+    ".github/actions/load-dependencies/action.yml",
+    ".github/workflows/external-api-test.yml",
+    ".github/workflows/pre-merge.yml",
+    "app/(header-default)/erreur/introuvable/[slug]/page.tsx",
+    "app/(header-default)/faq/page.tsx",
+    "data/faq/convention-collective.yml",
+    "middleware.ts",
+    "models/article/definitions/index.ts",
+    "models/article/faq/index.ts",
+    "models/landing-pages/index.ts",
+    "next.config.ts",
+    "package.json",
+    "tsconfig.json",
+    "utils/static-pages/load-all.ts"
+  ],
+  "edit_size": {
+    ".github/actions/install-dependencies/action.yml": 4,
+    ".github/actions/load-dependencies/action.yml": 2,
+    ".github/workflows/external-api-test.yml": 2,
+    ".github/workflows/pre-merge.yml": 2,
+    "app/(header-default)/erreur/introuvable/[slug]/page.tsx": 8,
+    "app/(header-default)/faq/page.tsx": 5,
+    "app/(header-default)/not-found.tsx": 13,
+    "app/(header-home)/not-found.tsx": 13,
+    "cypress/support/e2e.ts": 9,
+    "data/definitions/annonce-legale.yml": 1,
+    "data/definitions/association.yml": 1,
+    "data/definitions/bodacc.yml": 1,
+    "data/definitions/certification-qualiopi.yml": 1,
+    "data/definitions/code-ape.yml": 1,
+    "data/definitions/economie-sociale-et-solidaire-ess.yml": 1,
+    "data/definitions/entrepreneur-de-spectacles-vivants.yml": 1,
+    "data/definitions/entreprise-individuelle.yml": 1,
+    "data/definitions/entreprise-non-diffusible.yml": 1,
+    "data/definitions/etablissement.yml": 1,
+    "data/definitions/index-egapro-egalite-professionnelle-entre-les-femmes-et-les-hommes.yml": 1,
+    "data/definitions/kbis.yml": 1,
+    "data/definitions/label-professionnel-du-bio.yml": 1,
+    "data/definitions/numero-nic.yml": 1,
+    "data/definitions/numero-siren.yml": 1,
+    "data/definitions/numero-siret.yml": 1,
+    "data/definitions/personne-morale.yml": 1,
+    "data/definitions/personne-physique.yml": 1,
+    "data/definitions/societe-a-mission.yml": 1,
+    "data/definitions/tva-intracommunautaire.yml": 1,
+    "data/faq/adresse-personnelle.yml": 1,
+    "data/faq/association-introuvable.yml": 1,
+    "data/faq/convention-collective.yml": 3,
+    "data/faq/donnees-financieres.yml": 1,
+    "data/faq/egapro-egalite-professionnelle-femme-homme.yml": 1,
+    "data/faq/entrepreneur-spectacles-vivants.yml": 1,
+    "data/faq/entreprise-introuvable.yml": 1,
+    "data/faq/entreprise-non-diffusible.yml": 1,
+    "data/faq/extraire-liste-entreprises.yml": 1,
+    "data/faq/extrait-kbis.yml": 1,
+    "data/faq/fiche-immatriculation-introuvable.yml": 1,
+    "data/faq/fraudes-ecroqueries-annuaire-des-entreprises.yml": 1,
+    "data/faq/frequence-mise-a-jour-donnees.yml": 1,
+    "data/faq/justificatif-immatriculation-non-diffusible.yml": 1,
+    "data/faq/modifier-adresse.yml": 1,
+    "data/faq/pro-connect.yml": 1,
+    "data/faq/professionnels-bio.yml": 1,
+    "data/faq/qualiopi-organisme-formation.yml": 1,
+    "data/faq/reconnu-garant-environnement.yml": 1,
+    "data/faq/registre-des-beneficiaires-effectifs.yml": 1,
+    "data/faq/rendre-mon-entreprise-non-diffusible.yml": 1,
+    "data/faq/reutiliser-les-donnees.yml": 1,
+    "data/faq/societe-a-mission.yml": 1,
+    "data/faq/supprimer-donnees-personnelles-entreprise.yml": 1,
+    "models/article/definitions/index.ts": 27,
+    "models/article/faq/index.ts": 31,
+    "models/landing-pages/index.ts": 26,
+    "next-env.d.ts": 1,
+    "next.config.ts": 19,
+    "package.json": 18,
+    "middleware.ts => proxy.ts": 2,
+    "tsconfig.json": 12,
+    "utils/static-pages/load-all.ts": 20
+  },
+  "excluded_files": []
+}

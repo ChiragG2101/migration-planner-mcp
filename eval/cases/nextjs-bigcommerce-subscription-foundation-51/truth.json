@@ -1,0 +1,36 @@
+{
+  "case_id": "nextjs-bigcommerce-subscription-foundation-51",
+  "base_commit": "6cff8058d722b751cca4961230e8f09af803a88a",
+  "merge_commit": "572d6a25eac7d55b10f240dcacae9e7e33617524",
+  "changed_usages": [
+    {
+      "file": "package.json",
+      "line_start": 54,
+      "line_end": 54,
+      "snippet_hash": "98ca48099939d5ae233e769f88a31888917e40a04dbe4ff8ff486493c479e200"
+    },
+    {
+      "file": "package.json",
+      "line_start": 74,
+      "line_end": 74,
+      "snippet_hash": "0adde6ed6b91b5631925050bbda9efd829ebd8e8358e509272056a850d907159"
+    },
+    {
+      "file": "package.json",
+      "line_start": 89,
+      "line_end": 89,
+      "snippet_hash": "35faad6136aadf4afda2fe036a14c20b35ed9ed15a6d46b727bf6d1211cb1482"
+    }
+  ],
+  "touched_files": [
+    ".babelrc",
+    "next-env.d.ts",
+    "package.json"
+  ],
+  "edit_size": {
+    ".babelrc": 2,
+    "next-env.d.ts": 3,
+    "package.json": 6
+  },
+  "excluded_files": []
+}

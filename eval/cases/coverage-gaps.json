@@ -1,7 +1,6 @@
 [
-  "nextjs-upgrade: a licensed messy case (revert/partial) is still being sourced; nextjs-chiarel-6-messy is unlicensed and pending removal",
-  "nextjs-upgrade: monorepo with several major hops in one PR: none",
-  "nextjs-upgrade: pages-router-only migration: none",
-  "nextjs-upgrade: a Vitest or Playwright test runner (current cases use jest/tsx): partial",
+  "nextjs-upgrade: a reverted/partial migration where the planner is scored on the forward upgrade that landed on an older React (React 18 app-router 14->15 revert): none (annuaire-2146 is a 15->16 app-router revert; chiarel-style 14->15 revert not yet covered)",
+  "nextjs-upgrade: an app-router 13->14->15 multi-hop (cabinetoffice-497 covers 13->15 but pages-router): none",
+  "nextjs-upgrade: a Turbopack-config or next.config.ts-driven migration: none",
   "django-upgrade: pending until the Django pack lands (M10); cases listed as pending"
 ]

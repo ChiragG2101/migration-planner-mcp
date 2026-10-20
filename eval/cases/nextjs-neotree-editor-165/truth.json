@@ -1,0 +1,372 @@
+{
+  "case_id": "nextjs-neotree-editor-165",
+  "base_commit": "1f15f5c18dae612a937268db858e4a1ec93b2f81",
+  "merge_commit": "d69425430632e5719823a6ba3c127c708d9af094",
+  "changed_usages": [
+    {
+      "file": "app/(auth)/authorize/[token]/page.tsx",
+      "line_start": 13,
+      "line_end": 13,
+      "snippet_hash": "1dbd68bd96cc5190343f8d7bff1f75141018624afc498c8cab05aa9987e53725"
+    },
+    {
+      "file": "app/(dashboard)/(scripts)/script/[scriptId]/data-keys/page.tsx",
+      "line_start": 11,
+      "line_end": 11,
+      "snippet_hash": "bd5fa24f83cf69b523250916df41f76bc6f5c761f6263e4d64830e1916a430f1"
+    },
+    {
+      "file": "app/(dashboard)/(scripts)/script/[scriptId]/data-keys/page.tsx",
+      "line_start": 11,
+      "line_end": 11,
+      "snippet_hash": "bd5fa24f83cf69b523250916df41f76bc6f5c761f6263e4d64830e1916a430f1"
+    },
+    {
+      "file": "app/(dashboard)/(scripts)/script/[scriptId]/diagnosis/[diagnosisId]/page.tsx",
+      "line_start": 15,
+      "line_end": 15,
+      "snippet_hash": "e7a197eb896840cb5efc62cad96762a468f22f667fd846aeb4ba6534b7ff33cf"
+    },
+    {
+      "file": "app/(dashboard)/(scripts)/script/[scriptId]/layout.tsx",
+      "line_start": 11,
+      "line_end": 11,
+      "snippet_hash": "9c194f411d000ac83757ef69578e52819a062f257741c735f44663e757dce661"
+    },
+    {
+      "file": "app/(dashboard)/(scripts)/script/[scriptId]/new-diagnosis/page.tsx",
+      "line_start": 14,
+      "line_end": 14,
+      "snippet_hash": "eade00adf36696e649b9854888f98f5f9df6977c6edcdbf1dfcdb03b1cb03026"
+    },
+    {
+      "file": "app/(dashboard)/(scripts)/script/[scriptId]/new-problem/page.tsx",
+      "line_start": 14,
+      "line_end": 14,
+      "snippet_hash": "158e8ba96e948c78d92809304bbcc26b418a8a0a6f93eb8cdccec45fc09f1eeb"
+    },
+    {
+      "file": "app/(dashboard)/(scripts)/script/[scriptId]/new-screen/page.tsx",
+      "line_start": 14,
+      "line_end": 14,
+      "snippet_hash": "d90911d7359de34139746d47ff45d1c127f53a33105fa2c9769500de5209abbf"
+    },
+    {
+      "file": "app/(dashboard)/(scripts)/script/[scriptId]/problem/[problemId]/page.tsx",
+      "line_start": 15,
+      "line_end": 15,
+      "snippet_hash": "f0f34e6b54d2a084cf3a550d79d1c719e3db17d5113f4bfa34c98f0e7c6660dc"
+    },
+    {
+      "file": "app/(dashboard)/(scripts)/script/[scriptId]/screen/[screenId]/page.tsx",
+      "line_start": 15,
+      "line_end": 15,
+      "snippet_hash": "5fa6f66b9f53625c1191d3ad237274fe6ed0f184db6556a69ee6899d5157cb00"
+    },
+    {
+      "file": "app/(dashboard)/changelogs/[version]/changes/[changeId]/page.tsx",
+      "line_start": 70,
+      "line_end": 70,
+      "snippet_hash": "1e588ba8e5c618c030e2908a19ea5216186757b36d076a717f6e63e52ad5ea6b"
+    },
+    {
+      "file": "app/(dashboard)/changelogs/[version]/page.tsx",
+      "line_start": 67,
+      "line_end": 67,
+      "snippet_hash": "b70cc63c9f533af1542e23674b2741c1d15d71768766bbf8758ccecb6e1497b3"
+    },
+    {
+      "file": "app/(dashboard)/changelogs/page.tsx",
+      "line_start": 21,
+      "line_end": 21,
+      "snippet_hash": "18fa4f094b5ee232aa95125244da63ea87af807adfbb0e4bafaba5c4440a7113"
+    },
+    {
+      "file": "app/(dashboard)/changelogs/pending/[entryId]/page.tsx",
+      "line_start": 61,
+      "line_end": 61,
+      "snippet_hash": "fb2094a88d4d776c19c8648e2f1e27c1444ba5fa220f8064155e22e49f7415e0"
+    },
+    {
+      "file": "app/(dashboard)/changelogs/pending/page.tsx",
+      "line_start": 10,
+      "line_end": 10,
+      "snippet_hash": "a79e151d900a843a0a61e87cad5193297fe2c7c4ba0976119d3d8e7da0f46b21"
+    },
+    {
+      "file": "app/(dashboard)/data-keys/(editor)/edit/[dataKeyId]/page.tsx",
+      "line_start": 11,
+      "line_end": 11,
+      "snippet_hash": "aee38603986bf16a45ca80f5301bc48c29485275a34a8df4114b68e3b07bb6b2"
+    },
+    {
+      "file": "app/(dashboard)/data-keys/[dataKeyId]/metadata/page.tsx",
+      "line_start": 13,
+      "line_end": 13,
+      "snippet_hash": "7651ec417bbced57545b63caa76c8389cb2604cb8db691aee599da324cf5f2a4"
+    },
+    {
+      "file": "app/(dashboard)/hospitals/page.tsx",
+      "line_start": 19,
+      "line_end": 19,
+      "snippet_hash": "b7a59abc94c5394b39422fdbd278e69b632e0efcbdde53bca71c5107d6e97810"
+    },
+    {
+      "file": "app/(dashboard)/sessions/[sessionId]/page.tsx",
+      "line_start": 15,
+      "line_end": 15,
+      "snippet_hash": "072247cb4e22b3eefb1ca4630fbd7338c8ecd2d760819628918a642cdf88fd9c"
+    },
+    {
+      "file": "app/(dashboard)/sessions/page.tsx",
+      "line_start": 11,
+      "line_end": 11,
+      "snippet_hash": "acffed7bb39ae1672e2c5c002815c815d0b44b380858cfc5c562525dddfbd344"
+    },
+    {
+      "file": "app/(ops)/drugs-fluids-and-feeds/[itemId]/metadata/page.tsx",
+      "line_start": 12,
+      "line_end": 12,
+      "snippet_hash": "6bb7a353d600bbd0ddb091fe7ca2ca100d9ace2c1161e19d68a16b151fd05d57"
+    },
+    {
+      "file": "app/(ops)/scripts/[scriptId]/metadata/page.tsx",
+      "line_start": 13,
+      "line_end": 13,
+      "snippet_hash": "ff649b38a8807b1655133f8558efdd24aa2158e0f64f797081e565b9e1c3eceb"
+    },
+    {
+      "file": "app/actions/authenticate.ts",
+      "line_start": 8,
+      "line_end": 8,
+      "snippet_hash": "25c6321627280c74909f7a2e4b0903013eba7a908605813ab7016b0e3914cb74"
+    },
+    {
+      "file": "app/api/app/device/[deviceId]/route.ts",
+      "line_start": 40,
+      "line_end": 40,
+      "snippet_hash": "e4e2cb4a62f777dfc3cb05baeabb0c2c8d24099c9603d482acc854d4eed45be7"
+    },
+    {
+      "file": "app/api/app/device/[deviceId]/route.ts",
+      "line_start": 50,
+      "line_end": 50,
+      "snippet_hash": "10307698f6d644b0817686c374f4ae9e1da17bfa8b65b913c9e72101f5916f88"
+    },
+    {
+      "file": "app/api/changelogs/history/[entityId]/route.ts",
+      "line_start": 7,
+      "line_end": 7,
+      "snippet_hash": "defbf2c3f0774d72f47f1b114c24a0db50d729349e5e32c9791da607d5f48556"
+    },
+    {
+      "file": "app/api/changelogs/history/[entityId]/route.ts",
+      "line_start": 7,
+      "line_end": 7,
+      "snippet_hash": "defbf2c3f0774d72f47f1b114c24a0db50d729349e5e32c9791da607d5f48556"
+    },
+    {
+      "file": "app/api/files/[fileId]/download/route.ts",
+      "line_start": 12,
+      "line_end": 12,
+      "snippet_hash": "f23267e3c2407292fe44990a8adf2a80700509435c127c9f274af101a2741ce7"
+    },
+    {
+      "file": "app/api/files/[fileId]/download/route.ts",
+      "line_start": 12,
+      "line_end": 12,
+      "snippet_hash": "f23267e3c2407292fe44990a8adf2a80700509435c127c9f274af101a2741ce7"
+    },
+    {
+      "file": "app/api/files/[fileId]/references/route.ts",
+      "line_start": 13,
+      "line_end": 13,
+      "snippet_hash": "f23267e3c2407292fe44990a8adf2a80700509435c127c9f274af101a2741ce7"
+    },
+    {
+      "file": "app/api/files/[fileId]/references/route.ts",
+      "line_start": 13,
+      "line_end": 13,
+      "snippet_hash": "f23267e3c2407292fe44990a8adf2a80700509435c127c9f274af101a2741ce7"
+    },
+    {
+      "file": "app/api/files/[fileId]/route.ts",
+      "line_start": 25,
+      "line_end": 25,
+      "snippet_hash": "f23267e3c2407292fe44990a8adf2a80700509435c127c9f274af101a2741ce7"
+    },
+    {
+      "file": "app/api/files/[fileId]/route.ts",
+      "line_start": 25,
+      "line_end": 25,
+      "snippet_hash": "f23267e3c2407292fe44990a8adf2a80700509435c127c9f274af101a2741ce7"
+    },
+    {
+      "file": "app/api/hospitals/[hospitalId]/route.ts",
+      "line_start": 13,
+      "line_end": 13,
+      "snippet_hash": "6d2a77f20f23c289501ddc64aca1b95a4bfdde19083c5b14f7b300b7aae2ab24"
+    },
+    {
+      "file": "app/api/hospitals/[hospitalId]/route.ts",
+      "line_start": 13,
+      "line_end": 13,
+      "snippet_hash": "6d2a77f20f23c289501ddc64aca1b95a4bfdde19083c5b14f7b300b7aae2ab24"
+    },
+    {
+      "file": "app/api/users/[userId]/route.ts",
+      "line_start": 13,
+      "line_end": 13,
+      "snippet_hash": "eaac905636171bc8b5cb15d37b58c7336ddea005251acd75893f4c7098ec9b8d"
+    },
+    {
+      "file": "app/api/users/[userId]/route.ts",
+      "line_start": 13,
+      "line_end": 13,
+      "snippet_hash": "eaac905636171bc8b5cb15d37b58c7336ddea005251acd75893f4c7098ec9b8d"
+    },
+    {
+      "file": "databases/queries/sites/_get-site-api-key.ts",
+      "line_start": 27,
+      "line_end": 27,
+      "snippet_hash": "77cd11d72b140a3030d86c3e803665c4611b3402ad158f15f0bceb0ec4043fdd"
+    },
+    {
+      "file": "databases/queries/sites/_get-sites-no-confidential-data.ts",
+      "line_start": 42,
+      "line_end": 42,
+      "snippet_hash": "a44f5dfd4753d91f8afbe032161f5e614a2501399901eef51276ee837b89ec01"
+    },
+    {
+      "file": "databases/queries/sites/local-sites.ts",
+      "line_start": 4,
+      "line_end": 4,
+      "snippet_hash": "b6c3f7fd932f5a6581da563dd681a0657aea4ee0377dbf9a44be9a1529488ecd"
+    },
+    {
+      "file": "lib/header.ts",
+      "line_start": 4,
+      "line_end": 4,
+      "snippet_hash": "25c6321627280c74909f7a2e4b0903013eba7a908605813ab7016b0e3914cb74"
+    },
+    {
+      "file": "middleware.ts",
+      "line_start": 18,
+      "line_end": 18,
+      "snippet_hash": "e0d417f30764af4b3dafe65ecbf4b1d3896f04644526c014cd960ea6be805c48"
+    },
+    {
+      "file": "middleware.ts",
+      "line_start": 19,
+      "line_end": 19,
+      "snippet_hash": "cf06594007a47f9d7e024e72c0d8e15a0cdac1f9700c80aeb2d50b6e214d4085"
+    },
+    {
+      "file": "middleware.ts",
+      "line_start": 20,
+      "line_end": 20,
+      "snippet_hash": "1ea4021cf2e2852ae355e2198bd397cf828144ee839a75e351b53971b4e904f0"
+    },
+    {
+      "file": "middleware.ts",
+      "line_start": 21,
+      "line_end": 21,
+      "snippet_hash": "c37762799b6f1f1392bed69ef54667f5fb95bc47115f23c179a95dc7803e4d25"
+    },
+    {
+      "file": "middleware.ts",
+      "line_start": 22,
+      "line_end": 22,
+      "snippet_hash": "b1b6c1a98973b46c96d6c5a2dacaf6856be589408fe4ec029dffa32b0f7ac288"
+    },
+    {
+      "file": "package.json",
+      "line_start": 87,
+      "line_end": 87,
+      "snippet_hash": "a6e70bacb2428a96dcb82ee14f0704100d840dd30bc03202787220c416ab29e8"
+    }
+  ],
+  "touched_files": [
+    "app/(auth)/authorize/[token]/page.tsx",
+    "app/(dashboard)/(scripts)/new-script/page.tsx",
+    "app/(dashboard)/(scripts)/script/[scriptId]/data-keys/page.tsx",
+    "app/(dashboard)/(scripts)/script/[scriptId]/data-keys/validation-rules/page.tsx",
+    "app/(dashboard)/(scripts)/script/[scriptId]/diagnosis/[diagnosisId]/page.tsx",
+    "app/(dashboard)/(scripts)/script/[scriptId]/layout.tsx",
+    "app/(dashboard)/(scripts)/script/[scriptId]/new-diagnosis/page.tsx",
+    "app/(dashboard)/(scripts)/script/[scriptId]/new-problem/page.tsx",
+    "app/(dashboard)/(scripts)/script/[scriptId]/new-screen/page.tsx",
+    "app/(dashboard)/(scripts)/script/[scriptId]/problem/[problemId]/page.tsx",
+    "app/(dashboard)/(scripts)/script/[scriptId]/screen/[screenId]/page.tsx",
+    "app/(dashboard)/changelogs/[version]/changes/[changeId]/page.tsx",
+    "app/(dashboard)/changelogs/[version]/page.tsx",
+    "app/(dashboard)/changelogs/page.tsx",
+    "app/(dashboard)/changelogs/pending/[entryId]/page.tsx",
+    "app/(dashboard)/changelogs/pending/page.tsx",
+    "app/(dashboard)/data-keys/(editor)/edit/[dataKeyId]/page.tsx",
+    "app/(dashboard)/data-keys/[dataKeyId]/metadata/page.tsx",
+    "app/(dashboard)/hospitals/page.tsx",
+    "app/(dashboard)/sessions/[sessionId]/page.tsx",
+    "app/(dashboard)/sessions/page.tsx",
+    "app/(ops)/drugs-fluids-and-feeds/[itemId]/metadata/page.tsx",
+    "app/(ops)/scripts/[scriptId]/metadata/page.tsx",
+    "app/actions/authenticate.ts",
+    "app/actions/scripts.ts",
+    "app/api/app/device/[deviceId]/route.ts",
+    "app/api/changelogs/history/[entityId]/route.ts",
+    "app/api/files/[fileId]/download/route.ts",
+    "app/api/files/[fileId]/references/route.ts",
+    "app/api/files/[fileId]/route.ts",
+    "app/api/hospitals/[hospitalId]/route.ts",
+    "app/api/users/[userId]/route.ts",
+    "components/title.tsx",
+    "databases/queries/sites/_get-site-api-key.ts",
+    "databases/queries/sites/_get-sites-no-confidential-data.ts",
+    "databases/queries/sites/local-sites.ts",
+    "lib/header.ts",
+    "middleware.ts",
+    "package.json"
+  ],
+  "edit_size": {
+    "app/(auth)/authorize/[token]/page.tsx": 12,
+    "app/(dashboard)/(scripts)/new-script/page.tsx": 2,
+    "app/(dashboard)/(scripts)/script/[scriptId]/data-keys/page.tsx": 9,
+    "app/(dashboard)/(scripts)/script/[scriptId]/data-keys/validation-rules/page.tsx": 2,
+    "app/(dashboard)/(scripts)/script/[scriptId]/diagnosis/[diagnosisId]/page.tsx": 13,
+    "app/(dashboard)/(scripts)/script/[scriptId]/layout.tsx": 14,
+    "app/(dashboard)/(scripts)/script/[scriptId]/new-diagnosis/page.tsx": 12,
+    "app/(dashboard)/(scripts)/script/[scriptId]/new-problem/page.tsx": 12,
+    "app/(dashboard)/(scripts)/script/[scriptId]/new-screen/page.tsx": 12,
+    "app/(dashboard)/(scripts)/script/[scriptId]/problem/[problemId]/page.tsx": 13,
+    "app/(dashboard)/(scripts)/script/[scriptId]/screen/[screenId]/page.tsx": 13,
+    "app/(dashboard)/changelogs/[version]/changes/[changeId]/page.tsx": 3,
+    "app/(dashboard)/changelogs/[version]/page.tsx": 3,
+    "app/(dashboard)/changelogs/page.tsx": 3,
+    "app/(dashboard)/changelogs/pending/[entryId]/page.tsx": 3,
+    "app/(dashboard)/changelogs/pending/page.tsx": 27,
+    "app/(dashboard)/data-keys/(editor)/edit/[dataKeyId]/page.tsx": 3,
+    "app/(dashboard)/data-keys/[dataKeyId]/metadata/page.tsx": 12,
+    "app/(dashboard)/hospitals/page.tsx": 12,
+    "app/(dashboard)/sessions/[sessionId]/page.tsx": 12,
+    "app/(dashboard)/sessions/page.tsx": 5,
+    "app/(ops)/drugs-fluids-and-feeds/[itemId]/metadata/page.tsx": 12,
+    "app/(ops)/scripts/[scriptId]/metadata/page.tsx": 12,
+    "app/actions/authenticate.ts": 2,
+    "app/actions/scripts.ts": 2,
+    "app/api/app/device/[deviceId]/route.ts": 16,
+    "app/api/changelogs/history/[entityId]/route.ts": 3,
+    "app/api/files/[fileId]/download/route.ts": 14,
+    "app/api/files/[fileId]/references/route.ts": 14,
+    "app/api/files/[fileId]/route.ts": 14,
+    "app/api/hospitals/[hospitalId]/route.ts": 12,
+    "app/api/users/[userId]/route.ts": 14,
+    "components/title.tsx": 40,
+    "databases/queries/sites/_get-site-api-key.ts": 2,
+    "databases/queries/sites/_get-sites-no-confidential-data.ts": 2,
+    "databases/queries/sites/local-sites.ts": 4,
+    "lib/header.ts": 4,
+    "middleware.ts": 12,
+    "package.json": 2
+  },
+  "excluded_files": []
+}

@@ -1,0 +1,14 @@
+{
+  "id": "nextjs-c-shepherd-speller-16",
+  "pack": "nextjs-upgrade",
+  "repo_url": "https://github.com/wdonray/c-shepherd-speller",
+  "base_commit": "720be5330bf4c22dc51bdfcddbe1037d4f0c752d",
+  "merge_commit": "f690691bfcdb0823413427485fabc5f6256c4a68",
+  "pr_url": "https://github.com/wdonray/c-shepherd-speller/pull/16",
+  "source": { "framework": "next", "version": "15.4.6" },
+  "target": { "framework": "next", "version": "16.3.8" },
+  "license": "MIT",
+  "checks": {},
+  "tags": ["15-to-16", "vitest", "playwright", "app-router", "single-package"],
+  "notes": "Chosen to fill the 'Vitest or Playwright test runner' coverage cell (the existing cases use jest/tsx), and to add a 15 -> 16 hop (the existing cases are 14 -> 15). PR #16 'upgrade Next.js 15 to 16.3.8' bumps next 15.4.6 -> 16.3.8 in the single root package.json (read from the package.json diff, not the title). Router: src/app (app router). Test runners: vitest.config.mts + vitest.setup.mts and playwright.config.ts at base. MIT licensed. Uses package-lock.json, so cases:verify's npm lockfile reader applies. base_commit is the only parent of the merge commit (parents=1)."
+}

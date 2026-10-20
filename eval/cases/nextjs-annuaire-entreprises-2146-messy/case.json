@@ -1,0 +1,14 @@
+{
+  "id": "nextjs-annuaire-entreprises-2146-messy",
+  "pack": "nextjs-upgrade",
+  "repo_url": "https://github.com/annuaire-entreprises-data-gouv-fr/site",
+  "base_commit": "a31accd785082aeabdcaa85b9595a81731158340",
+  "merge_commit": "2570db77479163b13a115a15f8909beca23cde15",
+  "pr_url": "https://github.com/annuaire-entreprises-data-gouv-fr/site/pull/2146",
+  "source": { "framework": "next", "version": "15.3.8" },
+  "target": { "framework": "next", "version": "16.1.1" },
+  "license": "MIT",
+  "checks": {},
+  "tags": ["messy", "reverted", "15-to-16", "app-router", "jest", "cypress"],
+  "notes": "The required messy case for the Next.js pack, replacing the unlicensed nextjs-chiarel-6-messy (removed in the same handover under eval/cases/REMOVED.json, D15 exception b). This is the licensed equivalent of the chiarel shape: annuaire-entreprises-data-gouv-fr/site (a French government service, github.com/annuaire-entreprises-data-gouv-fr) is MIT-licensed, and its Next 16 upgrade was a genuine upgrade -> revert saga. PR #2146 'chore(next): upgrades Next to v16' merged 2026-01-12 (next ^15.3.8 -> ^16.1.1, 63 files, read from the package.json diff not the title) and was reverted the next day by #2233 'Revert \"chore(next): upgrades Next to v16 (#2146)\"' (2026-01-13); the team retried and reverted again twice more (#2279 -> #2286, #2352 -> #2300). So PR #2146 is a real, merged, partial/failed migration that was rolled back, exactly the kind the add-golden-case skill says to keep tagged 'messy'. The planner is scored on PR #2146 (the forward upgrade) against what it actually changed, not on the revert. Router: app/ (app router). Test runners: jest.config.js + cypress at base. Uses package-lock.json, so cases:verify's npm lockfile reader applies. base_commit is the only parent of the merge commit (parents=1)."
+}
