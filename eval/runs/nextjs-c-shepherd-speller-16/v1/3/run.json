@@ -1,0 +1,3407 @@
+{
+  "kind": "engine",
+  "case_id": "nextjs-c-shepherd-speller-16",
+  "prompt_version": "v1",
+  "run": 3,
+  "ingest": {
+    "source": {
+      "name": "next",
+      "version": "15.4.6"
+    },
+    "target": {
+      "name": "next",
+      "version": "16.3.8"
+    }
+  },
+  "scope_answers": {},
+  "docs": [
+    {
+      "library": "next",
+      "version": "16",
+      "topic": "next/amp",
+      "url": "https://nextjs.org/docs/app/guides/upgrading/version-16#amp-support",
+      "content": "AMP Support\n\nAMP support is removed, including the next/amp import, the amp config and the pages amp config export.\n\nold: import { useAmp } from 'next/amp'\nnew: no AMP API\n\n",
+      "doc_id": "01dac8eed168239a9b65c15bde5a819668478b243be6a1861f91484351dff343",
+      "fetched_by": "knowledge",
+      "official": true,
+      "status": "unverified"
+    },
+    {
+      "library": "next",
+      "version": "16",
+      "topic": "devIndicators",
+      "url": "https://nextjs.org/docs/app/guides/upgrading/version-16#devindicators-options",
+      "content": "devIndicators Options\n\ndevIndicators options appIsrStatus, buildActivity and buildActivityPosition are removed.\n\nold: devIndicators.buildActivity\nnew: the remaining devIndicators indicator\n\n",
+      "doc_id": "0a840e65f76004fbf1a6dad93ada8860f3b5e81d1697cac34da0db4d2487d030",
+      "fetched_by": "knowledge",
+      "official": true,
+      "status": "unverified"
+    },
+    {
+      "library": "next",
+      "version": "15",
+      "topic": "15.md",
+      "url": "pack://nextjs-upgrade@0.3.0/references/15.md",
+      "content": "<!-- do not edit; generated from pack v0.3.0 -->\n\n# nextjs-upgrade 15\n\n- `next/async-cookies` (changed_behavior): cookies() is async\n- `next/async-draft-mode` (changed_behavior): draftMode() is async\n- `next/async-headers` (changed_behavior): headers() is async\n- `next/async-params` (changed_behavior): params is a Promise\n- `next/async-request-ip` (removed): NextRequest.ip is removed\n- `next/async-search-params` (changed_behavior): searchParams is a Promise\n- `next/bundlepagesrouterdependencies` (renamed): bundlePagesRouterDependencies\n- `next/nextrequest-geolocation` (removed): NextRequest Geolocation\n- `next/react-19` (peer_requirement): App Router requires React 19\n- `next/route-handlers` (changed_default): Route Handlers\n- `next/runtime-configuration-breaking-change` (removed): runtime configuration (Breaking change)\n- `next/serverexternalpackages` (renamed): serverExternalPackages\n",
+      "doc_id": "12991973739f2926f4e9cf1a26157f181418224e44a9446f9d496e8b015ba348",
+      "fetched_by": "knowledge",
+      "official": false,
+      "status": "unverified"
+    },
+    {
+      "library": "next",
+      "version": "16",
+      "topic": "unstable_rootParams",
+      "url": "https://nextjs.org/docs/app/guides/upgrading/version-16#unstable-rootparams",
+      "content": "unstable_rootParams\n\nunstable_rootParams is removed. Use next/root-params.\n\nold: unstable_rootParams from next/server\nnew: next/root-params\n\n",
+      "doc_id": "15978401376afbd141199a7491950dce8297f9452b833625150eb2c52993d7d9",
+      "fetched_by": "knowledge",
+      "official": true,
+      "status": "unverified"
+    },
+    {
+      "library": "next",
+      "version": "16",
+      "topic": "unstable_cacheLife",
+      "url": "https://nextjs.org/docs/app/guides/upgrading/version-16#cachelife-and-cachetag",
+      "content": "cacheLife and cacheTag\n\nunstable_cacheLife and unstable_cacheTag are stable; drop the unstable_ prefix.\n\nold: unstable_cacheLife and unstable_cacheTag\nnew: cacheLife and cacheTag\n\n",
+      "doc_id": "1dc4a24aa50f2cfbe498ea46efa003a4a4d7e7b321017e95b55793ee0ca2c937",
+      "fetched_by": "knowledge",
+      "official": true,
+      "status": "unverified"
+    },
+    {
+      "library": "next",
+      "version": "16",
+      "topic": "next/legacy/image",
+      "url": "https://nextjs.org/docs/app/guides/upgrading/version-16#next-legacy-image-component-deprecated",
+      "content": "next/legacy/image Component (deprecated)\n\nnext/legacy/image is deprecated.\n\nold: import Image from 'next/legacy/image'\nnew: import Image from 'next/image'\n\n",
+      "doc_id": "364bc1a47fcc353af3144f3ebe6463e72585a873ba69e7a3bc6cda5ef5ae9550",
+      "fetched_by": "knowledge",
+      "official": true,
+      "status": "unverified"
+    },
+    {
+      "library": "next",
+      "version": "16",
+      "topic": "revalidateTag",
+      "url": "https://nextjs.org/docs/app/guides/upgrading/version-16#revalidatetag",
+      "content": "revalidateTag\n\nrevalidateTag now requires a cacheLife profile as its second argument. The one-argument form is deprecated.\n\nold: revalidateTag('posts')\nnew: revalidateTag('posts', 'max')\n\n",
+      "doc_id": "5b2dea8367d14bd3a4ecfb93f19e68f8c4e0015d916b5d1bdfea3c7a843e54c1",
+      "fetched_by": "knowledge",
+      "official": true,
+      "status": "unverified"
+    },
+    {
+      "library": "next",
+      "version": "16",
+      "topic": "images.domains",
+      "url": "https://nextjs.org/docs/app/guides/upgrading/version-16#images-domains-configuration-deprecated",
+      "content": "images.domains Configuration (deprecated)\n\nimages.domains is deprecated in favour of images.remotePatterns.\n\nold: images.domains\nnew: images.remotePatterns\n\n",
+      "doc_id": "601107b9a15df169cd94e676b6c87645042a3bd0e8aa27970d8a695271cb9e14",
+      "fetched_by": "knowledge",
+      "official": true,
+      "status": "unverified"
+    },
+    {
+      "library": "next",
+      "version": "16",
+      "topic": "headers",
+      "url": "https://nextjs.org/docs/app/guides/upgrading/version-15#async-request-apis-breaking-change",
+      "content": "headers() is async\n\nheaders() from next/headers is asynchronous.\n\nold: const headersList = headers()\nnew: const headersList = await headers()\n\n",
+      "doc_id": "64f42f2555224e6a937eabe99435de49e4d6c1602cd9ad75df4d80cbd41210b5",
+      "fetched_by": "knowledge",
+      "official": true,
+      "status": "unverified"
+    },
+    {
+      "library": "next",
+      "version": "16",
+      "topic": "cookies",
+      "url": "https://nextjs.org/docs/app/guides/upgrading/version-15#async-request-apis-breaking-change",
+      "content": "cookies() is async\n\ncookies() from next/headers is asynchronous. A synchronous call warns, and the warning becomes an error in 16.\n\nold: const cookieStore = cookies()\nnew: const cookieStore = await cookies()\n\n",
+      "doc_id": "66ba5b870fc1d2c1e096cc2c1ef160324af2d55c9bea6bbf393dd051ab32a158",
+      "fetched_by": "knowledge",
+      "official": true,
+      "status": "unverified"
+    },
+    {
+      "library": "next",
+      "version": "16",
+      "topic": "searchParams",
+      "url": "https://nextjs.org/docs/app/guides/upgrading/version-15#async-request-apis-breaking-change",
+      "content": "searchParams is a Promise\n\nsearchParams in page props is a Promise.\n\nold: const { q } = searchParams\nnew: const { q } = await searchParams\n\n",
+      "doc_id": "69f32c2ce28e3137602781ec716afc58819c85105b258091d86a84e1b5faa8dd",
+      "fetched_by": "knowledge",
+      "official": true,
+      "status": "unverified"
+    },
+    {
+      "library": "next",
+      "version": "16",
+      "topic": "codemods.md",
+      "url": "pack://nextjs-upgrade@0.3.0/references/codemods.md",
+      "content": "<!-- do not edit; generated from pack v0.3.0 -->\n\n# Codemods\n\n- `next-codemod:app-dir-runtime-config-experimental-edge`: next/runtime-configuration-breaking-change\n- `next-codemod:built-in-next-font`: next/the-next-font-package-has-been-fully-removed-in-favor-of-the\n- `next-codemod:metadata-to-viewport-export`: no reviewed rule names it\n- `next-codemod:middleware-to-proxy`: next/middleware-to-proxy\n- `next-codemod:next-async-request-api`: next/async-cookies, next/async-draft-mode, next/async-headers, next/async-params, next/async-search-params\n- `next-codemod:next-lint-to-eslint-cli`: next/next-lint-command\n- `next-codemod:next-og-import`: no reviewed rule names it\n- `next-codemod:next-request-geo-ip`: next/async-request-ip, next/nextrequest-geolocation\n- `next-codemod:remove-experimental-ppr`: no reviewed rule names it\n- `next-codemod:remove-unstable-prefix`: next/cachelife-and-cachetag\n- `next-codemod:upgrade`: no reviewed rule names it\n- `react-codemod:migration-recipe-19`: no reviewed rule names it\n- `react-codemod:prop-types-typescript`: no reviewed rule names it\n- `react-codemod:replace-act-import`: react/removed-react-dom-test-utils\n- `react-codemod:replace-reactdom-render`: react/removed-reactdom-hydrate, react/removed-reactdom-render, react/removed-unmountcomponentatnode\n- `react-codemod:replace-string-ref`: react/removed-string-refs\n- `react-codemod:replace-use-form-state`: no reviewed rule names it\n- `types-react-codemod:no-implicit-ref-callback-return`: no reviewed rule names it\n- `types-react-codemod:preset-19`: react/the-jsx-namespace-in-typescript\n- `types-react-codemod:refobject-defaults`: react/useref-requires-an-argument\n",
+      "doc_id": "72a67f34befeb2966cf5223217ce1f0081e8caf21051b77c9be35d7d994f1cfc",
+      "fetched_by": "knowledge",
+      "official": false,
+      "status": "unverified"
+    },
+    {
+      "library": "next",
+      "version": "16",
+      "topic": "~",
+      "url": "https://nextjs.org/docs/app/guides/upgrading/version-16#sass-node-modules-imports",
+      "content": "Sass node_modules imports\n\nTurbopack does not support the tilde prefix on Sass imports.\n\nold: @import '~bootstrap/dist/css/bootstrap.min.css'\nnew: @import 'bootstrap/dist/css/bootstrap.min.css'\n\n",
+      "doc_id": "72e8c8805992431e6c1d6cc20e20b033d973c3bab9cf5f2f8446a2486208a353",
+      "fetched_by": "knowledge",
+      "official": true,
+      "status": "unverified"
+    },
+    {
+      "library": "next",
+      "version": "16",
+      "topic": "middleware",
+      "url": "https://nextjs.org/docs/app/guides/upgrading/version-16#middleware-to-proxy",
+      "content": "middleware to proxy\n\nThe middleware file is deprecated and renamed to proxy. The edge runtime is not supported in proxy.\n\nold: middleware.ts\nnew: proxy.ts\n\n",
+      "doc_id": "831a1b0ff96c3dd4256f3523bf9a281cc444881370b9b0b530af972bc638e1d8",
+      "fetched_by": "knowledge",
+      "official": true,
+      "status": "unverified"
+    },
+    {
+      "library": "next",
+      "version": "16",
+      "topic": "experimental.useCache",
+      "url": "https://nextjs.org/docs/app/guides/upgrading/version-16#experimental-dynamicio-and-experimental-usecache",
+      "content": "experimental.dynamicIO and experimental.useCache\n\nexperimental.dynamicIO and experimental.useCache are removed. cacheComponents is the replacement, and it is not a rename-only change.\n\nold: experimental.useCache\nnew: cacheComponents, after adopting the Cache Components model\n\n",
+      "doc_id": "a39b500a91d5a58b4b1f53bd16ffbf154ce739b56e8dfa84f90058c91557d46a",
+      "fetched_by": "knowledge",
+      "official": true,
+      "status": "unverified"
+    },
+    {
+      "library": "next",
+      "version": "16",
+      "topic": "params",
+      "url": "https://nextjs.org/docs/app/guides/upgrading/version-15#async-request-apis-breaking-change",
+      "content": "params is a Promise\n\nparams in page, layout and route props is a Promise.\n\nold: const { slug } = params\nnew: const { slug } = await params\n\n",
+      "doc_id": "a4b3d590c2c78f791e41c39183b848272cdd7c9ce52d019ca79af2e176ff9560",
+      "fetched_by": "knowledge",
+      "official": true,
+      "status": "unverified"
+    },
+    {
+      "library": "next",
+      "version": "16",
+      "topic": "draftMode",
+      "url": "https://nextjs.org/docs/app/guides/upgrading/version-15#async-request-apis-breaking-change",
+      "content": "draftMode() is async\n\ndraftMode() from next/headers is asynchronous.\n\nold: const { isEnabled } = draftMode()\nnew: const { isEnabled } = await draftMode()\n\n",
+      "doc_id": "d116c74284f6544f8919c5f8c89999c040146da6fc61470bb4ee2d37a7feb759",
+      "fetched_by": "knowledge",
+      "official": true,
+      "status": "unverified"
+    },
+    {
+      "library": "react",
+      "version": "19",
+      "topic": "react-changes.md",
+      "url": "pack://nextjs-upgrade@0.3.0/references/react-changes.md",
+      "content": "<!-- do not edit; generated from pack v0.3.0 -->\n\n# react changes\n\n- `react/removed-legacy-context-using-contexttypes-and-getchildcontex` (19, removed): Removed: Legacy Context using contextTypes and getChildContext\n- `react/removed-proptypes-and-defaultprops-for-functions` (19, removed): Removed: propTypes and defaultProps for functions\n- `react/removed-react-createfactory` (19, removed): Removed: React.createFactory\n- `react/removed-react-dom-test-utils` (19, removed): Removed: react-dom/test-utils\n- `react/removed-react-test-renderer-shallow` (19, removed): Removed: react-test-renderer/shallow\n- `react/removed-reactdom-finddomnode` (19, removed): Removed: ReactDOM.findDOMNode\n- `react/removed-reactdom-hydrate` (19, removed): Removed: ReactDOM.hydrate\n- `react/removed-reactdom-render` (19, removed): Removed: ReactDOM.render\n- `react/removed-string-refs` (19, removed): Removed: string refs\n- `react/removed-unmountcomponentatnode` (19, removed): Removed: unmountComponentAtNode\n- `react/the-jsx-namespace-in-typescript` (19, removed): The JSX namespace in TypeScript\n- `react/useref-requires-an-argument` (19, changed_behavior): useRef requires an argument\n",
+      "doc_id": "d12dd30ba60f3d1f3adbbcb226519fe45ac6a0d8d86aba14af05643c150439f4",
+      "fetched_by": "knowledge",
+      "official": false,
+      "status": "unverified"
+    },
+    {
+      "library": "next",
+      "version": "16",
+      "topic": "16.md",
+      "url": "pack://nextjs-upgrade@0.3.0/references/16.md",
+      "content": "<!-- do not edit; generated from pack v0.3.0 -->\n\n# nextjs-upgrade 16\n\n- `next/amp-support` (removed): AMP Support\n- `next/cachelife-and-cachetag` (renamed): cacheLife and cacheTag\n- `next/devindicators-options` (removed): devIndicators Options\n- `next/experimental-dynamicio-and-experimental-usecache` (removed): experimental.dynamicIO and experimental.useCache\n- `next/images-domains-configuration-deprecated` (deprecated): images.domains Configuration (deprecated)\n- `next/middleware-to-proxy` (deprecated): middleware to proxy\n- `next/next-legacy-image-component-deprecated` (deprecated): next/legacy/image Component (deprecated)\n- `next/next-lint-command` (removed): next lint Command\n- `next/parallel-routes-default-js-requirement` (changed_behavior): Parallel Routes default.js requirement\n- `next/revalidatetag` (changed_behavior): revalidateTag\n- `next/runtime-configuration` (removed): Runtime Configuration\n- `next/sass-node-modules-imports` (removed): Sass node_modules imports\n- `next/unstable-rootparams` (removed): unstable_rootParams\n",
+      "doc_id": "d406c65e47cb47a006b00065d0d3839003ae08370f76499fa563e9fdef324806",
+      "fetched_by": "knowledge",
+      "official": false,
+      "status": "unverified"
+    },
+    {
+      "library": "next",
+      "version": "16",
+      "topic": "next lint",
+      "url": "https://nextjs.org/docs/app/guides/upgrading/version-16#next-lint-command",
+      "content": "next lint Command\n\nThe next lint command is removed. Use ESLint or Biome directly. next build no longer runs lint.\n\nold: next lint\nnew: the ESLint CLI\n\n",
+      "doc_id": "ed6dac3e7084c72c8b88dc79356f0519213ee6b32d706fd9e0e02572d3a30b24",
+      "fetched_by": "knowledge",
+      "official": true,
+      "status": "unverified"
+    },
+    {
+      "library": "next",
+      "version": "16",
+      "topic": "**/@*/**",
+      "url": "https://nextjs.org/docs/app/guides/upgrading/version-16#parallel-routes-default-js-requirement",
+      "content": "Parallel Routes default.js requirement\n\nEvery parallel route slot needs an explicit default.js. The build fails without it.\n\nold: a parallel slot with no default file\nnew: default.js that calls notFound() or returns null\n\n",
+      "doc_id": "fba6099169dd353974885be08654f90077eb93dc8afc905ee2be16c9171003a9",
+      "fetched_by": "knowledge",
+      "official": true,
+      "status": "unverified"
+    },
+    {
+      "library": "next",
+      "version": "16",
+      "topic": "next/config",
+      "url": "https://nextjs.org/docs/app/guides/upgrading/version-16#runtime-configuration",
+      "content": "Runtime Configuration\n\nserverRuntimeConfig and publicRuntimeConfig are removed. Use environment variables.\n\nold: publicRuntimeConfig\nnew: an environment variable, with the NEXT_PUBLIC_ prefix when the client reads it\n\n",
+      "doc_id": "ff1dd0c09625d47f3f0c42b83d3dd86d818bab3135ed0fcd6757ca230a09aec7",
+      "fetched_by": "knowledge",
+      "official": true,
+      "status": "unverified"
+    }
+  ],
+  "rounds": [
+    {
+      "submissions": [
+        {
+          "lens": "api",
+          "packet_usages": [
+            {
+              "file": "src/app/api/users/[id]/last-active/route.ts",
+              "line_start": 5,
+              "line_end": 5,
+              "snippet_hash": "3f716f2ae9c3a811ab2a62127ed3b96241f9a19255ece761290cf531edc60e1f",
+              "usage_id": "16586b547ec763c79ed12960"
+            },
+            {
+              "file": "src/app/api/users/[id]/route.ts",
+              "line_start": 6,
+              "line_end": 6,
+              "snippet_hash": "46e2ade69e4184b09f4443fe522a1fbd5f895d6857ef228e06f095f8545b03cb",
+              "usage_id": "b2435e5fc39619d2125becb1"
+            },
+            {
+              "file": "src/app/api/users/[id]/route.ts",
+              "line_start": 36,
+              "line_end": 36,
+              "snippet_hash": "3e57fc503a56eeabbc7b8508ef04c740826849b675e8d266e367f40c8d2d7d85",
+              "usage_id": "32df0157457f38401211d595"
+            },
+            {
+              "file": "src/app/api/users/[id]/spelling/route.ts",
+              "line_start": 5,
+              "line_end": 5,
+              "snippet_hash": "3e57fc503a56eeabbc7b8508ef04c740826849b675e8d266e367f40c8d2d7d85",
+              "usage_id": "9e692ebc5d074af9e016438f"
+            },
+            {
+              "file": "src/app/api/users/[id]/spelling/route.ts",
+              "line_start": 29,
+              "line_end": 29,
+              "snippet_hash": "46e2ade69e4184b09f4443fe522a1fbd5f895d6857ef228e06f095f8545b03cb",
+              "usage_id": "5814d8fdb87b9d570a8dc054"
+            },
+            {
+              "file": "src/middleware.ts",
+              "line_start": 4,
+              "line_end": 4,
+              "snippet_hash": "8ce7d3ff32fa52324dc3a910a4af4a7d538074f2b1fe2e63f1c97edf7b6449bf",
+              "usage_id": "dea49722ecd22e8d3aef4acb"
+            }
+          ],
+          "submission": {
+            "findings": [
+              {
+                "id": "api-16586b547ec763c79ed12960",
+                "repo_id": "abdde03e9348f307",
+                "lens": "api",
+                "concern": "api_change",
+                "severity": "high",
+                "evidence": [
+                  {
+                    "repo_id": "abdde03e9348f307",
+                    "file": "src/app/api/users/[id]/last-active/route.ts",
+                    "line_start": 5,
+                    "line_end": 5,
+                    "snippet_hash": "3f716f2ae9c3a811ab2a62127ed3b96241f9a19255ece761290cf531edc60e1f"
+                  }
+                ],
+                "doc_refs": [],
+                "reasoning": "params is a Promise: params in page, layout and route props is a Promise.",
+                "action": "Update to: const { slug } = await params",
+                "step_kind": "codemod",
+                "verify": "Load the affected page or run the build, and confirm the new behaviour.",
+                "confidence": 0.85,
+                "source": "rule_pack",
+                "usage_ids": [
+                  "16586b547ec763c79ed12960"
+                ],
+                "docs_status": "unverified",
+                "prompt_version": "v1",
+                "rule_id": "next/async-params",
+                "codemod": "next-codemod:next-async-request-api",
+                "rollback": "Return to the previous release of the library."
+              },
+              {
+                "id": "api-b2435e5fc39619d2125becb1",
+                "repo_id": "abdde03e9348f307",
+                "lens": "api",
+                "concern": "api_change",
+                "severity": "high",
+                "evidence": [
+                  {
+                    "repo_id": "abdde03e9348f307",
+                    "file": "src/app/api/users/[id]/route.ts",
+                    "line_start": 6,
+                    "line_end": 6,
+                    "snippet_hash": "46e2ade69e4184b09f4443fe522a1fbd5f895d6857ef228e06f095f8545b03cb"
+                  }
+                ],
+                "doc_refs": [],
+                "reasoning": "params is a Promise: params in page, layout and route props is a Promise.",
+                "action": "Update to: const { slug } = await params",
+                "step_kind": "codemod",
+                "verify": "Load the affected page or run the build, and confirm the new behaviour.",
+                "confidence": 0.85,
+                "source": "rule_pack",
+                "usage_ids": [
+                  "b2435e5fc39619d2125becb1"
+                ],
+                "docs_status": "unverified",
+                "prompt_version": "v1",
+                "rule_id": "next/async-params",
+                "codemod": "next-codemod:next-async-request-api",
+                "rollback": "Return to the previous release of the library."
+              },
+              {
+                "id": "api-32df0157457f38401211d595",
+                "repo_id": "abdde03e9348f307",
+                "lens": "api",
+                "concern": "api_change",
+                "severity": "high",
+                "evidence": [
+                  {
+                    "repo_id": "abdde03e9348f307",
+                    "file": "src/app/api/users/[id]/route.ts",
+                    "line_start": 36,
+                    "line_end": 36,
+                    "snippet_hash": "3e57fc503a56eeabbc7b8508ef04c740826849b675e8d266e367f40c8d2d7d85"
+                  }
+                ],
+                "doc_refs": [],
+                "reasoning": "params is a Promise: params in page, layout and route props is a Promise.",
+                "action": "Update to: const { slug } = await params",
+                "step_kind": "codemod",
+                "verify": "Load the affected page or run the build, and confirm the new behaviour.",
+                "confidence": 0.85,
+                "source": "rule_pack",
+                "usage_ids": [
+                  "32df0157457f38401211d595"
+                ],
+                "docs_status": "unverified",
+                "prompt_version": "v1",
+                "rule_id": "next/async-params",
+                "codemod": "next-codemod:next-async-request-api",
+                "rollback": "Return to the previous release of the library."
+              },
+              {
+                "id": "api-9e692ebc5d074af9e016438f",
+                "repo_id": "abdde03e9348f307",
+                "lens": "api",
+                "concern": "api_change",
+                "severity": "high",
+                "evidence": [
+                  {
+                    "repo_id": "abdde03e9348f307",
+                    "file": "src/app/api/users/[id]/spelling/route.ts",
+                    "line_start": 5,
+                    "line_end": 5,
+                    "snippet_hash": "3e57fc503a56eeabbc7b8508ef04c740826849b675e8d266e367f40c8d2d7d85"
+                  }
+                ],
+                "doc_refs": [],
+                "reasoning": "params is a Promise: params in page, layout and route props is a Promise.",
+                "action": "Update to: const { slug } = await params",
+                "step_kind": "codemod",
+                "verify": "Load the affected page or run the build, and confirm the new behaviour.",
+                "confidence": 0.85,
+                "source": "rule_pack",
+                "usage_ids": [
+                  "9e692ebc5d074af9e016438f"
+                ],
+                "docs_status": "unverified",
+                "prompt_version": "v1",
+                "rule_id": "next/async-params",
+                "codemod": "next-codemod:next-async-request-api",
+                "rollback": "Return to the previous release of the library."
+              },
+              {
+                "id": "api-5814d8fdb87b9d570a8dc054",
+                "repo_id": "abdde03e9348f307",
+                "lens": "api",
+                "concern": "api_change",
+                "severity": "high",
+                "evidence": [
+                  {
+                    "repo_id": "abdde03e9348f307",
+                    "file": "src/app/api/users/[id]/spelling/route.ts",
+                    "line_start": 29,
+                    "line_end": 29,
+                    "snippet_hash": "46e2ade69e4184b09f4443fe522a1fbd5f895d6857ef228e06f095f8545b03cb"
+                  }
+                ],
+                "doc_refs": [],
+                "reasoning": "params is a Promise: params in page, layout and route props is a Promise.",
+                "action": "Update to: const { slug } = await params",
+                "step_kind": "codemod",
+                "verify": "Load the affected page or run the build, and confirm the new behaviour.",
+                "confidence": 0.85,
+                "source": "rule_pack",
+                "usage_ids": [
+                  "5814d8fdb87b9d570a8dc054"
+                ],
+                "docs_status": "unverified",
+                "prompt_version": "v1",
+                "rule_id": "next/async-params",
+                "codemod": "next-codemod:next-async-request-api",
+                "rollback": "Return to the previous release of the library."
+              },
+              {
+                "id": "api-dea49722ecd22e8d3aef4acb",
+                "repo_id": "abdde03e9348f307",
+                "lens": "api",
+                "concern": "api_change",
+                "severity": "high",
+                "evidence": [
+                  {
+                    "repo_id": "abdde03e9348f307",
+                    "file": "src/middleware.ts",
+                    "line_start": 4,
+                    "line_end": 4,
+                    "snippet_hash": "8ce7d3ff32fa52324dc3a910a4af4a7d538074f2b1fe2e63f1c97edf7b6449bf"
+                  }
+                ],
+                "doc_refs": [],
+                "reasoning": "middleware to proxy: The middleware file is deprecated and renamed to proxy. The edge runtime is not supported in proxy.",
+                "action": "Update to: proxy.ts",
+                "step_kind": "codemod",
+                "verify": "Load the affected page or run the build, and confirm the new behaviour.",
+                "confidence": 0.85,
+                "source": "rule_pack",
+                "usage_ids": [
+                  "dea49722ecd22e8d3aef4acb"
+                ],
+                "docs_status": "unverified",
+                "prompt_version": "v1",
+                "rule_id": "next/middleware-to-proxy",
+                "codemod": "next-codemod:middleware-to-proxy",
+                "rollback": "Return to the previous release of the library."
+              }
+            ],
+            "out_of_scope": []
+          }
+        },
+        {
+          "lens": "dependency_build",
+          "packet_usages": [
+            {
+              "file": "next.config.ts",
+              "line_start": 46,
+              "line_end": 46,
+              "snippet_hash": "e034a61b3cc2c881b02a084bd9ab5a54c54fe2714f7db5eb93dd3c3623aa797b",
+              "usage_id": "4980cecfa1c802220e5ac9ad"
+            },
+            {
+              "file": "package-lock.json",
+              "line_start": 1297,
+              "line_end": 1297,
+              "snippet_hash": "bafbe5a6e6a856b47e326be27a1094dbc1c0a3e35d18d567cd957d545a935590",
+              "usage_id": "5f2245d681f75af8298488eb"
+            },
+            {
+              "file": "package-lock.json",
+              "line_start": 1297,
+              "line_end": 1297,
+              "snippet_hash": "bafbe5a6e6a856b47e326be27a1094dbc1c0a3e35d18d567cd957d545a935590",
+              "usage_id": "f88df99acecb550a641f94b9"
+            },
+            {
+              "file": "package-lock.json",
+              "line_start": 2386,
+              "line_end": 2386,
+              "snippet_hash": "39de035fc0f58b42e2fb7be28efa5573eafa2395a796c2a9bbaf1dc1649ca219",
+              "usage_id": "ded3c4cefc577c1867a7753d"
+            },
+            {
+              "file": "package-lock.json",
+              "line_start": 2386,
+              "line_end": 2386,
+              "snippet_hash": "39de035fc0f58b42e2fb7be28efa5573eafa2395a796c2a9bbaf1dc1649ca219",
+              "usage_id": "36f654c5e1d5e426465f49a3"
+            },
+            {
+              "file": "package-lock.json",
+              "line_start": 2409,
+              "line_end": 2409,
+              "snippet_hash": "f0ae2be8b1d9226e0cf6188ce7216a7b23ae1e76e2dce923eb41c523269dfbb3",
+              "usage_id": "cea513ebd77994157aabc313"
+            },
+            {
+              "file": "package-lock.json",
+              "line_start": 2409,
+              "line_end": 2409,
+              "snippet_hash": "f0ae2be8b1d9226e0cf6188ce7216a7b23ae1e76e2dce923eb41c523269dfbb3",
+              "usage_id": "98af7b1ecea2a076ce60dcfd"
+            },
+            {
+              "file": "package-lock.json",
+              "line_start": 2435,
+              "line_end": 2435,
+              "snippet_hash": "1d7d983cc8483a1ae1a32e44d712848b1c58cd48e22eeb1792d1554068a7a664",
+              "usage_id": "618ee41392a302f2043eac44"
+            },
+            {
+              "file": "package-lock.json",
+              "line_start": 2450,
+              "line_end": 2450,
+              "snippet_hash": "2aeed39c10d7e071dcf67b0ceac70942eb970fc9b0521adf128c4da43057432b",
+              "usage_id": "07a971100fca20f624013852"
+            },
+            {
+              "file": "package-lock.json",
+              "line_start": 2465,
+              "line_end": 2465,
+              "snippet_hash": "d4edfc563a9b487004edb0436983e0a7d9f7b5d273a15ee54373550b4ebb01e2",
+              "usage_id": "2c472a0d1c0c8fb344b528f1"
+            },
+            {
+              "file": "package-lock.json",
+              "line_start": 2465,
+              "line_end": 2465,
+              "snippet_hash": "d4edfc563a9b487004edb0436983e0a7d9f7b5d273a15ee54373550b4ebb01e2",
+              "usage_id": "98490291a08de8d1a483dbf0"
+            },
+            {
+              "file": "package-lock.json",
+              "line_start": 2501,
+              "line_end": 2501,
+              "snippet_hash": "4c9f478bc7efbdca3f7a77e224e850820e9c63d9978221f2d98a12527553d706",
+              "usage_id": "83c96cc005700f23dffe63a2"
+            },
+            {
+              "file": "package-lock.json",
+              "line_start": 2516,
+              "line_end": 2516,
+              "snippet_hash": "5b2401f13bc4232714b675df3d2038fac7c1ba877c9a2868ed42036ad34dcea0",
+              "usage_id": "127ebffa7fce2b336083628d"
+            },
+            {
+              "file": "package-lock.json",
+              "line_start": 2516,
+              "line_end": 2516,
+              "snippet_hash": "5b2401f13bc4232714b675df3d2038fac7c1ba877c9a2868ed42036ad34dcea0",
+              "usage_id": "09b91f7a3be5f401892df7aa"
+            },
+            {
+              "file": "package-lock.json",
+              "line_start": 2543,
+              "line_end": 2543,
+              "snippet_hash": "e8309a08bc242dc00840a122deb3fb4efa5a012f577034b9ed2dd0a1102cafec",
+              "usage_id": "ffc097a9aa5e8fa091855bde"
+            },
+            {
+              "file": "package-lock.json",
+              "line_start": 2543,
+              "line_end": 2543,
+              "snippet_hash": "e8309a08bc242dc00840a122deb3fb4efa5a012f577034b9ed2dd0a1102cafec",
+              "usage_id": "ea0c6fc84b1dc1a13b9adf98"
+            },
+            {
+              "file": "package-lock.json",
+              "line_start": 2572,
+              "line_end": 2572,
+              "snippet_hash": "fd531b2c7f6985be636d8b5572337fae7645adbf43e9f36f91e70821b1dcd6dd",
+              "usage_id": "acca1860c704a86b8ad5966d"
+            },
+            {
+              "file": "package-lock.json",
+              "line_start": 2587,
+              "line_end": 2587,
+              "snippet_hash": "b917c3c8e331296425472a7a28bb04ea6f15fa66b2ab6df328c2427acc829db5",
+              "usage_id": "0f3af4858d276bc40da02213"
+            },
+            {
+              "file": "package-lock.json",
+              "line_start": 2587,
+              "line_end": 2587,
+              "snippet_hash": "b917c3c8e331296425472a7a28bb04ea6f15fa66b2ab6df328c2427acc829db5",
+              "usage_id": "c08d2af7598cee63b6f4cf2a"
+            },
+            {
+              "file": "package-lock.json",
+              "line_start": 2612,
+              "line_end": 2612,
+              "snippet_hash": "c0f2a148fc0a604ce564bfde00b48e250b6c72a440706173dc391a431624b4ce",
+              "usage_id": "90c7a51a5b4b00ccd7c0ff6a"
+            },
+            {
+              "file": "package-lock.json",
+              "line_start": 2630,
+              "line_end": 2630,
+              "snippet_hash": "bd16d1901b006bb54fd487a098e00797be36a994dd5776a8905864d428dcd1a9",
+              "usage_id": "765a0bec7d2af617f3de05fd"
+            },
+            {
+              "file": "package-lock.json",
+              "line_start": 2630,
+              "line_end": 2630,
+              "snippet_hash": "bd16d1901b006bb54fd487a098e00797be36a994dd5776a8905864d428dcd1a9",
+              "usage_id": "203d904e794c46b04cce5f91"
+            },
+            {
+              "file": "package-lock.json",
+              "line_start": 2653,
+              "line_end": 2653,
+              "snippet_hash": "95194467653b122d9af04eeaa7ebdbd582453b1ad2b99914035667ab131d4f76",
+              "usage_id": "f906acd0211510664614bdb1"
+            },
+            {
+              "file": "package-lock.json",
+              "line_start": 2653,
+              "line_end": 2653,
+              "snippet_hash": "95194467653b122d9af04eeaa7ebdbd582453b1ad2b99914035667ab131d4f76",
+              "usage_id": "b8d9bcc4eb037fac42897f4f"
+            },
+            {
+              "file": "package-lock.json",
+              "line_start": 2693,
+              "line_end": 2693,
+              "snippet_hash": "634c8f9f2c4f6fb17e8ec9a21bdcfd145eecdbdab864d3d08fb194050b9d3bee",
+              "usage_id": "03f882c5f81d6fb03baf727d"
+            },
+            {
+              "file": "package-lock.json",
+              "line_start": 2693,
+              "line_end": 2693,
+              "snippet_hash": "634c8f9f2c4f6fb17e8ec9a21bdcfd145eecdbdab864d3d08fb194050b9d3bee",
+              "usage_id": "67882941b4991573eb2bd8e1"
+            },
+            {
+              "file": "package-lock.json",
+              "line_start": 2725,
+              "line_end": 2725,
+              "snippet_hash": "a7c9e28992c73a0ec47c6e7a830be842e134f5dcfa73c59d50b5b7d335c04839",
+              "usage_id": "f87c78a572c8bf2299a07e40"
+            },
+            {
+              "file": "package-lock.json",
+              "line_start": 2725,
+              "line_end": 2725,
+              "snippet_hash": "a7c9e28992c73a0ec47c6e7a830be842e134f5dcfa73c59d50b5b7d335c04839",
+              "usage_id": "a2351f17473fe71a7c27301c"
+            },
+            {
+              "file": "package-lock.json",
+              "line_start": 2749,
+              "line_end": 2749,
+              "snippet_hash": "da119f920d4b98a4302ef940e289b45238cd8b750160958dc7613f3d2a273792",
+              "usage_id": "8022a6db4fa688e4964ec902"
+            },
+            {
+              "file": "package-lock.json",
+              "line_start": 2749,
+              "line_end": 2749,
+              "snippet_hash": "da119f920d4b98a4302ef940e289b45238cd8b750160958dc7613f3d2a273792",
+              "usage_id": "28e2d75f428222f5375dbc2d"
+            },
+            {
+              "file": "package-lock.json",
+              "line_start": 2773,
+              "line_end": 2773,
+              "snippet_hash": "f76e03193214a91404e7cbe360bc452a5b3a16cc1ac761753723141e591bcff5",
+              "usage_id": "cc907257e30fd734bc89a02e"
+            },
+            {
+              "file": "package-lock.json",
+              "line_start": 2773,
+              "line_end": 2773,
+              "snippet_hash": "f76e03193214a91404e7cbe360bc452a5b3a16cc1ac761753723141e591bcff5",
+              "usage_id": "955daf753c58997ccce6d72b"
+            },
+            {
+              "file": "package-lock.json",
+              "line_start": 2796,
+              "line_end": 2796,
+              "snippet_hash": "80727c7d9cfece75e8e99efc1c49d946e4ff0a6c61a67ada4365181e6f8b520d",
+              "usage_id": "ae1a1df55fc19d21f9350aee"
+            },
+            {
+              "file": "package-lock.json",
+              "line_start": 2796,
+              "line_end": 2796,
+              "snippet_hash": "80727c7d9cfece75e8e99efc1c49d946e4ff0a6c61a67ada4365181e6f8b520d",
+              "usage_id": "c4ba59614b091c9e957702e0"
+            },
+            {
+              "file": "package-lock.json",
+              "line_start": 2827,
+              "line_end": 2827,
+              "snippet_hash": "a2bbe3245d4e7d712def2054d2db7d7e6a9d8eb14e658783c27fce7100e4a13f",
+              "usage_id": "7f62a3ca00d3658c5c7a2ecc"
+            },
+            {
+              "file": "package-lock.json",
+              "line_start": 2827,
+              "line_end": 2827,
+              "snippet_hash": "a2bbe3245d4e7d712def2054d2db7d7e6a9d8eb14e658783c27fce7100e4a13f",
+              "usage_id": "d442796a03285f891153992f"
+            },
+            {
+              "file": "package-lock.json",
+              "line_start": 2850,
+              "line_end": 2850,
+              "snippet_hash": "89b7f1af0baa3158cf8d9f3d2f6eb4e5f7cda38e44c5fb701379f3106bb39750",
+              "usage_id": "c27d176ad51466d2987a973f"
+            },
+            {
+              "file": "package-lock.json",
+              "line_start": 2868,
+              "line_end": 2868,
+              "snippet_hash": "b3f3cce948b7bc6e7a1c4af9fd6d2a2e21b3d2d9f3251ba391a504c72eedea33",
+              "usage_id": "aefde253d06ad8bf5a4078d9"
+            },
+            {
+              "file": "package-lock.json",
+              "line_start": 2883,
+              "line_end": 2883,
+              "snippet_hash": "a4fd62b4982f7ec0e92e65d18e003bad06405591f6ed0074728c7562ad80a6e8",
+              "usage_id": "877d10f4ade7b6f70172f445"
+            },
+            {
+              "file": "package-lock.json",
+              "line_start": 2902,
+              "line_end": 2902,
+              "snippet_hash": "c89bb54667e49ab6e4b876fa1dab8ba7092cb261c1f336611352257c3fe516b6",
+              "usage_id": "94488bd95da32fdf9af99eb8"
+            },
+            {
+              "file": "package-lock.json",
+              "line_start": 2920,
+              "line_end": 2920,
+              "snippet_hash": "74a9b4bf3ffe13d57791908dbd4534bc2e6328cd8d6954dc79d79b7689de000c",
+              "usage_id": "16172f26364cd9ac3d3ce157"
+            },
+            {
+              "file": "package-lock.json",
+              "line_start": 2938,
+              "line_end": 2938,
+              "snippet_hash": "032891a7f1cb34df2b106a38339f4aad2cdc6ffb23e030a98bd0a936b698b976",
+              "usage_id": "a4099594b97a90380f7b6711"
+            },
+            {
+              "file": "package-lock.json",
+              "line_start": 2953,
+              "line_end": 2953,
+              "snippet_hash": "efd4e26c69b6fcadaf9b289c396ad85474cb5b3de00fae3ca3ba6bcbcb9f0c5c",
+              "usage_id": "14b35802097f4a46c66a82e3"
+            },
+            {
+              "file": "package-lock.json",
+              "line_start": 2971,
+              "line_end": 2971,
+              "snippet_hash": "c3787dcb592b00e700435350c0f66d0631f74918cbb7af46212ec460e545a986",
+              "usage_id": "95b2bc4508356646f12efcaf"
+            },
+            {
+              "file": "package-lock.json",
+              "line_start": 4311,
+              "line_end": 4311,
+              "snippet_hash": "aaebd03555f3daf3828440edba4a038b17acb63cc9296fcb3a319c665dd262eb",
+              "usage_id": "f82df4e08a88f91b7019b38d"
+            },
+            {
+              "file": "package-lock.json",
+              "line_start": 4311,
+              "line_end": 4311,
+              "snippet_hash": "aaebd03555f3daf3828440edba4a038b17acb63cc9296fcb3a319c665dd262eb",
+              "usage_id": "0994dac89a72bb4b1e128508"
+            },
+            {
+              "file": "package-lock.json",
+              "line_start": 8136,
+              "line_end": 8136,
+              "snippet_hash": "696c46f3f391c491fad9995729533cfe3d2f58dd765b84107c2b9633ba11a00e",
+              "usage_id": "9972fe93aa08278b99fb099a"
+            },
+            {
+              "file": "package-lock.json",
+              "line_start": 8332,
+              "line_end": 8332,
+              "snippet_hash": "0aa341d4f0523a3cf6dc9ce8ac901d7a59d3aa35589977cdb3910fe7b2e79dfb",
+              "usage_id": "630e6514bc85f1465b3484c2"
+            },
+            {
+              "file": "package-lock.json",
+              "line_start": 8332,
+              "line_end": 8332,
+              "snippet_hash": "0aa341d4f0523a3cf6dc9ce8ac901d7a59d3aa35589977cdb3910fe7b2e79dfb",
+              "usage_id": "f2d09ad977fe3e873e3478e9"
+            },
+            {
+              "file": "package-lock.json",
+              "line_start": 8384,
+              "line_end": 8384,
+              "snippet_hash": "df3fe31c9c8abc636b7bac4044e7773dead8cd43d148e49f3dd248b4858170ad",
+              "usage_id": "9a89567941297e2a58db0103"
+            },
+            {
+              "file": "package-lock.json",
+              "line_start": 8384,
+              "line_end": 8384,
+              "snippet_hash": "df3fe31c9c8abc636b7bac4044e7773dead8cd43d148e49f3dd248b4858170ad",
+              "usage_id": "95c4af4ea819d11df267d3b5"
+            },
+            {
+              "file": "package-lock.json",
+              "line_start": 8384,
+              "line_end": 8384,
+              "snippet_hash": "df3fe31c9c8abc636b7bac4044e7773dead8cd43d148e49f3dd248b4858170ad",
+              "usage_id": "659c86a9db161430472804c8"
+            },
+            {
+              "file": "package-lock.json",
+              "line_start": 8416,
+              "line_end": 8416,
+              "snippet_hash": "5cc3e73440e7d4efe60c396916d7857cb13ed150aac411525b80434b7a4dc003",
+              "usage_id": "1645f9e13b739efbd7d459a7"
+            },
+            {
+              "file": "package-lock.json",
+              "line_start": 8416,
+              "line_end": 8416,
+              "snippet_hash": "5cc3e73440e7d4efe60c396916d7857cb13ed150aac411525b80434b7a4dc003",
+              "usage_id": "516c9cec39b410bc963703b1"
+            },
+            {
+              "file": "package-lock.json",
+              "line_start": 8983,
+              "line_end": 8983,
+              "snippet_hash": "5a90bd3dec182a8f0413366627d05b681d505138a8e2272ae7deaf8a2f8d2786",
+              "usage_id": "bc9f75dc095c907f7afbed78"
+            },
+            {
+              "file": "package-lock.json",
+              "line_start": 9002,
+              "line_end": 9002,
+              "snippet_hash": "4f416a2a0b6ca5ac32da4c521bd48df3bdaf768e8368773e7a13281fa736290c",
+              "usage_id": "b7559697d410f809dc43eaf6"
+            },
+            {
+              "file": "package-lock.json",
+              "line_start": 9027,
+              "line_end": 9027,
+              "snippet_hash": "3530da134724f8f68ce5a0cb73c81944a57780eab6baf17216a2967ea2f489c8",
+              "usage_id": "ca7c2a8f7b7db16268fad111"
+            },
+            {
+              "file": "package-lock.json",
+              "line_start": 9049,
+              "line_end": 9049,
+              "snippet_hash": "033027c695ef84e90f34b59cfc3a7be514d5943a58a88c4856498f75797913a1",
+              "usage_id": "dad64d3b36799a379cfa1212"
+            },
+            {
+              "file": "package-lock.json",
+              "line_start": 9736,
+              "line_end": 9736,
+              "snippet_hash": "bcdded0a6ced8e6b1c0154d4b6cab0249f326bb9365b7e08c7383748f15eb01d",
+              "usage_id": "093fc4c4896965efcd5801bf"
+            },
+            {
+              "file": "package-lock.json",
+              "line_start": 10204,
+              "line_end": 10204,
+              "snippet_hash": "8281e9c9e4f3415efedf2bf53351532c0d89299b6efc84b266d180f8da17cb5d",
+              "usage_id": "005a36048e292d22cdcbab5a"
+            },
+            {
+              "file": "package-lock.json",
+              "line_start": 10225,
+              "line_end": 10225,
+              "snippet_hash": "37a5f8cc993d78527a522868339e39edace9ec773a93fdf8d41c7a8b25c4eed5",
+              "usage_id": "8264a924ae1d066f9a960a2b"
+            },
+            {
+              "file": "package.json",
+              "line_start": 36,
+              "line_end": 36,
+              "snippet_hash": "37697500c4527a79025f6eaf5a8111eef680135e41542fc7032d9099924539e0",
+              "usage_id": "b7b6404cd86188689bbc27cf"
+            },
+            {
+              "file": "package.json",
+              "line_start": 39,
+              "line_end": 39,
+              "snippet_hash": "5a2b4efc5e70192664979c7e80a97d36fe23965eb3eee7ce5cf20437be98a8e3",
+              "usage_id": "0f72ed896407163226cbc4aa"
+            },
+            {
+              "file": "package.json",
+              "line_start": 40,
+              "line_end": 40,
+              "snippet_hash": "933d92c8bdbb82802030a593ea674b030c98ec5bd3ed9eb26d725c1b687986a3",
+              "usage_id": "65cecc61c7ec80226c4bf25d"
+            },
+            {
+              "file": "package.json",
+              "line_start": 52,
+              "line_end": 52,
+              "snippet_hash": "668c62fa1e605a43cc7c6eac2b215f0fceb1af182ff4d0d58aba2923a674e556",
+              "usage_id": "a6914be8100509e7ea8c826f"
+            },
+            {
+              "file": "package.json",
+              "line_start": 53,
+              "line_end": 53,
+              "snippet_hash": "0289f4e0593b28c3cf5adfd394a83e6d929a464b998b333cc26d536da0619da7",
+              "usage_id": "64a965f395f34f1ca96e384b"
+            },
+            {
+              "file": "package.json",
+              "line_start": 57,
+              "line_end": 57,
+              "snippet_hash": "c5428e89cfd42d434004cc2efee817e6a914cf56e532ae55d23e9f751fa67566",
+              "usage_id": "cb207b3b6695e569203002e2"
+            },
+            {
+              "file": "package.json",
+              "line_start": 64,
+              "line_end": 64,
+              "snippet_hash": "8ed9f806f5e095f2c65af6d931b6705b3214091f7eba4c813c90e211ad193a8b",
+              "usage_id": "469d6f01a251b10ccfea9d61"
+            }
+          ],
+          "submission": {
+            "findings": [
+              {
+                "id": "dependency_build-4980cecfa1c802220e5ac9ad",
+                "repo_id": "abdde03e9348f307",
+                "lens": "dependency_build",
+                "concern": "dependency",
+                "severity": "low",
+                "evidence": [
+                  {
+                    "repo_id": "abdde03e9348f307",
+                    "file": "next.config.ts",
+                    "line_start": 46,
+                    "line_end": 46,
+                    "snippet_hash": "e034a61b3cc2c881b02a084bd9ab5a54c54fe2714f7db5eb93dd3c3623aa797b"
+                  }
+                ],
+                "doc_refs": [],
+                "reasoning": "devIndicators Options: devIndicators options appIsrStatus, buildActivity and buildActivityPosition are removed.",
+                "action": "Update to: the remaining devIndicators indicator",
+                "step_kind": "manual",
+                "verify": "Load the affected page or run the build, and confirm the new behaviour.",
+                "confidence": 0.85,
+                "source": "rule_pack",
+                "usage_ids": [
+                  "4980cecfa1c802220e5ac9ad"
+                ],
+                "docs_status": "unverified",
+                "prompt_version": "v1",
+                "rule_id": "next/devindicators-options"
+              },
+              {
+                "id": "dependency_build-5f2245d681f75af8298488eb",
+                "repo_id": "abdde03e9348f307",
+                "lens": "dependency_build",
+                "concern": "dependency",
+                "severity": "low",
+                "evidence": [
+                  {
+                    "repo_id": "abdde03e9348f307",
+                    "file": "package-lock.json",
+                    "line_start": 1297,
+                    "line_end": 1297,
+                    "snippet_hash": "bafbe5a6e6a856b47e326be27a1094dbc1c0a3e35d18d567cd957d545a935590"
+                  }
+                ],
+                "doc_refs": [],
+                "reasoning": "devIndicators Options: devIndicators options appIsrStatus, buildActivity and buildActivityPosition are removed.",
+                "action": "Update to: the remaining devIndicators indicator",
+                "step_kind": "manual",
+                "verify": "Load the affected page or run the build, and confirm the new behaviour.",
+                "confidence": 0.85,
+                "source": "rule_pack",
+                "usage_ids": [
+                  "5f2245d681f75af8298488eb"
+                ],
+                "docs_status": "unverified",
+                "prompt_version": "v1",
+                "rule_id": "next/devindicators-options"
+              },
+              {
+                "id": "dependency_build-f88df99acecb550a641f94b9",
+                "repo_id": "abdde03e9348f307",
+                "lens": "dependency_build",
+                "concern": "dependency",
+                "severity": "low",
+                "evidence": [
+                  {
+                    "repo_id": "abdde03e9348f307",
+                    "file": "package-lock.json",
+                    "line_start": 1297,
+                    "line_end": 1297,
+                    "snippet_hash": "bafbe5a6e6a856b47e326be27a1094dbc1c0a3e35d18d567cd957d545a935590"
+                  }
+                ],
+                "doc_refs": [],
+                "reasoning": "devIndicators Options: devIndicators options appIsrStatus, buildActivity and buildActivityPosition are removed.",
+                "action": "Update to: the remaining devIndicators indicator",
+                "step_kind": "manual",
+                "verify": "Load the affected page or run the build, and confirm the new behaviour.",
+                "confidence": 0.85,
+                "source": "rule_pack",
+                "usage_ids": [
+                  "f88df99acecb550a641f94b9"
+                ],
+                "docs_status": "unverified",
+                "prompt_version": "v1",
+                "rule_id": "next/devindicators-options"
+              },
+              {
+                "id": "dependency_build-ded3c4cefc577c1867a7753d",
+                "repo_id": "abdde03e9348f307",
+                "lens": "dependency_build",
+                "concern": "dependency",
+                "severity": "low",
+                "evidence": [
+                  {
+                    "repo_id": "abdde03e9348f307",
+                    "file": "package-lock.json",
+                    "line_start": 2386,
+                    "line_end": 2386,
+                    "snippet_hash": "39de035fc0f58b42e2fb7be28efa5573eafa2395a796c2a9bbaf1dc1649ca219"
+                  }
+                ],
+                "doc_refs": [],
+                "reasoning": "devIndicators Options: devIndicators options appIsrStatus, buildActivity and buildActivityPosition are removed.",
+                "action": "Update to: the remaining devIndicators indicator",
+                "step_kind": "manual",
+                "verify": "Load the affected page or run the build, and confirm the new behaviour.",
+                "confidence": 0.85,
+                "source": "rule_pack",
+                "usage_ids": [
+                  "ded3c4cefc577c1867a7753d"
+                ],
+                "docs_status": "unverified",
+                "prompt_version": "v1",
+                "rule_id": "next/devindicators-options"
+              },
+              {
+                "id": "dependency_build-36f654c5e1d5e426465f49a3",
+                "repo_id": "abdde03e9348f307",
+                "lens": "dependency_build",
+                "concern": "dependency",
+                "severity": "low",
+                "evidence": [
+                  {
+                    "repo_id": "abdde03e9348f307",
+                    "file": "package-lock.json",
+                    "line_start": 2386,
+                    "line_end": 2386,
+                    "snippet_hash": "39de035fc0f58b42e2fb7be28efa5573eafa2395a796c2a9bbaf1dc1649ca219"
+                  }
+                ],
+                "doc_refs": [],
+                "reasoning": "devIndicators Options: devIndicators options appIsrStatus, buildActivity and buildActivityPosition are removed.",
+                "action": "Update to: the remaining devIndicators indicator",
+                "step_kind": "manual",
+                "verify": "Load the affected page or run the build, and confirm the new behaviour.",
+                "confidence": 0.85,
+                "source": "rule_pack",
+                "usage_ids": [
+                  "36f654c5e1d5e426465f49a3"
+                ],
+                "docs_status": "unverified",
+                "prompt_version": "v1",
+                "rule_id": "next/devindicators-options"
+              },
+              {
+                "id": "dependency_build-cea513ebd77994157aabc313",
+                "repo_id": "abdde03e9348f307",
+                "lens": "dependency_build",
+                "concern": "dependency",
+                "severity": "low",
+                "evidence": [
+                  {
+                    "repo_id": "abdde03e9348f307",
+                    "file": "package-lock.json",
+                    "line_start": 2409,
+                    "line_end": 2409,
+                    "snippet_hash": "f0ae2be8b1d9226e0cf6188ce7216a7b23ae1e76e2dce923eb41c523269dfbb3"
+                  }
+                ],
+                "doc_refs": [],
+                "reasoning": "devIndicators Options: devIndicators options appIsrStatus, buildActivity and buildActivityPosition are removed.",
+                "action": "Update to: the remaining devIndicators indicator",
+                "step_kind": "manual",
+                "verify": "Load the affected page or run the build, and confirm the new behaviour.",
+                "confidence": 0.85,
+                "source": "rule_pack",
+                "usage_ids": [
+                  "cea513ebd77994157aabc313"
+                ],
+                "docs_status": "unverified",
+                "prompt_version": "v1",
+                "rule_id": "next/devindicators-options"
+              },
+              {
+                "id": "dependency_build-98af7b1ecea2a076ce60dcfd",
+                "repo_id": "abdde03e9348f307",
+                "lens": "dependency_build",
+                "concern": "dependency",
+                "severity": "low",
+                "evidence": [
+                  {
+                    "repo_id": "abdde03e9348f307",
+                    "file": "package-lock.json",
+                    "line_start": 2409,
+                    "line_end": 2409,
+                    "snippet_hash": "f0ae2be8b1d9226e0cf6188ce7216a7b23ae1e76e2dce923eb41c523269dfbb3"
+                  }
+                ],
+                "doc_refs": [],
+                "reasoning": "devIndicators Options: devIndicators options appIsrStatus, buildActivity and buildActivityPosition are removed.",
+                "action": "Update to: the remaining devIndicators indicator",
+                "step_kind": "manual",
+                "verify": "Load the affected page or run the build, and confirm the new behaviour.",
+                "confidence": 0.85,
+                "source": "rule_pack",
+                "usage_ids": [
+                  "98af7b1ecea2a076ce60dcfd"
+                ],
+                "docs_status": "unverified",
+                "prompt_version": "v1",
+                "rule_id": "next/devindicators-options"
+              },
+              {
+                "id": "dependency_build-618ee41392a302f2043eac44",
+                "repo_id": "abdde03e9348f307",
+                "lens": "dependency_build",
+                "concern": "dependency",
+                "severity": "low",
+                "evidence": [
+                  {
+                    "repo_id": "abdde03e9348f307",
+                    "file": "package-lock.json",
+                    "line_start": 2435,
+                    "line_end": 2435,
+                    "snippet_hash": "1d7d983cc8483a1ae1a32e44d712848b1c58cd48e22eeb1792d1554068a7a664"
+                  }
+                ],
+                "doc_refs": [],
+                "reasoning": "devIndicators Options: devIndicators options appIsrStatus, buildActivity and buildActivityPosition are removed.",
+                "action": "Update to: the remaining devIndicators indicator",
+                "step_kind": "manual",
+                "verify": "Load the affected page or run the build, and confirm the new behaviour.",
+                "confidence": 0.85,
+                "source": "rule_pack",
+                "usage_ids": [
+                  "618ee41392a302f2043eac44"
+                ],
+                "docs_status": "unverified",
+                "prompt_version": "v1",
+                "rule_id": "next/devindicators-options"
+              },
+              {
+                "id": "dependency_build-07a971100fca20f624013852",
+                "repo_id": "abdde03e9348f307",
+                "lens": "dependency_build",
+                "concern": "dependency",
+                "severity": "low",
+                "evidence": [
+                  {
+                    "repo_id": "abdde03e9348f307",
+                    "file": "package-lock.json",
+                    "line_start": 2450,
+                    "line_end": 2450,
+                    "snippet_hash": "2aeed39c10d7e071dcf67b0ceac70942eb970fc9b0521adf128c4da43057432b"
+                  }
+                ],
+                "doc_refs": [],
+                "reasoning": "devIndicators Options: devIndicators options appIsrStatus, buildActivity and buildActivityPosition are removed.",
+                "action": "Update to: the remaining devIndicators indicator",
+                "step_kind": "manual",
+                "verify": "Load the affected page or run the build, and confirm the new behaviour.",
+                "confidence": 0.85,
+                "source": "rule_pack",
+                "usage_ids": [
+                  "07a971100fca20f624013852"
+                ],
+                "docs_status": "unverified",
+                "prompt_version": "v1",
+                "rule_id": "next/devindicators-options"
+              },
+              {
+                "id": "dependency_build-2c472a0d1c0c8fb344b528f1",
+                "repo_id": "abdde03e9348f307",
+                "lens": "dependency_build",
+                "concern": "dependency",
+                "severity": "low",
+                "evidence": [
+                  {
+                    "repo_id": "abdde03e9348f307",
+                    "file": "package-lock.json",
+                    "line_start": 2465,
+                    "line_end": 2465,
+                    "snippet_hash": "d4edfc563a9b487004edb0436983e0a7d9f7b5d273a15ee54373550b4ebb01e2"
+                  }
+                ],
+                "doc_refs": [],
+                "reasoning": "devIndicators Options: devIndicators options appIsrStatus, buildActivity and buildActivityPosition are removed.",
+                "action": "Update to: the remaining devIndicators indicator",
+                "step_kind": "manual",
+                "verify": "Load the affected page or run the build, and confirm the new behaviour.",
+                "confidence": 0.85,
+                "source": "rule_pack",
+                "usage_ids": [
+                  "2c472a0d1c0c8fb344b528f1"
+                ],
+                "docs_status": "unverified",
+                "prompt_version": "v1",
+                "rule_id": "next/devindicators-options"
+              },
+              {
+                "id": "dependency_build-98490291a08de8d1a483dbf0",
+                "repo_id": "abdde03e9348f307",
+                "lens": "dependency_build",
+                "concern": "dependency",
+                "severity": "low",
+                "evidence": [
+                  {
+                    "repo_id": "abdde03e9348f307",
+                    "file": "package-lock.json",
+                    "line_start": 2465,
+                    "line_end": 2465,
+                    "snippet_hash": "d4edfc563a9b487004edb0436983e0a7d9f7b5d273a15ee54373550b4ebb01e2"
+                  }
+                ],
+                "doc_refs": [],
+                "reasoning": "devIndicators Options: devIndicators options appIsrStatus, buildActivity and buildActivityPosition are removed.",
+                "action": "Update to: the remaining devIndicators indicator",
+                "step_kind": "manual",
+                "verify": "Load the affected page or run the build, and confirm the new behaviour.",
+                "confidence": 0.85,
+                "source": "rule_pack",
+                "usage_ids": [
+                  "98490291a08de8d1a483dbf0"
+                ],
+                "docs_status": "unverified",
+                "prompt_version": "v1",
+                "rule_id": "next/devindicators-options"
+              },
+              {
+                "id": "dependency_build-83c96cc005700f23dffe63a2",
+                "repo_id": "abdde03e9348f307",
+                "lens": "dependency_build",
+                "concern": "dependency",
+                "severity": "low",
+                "evidence": [
+                  {
+                    "repo_id": "abdde03e9348f307",
+                    "file": "package-lock.json",
+                    "line_start": 2501,
+                    "line_end": 2501,
+                    "snippet_hash": "4c9f478bc7efbdca3f7a77e224e850820e9c63d9978221f2d98a12527553d706"
+                  }
+                ],
+                "doc_refs": [],
+                "reasoning": "devIndicators Options: devIndicators options appIsrStatus, buildActivity and buildActivityPosition are removed.",
+                "action": "Update to: the remaining devIndicators indicator",
+                "step_kind": "manual",
+                "verify": "Load the affected page or run the build, and confirm the new behaviour.",
+                "confidence": 0.85,
+                "source": "rule_pack",
+                "usage_ids": [
+                  "83c96cc005700f23dffe63a2"
+                ],
+                "docs_status": "unverified",
+                "prompt_version": "v1",
+                "rule_id": "next/devindicators-options"
+              },
+              {
+                "id": "dependency_build-127ebffa7fce2b336083628d",
+                "repo_id": "abdde03e9348f307",
+                "lens": "dependency_build",
+                "concern": "dependency",
+                "severity": "low",
+                "evidence": [
+                  {
+                    "repo_id": "abdde03e9348f307",
+                    "file": "package-lock.json",
+                    "line_start": 2516,
+                    "line_end": 2516,
+                    "snippet_hash": "5b2401f13bc4232714b675df3d2038fac7c1ba877c9a2868ed42036ad34dcea0"
+                  }
+                ],
+                "doc_refs": [],
+                "reasoning": "devIndicators Options: devIndicators options appIsrStatus, buildActivity and buildActivityPosition are removed.",
+                "action": "Update to: the remaining devIndicators indicator",
+                "step_kind": "manual",
+                "verify": "Load the affected page or run the build, and confirm the new behaviour.",
+                "confidence": 0.85,
+                "source": "rule_pack",
+                "usage_ids": [
+                  "127ebffa7fce2b336083628d"
+                ],
+                "docs_status": "unverified",
+                "prompt_version": "v1",
+                "rule_id": "next/devindicators-options"
+              },
+              {
+                "id": "dependency_build-09b91f7a3be5f401892df7aa",
+                "repo_id": "abdde03e9348f307",
+                "lens": "dependency_build",
+                "concern": "dependency",
+                "severity": "low",
+                "evidence": [
+                  {
+                    "repo_id": "abdde03e9348f307",
+                    "file": "package-lock.json",
+                    "line_start": 2516,
+                    "line_end": 2516,
+                    "snippet_hash": "5b2401f13bc4232714b675df3d2038fac7c1ba877c9a2868ed42036ad34dcea0"
+                  }
+                ],
+                "doc_refs": [],
+                "reasoning": "devIndicators Options: devIndicators options appIsrStatus, buildActivity and buildActivityPosition are removed.",
+                "action": "Update to: the remaining devIndicators indicator",
+                "step_kind": "manual",
+                "verify": "Load the affected page or run the build, and confirm the new behaviour.",
+                "confidence": 0.85,
+                "source": "rule_pack",
+                "usage_ids": [
+                  "09b91f7a3be5f401892df7aa"
+                ],
+                "docs_status": "unverified",
+                "prompt_version": "v1",
+                "rule_id": "next/devindicators-options"
+              },
+              {
+                "id": "dependency_build-ffc097a9aa5e8fa091855bde",
+                "repo_id": "abdde03e9348f307",
+                "lens": "dependency_build",
+                "concern": "dependency",
+                "severity": "low",
+                "evidence": [
+                  {
+                    "repo_id": "abdde03e9348f307",
+                    "file": "package-lock.json",
+                    "line_start": 2543,
+                    "line_end": 2543,
+                    "snippet_hash": "e8309a08bc242dc00840a122deb3fb4efa5a012f577034b9ed2dd0a1102cafec"
+                  }
+                ],
+                "doc_refs": [],
+                "reasoning": "devIndicators Options: devIndicators options appIsrStatus, buildActivity and buildActivityPosition are removed.",
+                "action": "Update to: the remaining devIndicators indicator",
+                "step_kind": "manual",
+                "verify": "Load the affected page or run the build, and confirm the new behaviour.",
+                "confidence": 0.85,
+                "source": "rule_pack",
+                "usage_ids": [
+                  "ffc097a9aa5e8fa091855bde"
+                ],
+                "docs_status": "unverified",
+                "prompt_version": "v1",
+                "rule_id": "next/devindicators-options"
+              },
+              {
+                "id": "dependency_build-ea0c6fc84b1dc1a13b9adf98",
+                "repo_id": "abdde03e9348f307",
+                "lens": "dependency_build",
+                "concern": "dependency",
+                "severity": "low",
+                "evidence": [
+                  {
+                    "repo_id": "abdde03e9348f307",
+                    "file": "package-lock.json",
+                    "line_start": 2543,
+                    "line_end": 2543,
+                    "snippet_hash": "e8309a08bc242dc00840a122deb3fb4efa5a012f577034b9ed2dd0a1102cafec"
+                  }
+                ],
+                "doc_refs": [],
+                "reasoning": "devIndicators Options: devIndicators options appIsrStatus, buildActivity and buildActivityPosition are removed.",
+                "action": "Update to: the remaining devIndicators indicator",
+                "step_kind": "manual",
+                "verify": "Load the affected page or run the build, and confirm the new behaviour.",
+                "confidence": 0.85,
+                "source": "rule_pack",
+                "usage_ids": [
+                  "ea0c6fc84b1dc1a13b9adf98"
+                ],
+                "docs_status": "unverified",
+                "prompt_version": "v1",
+                "rule_id": "next/devindicators-options"
+              },
+              {
+                "id": "dependency_build-acca1860c704a86b8ad5966d",
+                "repo_id": "abdde03e9348f307",
+                "lens": "dependency_build",
+                "concern": "dependency",
+                "severity": "low",
+                "evidence": [
+                  {
+                    "repo_id": "abdde03e9348f307",
+                    "file": "package-lock.json",
+                    "line_start": 2572,
+                    "line_end": 2572,
+                    "snippet_hash": "fd531b2c7f6985be636d8b5572337fae7645adbf43e9f36f91e70821b1dcd6dd"
+                  }
+                ],
+                "doc_refs": [],
+                "reasoning": "devIndicators Options: devIndicators options appIsrStatus, buildActivity and buildActivityPosition are removed.",
+                "action": "Update to: the remaining devIndicators indicator",
+                "step_kind": "manual",
+                "verify": "Load the affected page or run the build, and confirm the new behaviour.",
+                "confidence": 0.85,
+                "source": "rule_pack",
+                "usage_ids": [
+                  "acca1860c704a86b8ad5966d"
+                ],
+                "docs_status": "unverified",
+                "prompt_version": "v1",
+                "rule_id": "next/devindicators-options"
+              },
+              {
+                "id": "dependency_build-0f3af4858d276bc40da02213",
+                "repo_id": "abdde03e9348f307",
+                "lens": "dependency_build",
+                "concern": "dependency",
+                "severity": "low",
+                "evidence": [
+                  {
+                    "repo_id": "abdde03e9348f307",
+                    "file": "package-lock.json",
+                    "line_start": 2587,
+                    "line_end": 2587,
+                    "snippet_hash": "b917c3c8e331296425472a7a28bb04ea6f15fa66b2ab6df328c2427acc829db5"
+                  }
+                ],
+                "doc_refs": [],
+                "reasoning": "devIndicators Options: devIndicators options appIsrStatus, buildActivity and buildActivityPosition are removed.",
+                "action": "Update to: the remaining devIndicators indicator",
+                "step_kind": "manual",
+                "verify": "Load the affected page or run the build, and confirm the new behaviour.",
+                "confidence": 0.85,
+                "source": "rule_pack",
+                "usage_ids": [
+                  "0f3af4858d276bc40da02213"
+                ],
+                "docs_status": "unverified",
+                "prompt_version": "v1",
+                "rule_id": "next/devindicators-options"
+              },
+              {
+                "id": "dependency_build-c08d2af7598cee63b6f4cf2a",
+                "repo_id": "abdde03e9348f307",
+                "lens": "dependency_build",
+                "concern": "dependency",
+                "severity": "low",
+                "evidence": [
+                  {
+                    "repo_id": "abdde03e9348f307",
+                    "file": "package-lock.json",
+                    "line_start": 2587,
+                    "line_end": 2587,
+                    "snippet_hash": "b917c3c8e331296425472a7a28bb04ea6f15fa66b2ab6df328c2427acc829db5"
+                  }
+                ],
+                "doc_refs": [],
+                "reasoning": "devIndicators Options: devIndicators options appIsrStatus, buildActivity and buildActivityPosition are removed.",
+                "action": "Update to: the remaining devIndicators indicator",
+                "step_kind": "manual",
+                "verify": "Load the affected page or run the build, and confirm the new behaviour.",
+                "confidence": 0.85,
+                "source": "rule_pack",
+                "usage_ids": [
+                  "c08d2af7598cee63b6f4cf2a"
+                ],
+                "docs_status": "unverified",
+                "prompt_version": "v1",
+                "rule_id": "next/devindicators-options"
+              },
+              {
+                "id": "dependency_build-90c7a51a5b4b00ccd7c0ff6a",
+                "repo_id": "abdde03e9348f307",
+                "lens": "dependency_build",
+                "concern": "dependency",
+                "severity": "low",
+                "evidence": [
+                  {
+                    "repo_id": "abdde03e9348f307",
+                    "file": "package-lock.json",
+                    "line_start": 2612,
+                    "line_end": 2612,
+                    "snippet_hash": "c0f2a148fc0a604ce564bfde00b48e250b6c72a440706173dc391a431624b4ce"
+                  }
+                ],
+                "doc_refs": [],
+                "reasoning": "devIndicators Options: devIndicators options appIsrStatus, buildActivity and buildActivityPosition are removed.",
+                "action": "Update to: the remaining devIndicators indicator",
+                "step_kind": "manual",
+                "verify": "Load the affected page or run the build, and confirm the new behaviour.",
+                "confidence": 0.85,
+                "source": "rule_pack",
+                "usage_ids": [
+                  "90c7a51a5b4b00ccd7c0ff6a"
+                ],
+                "docs_status": "unverified",
+                "prompt_version": "v1",
+                "rule_id": "next/devindicators-options"
+              },
+              {
+                "id": "dependency_build-765a0bec7d2af617f3de05fd",
+                "repo_id": "abdde03e9348f307",
+                "lens": "dependency_build",
+                "concern": "dependency",
+                "severity": "low",
+                "evidence": [
+                  {
+                    "repo_id": "abdde03e9348f307",
+                    "file": "package-lock.json",
+                    "line_start": 2630,
+                    "line_end": 2630,
+                    "snippet_hash": "bd16d1901b006bb54fd487a098e00797be36a994dd5776a8905864d428dcd1a9"
+                  }
+                ],
+                "doc_refs": [],
+                "reasoning": "devIndicators Options: devIndicators options appIsrStatus, buildActivity and buildActivityPosition are removed.",
+                "action": "Update to: the remaining devIndicators indicator",
+                "step_kind": "manual",
+                "verify": "Load the affected page or run the build, and confirm the new behaviour.",
+                "confidence": 0.85,
+                "source": "rule_pack",
+                "usage_ids": [
+                  "765a0bec7d2af617f3de05fd"
+                ],
+                "docs_status": "unverified",
+                "prompt_version": "v1",
+                "rule_id": "next/devindicators-options"
+              },
+              {
+                "id": "dependency_build-203d904e794c46b04cce5f91",
+                "repo_id": "abdde03e9348f307",
+                "lens": "dependency_build",
+                "concern": "dependency",
+                "severity": "low",
+                "evidence": [
+                  {
+                    "repo_id": "abdde03e9348f307",
+                    "file": "package-lock.json",
+                    "line_start": 2630,
+                    "line_end": 2630,
+                    "snippet_hash": "bd16d1901b006bb54fd487a098e00797be36a994dd5776a8905864d428dcd1a9"
+                  }
+                ],
+                "doc_refs": [],
+                "reasoning": "devIndicators Options: devIndicators options appIsrStatus, buildActivity and buildActivityPosition are removed.",
+                "action": "Update to: the remaining devIndicators indicator",
+                "step_kind": "manual",
+                "verify": "Load the affected page or run the build, and confirm the new behaviour.",
+                "confidence": 0.85,
+                "source": "rule_pack",
+                "usage_ids": [
+                  "203d904e794c46b04cce5f91"
+                ],
+                "docs_status": "unverified",
+                "prompt_version": "v1",
+                "rule_id": "next/devindicators-options"
+              },
+              {
+                "id": "dependency_build-f906acd0211510664614bdb1",
+                "repo_id": "abdde03e9348f307",
+                "lens": "dependency_build",
+                "concern": "dependency",
+                "severity": "low",
+                "evidence": [
+                  {
+                    "repo_id": "abdde03e9348f307",
+                    "file": "package-lock.json",
+                    "line_start": 2653,
+                    "line_end": 2653,
+                    "snippet_hash": "95194467653b122d9af04eeaa7ebdbd582453b1ad2b99914035667ab131d4f76"
+                  }
+                ],
+                "doc_refs": [],
+                "reasoning": "devIndicators Options: devIndicators options appIsrStatus, buildActivity and buildActivityPosition are removed.",
+                "action": "Update to: the remaining devIndicators indicator",
+                "step_kind": "manual",
+                "verify": "Load the affected page or run the build, and confirm the new behaviour.",
+                "confidence": 0.85,
+                "source": "rule_pack",
+                "usage_ids": [
+                  "f906acd0211510664614bdb1"
+                ],
+                "docs_status": "unverified",
+                "prompt_version": "v1",
+                "rule_id": "next/devindicators-options"
+              },
+              {
+                "id": "dependency_build-b8d9bcc4eb037fac42897f4f",
+                "repo_id": "abdde03e9348f307",
+                "lens": "dependency_build",
+                "concern": "dependency",
+                "severity": "low",
+                "evidence": [
+                  {
+                    "repo_id": "abdde03e9348f307",
+                    "file": "package-lock.json",
+                    "line_start": 2653,
+                    "line_end": 2653,
+                    "snippet_hash": "95194467653b122d9af04eeaa7ebdbd582453b1ad2b99914035667ab131d4f76"
+                  }
+                ],
+                "doc_refs": [],
+                "reasoning": "devIndicators Options: devIndicators options appIsrStatus, buildActivity and buildActivityPosition are removed.",
+                "action": "Update to: the remaining devIndicators indicator",
+                "step_kind": "manual",
+                "verify": "Load the affected page or run the build, and confirm the new behaviour.",
+                "confidence": 0.85,
+                "source": "rule_pack",
+                "usage_ids": [
+                  "b8d9bcc4eb037fac42897f4f"
+                ],
+                "docs_status": "unverified",
+                "prompt_version": "v1",
+                "rule_id": "next/devindicators-options"
+              },
+              {
+                "id": "dependency_build-03f882c5f81d6fb03baf727d",
+                "repo_id": "abdde03e9348f307",
+                "lens": "dependency_build",
+                "concern": "dependency",
+                "severity": "low",
+                "evidence": [
+                  {
+                    "repo_id": "abdde03e9348f307",
+                    "file": "package-lock.json",
+                    "line_start": 2693,
+                    "line_end": 2693,
+                    "snippet_hash": "634c8f9f2c4f6fb17e8ec9a21bdcfd145eecdbdab864d3d08fb194050b9d3bee"
+                  }
+                ],
+                "doc_refs": [],
+                "reasoning": "devIndicators Options: devIndicators options appIsrStatus, buildActivity and buildActivityPosition are removed.",
+                "action": "Update to: the remaining devIndicators indicator",
+                "step_kind": "manual",
+                "verify": "Load the affected page or run the build, and confirm the new behaviour.",
+                "confidence": 0.85,
+                "source": "rule_pack",
+                "usage_ids": [
+                  "03f882c5f81d6fb03baf727d"
+                ],
+                "docs_status": "unverified",
+                "prompt_version": "v1",
+                "rule_id": "next/devindicators-options"
+              },
+              {
+                "id": "dependency_build-67882941b4991573eb2bd8e1",
+                "repo_id": "abdde03e9348f307",
+                "lens": "dependency_build",
+                "concern": "dependency",
+                "severity": "low",
+                "evidence": [
+                  {
+                    "repo_id": "abdde03e9348f307",
+                    "file": "package-lock.json",
+                    "line_start": 2693,
+                    "line_end": 2693,
+                    "snippet_hash": "634c8f9f2c4f6fb17e8ec9a21bdcfd145eecdbdab864d3d08fb194050b9d3bee"
+                  }
+                ],
+                "doc_refs": [],
+                "reasoning": "devIndicators Options: devIndicators options appIsrStatus, buildActivity and buildActivityPosition are removed.",
+                "action": "Update to: the remaining devIndicators indicator",
+                "step_kind": "manual",
+                "verify": "Load the affected page or run the build, and confirm the new behaviour.",
+                "confidence": 0.85,
+                "source": "rule_pack",
+                "usage_ids": [
+                  "67882941b4991573eb2bd8e1"
+                ],
+                "docs_status": "unverified",
+                "prompt_version": "v1",
+                "rule_id": "next/devindicators-options"
+              },
+              {
+                "id": "dependency_build-f87c78a572c8bf2299a07e40",
+                "repo_id": "abdde03e9348f307",
+                "lens": "dependency_build",
+                "concern": "dependency",
+                "severity": "low",
+                "evidence": [
+                  {
+                    "repo_id": "abdde03e9348f307",
+                    "file": "package-lock.json",
+                    "line_start": 2725,
+                    "line_end": 2725,
+                    "snippet_hash": "a7c9e28992c73a0ec47c6e7a830be842e134f5dcfa73c59d50b5b7d335c04839"
+                  }
+                ],
+                "doc_refs": [],
+                "reasoning": "devIndicators Options: devIndicators options appIsrStatus, buildActivity and buildActivityPosition are removed.",
+                "action": "Update to: the remaining devIndicators indicator",
+                "step_kind": "manual",
+                "verify": "Load the affected page or run the build, and confirm the new behaviour.",
+                "confidence": 0.85,
+                "source": "rule_pack",
+                "usage_ids": [
+                  "f87c78a572c8bf2299a07e40"
+                ],
+                "docs_status": "unverified",
+                "prompt_version": "v1",
+                "rule_id": "next/devindicators-options"
+              },
+              {
+                "id": "dependency_build-a2351f17473fe71a7c27301c",
+                "repo_id": "abdde03e9348f307",
+                "lens": "dependency_build",
+                "concern": "dependency",
+                "severity": "low",
+                "evidence": [
+                  {
+                    "repo_id": "abdde03e9348f307",
+                    "file": "package-lock.json",
+                    "line_start": 2725,
+                    "line_end": 2725,
+                    "snippet_hash": "a7c9e28992c73a0ec47c6e7a830be842e134f5dcfa73c59d50b5b7d335c04839"
+                  }
+                ],
+                "doc_refs": [],
+                "reasoning": "devIndicators Options: devIndicators options appIsrStatus, buildActivity and buildActivityPosition are removed.",
+                "action": "Update to: the remaining devIndicators indicator",
+                "step_kind": "manual",
+                "verify": "Load the affected page or run the build, and confirm the new behaviour.",
+                "confidence": 0.85,
+                "source": "rule_pack",
+                "usage_ids": [
+                  "a2351f17473fe71a7c27301c"
+                ],
+                "docs_status": "unverified",
+                "prompt_version": "v1",
+                "rule_id": "next/devindicators-options"
+              },
+              {
+                "id": "dependency_build-8022a6db4fa688e4964ec902",
+                "repo_id": "abdde03e9348f307",
+                "lens": "dependency_build",
+                "concern": "dependency",
+                "severity": "low",
+                "evidence": [
+                  {
+                    "repo_id": "abdde03e9348f307",
+                    "file": "package-lock.json",
+                    "line_start": 2749,
+                    "line_end": 2749,
+                    "snippet_hash": "da119f920d4b98a4302ef940e289b45238cd8b750160958dc7613f3d2a273792"
+                  }
+                ],
+                "doc_refs": [],
+                "reasoning": "devIndicators Options: devIndicators options appIsrStatus, buildActivity and buildActivityPosition are removed.",
+                "action": "Update to: the remaining devIndicators indicator",
+                "step_kind": "manual",
+                "verify": "Load the affected page or run the build, and confirm the new behaviour.",
+                "confidence": 0.85,
+                "source": "rule_pack",
+                "usage_ids": [
+                  "8022a6db4fa688e4964ec902"
+                ],
+                "docs_status": "unverified",
+                "prompt_version": "v1",
+                "rule_id": "next/devindicators-options"
+              },
+              {
+                "id": "dependency_build-28e2d75f428222f5375dbc2d",
+                "repo_id": "abdde03e9348f307",
+                "lens": "dependency_build",
+                "concern": "dependency",
+                "severity": "low",
+                "evidence": [
+                  {
+                    "repo_id": "abdde03e9348f307",
+                    "file": "package-lock.json",
+                    "line_start": 2749,
+                    "line_end": 2749,
+                    "snippet_hash": "da119f920d4b98a4302ef940e289b45238cd8b750160958dc7613f3d2a273792"
+                  }
+                ],
+                "doc_refs": [],
+                "reasoning": "devIndicators Options: devIndicators options appIsrStatus, buildActivity and buildActivityPosition are removed.",
+                "action": "Update to: the remaining devIndicators indicator",
+                "step_kind": "manual",
+                "verify": "Load the affected page or run the build, and confirm the new behaviour.",
+                "confidence": 0.85,
+                "source": "rule_pack",
+                "usage_ids": [
+                  "28e2d75f428222f5375dbc2d"
+                ],
+                "docs_status": "unverified",
+                "prompt_version": "v1",
+                "rule_id": "next/devindicators-options"
+              },
+              {
+                "id": "dependency_build-cc907257e30fd734bc89a02e",
+                "repo_id": "abdde03e9348f307",
+                "lens": "dependency_build",
+                "concern": "dependency",
+                "severity": "low",
+                "evidence": [
+                  {
+                    "repo_id": "abdde03e9348f307",
+                    "file": "package-lock.json",
+                    "line_start": 2773,
+                    "line_end": 2773,
+                    "snippet_hash": "f76e03193214a91404e7cbe360bc452a5b3a16cc1ac761753723141e591bcff5"
+                  }
+                ],
+                "doc_refs": [],
+                "reasoning": "devIndicators Options: devIndicators options appIsrStatus, buildActivity and buildActivityPosition are removed.",
+                "action": "Update to: the remaining devIndicators indicator",
+                "step_kind": "manual",
+                "verify": "Load the affected page or run the build, and confirm the new behaviour.",
+                "confidence": 0.85,
+                "source": "rule_pack",
+                "usage_ids": [
+                  "cc907257e30fd734bc89a02e"
+                ],
+                "docs_status": "unverified",
+                "prompt_version": "v1",
+                "rule_id": "next/devindicators-options"
+              },
+              {
+                "id": "dependency_build-955daf753c58997ccce6d72b",
+                "repo_id": "abdde03e9348f307",
+                "lens": "dependency_build",
+                "concern": "dependency",
+                "severity": "low",
+                "evidence": [
+                  {
+                    "repo_id": "abdde03e9348f307",
+                    "file": "package-lock.json",
+                    "line_start": 2773,
+                    "line_end": 2773,
+                    "snippet_hash": "f76e03193214a91404e7cbe360bc452a5b3a16cc1ac761753723141e591bcff5"
+                  }
+                ],
+                "doc_refs": [],
+                "reasoning": "devIndicators Options: devIndicators options appIsrStatus, buildActivity and buildActivityPosition are removed.",
+                "action": "Update to: the remaining devIndicators indicator",
+                "step_kind": "manual",
+                "verify": "Load the affected page or run the build, and confirm the new behaviour.",
+                "confidence": 0.85,
+                "source": "rule_pack",
+                "usage_ids": [
+                  "955daf753c58997ccce6d72b"
+                ],
+                "docs_status": "unverified",
+                "prompt_version": "v1",
+                "rule_id": "next/devindicators-options"
+              },
+              {
+                "id": "dependency_build-ae1a1df55fc19d21f9350aee",
+                "repo_id": "abdde03e9348f307",
+                "lens": "dependency_build",
+                "concern": "dependency",
+                "severity": "low",
+                "evidence": [
+                  {
+                    "repo_id": "abdde03e9348f307",
+                    "file": "package-lock.json",
+                    "line_start": 2796,
+                    "line_end": 2796,
+                    "snippet_hash": "80727c7d9cfece75e8e99efc1c49d946e4ff0a6c61a67ada4365181e6f8b520d"
+                  }
+                ],
+                "doc_refs": [],
+                "reasoning": "devIndicators Options: devIndicators options appIsrStatus, buildActivity and buildActivityPosition are removed.",
+                "action": "Update to: the remaining devIndicators indicator",
+                "step_kind": "manual",
+                "verify": "Load the affected page or run the build, and confirm the new behaviour.",
+                "confidence": 0.85,
+                "source": "rule_pack",
+                "usage_ids": [
+                  "ae1a1df55fc19d21f9350aee"
+                ],
+                "docs_status": "unverified",
+                "prompt_version": "v1",
+                "rule_id": "next/devindicators-options"
+              },
+              {
+                "id": "dependency_build-c4ba59614b091c9e957702e0",
+                "repo_id": "abdde03e9348f307",
+                "lens": "dependency_build",
+                "concern": "dependency",
+                "severity": "low",
+                "evidence": [
+                  {
+                    "repo_id": "abdde03e9348f307",
+                    "file": "package-lock.json",
+                    "line_start": 2796,
+                    "line_end": 2796,
+                    "snippet_hash": "80727c7d9cfece75e8e99efc1c49d946e4ff0a6c61a67ada4365181e6f8b520d"
+                  }
+                ],
+                "doc_refs": [],
+                "reasoning": "devIndicators Options: devIndicators options appIsrStatus, buildActivity and buildActivityPosition are removed.",
+                "action": "Update to: the remaining devIndicators indicator",
+                "step_kind": "manual",
+                "verify": "Load the affected page or run the build, and confirm the new behaviour.",
+                "confidence": 0.85,
+                "source": "rule_pack",
+                "usage_ids": [
+                  "c4ba59614b091c9e957702e0"
+                ],
+                "docs_status": "unverified",
+                "prompt_version": "v1",
+                "rule_id": "next/devindicators-options"
+              },
+              {
+                "id": "dependency_build-7f62a3ca00d3658c5c7a2ecc",
+                "repo_id": "abdde03e9348f307",
+                "lens": "dependency_build",
+                "concern": "dependency",
+                "severity": "low",
+                "evidence": [
+                  {
+                    "repo_id": "abdde03e9348f307",
+                    "file": "package-lock.json",
+                    "line_start": 2827,
+                    "line_end": 2827,
+                    "snippet_hash": "a2bbe3245d4e7d712def2054d2db7d7e6a9d8eb14e658783c27fce7100e4a13f"
+                  }
+                ],
+                "doc_refs": [],
+                "reasoning": "devIndicators Options: devIndicators options appIsrStatus, buildActivity and buildActivityPosition are removed.",
+                "action": "Update to: the remaining devIndicators indicator",
+                "step_kind": "manual",
+                "verify": "Load the affected page or run the build, and confirm the new behaviour.",
+                "confidence": 0.85,
+                "source": "rule_pack",
+                "usage_ids": [
+                  "7f62a3ca00d3658c5c7a2ecc"
+                ],
+                "docs_status": "unverified",
+                "prompt_version": "v1",
+                "rule_id": "next/devindicators-options"
+              },
+              {
+                "id": "dependency_build-d442796a03285f891153992f",
+                "repo_id": "abdde03e9348f307",
+                "lens": "dependency_build",
+                "concern": "dependency",
+                "severity": "low",
+                "evidence": [
+                  {
+                    "repo_id": "abdde03e9348f307",
+                    "file": "package-lock.json",
+                    "line_start": 2827,
+                    "line_end": 2827,
+                    "snippet_hash": "a2bbe3245d4e7d712def2054d2db7d7e6a9d8eb14e658783c27fce7100e4a13f"
+                  }
+                ],
+                "doc_refs": [],
+                "reasoning": "devIndicators Options: devIndicators options appIsrStatus, buildActivity and buildActivityPosition are removed.",
+                "action": "Update to: the remaining devIndicators indicator",
+                "step_kind": "manual",
+                "verify": "Load the affected page or run the build, and confirm the new behaviour.",
+                "confidence": 0.85,
+                "source": "rule_pack",
+                "usage_ids": [
+                  "d442796a03285f891153992f"
+                ],
+                "docs_status": "unverified",
+                "prompt_version": "v1",
+                "rule_id": "next/devindicators-options"
+              },
+              {
+                "id": "dependency_build-c27d176ad51466d2987a973f",
+                "repo_id": "abdde03e9348f307",
+                "lens": "dependency_build",
+                "concern": "dependency",
+                "severity": "low",
+                "evidence": [
+                  {
+                    "repo_id": "abdde03e9348f307",
+                    "file": "package-lock.json",
+                    "line_start": 2850,
+                    "line_end": 2850,
+                    "snippet_hash": "89b7f1af0baa3158cf8d9f3d2f6eb4e5f7cda38e44c5fb701379f3106bb39750"
+                  }
+                ],
+                "doc_refs": [],
+                "reasoning": "devIndicators Options: devIndicators options appIsrStatus, buildActivity and buildActivityPosition are removed.",
+                "action": "Update to: the remaining devIndicators indicator",
+                "step_kind": "manual",
+                "verify": "Load the affected page or run the build, and confirm the new behaviour.",
+                "confidence": 0.85,
+                "source": "rule_pack",
+                "usage_ids": [
+                  "c27d176ad51466d2987a973f"
+                ],
+                "docs_status": "unverified",
+                "prompt_version": "v1",
+                "rule_id": "next/devindicators-options"
+              },
+              {
+                "id": "dependency_build-aefde253d06ad8bf5a4078d9",
+                "repo_id": "abdde03e9348f307",
+                "lens": "dependency_build",
+                "concern": "dependency",
+                "severity": "low",
+                "evidence": [
+                  {
+                    "repo_id": "abdde03e9348f307",
+                    "file": "package-lock.json",
+                    "line_start": 2868,
+                    "line_end": 2868,
+                    "snippet_hash": "b3f3cce948b7bc6e7a1c4af9fd6d2a2e21b3d2d9f3251ba391a504c72eedea33"
+                  }
+                ],
+                "doc_refs": [],
+                "reasoning": "devIndicators Options: devIndicators options appIsrStatus, buildActivity and buildActivityPosition are removed.",
+                "action": "Update to: the remaining devIndicators indicator",
+                "step_kind": "manual",
+                "verify": "Load the affected page or run the build, and confirm the new behaviour.",
+                "confidence": 0.85,
+                "source": "rule_pack",
+                "usage_ids": [
+                  "aefde253d06ad8bf5a4078d9"
+                ],
+                "docs_status": "unverified",
+                "prompt_version": "v1",
+                "rule_id": "next/devindicators-options"
+              },
+              {
+                "id": "dependency_build-877d10f4ade7b6f70172f445",
+                "repo_id": "abdde03e9348f307",
+                "lens": "dependency_build",
+                "concern": "dependency",
+                "severity": "low",
+                "evidence": [
+                  {
+                    "repo_id": "abdde03e9348f307",
+                    "file": "package-lock.json",
+                    "line_start": 2883,
+                    "line_end": 2883,
+                    "snippet_hash": "a4fd62b4982f7ec0e92e65d18e003bad06405591f6ed0074728c7562ad80a6e8"
+                  }
+                ],
+                "doc_refs": [],
+                "reasoning": "devIndicators Options: devIndicators options appIsrStatus, buildActivity and buildActivityPosition are removed.",
+                "action": "Update to: the remaining devIndicators indicator",
+                "step_kind": "manual",
+                "verify": "Load the affected page or run the build, and confirm the new behaviour.",
+                "confidence": 0.85,
+                "source": "rule_pack",
+                "usage_ids": [
+                  "877d10f4ade7b6f70172f445"
+                ],
+                "docs_status": "unverified",
+                "prompt_version": "v1",
+                "rule_id": "next/devindicators-options"
+              },
+              {
+                "id": "dependency_build-94488bd95da32fdf9af99eb8",
+                "repo_id": "abdde03e9348f307",
+                "lens": "dependency_build",
+                "concern": "dependency",
+                "severity": "low",
+                "evidence": [
+                  {
+                    "repo_id": "abdde03e9348f307",
+                    "file": "package-lock.json",
+                    "line_start": 2902,
+                    "line_end": 2902,
+                    "snippet_hash": "c89bb54667e49ab6e4b876fa1dab8ba7092cb261c1f336611352257c3fe516b6"
+                  }
+                ],
+                "doc_refs": [],
+                "reasoning": "devIndicators Options: devIndicators options appIsrStatus, buildActivity and buildActivityPosition are removed.",
+                "action": "Update to: the remaining devIndicators indicator",
+                "step_kind": "manual",
+                "verify": "Load the affected page or run the build, and confirm the new behaviour.",
+                "confidence": 0.85,
+                "source": "rule_pack",
+                "usage_ids": [
+                  "94488bd95da32fdf9af99eb8"
+                ],
+                "docs_status": "unverified",
+                "prompt_version": "v1",
+                "rule_id": "next/devindicators-options"
+              },
+              {
+                "id": "dependency_build-16172f26364cd9ac3d3ce157",
+                "repo_id": "abdde03e9348f307",
+                "lens": "dependency_build",
+                "concern": "dependency",
+                "severity": "low",
+                "evidence": [
+                  {
+                    "repo_id": "abdde03e9348f307",
+                    "file": "package-lock.json",
+                    "line_start": 2920,
+                    "line_end": 2920,
+                    "snippet_hash": "74a9b4bf3ffe13d57791908dbd4534bc2e6328cd8d6954dc79d79b7689de000c"
+                  }
+                ],
+                "doc_refs": [],
+                "reasoning": "devIndicators Options: devIndicators options appIsrStatus, buildActivity and buildActivityPosition are removed.",
+                "action": "Update to: the remaining devIndicators indicator",
+                "step_kind": "manual",
+                "verify": "Load the affected page or run the build, and confirm the new behaviour.",
+                "confidence": 0.85,
+                "source": "rule_pack",
+                "usage_ids": [
+                  "16172f26364cd9ac3d3ce157"
+                ],
+                "docs_status": "unverified",
+                "prompt_version": "v1",
+                "rule_id": "next/devindicators-options"
+              },
+              {
+                "id": "dependency_build-a4099594b97a90380f7b6711",
+                "repo_id": "abdde03e9348f307",
+                "lens": "dependency_build",
+                "concern": "dependency",
+                "severity": "low",
+                "evidence": [
+                  {
+                    "repo_id": "abdde03e9348f307",
+                    "file": "package-lock.json",
+                    "line_start": 2938,
+                    "line_end": 2938,
+                    "snippet_hash": "032891a7f1cb34df2b106a38339f4aad2cdc6ffb23e030a98bd0a936b698b976"
+                  }
+                ],
+                "doc_refs": [],
+                "reasoning": "devIndicators Options: devIndicators options appIsrStatus, buildActivity and buildActivityPosition are removed.",
+                "action": "Update to: the remaining devIndicators indicator",
+                "step_kind": "manual",
+                "verify": "Load the affected page or run the build, and confirm the new behaviour.",
+                "confidence": 0.85,
+                "source": "rule_pack",
+                "usage_ids": [
+                  "a4099594b97a90380f7b6711"
+                ],
+                "docs_status": "unverified",
+                "prompt_version": "v1",
+                "rule_id": "next/devindicators-options"
+              },
+              {
+                "id": "dependency_build-14b35802097f4a46c66a82e3",
+                "repo_id": "abdde03e9348f307",
+                "lens": "dependency_build",
+                "concern": "dependency",
+                "severity": "low",
+                "evidence": [
+                  {
+                    "repo_id": "abdde03e9348f307",
+                    "file": "package-lock.json",
+                    "line_start": 2953,
+                    "line_end": 2953,
+                    "snippet_hash": "efd4e26c69b6fcadaf9b289c396ad85474cb5b3de00fae3ca3ba6bcbcb9f0c5c"
+                  }
+                ],
+                "doc_refs": [],
+                "reasoning": "devIndicators Options: devIndicators options appIsrStatus, buildActivity and buildActivityPosition are removed.",
+                "action": "Update to: the remaining devIndicators indicator",
+                "step_kind": "manual",
+                "verify": "Load the affected page or run the build, and confirm the new behaviour.",
+                "confidence": 0.85,
+                "source": "rule_pack",
+                "usage_ids": [
+                  "14b35802097f4a46c66a82e3"
+                ],
+                "docs_status": "unverified",
+                "prompt_version": "v1",
+                "rule_id": "next/devindicators-options"
+              },
+              {
+                "id": "dependency_build-95b2bc4508356646f12efcaf",
+                "repo_id": "abdde03e9348f307",
+                "lens": "dependency_build",
+                "concern": "dependency",
+                "severity": "low",
+                "evidence": [
+                  {
+                    "repo_id": "abdde03e9348f307",
+                    "file": "package-lock.json",
+                    "line_start": 2971,
+                    "line_end": 2971,
+                    "snippet_hash": "c3787dcb592b00e700435350c0f66d0631f74918cbb7af46212ec460e545a986"
+                  }
+                ],
+                "doc_refs": [],
+                "reasoning": "devIndicators Options: devIndicators options appIsrStatus, buildActivity and buildActivityPosition are removed.",
+                "action": "Update to: the remaining devIndicators indicator",
+                "step_kind": "manual",
+                "verify": "Load the affected page or run the build, and confirm the new behaviour.",
+                "confidence": 0.85,
+                "source": "rule_pack",
+                "usage_ids": [
+                  "95b2bc4508356646f12efcaf"
+                ],
+                "docs_status": "unverified",
+                "prompt_version": "v1",
+                "rule_id": "next/devindicators-options"
+              },
+              {
+                "id": "dependency_build-f82df4e08a88f91b7019b38d",
+                "repo_id": "abdde03e9348f307",
+                "lens": "dependency_build",
+                "concern": "dependency",
+                "severity": "low",
+                "evidence": [
+                  {
+                    "repo_id": "abdde03e9348f307",
+                    "file": "package-lock.json",
+                    "line_start": 4311,
+                    "line_end": 4311,
+                    "snippet_hash": "aaebd03555f3daf3828440edba4a038b17acb63cc9296fcb3a319c665dd262eb"
+                  }
+                ],
+                "doc_refs": [],
+                "reasoning": "devIndicators Options: devIndicators options appIsrStatus, buildActivity and buildActivityPosition are removed.",
+                "action": "Update to: the remaining devIndicators indicator",
+                "step_kind": "manual",
+                "verify": "Load the affected page or run the build, and confirm the new behaviour.",
+                "confidence": 0.85,
+                "source": "rule_pack",
+                "usage_ids": [
+                  "f82df4e08a88f91b7019b38d"
+                ],
+                "docs_status": "unverified",
+                "prompt_version": "v1",
+                "rule_id": "next/devindicators-options"
+              },
+              {
+                "id": "dependency_build-0994dac89a72bb4b1e128508",
+                "repo_id": "abdde03e9348f307",
+                "lens": "dependency_build",
+                "concern": "dependency",
+                "severity": "low",
+                "evidence": [
+                  {
+                    "repo_id": "abdde03e9348f307",
+                    "file": "package-lock.json",
+                    "line_start": 4311,
+                    "line_end": 4311,
+                    "snippet_hash": "aaebd03555f3daf3828440edba4a038b17acb63cc9296fcb3a319c665dd262eb"
+                  }
+                ],
+                "doc_refs": [],
+                "reasoning": "devIndicators Options: devIndicators options appIsrStatus, buildActivity and buildActivityPosition are removed.",
+                "action": "Update to: the remaining devIndicators indicator",
+                "step_kind": "manual",
+                "verify": "Load the affected page or run the build, and confirm the new behaviour.",
+                "confidence": 0.85,
+                "source": "rule_pack",
+                "usage_ids": [
+                  "0994dac89a72bb4b1e128508"
+                ],
+                "docs_status": "unverified",
+                "prompt_version": "v1",
+                "rule_id": "next/devindicators-options"
+              },
+              {
+                "id": "dependency_build-9972fe93aa08278b99fb099a",
+                "repo_id": "abdde03e9348f307",
+                "lens": "dependency_build",
+                "concern": "dependency",
+                "severity": "low",
+                "evidence": [
+                  {
+                    "repo_id": "abdde03e9348f307",
+                    "file": "package-lock.json",
+                    "line_start": 8136,
+                    "line_end": 8136,
+                    "snippet_hash": "696c46f3f391c491fad9995729533cfe3d2f58dd765b84107c2b9633ba11a00e"
+                  }
+                ],
+                "doc_refs": [],
+                "reasoning": "devIndicators Options: devIndicators options appIsrStatus, buildActivity and buildActivityPosition are removed.",
+                "action": "Update to: the remaining devIndicators indicator",
+                "step_kind": "manual",
+                "verify": "Load the affected page or run the build, and confirm the new behaviour.",
+                "confidence": 0.85,
+                "source": "rule_pack",
+                "usage_ids": [
+                  "9972fe93aa08278b99fb099a"
+                ],
+                "docs_status": "unverified",
+                "prompt_version": "v1",
+                "rule_id": "next/devindicators-options"
+              },
+              {
+                "id": "dependency_build-630e6514bc85f1465b3484c2",
+                "repo_id": "abdde03e9348f307",
+                "lens": "dependency_build",
+                "concern": "dependency",
+                "severity": "low",
+                "evidence": [
+                  {
+                    "repo_id": "abdde03e9348f307",
+                    "file": "package-lock.json",
+                    "line_start": 8332,
+                    "line_end": 8332,
+                    "snippet_hash": "0aa341d4f0523a3cf6dc9ce8ac901d7a59d3aa35589977cdb3910fe7b2e79dfb"
+                  }
+                ],
+                "doc_refs": [],
+                "reasoning": "devIndicators Options: devIndicators options appIsrStatus, buildActivity and buildActivityPosition are removed.",
+                "action": "Update to: the remaining devIndicators indicator",
+                "step_kind": "manual",
+                "verify": "Load the affected page or run the build, and confirm the new behaviour.",
+                "confidence": 0.85,
+                "source": "rule_pack",
+                "usage_ids": [
+                  "630e6514bc85f1465b3484c2"
+                ],
+                "docs_status": "unverified",
+                "prompt_version": "v1",
+                "rule_id": "next/devindicators-options"
+              },
+              {
+                "id": "dependency_build-f2d09ad977fe3e873e3478e9",
+                "repo_id": "abdde03e9348f307",
+                "lens": "dependency_build",
+                "concern": "dependency",
+                "severity": "low",
+                "evidence": [
+                  {
+                    "repo_id": "abdde03e9348f307",
+                    "file": "package-lock.json",
+                    "line_start": 8332,
+                    "line_end": 8332,
+                    "snippet_hash": "0aa341d4f0523a3cf6dc9ce8ac901d7a59d3aa35589977cdb3910fe7b2e79dfb"
+                  }
+                ],
+                "doc_refs": [],
+                "reasoning": "devIndicators Options: devIndicators options appIsrStatus, buildActivity and buildActivityPosition are removed.",
+                "action": "Update to: the remaining devIndicators indicator",
+                "step_kind": "manual",
+                "verify": "Load the affected page or run the build, and confirm the new behaviour.",
+                "confidence": 0.85,
+                "source": "rule_pack",
+                "usage_ids": [
+                  "f2d09ad977fe3e873e3478e9"
+                ],
+                "docs_status": "unverified",
+                "prompt_version": "v1",
+                "rule_id": "next/devindicators-options"
+              },
+              {
+                "id": "dependency_build-9a89567941297e2a58db0103",
+                "repo_id": "abdde03e9348f307",
+                "lens": "dependency_build",
+                "concern": "dependency",
+                "severity": "low",
+                "evidence": [
+                  {
+                    "repo_id": "abdde03e9348f307",
+                    "file": "package-lock.json",
+                    "line_start": 8384,
+                    "line_end": 8384,
+                    "snippet_hash": "df3fe31c9c8abc636b7bac4044e7773dead8cd43d148e49f3dd248b4858170ad"
+                  }
+                ],
+                "doc_refs": [],
+                "reasoning": "devIndicators Options: devIndicators options appIsrStatus, buildActivity and buildActivityPosition are removed.",
+                "action": "Update to: the remaining devIndicators indicator",
+                "step_kind": "manual",
+                "verify": "Load the affected page or run the build, and confirm the new behaviour.",
+                "confidence": 0.85,
+                "source": "rule_pack",
+                "usage_ids": [
+                  "9a89567941297e2a58db0103"
+                ],
+                "docs_status": "unverified",
+                "prompt_version": "v1",
+                "rule_id": "next/devindicators-options"
+              },
+              {
+                "id": "dependency_build-95c4af4ea819d11df267d3b5",
+                "repo_id": "abdde03e9348f307",
+                "lens": "dependency_build",
+                "concern": "dependency",
+                "severity": "low",
+                "evidence": [
+                  {
+                    "repo_id": "abdde03e9348f307",
+                    "file": "package-lock.json",
+                    "line_start": 8384,
+                    "line_end": 8384,
+                    "snippet_hash": "df3fe31c9c8abc636b7bac4044e7773dead8cd43d148e49f3dd248b4858170ad"
+                  }
+                ],
+                "doc_refs": [],
+                "reasoning": "devIndicators Options: devIndicators options appIsrStatus, buildActivity and buildActivityPosition are removed.",
+                "action": "Update to: the remaining devIndicators indicator",
+                "step_kind": "manual",
+                "verify": "Load the affected page or run the build, and confirm the new behaviour.",
+                "confidence": 0.85,
+                "source": "rule_pack",
+                "usage_ids": [
+                  "95c4af4ea819d11df267d3b5"
+                ],
+                "docs_status": "unverified",
+                "prompt_version": "v1",
+                "rule_id": "next/devindicators-options"
+              },
+              {
+                "id": "dependency_build-659c86a9db161430472804c8",
+                "repo_id": "abdde03e9348f307",
+                "lens": "dependency_build",
+                "concern": "dependency",
+                "severity": "low",
+                "evidence": [
+                  {
+                    "repo_id": "abdde03e9348f307",
+                    "file": "package-lock.json",
+                    "line_start": 8384,
+                    "line_end": 8384,
+                    "snippet_hash": "df3fe31c9c8abc636b7bac4044e7773dead8cd43d148e49f3dd248b4858170ad"
+                  }
+                ],
+                "doc_refs": [],
+                "reasoning": "devIndicators Options: devIndicators options appIsrStatus, buildActivity and buildActivityPosition are removed.",
+                "action": "Update to: the remaining devIndicators indicator",
+                "step_kind": "manual",
+                "verify": "Load the affected page or run the build, and confirm the new behaviour.",
+                "confidence": 0.85,
+                "source": "rule_pack",
+                "usage_ids": [
+                  "659c86a9db161430472804c8"
+                ],
+                "docs_status": "unverified",
+                "prompt_version": "v1",
+                "rule_id": "next/devindicators-options"
+              },
+              {
+                "id": "dependency_build-1645f9e13b739efbd7d459a7",
+                "repo_id": "abdde03e9348f307",
+                "lens": "dependency_build",
+                "concern": "dependency",
+                "severity": "low",
+                "evidence": [
+                  {
+                    "repo_id": "abdde03e9348f307",
+                    "file": "package-lock.json",
+                    "line_start": 8416,
+                    "line_end": 8416,
+                    "snippet_hash": "5cc3e73440e7d4efe60c396916d7857cb13ed150aac411525b80434b7a4dc003"
+                  }
+                ],
+                "doc_refs": [],
+                "reasoning": "devIndicators Options: devIndicators options appIsrStatus, buildActivity and buildActivityPosition are removed.",
+                "action": "Update to: the remaining devIndicators indicator",
+                "step_kind": "manual",
+                "verify": "Load the affected page or run the build, and confirm the new behaviour.",
+                "confidence": 0.85,
+                "source": "rule_pack",
+                "usage_ids": [
+                  "1645f9e13b739efbd7d459a7"
+                ],
+                "docs_status": "unverified",
+                "prompt_version": "v1",
+                "rule_id": "next/devindicators-options"
+              },
+              {
+                "id": "dependency_build-516c9cec39b410bc963703b1",
+                "repo_id": "abdde03e9348f307",
+                "lens": "dependency_build",
+                "concern": "dependency",
+                "severity": "low",
+                "evidence": [
+                  {
+                    "repo_id": "abdde03e9348f307",
+                    "file": "package-lock.json",
+                    "line_start": 8416,
+                    "line_end": 8416,
+                    "snippet_hash": "5cc3e73440e7d4efe60c396916d7857cb13ed150aac411525b80434b7a4dc003"
+                  }
+                ],
+                "doc_refs": [],
+                "reasoning": "devIndicators Options: devIndicators options appIsrStatus, buildActivity and buildActivityPosition are removed.",
+                "action": "Update to: the remaining devIndicators indicator",
+                "step_kind": "manual",
+                "verify": "Load the affected page or run the build, and confirm the new behaviour.",
+                "confidence": 0.85,
+                "source": "rule_pack",
+                "usage_ids": [
+                  "516c9cec39b410bc963703b1"
+                ],
+                "docs_status": "unverified",
+                "prompt_version": "v1",
+                "rule_id": "next/devindicators-options"
+              },
+              {
+                "id": "dependency_build-bc9f75dc095c907f7afbed78",
+                "repo_id": "abdde03e9348f307",
+                "lens": "dependency_build",
+                "concern": "dependency",
+                "severity": "low",
+                "evidence": [
+                  {
+                    "repo_id": "abdde03e9348f307",
+                    "file": "package-lock.json",
+                    "line_start": 8983,
+                    "line_end": 8983,
+                    "snippet_hash": "5a90bd3dec182a8f0413366627d05b681d505138a8e2272ae7deaf8a2f8d2786"
+                  }
+                ],
+                "doc_refs": [],
+                "reasoning": "devIndicators Options: devIndicators options appIsrStatus, buildActivity and buildActivityPosition are removed.",
+                "action": "Update to: the remaining devIndicators indicator",
+                "step_kind": "manual",
+                "verify": "Load the affected page or run the build, and confirm the new behaviour.",
+                "confidence": 0.85,
+                "source": "rule_pack",
+                "usage_ids": [
+                  "bc9f75dc095c907f7afbed78"
+                ],
+                "docs_status": "unverified",
+                "prompt_version": "v1",
+                "rule_id": "next/devindicators-options"
+              },
+              {
+                "id": "dependency_build-b7559697d410f809dc43eaf6",
+                "repo_id": "abdde03e9348f307",
+                "lens": "dependency_build",
+                "concern": "dependency",
+                "severity": "low",
+                "evidence": [
+                  {
+                    "repo_id": "abdde03e9348f307",
+                    "file": "package-lock.json",
+                    "line_start": 9002,
+                    "line_end": 9002,
+                    "snippet_hash": "4f416a2a0b6ca5ac32da4c521bd48df3bdaf768e8368773e7a13281fa736290c"
+                  }
+                ],
+                "doc_refs": [],
+                "reasoning": "devIndicators Options: devIndicators options appIsrStatus, buildActivity and buildActivityPosition are removed.",
+                "action": "Update to: the remaining devIndicators indicator",
+                "step_kind": "manual",
+                "verify": "Load the affected page or run the build, and confirm the new behaviour.",
+                "confidence": 0.85,
+                "source": "rule_pack",
+                "usage_ids": [
+                  "b7559697d410f809dc43eaf6"
+                ],
+                "docs_status": "unverified",
+                "prompt_version": "v1",
+                "rule_id": "next/devindicators-options"
+              },
+              {
+                "id": "dependency_build-ca7c2a8f7b7db16268fad111",
+                "repo_id": "abdde03e9348f307",
+                "lens": "dependency_build",
+                "concern": "dependency",
+                "severity": "low",
+                "evidence": [
+                  {
+                    "repo_id": "abdde03e9348f307",
+                    "file": "package-lock.json",
+                    "line_start": 9027,
+                    "line_end": 9027,
+                    "snippet_hash": "3530da134724f8f68ce5a0cb73c81944a57780eab6baf17216a2967ea2f489c8"
+                  }
+                ],
+                "doc_refs": [],
+                "reasoning": "devIndicators Options: devIndicators options appIsrStatus, buildActivity and buildActivityPosition are removed.",
+                "action": "Update to: the remaining devIndicators indicator",
+                "step_kind": "manual",
+                "verify": "Load the affected page or run the build, and confirm the new behaviour.",
+                "confidence": 0.85,
+                "source": "rule_pack",
+                "usage_ids": [
+                  "ca7c2a8f7b7db16268fad111"
+                ],
+                "docs_status": "unverified",
+                "prompt_version": "v1",
+                "rule_id": "next/devindicators-options"
+              },
+              {
+                "id": "dependency_build-dad64d3b36799a379cfa1212",
+                "repo_id": "abdde03e9348f307",
+                "lens": "dependency_build",
+                "concern": "dependency",
+                "severity": "low",
+                "evidence": [
+                  {
+                    "repo_id": "abdde03e9348f307",
+                    "file": "package-lock.json",
+                    "line_start": 9049,
+                    "line_end": 9049,
+                    "snippet_hash": "033027c695ef84e90f34b59cfc3a7be514d5943a58a88c4856498f75797913a1"
+                  }
+                ],
+                "doc_refs": [],
+                "reasoning": "devIndicators Options: devIndicators options appIsrStatus, buildActivity and buildActivityPosition are removed.",
+                "action": "Update to: the remaining devIndicators indicator",
+                "step_kind": "manual",
+                "verify": "Load the affected page or run the build, and confirm the new behaviour.",
+                "confidence": 0.85,
+                "source": "rule_pack",
+                "usage_ids": [
+                  "dad64d3b36799a379cfa1212"
+                ],
+                "docs_status": "unverified",
+                "prompt_version": "v1",
+                "rule_id": "next/devindicators-options"
+              },
+              {
+                "id": "dependency_build-093fc4c4896965efcd5801bf",
+                "repo_id": "abdde03e9348f307",
+                "lens": "dependency_build",
+                "concern": "dependency",
+                "severity": "low",
+                "evidence": [
+                  {
+                    "repo_id": "abdde03e9348f307",
+                    "file": "package-lock.json",
+                    "line_start": 9736,
+                    "line_end": 9736,
+                    "snippet_hash": "bcdded0a6ced8e6b1c0154d4b6cab0249f326bb9365b7e08c7383748f15eb01d"
+                  }
+                ],
+                "doc_refs": [],
+                "reasoning": "devIndicators Options: devIndicators options appIsrStatus, buildActivity and buildActivityPosition are removed.",
+                "action": "Update to: the remaining devIndicators indicator",
+                "step_kind": "manual",
+                "verify": "Load the affected page or run the build, and confirm the new behaviour.",
+                "confidence": 0.85,
+                "source": "rule_pack",
+                "usage_ids": [
+                  "093fc4c4896965efcd5801bf"
+                ],
+                "docs_status": "unverified",
+                "prompt_version": "v1",
+                "rule_id": "next/devindicators-options"
+              },
+              {
+                "id": "dependency_build-005a36048e292d22cdcbab5a",
+                "repo_id": "abdde03e9348f307",
+                "lens": "dependency_build",
+                "concern": "dependency",
+                "severity": "low",
+                "evidence": [
+                  {
+                    "repo_id": "abdde03e9348f307",
+                    "file": "package-lock.json",
+                    "line_start": 10204,
+                    "line_end": 10204,
+                    "snippet_hash": "8281e9c9e4f3415efedf2bf53351532c0d89299b6efc84b266d180f8da17cb5d"
+                  }
+                ],
+                "doc_refs": [],
+                "reasoning": "devIndicators Options: devIndicators options appIsrStatus, buildActivity and buildActivityPosition are removed.",
+                "action": "Update to: the remaining devIndicators indicator",
+                "step_kind": "manual",
+                "verify": "Load the affected page or run the build, and confirm the new behaviour.",
+                "confidence": 0.85,
+                "source": "rule_pack",
+                "usage_ids": [
+                  "005a36048e292d22cdcbab5a"
+                ],
+                "docs_status": "unverified",
+                "prompt_version": "v1",
+                "rule_id": "next/devindicators-options"
+              },
+              {
+                "id": "dependency_build-8264a924ae1d066f9a960a2b",
+                "repo_id": "abdde03e9348f307",
+                "lens": "dependency_build",
+                "concern": "dependency",
+                "severity": "low",
+                "evidence": [
+                  {
+                    "repo_id": "abdde03e9348f307",
+                    "file": "package-lock.json",
+                    "line_start": 10225,
+                    "line_end": 10225,
+                    "snippet_hash": "37a5f8cc993d78527a522868339e39edace9ec773a93fdf8d41c7a8b25c4eed5"
+                  }
+                ],
+                "doc_refs": [],
+                "reasoning": "devIndicators Options: devIndicators options appIsrStatus, buildActivity and buildActivityPosition are removed.",
+                "action": "Update to: the remaining devIndicators indicator",
+                "step_kind": "manual",
+                "verify": "Load the affected page or run the build, and confirm the new behaviour.",
+                "confidence": 0.85,
+                "source": "rule_pack",
+                "usage_ids": [
+                  "8264a924ae1d066f9a960a2b"
+                ],
+                "docs_status": "unverified",
+                "prompt_version": "v1",
+                "rule_id": "next/devindicators-options"
+              },
+              {
+                "id": "dependency_build-b7b6404cd86188689bbc27cf",
+                "repo_id": "abdde03e9348f307",
+                "lens": "dependency_build",
+                "concern": "dependency",
+                "severity": "low",
+                "evidence": [
+                  {
+                    "repo_id": "abdde03e9348f307",
+                    "file": "package.json",
+                    "line_start": 36,
+                    "line_end": 36,
+                    "snippet_hash": "37697500c4527a79025f6eaf5a8111eef680135e41542fc7032d9099924539e0"
+                  }
+                ],
+                "doc_refs": [],
+                "reasoning": "devIndicators Options: devIndicators options appIsrStatus, buildActivity and buildActivityPosition are removed.",
+                "action": "Update to: the remaining devIndicators indicator",
+                "step_kind": "manual",
+                "verify": "Load the affected page or run the build, and confirm the new behaviour.",
+                "confidence": 0.85,
+                "source": "rule_pack",
+                "usage_ids": [
+                  "b7b6404cd86188689bbc27cf"
+                ],
+                "docs_status": "unverified",
+                "prompt_version": "v1",
+                "rule_id": "next/devindicators-options"
+              },
+              {
+                "id": "dependency_build-0f72ed896407163226cbc4aa",
+                "repo_id": "abdde03e9348f307",
+                "lens": "dependency_build",
+                "concern": "dependency",
+                "severity": "low",
+                "evidence": [
+                  {
+                    "repo_id": "abdde03e9348f307",
+                    "file": "package.json",
+                    "line_start": 39,
+                    "line_end": 39,
+                    "snippet_hash": "5a2b4efc5e70192664979c7e80a97d36fe23965eb3eee7ce5cf20437be98a8e3"
+                  }
+                ],
+                "doc_refs": [],
+                "reasoning": "devIndicators Options: devIndicators options appIsrStatus, buildActivity and buildActivityPosition are removed.",
+                "action": "Update to: the remaining devIndicators indicator",
+                "step_kind": "manual",
+                "verify": "Load the affected page or run the build, and confirm the new behaviour.",
+                "confidence": 0.85,
+                "source": "rule_pack",
+                "usage_ids": [
+                  "0f72ed896407163226cbc4aa"
+                ],
+                "docs_status": "unverified",
+                "prompt_version": "v1",
+                "rule_id": "next/devindicators-options"
+              },
+              {
+                "id": "dependency_build-65cecc61c7ec80226c4bf25d",
+                "repo_id": "abdde03e9348f307",
+                "lens": "dependency_build",
+                "concern": "dependency",
+                "severity": "low",
+                "evidence": [
+                  {
+                    "repo_id": "abdde03e9348f307",
+                    "file": "package.json",
+                    "line_start": 40,
+                    "line_end": 40,
+                    "snippet_hash": "933d92c8bdbb82802030a593ea674b030c98ec5bd3ed9eb26d725c1b687986a3"
+                  }
+                ],
+                "doc_refs": [],
+                "reasoning": "devIndicators Options: devIndicators options appIsrStatus, buildActivity and buildActivityPosition are removed.",
+                "action": "Update to: the remaining devIndicators indicator",
+                "step_kind": "manual",
+                "verify": "Load the affected page or run the build, and confirm the new behaviour.",
+                "confidence": 0.85,
+                "source": "rule_pack",
+                "usage_ids": [
+                  "65cecc61c7ec80226c4bf25d"
+                ],
+                "docs_status": "unverified",
+                "prompt_version": "v1",
+                "rule_id": "next/devindicators-options"
+              },
+              {
+                "id": "dependency_build-a6914be8100509e7ea8c826f",
+                "repo_id": "abdde03e9348f307",
+                "lens": "dependency_build",
+                "concern": "dependency",
+                "severity": "low",
+                "evidence": [
+                  {
+                    "repo_id": "abdde03e9348f307",
+                    "file": "package.json",
+                    "line_start": 52,
+                    "line_end": 52,
+                    "snippet_hash": "668c62fa1e605a43cc7c6eac2b215f0fceb1af182ff4d0d58aba2923a674e556"
+                  }
+                ],
+                "doc_refs": [],
+                "reasoning": "devIndicators Options: devIndicators options appIsrStatus, buildActivity and buildActivityPosition are removed.",
+                "action": "Update to: the remaining devIndicators indicator",
+                "step_kind": "manual",
+                "verify": "Load the affected page or run the build, and confirm the new behaviour.",
+                "confidence": 0.85,
+                "source": "rule_pack",
+                "usage_ids": [
+                  "a6914be8100509e7ea8c826f"
+                ],
+                "docs_status": "unverified",
+                "prompt_version": "v1",
+                "rule_id": "next/devindicators-options"
+              },
+              {
+                "id": "dependency_build-64a965f395f34f1ca96e384b",
+                "repo_id": "abdde03e9348f307",
+                "lens": "dependency_build",
+                "concern": "dependency",
+                "severity": "low",
+                "evidence": [
+                  {
+                    "repo_id": "abdde03e9348f307",
+                    "file": "package.json",
+                    "line_start": 53,
+                    "line_end": 53,
+                    "snippet_hash": "0289f4e0593b28c3cf5adfd394a83e6d929a464b998b333cc26d536da0619da7"
+                  }
+                ],
+                "doc_refs": [],
+                "reasoning": "devIndicators Options: devIndicators options appIsrStatus, buildActivity and buildActivityPosition are removed.",
+                "action": "Update to: the remaining devIndicators indicator",
+                "step_kind": "manual",
+                "verify": "Load the affected page or run the build, and confirm the new behaviour.",
+                "confidence": 0.85,
+                "source": "rule_pack",
+                "usage_ids": [
+                  "64a965f395f34f1ca96e384b"
+                ],
+                "docs_status": "unverified",
+                "prompt_version": "v1",
+                "rule_id": "next/devindicators-options"
+              },
+              {
+                "id": "dependency_build-cb207b3b6695e569203002e2",
+                "repo_id": "abdde03e9348f307",
+                "lens": "dependency_build",
+                "concern": "dependency",
+                "severity": "low",
+                "evidence": [
+                  {
+                    "repo_id": "abdde03e9348f307",
+                    "file": "package.json",
+                    "line_start": 57,
+                    "line_end": 57,
+                    "snippet_hash": "c5428e89cfd42d434004cc2efee817e6a914cf56e532ae55d23e9f751fa67566"
+                  }
+                ],
+                "doc_refs": [],
+                "reasoning": "devIndicators Options: devIndicators options appIsrStatus, buildActivity and buildActivityPosition are removed.",
+                "action": "Update to: the remaining devIndicators indicator",
+                "step_kind": "manual",
+                "verify": "Load the affected page or run the build, and confirm the new behaviour.",
+                "confidence": 0.85,
+                "source": "rule_pack",
+                "usage_ids": [
+                  "cb207b3b6695e569203002e2"
+                ],
+                "docs_status": "unverified",
+                "prompt_version": "v1",
+                "rule_id": "next/devindicators-options"
+              },
+              {
+                "id": "dependency_build-469d6f01a251b10ccfea9d61",
+                "repo_id": "abdde03e9348f307",
+                "lens": "dependency_build",
+                "concern": "dependency",
+                "severity": "low",
+                "evidence": [
+                  {
+                    "repo_id": "abdde03e9348f307",
+                    "file": "package.json",
+                    "line_start": 64,
+                    "line_end": 64,
+                    "snippet_hash": "8ed9f806f5e095f2c65af6d931b6705b3214091f7eba4c813c90e211ad193a8b"
+                  }
+                ],
+                "doc_refs": [],
+                "reasoning": "devIndicators Options: devIndicators options appIsrStatus, buildActivity and buildActivityPosition are removed.",
+                "action": "Update to: the remaining devIndicators indicator",
+                "step_kind": "manual",
+                "verify": "Load the affected page or run the build, and confirm the new behaviour.",
+                "confidence": 0.85,
+                "source": "rule_pack",
+                "usage_ids": [
+                  "469d6f01a251b10ccfea9d61"
+                ],
+                "docs_status": "unverified",
+                "prompt_version": "v1",
+                "rule_id": "next/devindicators-options"
+              }
+            ],
+            "out_of_scope": []
+          }
+        },
+        {
+          "lens": "behavior_runtime",
+          "packet_usages": [
+            {
+              "file": "src/app/api/users/[id]/route.ts",
+              "line_start": 36,
+              "line_end": 36,
+              "snippet_hash": "3e57fc503a56eeabbc7b8508ef04c740826849b675e8d266e367f40c8d2d7d85",
+              "usage_id": "d28fd94909feecb5cbe6ef4f"
+            },
+            {
+              "file": "src/app/api/users/[id]/spelling/route.ts",
+              "line_start": 5,
+              "line_end": 5,
+              "snippet_hash": "3e57fc503a56eeabbc7b8508ef04c740826849b675e8d266e367f40c8d2d7d85",
+              "usage_id": "b0ad00359d090da51c35efa0"
+            },
+            {
+              "file": "src/app/api/users/route.ts",
+              "line_start": 37,
+              "line_end": 37,
+              "snippet_hash": "b3c0218c0f467556109abd69c8a937ff2ef8563e13d50569022146a50b3348e4",
+              "usage_id": "30a0edbc7f2c0bd2937a0913"
+            },
+            {
+              "file": "src/lib/spelling-api.ts",
+              "line_start": 28,
+              "line_end": 28,
+              "snippet_hash": "b4ab6597c46dd04c01fd2e5ffa86ca4d90309efd9ea13d271a011a16565f7631",
+              "usage_id": "d4763fc8f67f6faa408b2a53"
+            },
+            {
+              "file": "src/lib/spelling-api.ts",
+              "line_start": 40,
+              "line_end": 40,
+              "snippet_hash": "6f1aaf5054cfa2324e93417972b932114cf67c9dd86b15346bf4815f1cc428f8",
+              "usage_id": "b7bc513afae86f117b17fde0"
+            },
+            {
+              "file": "src/lib/spelling-api.ts",
+              "line_start": 52,
+              "line_end": 56,
+              "snippet_hash": "ed494e91db3a68f24c8257c744030c82727bb7f7dafa24446c658adbe2633c21",
+              "usage_id": "893f9e2ccaf1da628d361da9"
+            },
+            {
+              "file": "src/lib/spelling-api.ts",
+              "line_start": 66,
+              "line_end": 72,
+              "snippet_hash": "c5aba08eeb3103277e54192016ef086e9e1e25b66a1f1e9decced039e39bf49f",
+              "usage_id": "0318bd4bebbeaa68fc602cc9"
+            },
+            {
+              "file": "src/lib/spelling-api.ts",
+              "line_start": 82,
+              "line_end": 88,
+              "snippet_hash": "e26af50ef04f5cc98f0a7eb6aa8244ab9f4b6155d9e2fb7e0d77c05cb0f974a5",
+              "usage_id": "44b584248ed49a89d200c059"
+            },
+            {
+              "file": "src/lib/spelling-api.ts",
+              "line_start": 98,
+              "line_end": 104,
+              "snippet_hash": "95df44d0fbf942a99748a83dea9cb982c88f827fa8aa32faa79201d28b5a9326",
+              "usage_id": "28827aca7d46425ea662b1dc"
+            },
+            {
+              "file": "src/lib/spelling-api.ts",
+              "line_start": 120,
+              "line_end": 126,
+              "snippet_hash": "28b75dceeeed58e4cd01127d15407aacb9577078e5b44a1312a486c0d04cef47",
+              "usage_id": "14d10ceb580ac93ce3f0e886"
+            },
+            {
+              "file": "src/lib/spelling-api.ts",
+              "line_start": 136,
+              "line_end": 138,
+              "snippet_hash": "d1d2e2d006ef44c2b4fcb551b9d3d263e9b128f4b663e55e707f758dd7034fd6",
+              "usage_id": "57d11b8018017f595058b751"
+            }
+          ],
+          "submission": {
+            "findings": [
+              {
+                "id": "behavior_runtime-d28fd94909feecb5cbe6ef4f",
+                "repo_id": "abdde03e9348f307",
+                "lens": "behavior_runtime",
+                "concern": "behavior_change",
+                "severity": "high",
+                "evidence": [
+                  {
+                    "repo_id": "abdde03e9348f307",
+                    "file": "src/app/api/users/[id]/route.ts",
+                    "line_start": 36,
+                    "line_end": 36,
+                    "snippet_hash": "3e57fc503a56eeabbc7b8508ef04c740826849b675e8d266e367f40c8d2d7d85"
+                  }
+                ],
+                "doc_refs": [],
+                "reasoning": "cookies() is async: cookies() from next/headers is asynchronous. A synchronous call warns, and the warning becomes an error in 16.",
+                "action": "Update to: const cookieStore = await cookies()",
+                "step_kind": "codemod",
+                "verify": "Load the affected page or run the build, and confirm the new behaviour.",
+                "confidence": 0.85,
+                "source": "rule_pack",
+                "usage_ids": [
+                  "d28fd94909feecb5cbe6ef4f"
+                ],
+                "docs_status": "unverified",
+                "prompt_version": "v1",
+                "rule_id": "next/async-cookies",
+                "codemod": "next-codemod:next-async-request-api",
+                "rollback": "Return to the previous release of the library."
+              },
+              {
+                "id": "behavior_runtime-b0ad00359d090da51c35efa0",
+                "repo_id": "abdde03e9348f307",
+                "lens": "behavior_runtime",
+                "concern": "behavior_change",
+                "severity": "high",
+                "evidence": [
+                  {
+                    "repo_id": "abdde03e9348f307",
+                    "file": "src/app/api/users/[id]/spelling/route.ts",
+                    "line_start": 5,
+                    "line_end": 5,
+                    "snippet_hash": "3e57fc503a56eeabbc7b8508ef04c740826849b675e8d266e367f40c8d2d7d85"
+                  }
+                ],
+                "doc_refs": [],
+                "reasoning": "cookies() is async: cookies() from next/headers is asynchronous. A synchronous call warns, and the warning becomes an error in 16.",
+                "action": "Update to: const cookieStore = await cookies()",
+                "step_kind": "codemod",
+                "verify": "Load the affected page or run the build, and confirm the new behaviour.",
+                "confidence": 0.85,
+                "source": "rule_pack",
+                "usage_ids": [
+                  "b0ad00359d090da51c35efa0"
+                ],
+                "docs_status": "unverified",
+                "prompt_version": "v1",
+                "rule_id": "next/async-cookies",
+                "codemod": "next-codemod:next-async-request-api",
+                "rollback": "Return to the previous release of the library."
+              },
+              {
+                "id": "behavior_runtime-30a0edbc7f2c0bd2937a0913",
+                "repo_id": "abdde03e9348f307",
+                "lens": "behavior_runtime",
+                "concern": "behavior_change",
+                "severity": "high",
+                "evidence": [
+                  {
+                    "repo_id": "abdde03e9348f307",
+                    "file": "src/app/api/users/route.ts",
+                    "line_start": 37,
+                    "line_end": 37,
+                    "snippet_hash": "b3c0218c0f467556109abd69c8a937ff2ef8563e13d50569022146a50b3348e4"
+                  }
+                ],
+                "doc_refs": [],
+                "reasoning": "cookies() is async: cookies() from next/headers is asynchronous. A synchronous call warns, and the warning becomes an error in 16.",
+                "action": "Update to: const cookieStore = await cookies()",
+                "step_kind": "codemod",
+                "verify": "Load the affected page or run the build, and confirm the new behaviour.",
+                "confidence": 0.85,
+                "source": "rule_pack",
+                "usage_ids": [
+                  "30a0edbc7f2c0bd2937a0913"
+                ],
+                "docs_status": "unverified",
+                "prompt_version": "v1",
+                "rule_id": "next/async-cookies",
+                "codemod": "next-codemod:next-async-request-api",
+                "rollback": "Return to the previous release of the library."
+              },
+              {
+                "id": "behavior_runtime-d4763fc8f67f6faa408b2a53",
+                "repo_id": "abdde03e9348f307",
+                "lens": "behavior_runtime",
+                "concern": "behavior_change",
+                "severity": "high",
+                "evidence": [
+                  {
+                    "repo_id": "abdde03e9348f307",
+                    "file": "src/lib/spelling-api.ts",
+                    "line_start": 28,
+                    "line_end": 28,
+                    "snippet_hash": "b4ab6597c46dd04c01fd2e5ffa86ca4d90309efd9ea13d271a011a16565f7631"
+                  }
+                ],
+                "doc_refs": [],
+                "reasoning": "cookies() is async: cookies() from next/headers is asynchronous. A synchronous call warns, and the warning becomes an error in 16.",
+                "action": "Update to: const cookieStore = await cookies()",
+                "step_kind": "codemod",
+                "verify": "Load the affected page or run the build, and confirm the new behaviour.",
+                "confidence": 0.85,
+                "source": "rule_pack",
+                "usage_ids": [
+                  "d4763fc8f67f6faa408b2a53"
+                ],
+                "docs_status": "unverified",
+                "prompt_version": "v1",
+                "rule_id": "next/async-cookies",
+                "codemod": "next-codemod:next-async-request-api",
+                "rollback": "Return to the previous release of the library."
+              },
+              {
+                "id": "behavior_runtime-b7bc513afae86f117b17fde0",
+                "repo_id": "abdde03e9348f307",
+                "lens": "behavior_runtime",
+                "concern": "behavior_change",
+                "severity": "high",
+                "evidence": [
+                  {
+                    "repo_id": "abdde03e9348f307",
+                    "file": "src/lib/spelling-api.ts",
+                    "line_start": 40,
+                    "line_end": 40,
+                    "snippet_hash": "6f1aaf5054cfa2324e93417972b932114cf67c9dd86b15346bf4815f1cc428f8"
+                  }
+                ],
+                "doc_refs": [],
+                "reasoning": "cookies() is async: cookies() from next/headers is asynchronous. A synchronous call warns, and the warning becomes an error in 16.",
+                "action": "Update to: const cookieStore = await cookies()",
+                "step_kind": "codemod",
+                "verify": "Load the affected page or run the build, and confirm the new behaviour.",
+                "confidence": 0.85,
+                "source": "rule_pack",
+                "usage_ids": [
+                  "b7bc513afae86f117b17fde0"
+                ],
+                "docs_status": "unverified",
+                "prompt_version": "v1",
+                "rule_id": "next/async-cookies",
+                "codemod": "next-codemod:next-async-request-api",
+                "rollback": "Return to the previous release of the library."
+              },
+              {
+                "id": "behavior_runtime-893f9e2ccaf1da628d361da9",
+                "repo_id": "abdde03e9348f307",
+                "lens": "behavior_runtime",
+                "concern": "behavior_change",
+                "severity": "high",
+                "evidence": [
+                  {
+                    "repo_id": "abdde03e9348f307",
+                    "file": "src/lib/spelling-api.ts",
+                    "line_start": 52,
+                    "line_end": 56,
+                    "snippet_hash": "ed494e91db3a68f24c8257c744030c82727bb7f7dafa24446c658adbe2633c21"
+                  }
+                ],
+                "doc_refs": [],
+                "reasoning": "cookies() is async: cookies() from next/headers is asynchronous. A synchronous call warns, and the warning becomes an error in 16.",
+                "action": "Update to: const cookieStore = await cookies()",
+                "step_kind": "codemod",
+                "verify": "Load the affected page or run the build, and confirm the new behaviour.",
+                "confidence": 0.85,
+                "source": "rule_pack",
+                "usage_ids": [
+                  "893f9e2ccaf1da628d361da9"
+                ],
+                "docs_status": "unverified",
+                "prompt_version": "v1",
+                "rule_id": "next/async-cookies",
+                "codemod": "next-codemod:next-async-request-api",
+                "rollback": "Return to the previous release of the library."
+              },
+              {
+                "id": "behavior_runtime-0318bd4bebbeaa68fc602cc9",
+                "repo_id": "abdde03e9348f307",
+                "lens": "behavior_runtime",
+                "concern": "behavior_change",
+                "severity": "high",
+                "evidence": [
+                  {
+                    "repo_id": "abdde03e9348f307",
+                    "file": "src/lib/spelling-api.ts",
+                    "line_start": 66,
+                    "line_end": 72,
+                    "snippet_hash": "c5aba08eeb3103277e54192016ef086e9e1e25b66a1f1e9decced039e39bf49f"
+                  }
+                ],
+                "doc_refs": [],
+                "reasoning": "cookies() is async: cookies() from next/headers is asynchronous. A synchronous call warns, and the warning becomes an error in 16.",
+                "action": "Update to: const cookieStore = await cookies()",
+                "step_kind": "codemod",
+                "verify": "Load the affected page or run the build, and confirm the new behaviour.",
+                "confidence": 0.85,
+                "source": "rule_pack",
+                "usage_ids": [
+                  "0318bd4bebbeaa68fc602cc9"
+                ],
+                "docs_status": "unverified",
+                "prompt_version": "v1",
+                "rule_id": "next/async-cookies",
+                "codemod": "next-codemod:next-async-request-api",
+                "rollback": "Return to the previous release of the library."
+              },
+              {
+                "id": "behavior_runtime-44b584248ed49a89d200c059",
+                "repo_id": "abdde03e9348f307",
+                "lens": "behavior_runtime",
+                "concern": "behavior_change",
+                "severity": "high",
+                "evidence": [
+                  {
+                    "repo_id": "abdde03e9348f307",
+                    "file": "src/lib/spelling-api.ts",
+                    "line_start": 82,
+                    "line_end": 88,
+                    "snippet_hash": "e26af50ef04f5cc98f0a7eb6aa8244ab9f4b6155d9e2fb7e0d77c05cb0f974a5"
+                  }
+                ],
+                "doc_refs": [],
+                "reasoning": "cookies() is async: cookies() from next/headers is asynchronous. A synchronous call warns, and the warning becomes an error in 16.",
+                "action": "Update to: const cookieStore = await cookies()",
+                "step_kind": "codemod",
+                "verify": "Load the affected page or run the build, and confirm the new behaviour.",
+                "confidence": 0.85,
+                "source": "rule_pack",
+                "usage_ids": [
+                  "44b584248ed49a89d200c059"
+                ],
+                "docs_status": "unverified",
+                "prompt_version": "v1",
+                "rule_id": "next/async-cookies",
+                "codemod": "next-codemod:next-async-request-api",
+                "rollback": "Return to the previous release of the library."
+              },
+              {
+                "id": "behavior_runtime-28827aca7d46425ea662b1dc",
+                "repo_id": "abdde03e9348f307",
+                "lens": "behavior_runtime",
+                "concern": "behavior_change",
+                "severity": "high",
+                "evidence": [
+                  {
+                    "repo_id": "abdde03e9348f307",
+                    "file": "src/lib/spelling-api.ts",
+                    "line_start": 98,
+                    "line_end": 104,
+                    "snippet_hash": "95df44d0fbf942a99748a83dea9cb982c88f827fa8aa32faa79201d28b5a9326"
+                  }
+                ],
+                "doc_refs": [],
+                "reasoning": "cookies() is async: cookies() from next/headers is asynchronous. A synchronous call warns, and the warning becomes an error in 16.",
+                "action": "Update to: const cookieStore = await cookies()",
+                "step_kind": "codemod",
+                "verify": "Load the affected page or run the build, and confirm the new behaviour.",
+                "confidence": 0.85,
+                "source": "rule_pack",
+                "usage_ids": [
+                  "28827aca7d46425ea662b1dc"
+                ],
+                "docs_status": "unverified",
+                "prompt_version": "v1",
+                "rule_id": "next/async-cookies",
+                "codemod": "next-codemod:next-async-request-api",
+                "rollback": "Return to the previous release of the library."
+              },
+              {
+                "id": "behavior_runtime-14d10ceb580ac93ce3f0e886",
+                "repo_id": "abdde03e9348f307",
+                "lens": "behavior_runtime",
+                "concern": "behavior_change",
+                "severity": "high",
+                "evidence": [
+                  {
+                    "repo_id": "abdde03e9348f307",
+                    "file": "src/lib/spelling-api.ts",
+                    "line_start": 120,
+                    "line_end": 126,
+                    "snippet_hash": "28b75dceeeed58e4cd01127d15407aacb9577078e5b44a1312a486c0d04cef47"
+                  }
+                ],
+                "doc_refs": [],
+                "reasoning": "cookies() is async: cookies() from next/headers is asynchronous. A synchronous call warns, and the warning becomes an error in 16.",
+                "action": "Update to: const cookieStore = await cookies()",
+                "step_kind": "codemod",
+                "verify": "Load the affected page or run the build, and confirm the new behaviour.",
+                "confidence": 0.85,
+                "source": "rule_pack",
+                "usage_ids": [
+                  "14d10ceb580ac93ce3f0e886"
+                ],
+                "docs_status": "unverified",
+                "prompt_version": "v1",
+                "rule_id": "next/async-cookies",
+                "codemod": "next-codemod:next-async-request-api",
+                "rollback": "Return to the previous release of the library."
+              },
+              {
+                "id": "behavior_runtime-57d11b8018017f595058b751",
+                "repo_id": "abdde03e9348f307",
+                "lens": "behavior_runtime",
+                "concern": "behavior_change",
+                "severity": "high",
+                "evidence": [
+                  {
+                    "repo_id": "abdde03e9348f307",
+                    "file": "src/lib/spelling-api.ts",
+                    "line_start": 136,
+                    "line_end": 138,
+                    "snippet_hash": "d1d2e2d006ef44c2b4fcb551b9d3d263e9b128f4b663e55e707f758dd7034fd6"
+                  }
+                ],
+                "doc_refs": [],
+                "reasoning": "cookies() is async: cookies() from next/headers is asynchronous. A synchronous call warns, and the warning becomes an error in 16.",
+                "action": "Update to: const cookieStore = await cookies()",
+                "step_kind": "codemod",
+                "verify": "Load the affected page or run the build, and confirm the new behaviour.",
+                "confidence": 0.85,
+                "source": "rule_pack",
+                "usage_ids": [
+                  "57d11b8018017f595058b751"
+                ],
+                "docs_status": "unverified",
+                "prompt_version": "v1",
+                "rule_id": "next/async-cookies",
+                "codemod": "next-codemod:next-async-request-api",
+                "rollback": "Return to the previous release of the library."
+              }
+            ],
+            "out_of_scope": []
+          }
+        },
+        {
+          "lens": "verification",
+          "packet_usages": [],
+          "submission": {
+            "findings": [],
+            "out_of_scope": []
+          }
+        }
+      ]
+    }
+  ],
+  "size": "full",
+  "cost_tokens": 0,
+  "wall_ms": 478,
+  "host": {
+    "product": "Cursor",
+    "model": "databricks-claude-sonnet-4-6",
+    "cli_version": "3.25.6"
+  }
+}

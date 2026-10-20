@@ -1,0 +1,14 @@
+{
+  "kind": "baseline",
+  "case_id": "nextjs-couchers-web-9893",
+  "run": 2,
+  "markdown": "# Migration Plan: next 15.5.7 → 16.4.0\n\n## Summary\n\nUpgrade `next` from version `15.5.7` to `16.4.0`.\n\n## Required Changes\n\n- **[high]** `app/web/package.json` — Upgrade `next` from `^15.5.7` to `16.4.0`. Update peer dependencies (`react`, `react-dom`, `eslint-config-next`) accordingly.\n- **[medium]** `app/web/next.config.js` — Review Next.js configuration options that changed between 15.5.7 and 16.4.0 (e.g. experimental flags, image domains, webpack config).\n- **[medium]** `app/web/middleware.ts` — Review middleware API changes in Next.js 16.4.0.\n- **[low]** `app/mobile/jest.setup.ts` — Update test setup for compatibility with Next.js 16.4.0.\n- **[low]** `app/web/test/setupTests.ts` — Update test setup for compatibility with Next.js 16.4.0.\n",
+  "prompt_hash": "c2b4a0ad895125cbf6a3e721d55ebbd741b6e7b9d7edce7ebd63f8b828623550",
+  "cost_tokens": null,
+  "wall_ms": 28,
+  "host": {
+    "product": "Cursor",
+    "model": "databricks-claude-sonnet-4-6",
+    "cli_version": "3.25.6"
+  }
+}

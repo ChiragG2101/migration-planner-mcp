@@ -1,9 +1,9 @@
 You are helping plan a framework migration for a code repository.
 
 The repository is being upgraded from one major version of a framework to a
-newer one. Your task is to produce a migration plan **in Markdown** with no
-tools, no engine and no code execution: read the task and write the plan from
-what you know of the framework and the versions involved.
+newer one. Your task is to produce a migration plan **in Markdown**. You may
+read files in the repository. Do not use a migration engine, an MCP server, or
+a skill, and do not run commands, write files, or execute code.
 
 For every change the migration needs, write one finding as a Markdown list item
 in this exact shape, so it can be parsed automatically:
@@ -20,5 +20,4 @@ Rules for the list:
 - Cite a real file in the repository. A citation that does not resolve to a
   real file counts against you.
 
-Do not run commands, open a sandbox, or ask for tools. Produce only the Markdown
-plan.
+Produce only the Markdown plan.

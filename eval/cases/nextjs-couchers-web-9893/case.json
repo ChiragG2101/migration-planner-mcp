@@ -1,0 +1,17 @@
+{
+  "id": "nextjs-couchers-web-9893",
+  "pack": "nextjs-upgrade",
+  "repo_url": "https://github.com/Couchers-org/couchers",
+  "base_commit": "b782329204a3c52969f1a91ad216a79970fb26b4",
+  "merge_commit": "fed6efb674f5e5ac2a436055f11df7e89c753468",
+  "pr_url": "https://github.com/Couchers-org/couchers/pull/9893",
+  "source": { "framework": "next", "version": "15.5.7" },
+  "target": { "framework": "next", "version": "16.4.0" },
+  "license": "MIT",
+  "checks": {
+    "install": ["yarn --cwd app/web install --frozen-lockfile"],
+    "test": ["yarn --cwd app/web test"]
+  },
+  "tags": ["pages-router", "15-to-16", "jest", "monorepo"],
+  "notes": "Replaces nextjs-wazaby-web-137 as the pages-router-only cell. Wazaby has no test script and no CI at its base commit, so it fails the re-checker's test check and cannot be an L1 case; it is removed in the same change (eval/cases/REMOVED.json). Couchers-org/couchers is MIT. The web app lives at app/web and is pages-router only (app/web/pages, no app/web/app directory at base). PR #9893 upgrades next ^15.5.7 -> 16.4.0. The installed versions are the app/web/yarn.lock pins, 15.5.7 at base and 16.4.0 at merge, not the manifest range. There is no root lockfile; mobile packages do not depend on next, so the pin is unambiguous. The web package.json test script is jest, and the repo has .github/workflows at base. The jest script sets NEXT_PUBLIC_API_BASE_URL itself via cross-env. Confirm whether the suite needs the local API before enabling L1. base_commit is the first parent of the merge commit."
+}

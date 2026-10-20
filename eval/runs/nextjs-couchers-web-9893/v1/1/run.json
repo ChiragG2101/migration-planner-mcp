@@ -1,0 +1,1368 @@
+{
+  "kind": "engine",
+  "case_id": "nextjs-couchers-web-9893",
+  "prompt_version": "v1",
+  "run": 1,
+  "ingest": {
+    "source": {
+      "name": "next",
+      "version": "15.5.7"
+    },
+    "target": {
+      "name": "next",
+      "version": "16.4.0"
+    }
+  },
+  "scope_answers": {},
+  "docs": [
+    {
+      "library": "next",
+      "version": "16",
+      "topic": "next/amp",
+      "url": "https://nextjs.org/docs/app/guides/upgrading/version-16#amp-support",
+      "content": "AMP Support\n\nAMP support is removed, including the next/amp import, the amp config and the pages amp config export.\n\nold: import { useAmp } from 'next/amp'\nnew: no AMP API\n\n",
+      "doc_id": "01dac8eed168239a9b65c15bde5a819668478b243be6a1861f91484351dff343",
+      "fetched_by": "knowledge",
+      "official": true,
+      "status": "unverified"
+    },
+    {
+      "library": "next",
+      "version": "16",
+      "topic": "devIndicators",
+      "url": "https://nextjs.org/docs/app/guides/upgrading/version-16#devindicators-options",
+      "content": "devIndicators Options\n\ndevIndicators options appIsrStatus, buildActivity and buildActivityPosition are removed.\n\nold: devIndicators.buildActivity\nnew: the remaining devIndicators indicator\n\n",
+      "doc_id": "0a840e65f76004fbf1a6dad93ada8860f3b5e81d1697cac34da0db4d2487d030",
+      "fetched_by": "knowledge",
+      "official": true,
+      "status": "unverified"
+    },
+    {
+      "library": "next",
+      "version": "15",
+      "topic": "15.md",
+      "url": "pack://nextjs-upgrade@0.3.0/references/15.md",
+      "content": "<!-- do not edit; generated from pack v0.3.0 -->\n\n# nextjs-upgrade 15\n\n- `next/async-cookies` (changed_behavior): cookies() is async\n- `next/async-draft-mode` (changed_behavior): draftMode() is async\n- `next/async-headers` (changed_behavior): headers() is async\n- `next/async-params` (changed_behavior): params is a Promise\n- `next/async-request-ip` (removed): NextRequest.ip is removed\n- `next/async-search-params` (changed_behavior): searchParams is a Promise\n- `next/bundlepagesrouterdependencies` (renamed): bundlePagesRouterDependencies\n- `next/nextrequest-geolocation` (removed): NextRequest Geolocation\n- `next/react-19` (peer_requirement): App Router requires React 19\n- `next/route-handlers` (changed_default): Route Handlers\n- `next/runtime-configuration-breaking-change` (removed): runtime configuration (Breaking change)\n- `next/serverexternalpackages` (renamed): serverExternalPackages\n",
+      "doc_id": "12991973739f2926f4e9cf1a26157f181418224e44a9446f9d496e8b015ba348",
+      "fetched_by": "knowledge",
+      "official": false,
+      "status": "unverified"
+    },
+    {
+      "library": "next",
+      "version": "16",
+      "topic": "unstable_rootParams",
+      "url": "https://nextjs.org/docs/app/guides/upgrading/version-16#unstable-rootparams",
+      "content": "unstable_rootParams\n\nunstable_rootParams is removed. Use next/root-params.\n\nold: unstable_rootParams from next/server\nnew: next/root-params\n\n",
+      "doc_id": "15978401376afbd141199a7491950dce8297f9452b833625150eb2c52993d7d9",
+      "fetched_by": "knowledge",
+      "official": true,
+      "status": "unverified"
+    },
+    {
+      "library": "next",
+      "version": "16",
+      "topic": "unstable_cacheLife",
+      "url": "https://nextjs.org/docs/app/guides/upgrading/version-16#cachelife-and-cachetag",
+      "content": "cacheLife and cacheTag\n\nunstable_cacheLife and unstable_cacheTag are stable; drop the unstable_ prefix.\n\nold: unstable_cacheLife and unstable_cacheTag\nnew: cacheLife and cacheTag\n\n",
+      "doc_id": "1dc4a24aa50f2cfbe498ea46efa003a4a4d7e7b321017e95b55793ee0ca2c937",
+      "fetched_by": "knowledge",
+      "official": true,
+      "status": "unverified"
+    },
+    {
+      "library": "next",
+      "version": "16",
+      "topic": "next/legacy/image",
+      "url": "https://nextjs.org/docs/app/guides/upgrading/version-16#next-legacy-image-component-deprecated",
+      "content": "next/legacy/image Component (deprecated)\n\nnext/legacy/image is deprecated.\n\nold: import Image from 'next/legacy/image'\nnew: import Image from 'next/image'\n\n",
+      "doc_id": "364bc1a47fcc353af3144f3ebe6463e72585a873ba69e7a3bc6cda5ef5ae9550",
+      "fetched_by": "knowledge",
+      "official": true,
+      "status": "unverified"
+    },
+    {
+      "library": "next",
+      "version": "16",
+      "topic": "revalidateTag",
+      "url": "https://nextjs.org/docs/app/guides/upgrading/version-16#revalidatetag",
+      "content": "revalidateTag\n\nrevalidateTag now requires a cacheLife profile as its second argument. The one-argument form is deprecated.\n\nold: revalidateTag('posts')\nnew: revalidateTag('posts', 'max')\n\n",
+      "doc_id": "5b2dea8367d14bd3a4ecfb93f19e68f8c4e0015d916b5d1bdfea3c7a843e54c1",
+      "fetched_by": "knowledge",
+      "official": true,
+      "status": "unverified"
+    },
+    {
+      "library": "next",
+      "version": "16",
+      "topic": "images.domains",
+      "url": "https://nextjs.org/docs/app/guides/upgrading/version-16#images-domains-configuration-deprecated",
+      "content": "images.domains Configuration (deprecated)\n\nimages.domains is deprecated in favour of images.remotePatterns.\n\nold: images.domains\nnew: images.remotePatterns\n\n",
+      "doc_id": "601107b9a15df169cd94e676b6c87645042a3bd0e8aa27970d8a695271cb9e14",
+      "fetched_by": "knowledge",
+      "official": true,
+      "status": "unverified"
+    },
+    {
+      "library": "next",
+      "version": "16",
+      "topic": "headers",
+      "url": "https://nextjs.org/docs/app/guides/upgrading/version-15#async-request-apis-breaking-change",
+      "content": "headers() is async\n\nheaders() from next/headers is asynchronous.\n\nold: const headersList = headers()\nnew: const headersList = await headers()\n\n",
+      "doc_id": "64f42f2555224e6a937eabe99435de49e4d6c1602cd9ad75df4d80cbd41210b5",
+      "fetched_by": "knowledge",
+      "official": true,
+      "status": "unverified"
+    },
+    {
+      "library": "next",
+      "version": "16",
+      "topic": "cookies",
+      "url": "https://nextjs.org/docs/app/guides/upgrading/version-15#async-request-apis-breaking-change",
+      "content": "cookies() is async\n\ncookies() from next/headers is asynchronous. A synchronous call warns, and the warning becomes an error in 16.\n\nold: const cookieStore = cookies()\nnew: const cookieStore = await cookies()\n\n",
+      "doc_id": "66ba5b870fc1d2c1e096cc2c1ef160324af2d55c9bea6bbf393dd051ab32a158",
+      "fetched_by": "knowledge",
+      "official": true,
+      "status": "unverified"
+    },
+    {
+      "library": "next",
+      "version": "16",
+      "topic": "searchParams",
+      "url": "https://nextjs.org/docs/app/guides/upgrading/version-15#async-request-apis-breaking-change",
+      "content": "searchParams is a Promise\n\nsearchParams in page props is a Promise.\n\nold: const { q } = searchParams\nnew: const { q } = await searchParams\n\n",
+      "doc_id": "69f32c2ce28e3137602781ec716afc58819c85105b258091d86a84e1b5faa8dd",
+      "fetched_by": "knowledge",
+      "official": true,
+      "status": "unverified"
+    },
+    {
+      "library": "next",
+      "version": "16",
+      "topic": "codemods.md",
+      "url": "pack://nextjs-upgrade@0.3.0/references/codemods.md",
+      "content": "<!-- do not edit; generated from pack v0.3.0 -->\n\n# Codemods\n\n- `next-codemod:app-dir-runtime-config-experimental-edge`: next/runtime-configuration-breaking-change\n- `next-codemod:built-in-next-font`: next/the-next-font-package-has-been-fully-removed-in-favor-of-the\n- `next-codemod:metadata-to-viewport-export`: no reviewed rule names it\n- `next-codemod:middleware-to-proxy`: next/middleware-to-proxy\n- `next-codemod:next-async-request-api`: next/async-cookies, next/async-draft-mode, next/async-headers, next/async-params, next/async-search-params\n- `next-codemod:next-lint-to-eslint-cli`: next/next-lint-command\n- `next-codemod:next-og-import`: no reviewed rule names it\n- `next-codemod:next-request-geo-ip`: next/async-request-ip, next/nextrequest-geolocation\n- `next-codemod:remove-experimental-ppr`: no reviewed rule names it\n- `next-codemod:remove-unstable-prefix`: next/cachelife-and-cachetag\n- `next-codemod:upgrade`: no reviewed rule names it\n- `react-codemod:migration-recipe-19`: no reviewed rule names it\n- `react-codemod:prop-types-typescript`: no reviewed rule names it\n- `react-codemod:replace-act-import`: react/removed-react-dom-test-utils\n- `react-codemod:replace-reactdom-render`: react/removed-reactdom-hydrate, react/removed-reactdom-render, react/removed-unmountcomponentatnode\n- `react-codemod:replace-string-ref`: react/removed-string-refs\n- `react-codemod:replace-use-form-state`: no reviewed rule names it\n- `types-react-codemod:no-implicit-ref-callback-return`: no reviewed rule names it\n- `types-react-codemod:preset-19`: react/the-jsx-namespace-in-typescript\n- `types-react-codemod:refobject-defaults`: react/useref-requires-an-argument\n",
+      "doc_id": "72a67f34befeb2966cf5223217ce1f0081e8caf21051b77c9be35d7d994f1cfc",
+      "fetched_by": "knowledge",
+      "official": false,
+      "status": "unverified"
+    },
+    {
+      "library": "next",
+      "version": "16",
+      "topic": "~",
+      "url": "https://nextjs.org/docs/app/guides/upgrading/version-16#sass-node-modules-imports",
+      "content": "Sass node_modules imports\n\nTurbopack does not support the tilde prefix on Sass imports.\n\nold: @import '~bootstrap/dist/css/bootstrap.min.css'\nnew: @import 'bootstrap/dist/css/bootstrap.min.css'\n\n",
+      "doc_id": "72e8c8805992431e6c1d6cc20e20b033d973c3bab9cf5f2f8446a2486208a353",
+      "fetched_by": "knowledge",
+      "official": true,
+      "status": "unverified"
+    },
+    {
+      "library": "next",
+      "version": "16",
+      "topic": "middleware",
+      "url": "https://nextjs.org/docs/app/guides/upgrading/version-16#middleware-to-proxy",
+      "content": "middleware to proxy\n\nThe middleware file is deprecated and renamed to proxy. The edge runtime is not supported in proxy.\n\nold: middleware.ts\nnew: proxy.ts\n\n",
+      "doc_id": "831a1b0ff96c3dd4256f3523bf9a281cc444881370b9b0b530af972bc638e1d8",
+      "fetched_by": "knowledge",
+      "official": true,
+      "status": "unverified"
+    },
+    {
+      "library": "next",
+      "version": "16",
+      "topic": "experimental.useCache",
+      "url": "https://nextjs.org/docs/app/guides/upgrading/version-16#experimental-dynamicio-and-experimental-usecache",
+      "content": "experimental.dynamicIO and experimental.useCache\n\nexperimental.dynamicIO and experimental.useCache are removed. cacheComponents is the replacement, and it is not a rename-only change.\n\nold: experimental.useCache\nnew: cacheComponents, after adopting the Cache Components model\n\n",
+      "doc_id": "a39b500a91d5a58b4b1f53bd16ffbf154ce739b56e8dfa84f90058c91557d46a",
+      "fetched_by": "knowledge",
+      "official": true,
+      "status": "unverified"
+    },
+    {
+      "library": "next",
+      "version": "16",
+      "topic": "params",
+      "url": "https://nextjs.org/docs/app/guides/upgrading/version-15#async-request-apis-breaking-change",
+      "content": "params is a Promise\n\nparams in page, layout and route props is a Promise.\n\nold: const { slug } = params\nnew: const { slug } = await params\n\n",
+      "doc_id": "a4b3d590c2c78f791e41c39183b848272cdd7c9ce52d019ca79af2e176ff9560",
+      "fetched_by": "knowledge",
+      "official": true,
+      "status": "unverified"
+    },
+    {
+      "library": "next",
+      "version": "16",
+      "topic": "draftMode",
+      "url": "https://nextjs.org/docs/app/guides/upgrading/version-15#async-request-apis-breaking-change",
+      "content": "draftMode() is async\n\ndraftMode() from next/headers is asynchronous.\n\nold: const { isEnabled } = draftMode()\nnew: const { isEnabled } = await draftMode()\n\n",
+      "doc_id": "d116c74284f6544f8919c5f8c89999c040146da6fc61470bb4ee2d37a7feb759",
+      "fetched_by": "knowledge",
+      "official": true,
+      "status": "unverified"
+    },
+    {
+      "library": "next",
+      "version": "16",
+      "topic": "16.md",
+      "url": "pack://nextjs-upgrade@0.3.0/references/16.md",
+      "content": "<!-- do not edit; generated from pack v0.3.0 -->\n\n# nextjs-upgrade 16\n\n- `next/amp-support` (removed): AMP Support\n- `next/cachelife-and-cachetag` (renamed): cacheLife and cacheTag\n- `next/devindicators-options` (removed): devIndicators Options\n- `next/experimental-dynamicio-and-experimental-usecache` (removed): experimental.dynamicIO and experimental.useCache\n- `next/images-domains-configuration-deprecated` (deprecated): images.domains Configuration (deprecated)\n- `next/middleware-to-proxy` (deprecated): middleware to proxy\n- `next/next-legacy-image-component-deprecated` (deprecated): next/legacy/image Component (deprecated)\n- `next/next-lint-command` (removed): next lint Command\n- `next/parallel-routes-default-js-requirement` (changed_behavior): Parallel Routes default.js requirement\n- `next/revalidatetag` (changed_behavior): revalidateTag\n- `next/runtime-configuration` (removed): Runtime Configuration\n- `next/sass-node-modules-imports` (removed): Sass node_modules imports\n- `next/unstable-rootparams` (removed): unstable_rootParams\n",
+      "doc_id": "d406c65e47cb47a006b00065d0d3839003ae08370f76499fa563e9fdef324806",
+      "fetched_by": "knowledge",
+      "official": false,
+      "status": "unverified"
+    },
+    {
+      "library": "next",
+      "version": "16",
+      "topic": "next lint",
+      "url": "https://nextjs.org/docs/app/guides/upgrading/version-16#next-lint-command",
+      "content": "next lint Command\n\nThe next lint command is removed. Use ESLint or Biome directly. next build no longer runs lint.\n\nold: next lint\nnew: the ESLint CLI\n\n",
+      "doc_id": "ed6dac3e7084c72c8b88dc79356f0519213ee6b32d706fd9e0e02572d3a30b24",
+      "fetched_by": "knowledge",
+      "official": true,
+      "status": "unverified"
+    },
+    {
+      "library": "next",
+      "version": "16",
+      "topic": "**/@*/**",
+      "url": "https://nextjs.org/docs/app/guides/upgrading/version-16#parallel-routes-default-js-requirement",
+      "content": "Parallel Routes default.js requirement\n\nEvery parallel route slot needs an explicit default.js. The build fails without it.\n\nold: a parallel slot with no default file\nnew: default.js that calls notFound() or returns null\n\n",
+      "doc_id": "fba6099169dd353974885be08654f90077eb93dc8afc905ee2be16c9171003a9",
+      "fetched_by": "knowledge",
+      "official": true,
+      "status": "unverified"
+    },
+    {
+      "library": "next",
+      "version": "16",
+      "topic": "next/config",
+      "url": "https://nextjs.org/docs/app/guides/upgrading/version-16#runtime-configuration",
+      "content": "Runtime Configuration\n\nserverRuntimeConfig and publicRuntimeConfig are removed. Use environment variables.\n\nold: publicRuntimeConfig\nnew: an environment variable, with the NEXT_PUBLIC_ prefix when the client reads it\n\n",
+      "doc_id": "ff1dd0c09625d47f3f0c42b83d3dd86d818bab3135ed0fcd6757ca230a09aec7",
+      "fetched_by": "knowledge",
+      "official": true,
+      "status": "unverified"
+    }
+  ],
+  "rounds": [
+    {
+      "submissions": [
+        {
+          "lens": "api",
+          "packet_usages": [
+            {
+              "file": "app/web/features/search/ZoomControl.tsx",
+              "line_start": 13,
+              "line_end": 13,
+              "snippet_hash": "7096d3afd8ba44bd64d0760a0e0ba8a14d5b67e56cf813a0bf1e4fbba1878dfd",
+              "usage_id": "15eef54109bc243fcd76eb61"
+            },
+            {
+              "file": "app/web/middleware.ts",
+              "line_start": 95,
+              "line_end": 95,
+              "snippet_hash": "8ce7d3ff32fa52324dc3a910a4af4a7d538074f2b1fe2e63f1c97edf7b6449bf",
+              "usage_id": "d3ac1d0bd3e6badb6063ef39"
+            },
+            {
+              "file": "app/web/utils/hooks.ts",
+              "line_start": 42,
+              "line_end": 42,
+              "snippet_hash": "edd80beef21d1f73d2d9c35f4370be9e4e3c022ee9cfa8187246340415c25262",
+              "usage_id": "bb236fd1d2805b223c167640"
+            }
+          ],
+          "submission": {
+            "findings": [
+              {
+                "id": "api-15eef54109bc243fcd76eb61",
+                "repo_id": "7ff7e562c62327c5",
+                "lens": "api",
+                "concern": "api_change",
+                "severity": "high",
+                "evidence": [
+                  {
+                    "repo_id": "7ff7e562c62327c5",
+                    "file": "app/web/features/search/ZoomControl.tsx",
+                    "line_start": 13,
+                    "line_end": 13,
+                    "snippet_hash": "7096d3afd8ba44bd64d0760a0e0ba8a14d5b67e56cf813a0bf1e4fbba1878dfd"
+                  }
+                ],
+                "doc_refs": [],
+                "reasoning": "AMP Support: AMP support is removed, including the next/amp import, the amp config and the pages amp config export.",
+                "action": "Update to: no AMP API",
+                "step_kind": "manual",
+                "verify": "Load the affected page or run the build, and confirm the new behaviour.",
+                "confidence": 0.85,
+                "source": "rule_pack",
+                "usage_ids": [
+                  "15eef54109bc243fcd76eb61"
+                ],
+                "docs_status": "unverified",
+                "prompt_version": "v1",
+                "rule_id": "next/amp-support"
+              },
+              {
+                "id": "api-d3ac1d0bd3e6badb6063ef39",
+                "repo_id": "7ff7e562c62327c5",
+                "lens": "api",
+                "concern": "api_change",
+                "severity": "high",
+                "evidence": [
+                  {
+                    "repo_id": "7ff7e562c62327c5",
+                    "file": "app/web/middleware.ts",
+                    "line_start": 95,
+                    "line_end": 95,
+                    "snippet_hash": "8ce7d3ff32fa52324dc3a910a4af4a7d538074f2b1fe2e63f1c97edf7b6449bf"
+                  }
+                ],
+                "doc_refs": [],
+                "reasoning": "middleware to proxy: The middleware file is deprecated and renamed to proxy. The edge runtime is not supported in proxy.",
+                "action": "Update to: proxy.ts",
+                "step_kind": "codemod",
+                "verify": "Load the affected page or run the build, and confirm the new behaviour.",
+                "confidence": 0.85,
+                "source": "rule_pack",
+                "usage_ids": [
+                  "d3ac1d0bd3e6badb6063ef39"
+                ],
+                "docs_status": "unverified",
+                "prompt_version": "v1",
+                "rule_id": "next/middleware-to-proxy",
+                "codemod": "next-codemod:middleware-to-proxy",
+                "rollback": "Return to the previous release of the library."
+              },
+              {
+                "id": "api-bb236fd1d2805b223c167640",
+                "repo_id": "7ff7e562c62327c5",
+                "lens": "api",
+                "concern": "api_change",
+                "severity": "high",
+                "evidence": [
+                  {
+                    "repo_id": "7ff7e562c62327c5",
+                    "file": "app/web/utils/hooks.ts",
+                    "line_start": 42,
+                    "line_end": 42,
+                    "snippet_hash": "edd80beef21d1f73d2d9c35f4370be9e4e3c022ee9cfa8187246340415c25262"
+                  }
+                ],
+                "doc_refs": [],
+                "reasoning": "AMP Support: AMP support is removed, including the next/amp import, the amp config and the pages amp config export.",
+                "action": "Update to: no AMP API",
+                "step_kind": "manual",
+                "verify": "Load the affected page or run the build, and confirm the new behaviour.",
+                "confidence": 0.85,
+                "source": "rule_pack",
+                "usage_ids": [
+                  "bb236fd1d2805b223c167640"
+                ],
+                "docs_status": "unverified",
+                "prompt_version": "v1",
+                "rule_id": "next/amp-support"
+              }
+            ],
+            "out_of_scope": []
+          }
+        },
+        {
+          "lens": "dependency_build",
+          "packet_usages": [
+            {
+              "file": "app/web/next.config.js",
+              "line_start": 103,
+              "line_end": 103,
+              "snippet_hash": "5de01187405bc513981b86c96bb532722b72cb9f8615d0e3ff4a3c2abf842239",
+              "usage_id": "175b1092fb6d1e99115250d7"
+            },
+            {
+              "file": "app/web/next.config.js",
+              "line_start": 105,
+              "line_end": 105,
+              "snippet_hash": "c15b85cc0045c676eac81355c0b39c9b26637b0246a8f9f5680ffe0b34b3f954",
+              "usage_id": "570dc766c0f73f7ef428fb60"
+            },
+            {
+              "file": "app/web/next.config.js",
+              "line_start": 108,
+              "line_end": 108,
+              "snippet_hash": "58549d2689cda2725c6e9c098a8910e905eca8caa02aa90ce0d25682e5a8a683",
+              "usage_id": "17b090191e816758a3cf1d10"
+            },
+            {
+              "file": "app/web/next.config.js",
+              "line_start": 111,
+              "line_end": 111,
+              "snippet_hash": "f0368c3d187e3d67ddd85a9911b1f865590d411740a2224345a9d41da6c7f929",
+              "usage_id": "aad326204f823e4a4ee26e87"
+            },
+            {
+              "file": "app/web/next.config.js",
+              "line_start": 112,
+              "line_end": 112,
+              "snippet_hash": "c4be04b69c6e2cb93edf331e6b36e0b549cd5b19b8aebb0b26387607e7f2022f",
+              "usage_id": "5f0ca6d45252c93ae5f0cace"
+            },
+            {
+              "file": "app/web/next.config.js",
+              "line_start": 114,
+              "line_end": 114,
+              "snippet_hash": "3a1518b001a9a830513ba1f2357a18f724de1f56d18f2dac66d6df78fcf5a77b",
+              "usage_id": "41ea8afa0bbe811a994da3bc"
+            },
+            {
+              "file": "app/web/next.config.js",
+              "line_start": 117,
+              "line_end": 117,
+              "snippet_hash": "852ba185b15f334047e1aaad277607f4481aa4dcd5aac42454ff478c76aead3c",
+              "usage_id": "f495b600985a14093cbf2109"
+            },
+            {
+              "file": "app/web/next.config.js",
+              "line_start": 119,
+              "line_end": 119,
+              "snippet_hash": "609cab2ff96ae264a038b3c1ab14d47ecb1d650c62ac9125c32f345321f7e091",
+              "usage_id": "8603fc8595a8ddd7785a6b09"
+            },
+            {
+              "file": "app/web/next.config.js",
+              "line_start": 121,
+              "line_end": 121,
+              "snippet_hash": "d10a1f6febd43fc21c77717a05e016d90eb582b314f2af2045c7094505609c00",
+              "usage_id": "035397b62681d4354ea11974"
+            },
+            {
+              "file": "app/web/next.config.js",
+              "line_start": 121,
+              "line_end": 121,
+              "snippet_hash": "d10a1f6febd43fc21c77717a05e016d90eb582b314f2af2045c7094505609c00",
+              "usage_id": "171695ee9677add205a2b1ea"
+            },
+            {
+              "file": "app/web/package.json",
+              "line_start": 58,
+              "line_end": 58,
+              "snippet_hash": "7d03dcaf7e01bea04ef5c447075e0cb8569309cae01575c094c4c1545ccb7e24",
+              "usage_id": "b88223dd600c7304877dd3b9"
+            },
+            {
+              "file": "app/web/package.json",
+              "line_start": 60,
+              "line_end": 60,
+              "snippet_hash": "c3a964380543283df20b60dc08ff446f68db2b90d13f39231ee077643adddb4d",
+              "usage_id": "4f1e8bd9809fbabc5c6694f6"
+            },
+            {
+              "file": "app/web/package.json",
+              "line_start": 61,
+              "line_end": 61,
+              "snippet_hash": "f571ca341b028799c3f220f43b34b74ad47708f989d1996a80a0e155934bad36",
+              "usage_id": "3182b029dd3ef8bb4699edef"
+            },
+            {
+              "file": "app/web/package.json",
+              "line_start": 88,
+              "line_end": 88,
+              "snippet_hash": "5a53b572c5a6f32be78098c252f0f52e45117813363e14d2ffb5f653ed01fed6",
+              "usage_id": "3bb7f232e770f80a500ddb22"
+            },
+            {
+              "file": "app/web/package.json",
+              "line_start": 89,
+              "line_end": 89,
+              "snippet_hash": "e9661c1a5641214f4c97817607cac54878f13a82106f9e1af95fcf22416472b9",
+              "usage_id": "25961f7660d11decdf13346e"
+            },
+            {
+              "file": "app/web/package.json",
+              "line_start": 97,
+              "line_end": 97,
+              "snippet_hash": "ca0fa47b6d5645cc05853e8547535d3a5315ce25fc1c2f4bd6b91cc95eee5d97",
+              "usage_id": "bd48a46ca7660f7b4f1f51de"
+            },
+            {
+              "file": "app/web/package.json",
+              "line_start": 110,
+              "line_end": 110,
+              "snippet_hash": "edf2e30c4bfb54bc8e0cec7759d49b8cd122f2cdf6d76edbc2b2d44ec11df2f1",
+              "usage_id": "bf42ec6bcb0e65db352c81e3"
+            }
+          ],
+          "submission": {
+            "findings": [
+              {
+                "id": "dependency_build-175b1092fb6d1e99115250d7",
+                "repo_id": "7ff7e562c62327c5",
+                "lens": "dependency_build",
+                "concern": "dependency",
+                "severity": "low",
+                "evidence": [
+                  {
+                    "repo_id": "7ff7e562c62327c5",
+                    "file": "app/web/next.config.js",
+                    "line_start": 103,
+                    "line_end": 103,
+                    "snippet_hash": "5de01187405bc513981b86c96bb532722b72cb9f8615d0e3ff4a3c2abf842239"
+                  }
+                ],
+                "doc_refs": [],
+                "reasoning": "devIndicators Options: devIndicators options appIsrStatus, buildActivity and buildActivityPosition are removed.",
+                "action": "Update to: the remaining devIndicators indicator",
+                "step_kind": "manual",
+                "verify": "Load the affected page or run the build, and confirm the new behaviour.",
+                "confidence": 0.85,
+                "source": "rule_pack",
+                "usage_ids": [
+                  "175b1092fb6d1e99115250d7"
+                ],
+                "docs_status": "unverified",
+                "prompt_version": "v1",
+                "rule_id": "next/devindicators-options"
+              },
+              {
+                "id": "dependency_build-570dc766c0f73f7ef428fb60",
+                "repo_id": "7ff7e562c62327c5",
+                "lens": "dependency_build",
+                "concern": "dependency",
+                "severity": "low",
+                "evidence": [
+                  {
+                    "repo_id": "7ff7e562c62327c5",
+                    "file": "app/web/next.config.js",
+                    "line_start": 105,
+                    "line_end": 105,
+                    "snippet_hash": "c15b85cc0045c676eac81355c0b39c9b26637b0246a8f9f5680ffe0b34b3f954"
+                  }
+                ],
+                "doc_refs": [],
+                "reasoning": "devIndicators Options: devIndicators options appIsrStatus, buildActivity and buildActivityPosition are removed.",
+                "action": "Update to: the remaining devIndicators indicator",
+                "step_kind": "manual",
+                "verify": "Load the affected page or run the build, and confirm the new behaviour.",
+                "confidence": 0.85,
+                "source": "rule_pack",
+                "usage_ids": [
+                  "570dc766c0f73f7ef428fb60"
+                ],
+                "docs_status": "unverified",
+                "prompt_version": "v1",
+                "rule_id": "next/devindicators-options"
+              },
+              {
+                "id": "dependency_build-17b090191e816758a3cf1d10",
+                "repo_id": "7ff7e562c62327c5",
+                "lens": "dependency_build",
+                "concern": "dependency",
+                "severity": "low",
+                "evidence": [
+                  {
+                    "repo_id": "7ff7e562c62327c5",
+                    "file": "app/web/next.config.js",
+                    "line_start": 108,
+                    "line_end": 108,
+                    "snippet_hash": "58549d2689cda2725c6e9c098a8910e905eca8caa02aa90ce0d25682e5a8a683"
+                  }
+                ],
+                "doc_refs": [],
+                "reasoning": "devIndicators Options: devIndicators options appIsrStatus, buildActivity and buildActivityPosition are removed.",
+                "action": "Update to: the remaining devIndicators indicator",
+                "step_kind": "manual",
+                "verify": "Load the affected page or run the build, and confirm the new behaviour.",
+                "confidence": 0.85,
+                "source": "rule_pack",
+                "usage_ids": [
+                  "17b090191e816758a3cf1d10"
+                ],
+                "docs_status": "unverified",
+                "prompt_version": "v1",
+                "rule_id": "next/devindicators-options"
+              },
+              {
+                "id": "dependency_build-aad326204f823e4a4ee26e87",
+                "repo_id": "7ff7e562c62327c5",
+                "lens": "dependency_build",
+                "concern": "dependency",
+                "severity": "low",
+                "evidence": [
+                  {
+                    "repo_id": "7ff7e562c62327c5",
+                    "file": "app/web/next.config.js",
+                    "line_start": 111,
+                    "line_end": 111,
+                    "snippet_hash": "f0368c3d187e3d67ddd85a9911b1f865590d411740a2224345a9d41da6c7f929"
+                  }
+                ],
+                "doc_refs": [],
+                "reasoning": "devIndicators Options: devIndicators options appIsrStatus, buildActivity and buildActivityPosition are removed.",
+                "action": "Update to: the remaining devIndicators indicator",
+                "step_kind": "manual",
+                "verify": "Load the affected page or run the build, and confirm the new behaviour.",
+                "confidence": 0.85,
+                "source": "rule_pack",
+                "usage_ids": [
+                  "aad326204f823e4a4ee26e87"
+                ],
+                "docs_status": "unverified",
+                "prompt_version": "v1",
+                "rule_id": "next/devindicators-options"
+              },
+              {
+                "id": "dependency_build-5f0ca6d45252c93ae5f0cace",
+                "repo_id": "7ff7e562c62327c5",
+                "lens": "dependency_build",
+                "concern": "dependency",
+                "severity": "low",
+                "evidence": [
+                  {
+                    "repo_id": "7ff7e562c62327c5",
+                    "file": "app/web/next.config.js",
+                    "line_start": 112,
+                    "line_end": 112,
+                    "snippet_hash": "c4be04b69c6e2cb93edf331e6b36e0b549cd5b19b8aebb0b26387607e7f2022f"
+                  }
+                ],
+                "doc_refs": [],
+                "reasoning": "devIndicators Options: devIndicators options appIsrStatus, buildActivity and buildActivityPosition are removed.",
+                "action": "Update to: the remaining devIndicators indicator",
+                "step_kind": "manual",
+                "verify": "Load the affected page or run the build, and confirm the new behaviour.",
+                "confidence": 0.85,
+                "source": "rule_pack",
+                "usage_ids": [
+                  "5f0ca6d45252c93ae5f0cace"
+                ],
+                "docs_status": "unverified",
+                "prompt_version": "v1",
+                "rule_id": "next/devindicators-options"
+              },
+              {
+                "id": "dependency_build-41ea8afa0bbe811a994da3bc",
+                "repo_id": "7ff7e562c62327c5",
+                "lens": "dependency_build",
+                "concern": "dependency",
+                "severity": "low",
+                "evidence": [
+                  {
+                    "repo_id": "7ff7e562c62327c5",
+                    "file": "app/web/next.config.js",
+                    "line_start": 114,
+                    "line_end": 114,
+                    "snippet_hash": "3a1518b001a9a830513ba1f2357a18f724de1f56d18f2dac66d6df78fcf5a77b"
+                  }
+                ],
+                "doc_refs": [],
+                "reasoning": "devIndicators Options: devIndicators options appIsrStatus, buildActivity and buildActivityPosition are removed.",
+                "action": "Update to: the remaining devIndicators indicator",
+                "step_kind": "manual",
+                "verify": "Load the affected page or run the build, and confirm the new behaviour.",
+                "confidence": 0.85,
+                "source": "rule_pack",
+                "usage_ids": [
+                  "41ea8afa0bbe811a994da3bc"
+                ],
+                "docs_status": "unverified",
+                "prompt_version": "v1",
+                "rule_id": "next/devindicators-options"
+              },
+              {
+                "id": "dependency_build-f495b600985a14093cbf2109",
+                "repo_id": "7ff7e562c62327c5",
+                "lens": "dependency_build",
+                "concern": "dependency",
+                "severity": "low",
+                "evidence": [
+                  {
+                    "repo_id": "7ff7e562c62327c5",
+                    "file": "app/web/next.config.js",
+                    "line_start": 117,
+                    "line_end": 117,
+                    "snippet_hash": "852ba185b15f334047e1aaad277607f4481aa4dcd5aac42454ff478c76aead3c"
+                  }
+                ],
+                "doc_refs": [],
+                "reasoning": "devIndicators Options: devIndicators options appIsrStatus, buildActivity and buildActivityPosition are removed.",
+                "action": "Update to: the remaining devIndicators indicator",
+                "step_kind": "manual",
+                "verify": "Load the affected page or run the build, and confirm the new behaviour.",
+                "confidence": 0.85,
+                "source": "rule_pack",
+                "usage_ids": [
+                  "f495b600985a14093cbf2109"
+                ],
+                "docs_status": "unverified",
+                "prompt_version": "v1",
+                "rule_id": "next/devindicators-options"
+              },
+              {
+                "id": "dependency_build-8603fc8595a8ddd7785a6b09",
+                "repo_id": "7ff7e562c62327c5",
+                "lens": "dependency_build",
+                "concern": "dependency",
+                "severity": "low",
+                "evidence": [
+                  {
+                    "repo_id": "7ff7e562c62327c5",
+                    "file": "app/web/next.config.js",
+                    "line_start": 119,
+                    "line_end": 119,
+                    "snippet_hash": "609cab2ff96ae264a038b3c1ab14d47ecb1d650c62ac9125c32f345321f7e091"
+                  }
+                ],
+                "doc_refs": [],
+                "reasoning": "devIndicators Options: devIndicators options appIsrStatus, buildActivity and buildActivityPosition are removed.",
+                "action": "Update to: the remaining devIndicators indicator",
+                "step_kind": "manual",
+                "verify": "Load the affected page or run the build, and confirm the new behaviour.",
+                "confidence": 0.85,
+                "source": "rule_pack",
+                "usage_ids": [
+                  "8603fc8595a8ddd7785a6b09"
+                ],
+                "docs_status": "unverified",
+                "prompt_version": "v1",
+                "rule_id": "next/devindicators-options"
+              },
+              {
+                "id": "dependency_build-035397b62681d4354ea11974",
+                "repo_id": "7ff7e562c62327c5",
+                "lens": "dependency_build",
+                "concern": "dependency",
+                "severity": "low",
+                "evidence": [
+                  {
+                    "repo_id": "7ff7e562c62327c5",
+                    "file": "app/web/next.config.js",
+                    "line_start": 121,
+                    "line_end": 121,
+                    "snippet_hash": "d10a1f6febd43fc21c77717a05e016d90eb582b314f2af2045c7094505609c00"
+                  }
+                ],
+                "doc_refs": [],
+                "reasoning": "devIndicators Options: devIndicators options appIsrStatus, buildActivity and buildActivityPosition are removed.",
+                "action": "Update to: the remaining devIndicators indicator",
+                "step_kind": "manual",
+                "verify": "Load the affected page or run the build, and confirm the new behaviour.",
+                "confidence": 0.85,
+                "source": "rule_pack",
+                "usage_ids": [
+                  "035397b62681d4354ea11974"
+                ],
+                "docs_status": "unverified",
+                "prompt_version": "v1",
+                "rule_id": "next/devindicators-options"
+              },
+              {
+                "id": "dependency_build-171695ee9677add205a2b1ea",
+                "repo_id": "7ff7e562c62327c5",
+                "lens": "dependency_build",
+                "concern": "dependency",
+                "severity": "low",
+                "evidence": [
+                  {
+                    "repo_id": "7ff7e562c62327c5",
+                    "file": "app/web/next.config.js",
+                    "line_start": 121,
+                    "line_end": 121,
+                    "snippet_hash": "d10a1f6febd43fc21c77717a05e016d90eb582b314f2af2045c7094505609c00"
+                  }
+                ],
+                "doc_refs": [],
+                "reasoning": "devIndicators Options: devIndicators options appIsrStatus, buildActivity and buildActivityPosition are removed.",
+                "action": "Update to: the remaining devIndicators indicator",
+                "step_kind": "manual",
+                "verify": "Load the affected page or run the build, and confirm the new behaviour.",
+                "confidence": 0.85,
+                "source": "rule_pack",
+                "usage_ids": [
+                  "171695ee9677add205a2b1ea"
+                ],
+                "docs_status": "unverified",
+                "prompt_version": "v1",
+                "rule_id": "next/devindicators-options"
+              },
+              {
+                "id": "dependency_build-b88223dd600c7304877dd3b9",
+                "repo_id": "7ff7e562c62327c5",
+                "lens": "dependency_build",
+                "concern": "dependency",
+                "severity": "low",
+                "evidence": [
+                  {
+                    "repo_id": "7ff7e562c62327c5",
+                    "file": "app/web/package.json",
+                    "line_start": 58,
+                    "line_end": 58,
+                    "snippet_hash": "7d03dcaf7e01bea04ef5c447075e0cb8569309cae01575c094c4c1545ccb7e24"
+                  }
+                ],
+                "doc_refs": [],
+                "reasoning": "devIndicators Options: devIndicators options appIsrStatus, buildActivity and buildActivityPosition are removed.",
+                "action": "Update to: the remaining devIndicators indicator",
+                "step_kind": "manual",
+                "verify": "Load the affected page or run the build, and confirm the new behaviour.",
+                "confidence": 0.85,
+                "source": "rule_pack",
+                "usage_ids": [
+                  "b88223dd600c7304877dd3b9"
+                ],
+                "docs_status": "unverified",
+                "prompt_version": "v1",
+                "rule_id": "next/devindicators-options"
+              },
+              {
+                "id": "dependency_build-4f1e8bd9809fbabc5c6694f6",
+                "repo_id": "7ff7e562c62327c5",
+                "lens": "dependency_build",
+                "concern": "dependency",
+                "severity": "low",
+                "evidence": [
+                  {
+                    "repo_id": "7ff7e562c62327c5",
+                    "file": "app/web/package.json",
+                    "line_start": 60,
+                    "line_end": 60,
+                    "snippet_hash": "c3a964380543283df20b60dc08ff446f68db2b90d13f39231ee077643adddb4d"
+                  }
+                ],
+                "doc_refs": [],
+                "reasoning": "devIndicators Options: devIndicators options appIsrStatus, buildActivity and buildActivityPosition are removed.",
+                "action": "Update to: the remaining devIndicators indicator",
+                "step_kind": "manual",
+                "verify": "Load the affected page or run the build, and confirm the new behaviour.",
+                "confidence": 0.85,
+                "source": "rule_pack",
+                "usage_ids": [
+                  "4f1e8bd9809fbabc5c6694f6"
+                ],
+                "docs_status": "unverified",
+                "prompt_version": "v1",
+                "rule_id": "next/devindicators-options"
+              },
+              {
+                "id": "dependency_build-3182b029dd3ef8bb4699edef",
+                "repo_id": "7ff7e562c62327c5",
+                "lens": "dependency_build",
+                "concern": "dependency",
+                "severity": "low",
+                "evidence": [
+                  {
+                    "repo_id": "7ff7e562c62327c5",
+                    "file": "app/web/package.json",
+                    "line_start": 61,
+                    "line_end": 61,
+                    "snippet_hash": "f571ca341b028799c3f220f43b34b74ad47708f989d1996a80a0e155934bad36"
+                  }
+                ],
+                "doc_refs": [],
+                "reasoning": "devIndicators Options: devIndicators options appIsrStatus, buildActivity and buildActivityPosition are removed.",
+                "action": "Update to: the remaining devIndicators indicator",
+                "step_kind": "manual",
+                "verify": "Load the affected page or run the build, and confirm the new behaviour.",
+                "confidence": 0.85,
+                "source": "rule_pack",
+                "usage_ids": [
+                  "3182b029dd3ef8bb4699edef"
+                ],
+                "docs_status": "unverified",
+                "prompt_version": "v1",
+                "rule_id": "next/devindicators-options"
+              },
+              {
+                "id": "dependency_build-3bb7f232e770f80a500ddb22",
+                "repo_id": "7ff7e562c62327c5",
+                "lens": "dependency_build",
+                "concern": "dependency",
+                "severity": "low",
+                "evidence": [
+                  {
+                    "repo_id": "7ff7e562c62327c5",
+                    "file": "app/web/package.json",
+                    "line_start": 88,
+                    "line_end": 88,
+                    "snippet_hash": "5a53b572c5a6f32be78098c252f0f52e45117813363e14d2ffb5f653ed01fed6"
+                  }
+                ],
+                "doc_refs": [],
+                "reasoning": "devIndicators Options: devIndicators options appIsrStatus, buildActivity and buildActivityPosition are removed.",
+                "action": "Update to: the remaining devIndicators indicator",
+                "step_kind": "manual",
+                "verify": "Load the affected page or run the build, and confirm the new behaviour.",
+                "confidence": 0.85,
+                "source": "rule_pack",
+                "usage_ids": [
+                  "3bb7f232e770f80a500ddb22"
+                ],
+                "docs_status": "unverified",
+                "prompt_version": "v1",
+                "rule_id": "next/devindicators-options"
+              },
+              {
+                "id": "dependency_build-25961f7660d11decdf13346e",
+                "repo_id": "7ff7e562c62327c5",
+                "lens": "dependency_build",
+                "concern": "dependency",
+                "severity": "low",
+                "evidence": [
+                  {
+                    "repo_id": "7ff7e562c62327c5",
+                    "file": "app/web/package.json",
+                    "line_start": 89,
+                    "line_end": 89,
+                    "snippet_hash": "e9661c1a5641214f4c97817607cac54878f13a82106f9e1af95fcf22416472b9"
+                  }
+                ],
+                "doc_refs": [],
+                "reasoning": "devIndicators Options: devIndicators options appIsrStatus, buildActivity and buildActivityPosition are removed.",
+                "action": "Update to: the remaining devIndicators indicator",
+                "step_kind": "manual",
+                "verify": "Load the affected page or run the build, and confirm the new behaviour.",
+                "confidence": 0.85,
+                "source": "rule_pack",
+                "usage_ids": [
+                  "25961f7660d11decdf13346e"
+                ],
+                "docs_status": "unverified",
+                "prompt_version": "v1",
+                "rule_id": "next/devindicators-options"
+              },
+              {
+                "id": "dependency_build-bd48a46ca7660f7b4f1f51de",
+                "repo_id": "7ff7e562c62327c5",
+                "lens": "dependency_build",
+                "concern": "dependency",
+                "severity": "low",
+                "evidence": [
+                  {
+                    "repo_id": "7ff7e562c62327c5",
+                    "file": "app/web/package.json",
+                    "line_start": 97,
+                    "line_end": 97,
+                    "snippet_hash": "ca0fa47b6d5645cc05853e8547535d3a5315ce25fc1c2f4bd6b91cc95eee5d97"
+                  }
+                ],
+                "doc_refs": [],
+                "reasoning": "devIndicators Options: devIndicators options appIsrStatus, buildActivity and buildActivityPosition are removed.",
+                "action": "Update to: the remaining devIndicators indicator",
+                "step_kind": "manual",
+                "verify": "Load the affected page or run the build, and confirm the new behaviour.",
+                "confidence": 0.85,
+                "source": "rule_pack",
+                "usage_ids": [
+                  "bd48a46ca7660f7b4f1f51de"
+                ],
+                "docs_status": "unverified",
+                "prompt_version": "v1",
+                "rule_id": "next/devindicators-options"
+              },
+              {
+                "id": "dependency_build-bf42ec6bcb0e65db352c81e3",
+                "repo_id": "7ff7e562c62327c5",
+                "lens": "dependency_build",
+                "concern": "dependency",
+                "severity": "low",
+                "evidence": [
+                  {
+                    "repo_id": "7ff7e562c62327c5",
+                    "file": "app/web/package.json",
+                    "line_start": 110,
+                    "line_end": 110,
+                    "snippet_hash": "edf2e30c4bfb54bc8e0cec7759d49b8cd122f2cdf6d76edbc2b2d44ec11df2f1"
+                  }
+                ],
+                "doc_refs": [],
+                "reasoning": "devIndicators Options: devIndicators options appIsrStatus, buildActivity and buildActivityPosition are removed.",
+                "action": "Update to: the remaining devIndicators indicator",
+                "step_kind": "manual",
+                "verify": "Load the affected page or run the build, and confirm the new behaviour.",
+                "confidence": 0.85,
+                "source": "rule_pack",
+                "usage_ids": [
+                  "bf42ec6bcb0e65db352c81e3"
+                ],
+                "docs_status": "unverified",
+                "prompt_version": "v1",
+                "rule_id": "next/devindicators-options"
+              }
+            ],
+            "out_of_scope": []
+          }
+        },
+        {
+          "lens": "behavior_runtime",
+          "packet_usages": [
+            {
+              "file": "app/web/components/MapAnimation.tsx",
+              "line_start": 42,
+              "line_end": 42,
+              "snippet_hash": "3edb84be1b1f8f6de89f519c60e843fc15a11357b7efc75df171398f055e5b57",
+              "usage_id": "69d4e700fba2008f066873e1"
+            },
+            {
+              "file": "app/web/features/analytics/eventCollector.ts",
+              "line_start": 123,
+              "line_end": 129,
+              "snippet_hash": "fd7717bb9ea97c8a799ef521e4333b9c0dac1737db486a993c530c6d7baae862",
+              "usage_id": "7403d2aa8267486c7e65596e"
+            },
+            {
+              "file": "app/web/i18n/weblate.ts",
+              "line_start": 20,
+              "line_end": 24,
+              "snippet_hash": "c8a5ed23b19bcf5a0690fd10bf27fb9e250b8aa17b11bb8a74bbf0f8d0577399",
+              "usage_id": "d3d55cd4cef5fbf1ccd3dd18"
+            },
+            {
+              "file": "app/web/service/api.ts",
+              "line_start": 77,
+              "line_end": 80,
+              "snippet_hash": "a8003e83f865458953cc175d853e0b9a961c0b4a2fbf206731b426ac5e7b3129",
+              "usage_id": "bf5dad8b82dfc0cd11bb6ca3"
+            },
+            {
+              "file": "app/web/utils/addToCalendar.ts",
+              "line_start": 5,
+              "line_end": 5,
+              "snippet_hash": "fe2e62af8610c7bf3e36cfdad1d12d5369918d2e1e205a61ebe9bce3a0014444",
+              "usage_id": "d407102f4c9b9472d6d436ee"
+            },
+            {
+              "file": "app/web/utils/hooks.ts",
+              "line_start": 110,
+              "line_end": 110,
+              "snippet_hash": "d588ce9b01a3a3e859b465d1b0c5f83f76c731bbf43996f2308290d57b9cb0db",
+              "usage_id": "61d66b757821fb652596b804"
+            },
+            {
+              "file": "app/web/utils/useSignupPageInfo.ts",
+              "line_start": 17,
+              "line_end": 17,
+              "snippet_hash": "ee8d8f7ad11b20bbec8e1e023fcb1cf80256cbfc25f982e6f35d6bca3ff1201b",
+              "usage_id": "8bc964e13d968b4f07ada90e"
+            }
+          ],
+          "submission": {
+            "findings": [
+              {
+                "id": "behavior_runtime-69d4e700fba2008f066873e1",
+                "repo_id": "7ff7e562c62327c5",
+                "lens": "behavior_runtime",
+                "concern": "behavior_change",
+                "severity": "high",
+                "evidence": [
+                  {
+                    "repo_id": "7ff7e562c62327c5",
+                    "file": "app/web/components/MapAnimation.tsx",
+                    "line_start": 42,
+                    "line_end": 42,
+                    "snippet_hash": "3edb84be1b1f8f6de89f519c60e843fc15a11357b7efc75df171398f055e5b57"
+                  }
+                ],
+                "doc_refs": [],
+                "reasoning": "cookies() is async: cookies() from next/headers is asynchronous. A synchronous call warns, and the warning becomes an error in 16.",
+                "action": "Update to: const cookieStore = await cookies()",
+                "step_kind": "codemod",
+                "verify": "Load the affected page or run the build, and confirm the new behaviour.",
+                "confidence": 0.85,
+                "source": "rule_pack",
+                "usage_ids": [
+                  "69d4e700fba2008f066873e1"
+                ],
+                "docs_status": "unverified",
+                "prompt_version": "v1",
+                "rule_id": "next/async-cookies",
+                "codemod": "next-codemod:next-async-request-api",
+                "rollback": "Return to the previous release of the library."
+              },
+              {
+                "id": "behavior_runtime-7403d2aa8267486c7e65596e",
+                "repo_id": "7ff7e562c62327c5",
+                "lens": "behavior_runtime",
+                "concern": "behavior_change",
+                "severity": "high",
+                "evidence": [
+                  {
+                    "repo_id": "7ff7e562c62327c5",
+                    "file": "app/web/features/analytics/eventCollector.ts",
+                    "line_start": 123,
+                    "line_end": 129,
+                    "snippet_hash": "fd7717bb9ea97c8a799ef521e4333b9c0dac1737db486a993c530c6d7baae862"
+                  }
+                ],
+                "doc_refs": [],
+                "reasoning": "cookies() is async: cookies() from next/headers is asynchronous. A synchronous call warns, and the warning becomes an error in 16.",
+                "action": "Update to: const cookieStore = await cookies()",
+                "step_kind": "codemod",
+                "verify": "Load the affected page or run the build, and confirm the new behaviour.",
+                "confidence": 0.85,
+                "source": "rule_pack",
+                "usage_ids": [
+                  "7403d2aa8267486c7e65596e"
+                ],
+                "docs_status": "unverified",
+                "prompt_version": "v1",
+                "rule_id": "next/async-cookies",
+                "codemod": "next-codemod:next-async-request-api",
+                "rollback": "Return to the previous release of the library."
+              },
+              {
+                "id": "behavior_runtime-d3d55cd4cef5fbf1ccd3dd18",
+                "repo_id": "7ff7e562c62327c5",
+                "lens": "behavior_runtime",
+                "concern": "behavior_change",
+                "severity": "high",
+                "evidence": [
+                  {
+                    "repo_id": "7ff7e562c62327c5",
+                    "file": "app/web/i18n/weblate.ts",
+                    "line_start": 20,
+                    "line_end": 24,
+                    "snippet_hash": "c8a5ed23b19bcf5a0690fd10bf27fb9e250b8aa17b11bb8a74bbf0f8d0577399"
+                  }
+                ],
+                "doc_refs": [],
+                "reasoning": "cookies() is async: cookies() from next/headers is asynchronous. A synchronous call warns, and the warning becomes an error in 16.",
+                "action": "Update to: const cookieStore = await cookies()",
+                "step_kind": "codemod",
+                "verify": "Load the affected page or run the build, and confirm the new behaviour.",
+                "confidence": 0.85,
+                "source": "rule_pack",
+                "usage_ids": [
+                  "d3d55cd4cef5fbf1ccd3dd18"
+                ],
+                "docs_status": "unverified",
+                "prompt_version": "v1",
+                "rule_id": "next/async-cookies",
+                "codemod": "next-codemod:next-async-request-api",
+                "rollback": "Return to the previous release of the library."
+              },
+              {
+                "id": "behavior_runtime-bf5dad8b82dfc0cd11bb6ca3",
+                "repo_id": "7ff7e562c62327c5",
+                "lens": "behavior_runtime",
+                "concern": "behavior_change",
+                "severity": "high",
+                "evidence": [
+                  {
+                    "repo_id": "7ff7e562c62327c5",
+                    "file": "app/web/service/api.ts",
+                    "line_start": 77,
+                    "line_end": 80,
+                    "snippet_hash": "a8003e83f865458953cc175d853e0b9a961c0b4a2fbf206731b426ac5e7b3129"
+                  }
+                ],
+                "doc_refs": [],
+                "reasoning": "cookies() is async: cookies() from next/headers is asynchronous. A synchronous call warns, and the warning becomes an error in 16.",
+                "action": "Update to: const cookieStore = await cookies()",
+                "step_kind": "codemod",
+                "verify": "Load the affected page or run the build, and confirm the new behaviour.",
+                "confidence": 0.85,
+                "source": "rule_pack",
+                "usage_ids": [
+                  "bf5dad8b82dfc0cd11bb6ca3"
+                ],
+                "docs_status": "unverified",
+                "prompt_version": "v1",
+                "rule_id": "next/async-cookies",
+                "codemod": "next-codemod:next-async-request-api",
+                "rollback": "Return to the previous release of the library."
+              },
+              {
+                "id": "behavior_runtime-d407102f4c9b9472d6d436ee",
+                "repo_id": "7ff7e562c62327c5",
+                "lens": "behavior_runtime",
+                "concern": "behavior_change",
+                "severity": "high",
+                "evidence": [
+                  {
+                    "repo_id": "7ff7e562c62327c5",
+                    "file": "app/web/utils/addToCalendar.ts",
+                    "line_start": 5,
+                    "line_end": 5,
+                    "snippet_hash": "fe2e62af8610c7bf3e36cfdad1d12d5369918d2e1e205a61ebe9bce3a0014444"
+                  }
+                ],
+                "doc_refs": [],
+                "reasoning": "cookies() is async: cookies() from next/headers is asynchronous. A synchronous call warns, and the warning becomes an error in 16.",
+                "action": "Update to: const cookieStore = await cookies()",
+                "step_kind": "codemod",
+                "verify": "Load the affected page or run the build, and confirm the new behaviour.",
+                "confidence": 0.85,
+                "source": "rule_pack",
+                "usage_ids": [
+                  "d407102f4c9b9472d6d436ee"
+                ],
+                "docs_status": "unverified",
+                "prompt_version": "v1",
+                "rule_id": "next/async-cookies",
+                "codemod": "next-codemod:next-async-request-api",
+                "rollback": "Return to the previous release of the library."
+              },
+              {
+                "id": "behavior_runtime-61d66b757821fb652596b804",
+                "repo_id": "7ff7e562c62327c5",
+                "lens": "behavior_runtime",
+                "concern": "behavior_change",
+                "severity": "high",
+                "evidence": [
+                  {
+                    "repo_id": "7ff7e562c62327c5",
+                    "file": "app/web/utils/hooks.ts",
+                    "line_start": 110,
+                    "line_end": 110,
+                    "snippet_hash": "d588ce9b01a3a3e859b465d1b0c5f83f76c731bbf43996f2308290d57b9cb0db"
+                  }
+                ],
+                "doc_refs": [],
+                "reasoning": "cookies() is async: cookies() from next/headers is asynchronous. A synchronous call warns, and the warning becomes an error in 16.",
+                "action": "Update to: const cookieStore = await cookies()",
+                "step_kind": "codemod",
+                "verify": "Load the affected page or run the build, and confirm the new behaviour.",
+                "confidence": 0.85,
+                "source": "rule_pack",
+                "usage_ids": [
+                  "61d66b757821fb652596b804"
+                ],
+                "docs_status": "unverified",
+                "prompt_version": "v1",
+                "rule_id": "next/async-cookies",
+                "codemod": "next-codemod:next-async-request-api",
+                "rollback": "Return to the previous release of the library."
+              },
+              {
+                "id": "behavior_runtime-8bc964e13d968b4f07ada90e",
+                "repo_id": "7ff7e562c62327c5",
+                "lens": "behavior_runtime",
+                "concern": "behavior_change",
+                "severity": "high",
+                "evidence": [
+                  {
+                    "repo_id": "7ff7e562c62327c5",
+                    "file": "app/web/utils/useSignupPageInfo.ts",
+                    "line_start": 17,
+                    "line_end": 17,
+                    "snippet_hash": "ee8d8f7ad11b20bbec8e1e023fcb1cf80256cbfc25f982e6f35d6bca3ff1201b"
+                  }
+                ],
+                "doc_refs": [],
+                "reasoning": "cookies() is async: cookies() from next/headers is asynchronous. A synchronous call warns, and the warning becomes an error in 16.",
+                "action": "Update to: const cookieStore = await cookies()",
+                "step_kind": "codemod",
+                "verify": "Load the affected page or run the build, and confirm the new behaviour.",
+                "confidence": 0.85,
+                "source": "rule_pack",
+                "usage_ids": [
+                  "8bc964e13d968b4f07ada90e"
+                ],
+                "docs_status": "unverified",
+                "prompt_version": "v1",
+                "rule_id": "next/async-cookies",
+                "codemod": "next-codemod:next-async-request-api",
+                "rollback": "Return to the previous release of the library."
+              }
+            ],
+            "out_of_scope": []
+          }
+        },
+        {
+          "lens": "verification",
+          "packet_usages": [
+            {
+              "file": "app/web/pages/[...slug].tsx",
+              "line_start": 9,
+              "line_end": 9,
+              "snippet_hash": "92e761003329a45b8e70687d9fc55853becc79b88b00ed95d01a5db7c74216c5",
+              "usage_id": "558412ac17f2ca53919bbd76"
+            },
+            {
+              "file": "app/web/test/setupTests.ts",
+              "line_start": 39,
+              "line_end": 39,
+              "snippet_hash": "ff8b58c304ef3d868e141a46a2fcef5e2a9b67d7fbad3ee702c0e9839aa09593",
+              "usage_id": "fc1a947b26754eef63bb8cb0"
+            }
+          ],
+          "submission": {
+            "findings": [
+              {
+                "id": "verification-558412ac17f2ca53919bbd76",
+                "repo_id": "7ff7e562c62327c5",
+                "lens": "verification",
+                "concern": "test",
+                "severity": "medium",
+                "evidence": [
+                  {
+                    "repo_id": "7ff7e562c62327c5",
+                    "file": "app/web/pages/[...slug].tsx",
+                    "line_start": 9,
+                    "line_end": 9,
+                    "snippet_hash": "92e761003329a45b8e70687d9fc55853becc79b88b00ed95d01a5db7c74216c5"
+                  }
+                ],
+                "doc_refs": [],
+                "reasoning": "Usage of unresolved_dynamic at app/web/pages/[...slug].tsx:9 requires attention for next@16.4.0.",
+                "action": "Review and update this usage for next@16.4.0.",
+                "step_kind": "manual",
+                "verify": "Run the test suite and confirm the build passes.",
+                "confidence": 0.6,
+                "source": "usage_scan",
+                "usage_ids": [
+                  "558412ac17f2ca53919bbd76"
+                ],
+                "docs_status": "unverified",
+                "prompt_version": "v1"
+              },
+              {
+                "id": "verification-fc1a947b26754eef63bb8cb0",
+                "repo_id": "7ff7e562c62327c5",
+                "lens": "verification",
+                "concern": "test",
+                "severity": "medium",
+                "evidence": [
+                  {
+                    "repo_id": "7ff7e562c62327c5",
+                    "file": "app/web/test/setupTests.ts",
+                    "line_start": 39,
+                    "line_end": 39,
+                    "snippet_hash": "ff8b58c304ef3d868e141a46a2fcef5e2a9b67d7fbad3ee702c0e9839aa09593"
+                  }
+                ],
+                "doc_refs": [],
+                "reasoning": "Usage of unresolved_dynamic at app/web/test/setupTests.ts:39 requires attention for next@16.4.0.",
+                "action": "Review and update this usage for next@16.4.0.",
+                "step_kind": "manual",
+                "verify": "Run the test suite and confirm the build passes.",
+                "confidence": 0.6,
+                "source": "usage_scan",
+                "usage_ids": [
+                  "fc1a947b26754eef63bb8cb0"
+                ],
+                "docs_status": "unverified",
+                "prompt_version": "v1"
+              }
+            ],
+            "out_of_scope": []
+          }
+        }
+      ]
+    },
+    {
+      "submissions": []
+    },
+    {
+      "submissions": []
+    }
+  ],
+  "size": "full",
+  "cost_tokens": 0,
+  "wall_ms": 4442,
+  "host": {
+    "product": "Cursor",
+    "model": "databricks-claude-sonnet-4-6",
+    "cli_version": "3.25.6"
+  }
+}

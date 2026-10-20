@@ -1,0 +1,67 @@
+{
+  "case_id": "nextjs-couchers-web-9893",
+  "base_commit": "b782329204a3c52969f1a91ad216a79970fb26b4",
+  "merge_commit": "fed6efb674f5e5ac2a436055f11df7e89c753468",
+  "changed_usages": [
+    {
+      "file": "app/web/package.json",
+      "line_start": 58,
+      "line_end": 58,
+      "snippet_hash": "7d03dcaf7e01bea04ef5c447075e0cb8569309cae01575c094c4c1545ccb7e24"
+    },
+    {
+      "file": "app/web/package.json",
+      "line_start": 60,
+      "line_end": 60,
+      "snippet_hash": "c3a964380543283df20b60dc08ff446f68db2b90d13f39231ee077643adddb4d"
+    },
+    {
+      "file": "app/web/package.json",
+      "line_start": 61,
+      "line_end": 61,
+      "snippet_hash": "f571ca341b028799c3f220f43b34b74ad47708f989d1996a80a0e155934bad36"
+    },
+    {
+      "file": "app/web/package.json",
+      "line_start": 88,
+      "line_end": 88,
+      "snippet_hash": "5a53b572c5a6f32be78098c252f0f52e45117813363e14d2ffb5f653ed01fed6"
+    },
+    {
+      "file": "app/web/package.json",
+      "line_start": 89,
+      "line_end": 89,
+      "snippet_hash": "e9661c1a5641214f4c97817607cac54878f13a82106f9e1af95fcf22416472b9"
+    },
+    {
+      "file": "app/web/package.json",
+      "line_start": 97,
+      "line_end": 97,
+      "snippet_hash": "ca0fa47b6d5645cc05853e8547535d3a5315ce25fc1c2f4bd6b91cc95eee5d97"
+    },
+    {
+      "file": "app/web/test/setupTests.ts",
+      "line_start": 39,
+      "line_end": 39,
+      "snippet_hash": "ff8b58c304ef3d868e141a46a2fcef5e2a9b67d7fbad3ee702c0e9839aa09593"
+    }
+  ],
+  "touched_files": [
+    "app/web/eslint.config.mjs",
+    "app/web/next-env.d.ts",
+    "app/web/next.config.js",
+    "app/web/package.json",
+    "app/web/test/setupTests.ts",
+    "app/web/tsconfig.json"
+  ],
+  "edit_size": {
+    "app/web/.gitignore": 1,
+    "app/web/eslint.config.mjs": 37,
+    "app/web/next-env.d.ts": 6,
+    "app/web/next.config.js": 5,
+    "app/web/package.json": 34,
+    "app/web/test/setupTests.ts": 21,
+    "app/web/tsconfig.json": 12
+  },
+  "excluded_files": []
+}

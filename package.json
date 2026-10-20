@@ -32,6 +32,7 @@
     "truth:derive": "tsx scripts/derive-truth.ts",
     "cases:find": "tsx scripts/find-golden-cases.ts",
     "cases:verify": "tsx scripts/verify-case.ts",
+    "runs:export": "tsx scripts/export-run.ts",
     "build:packs": "tsx scripts/build-pack.ts",
     "knowledge:draft": "tsx scripts/draft-release.ts",
     "pack:report": "tsx scripts/pack-docs-report.ts"

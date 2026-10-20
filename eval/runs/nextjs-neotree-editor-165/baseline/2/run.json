@@ -1,0 +1,14 @@
+{
+  "kind": "baseline",
+  "case_id": "nextjs-neotree-editor-165",
+  "run": 2,
+  "markdown": "# Migration Plan: next 14.2.35 → 15.5.27\n\n## Summary\n\nUpgrade `next` from version `14.2.35` to `15.5.27`.\n\n## Required Changes\n\n- **[high]** `package.json` — Upgrade `next` from `14.2.35` to `15.5.27`. Update peer dependencies (`react`, `react-dom`, `eslint-config-next`) accordingly.\n- **[medium]** `next.config.mjs` — Review Next.js configuration options that changed between 14.2.35 and 15.5.27 (e.g. experimental flags, image domains, webpack config).\n- **[medium]** `middleware.ts` — Review middleware API changes in Next.js 15.5.27.\n",
+  "prompt_hash": "c2b4a0ad895125cbf6a3e721d55ebbd741b6e7b9d7edce7ebd63f8b828623550",
+  "cost_tokens": null,
+  "wall_ms": 24,
+  "host": {
+    "product": "Cursor",
+    "model": "databricks-claude-sonnet-4-6",
+    "cli_version": "3.25.6"
+  }
+}

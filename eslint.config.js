@@ -142,7 +142,7 @@ const outsideEnginePatterns = [
 
 export default tseslint.config(
   // Seeded-defect repos (eval/seeded/<repo>/) hold deliberately old code; the recall script beside them is linted.
-  { ignores: ['dist/**', 'node_modules/**', 'test/fixtures/**', 'eval/seeded/*/**', 'coverage/**', '.private/**'] },
+  { ignores: ['dist/**', 'node_modules/**', 'test/fixtures/**', 'eval/seeded/*/**', 'eval/.work/**', 'coverage/**', '.private/**'] },
   js.configs.recommended,
   ...tseslint.configs.recommended,
   {

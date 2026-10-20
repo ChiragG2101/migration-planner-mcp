@@ -78,9 +78,18 @@ function remap(
     if ((f.usage_ids as string[]).length > 0 && mapped.length === 0) dropped += 1;
     return { ...f, usage_ids: mapped };
   });
+  // Deduplicate: two recorded usages may map to the same HEAD usage (e.g. when
+  // the adapter merged spans since the recording), which would produce duplicate
+  // out_of_scope entries that HEAD's engine rejects.
+  const seenOos = new Set<string>();
   const outOfScope = (sub.submission.out_of_scope as { usage_id?: unknown }[])
     .map((o) => ({ ...o, usage_id: typeof o.usage_id === 'string' ? toHead.get(o.usage_id) ?? null : null }))
-    .filter((o) => o.usage_id !== null);
+    .filter((o): o is typeof o & { usage_id: string } => {
+      if (o.usage_id === null) return false;
+      if (seenOos.has(o.usage_id as string)) return false;
+      seenOos.add(o.usage_id as string);
+      return true;
+    });
   return { submission: { findings, out_of_scope: outOfScope }, dropped };
 }
 
@@ -164,10 +173,19 @@ async function replayInner(engine: Engine, run: EngineRun, truth: Truth, baseChe
         for (const sub of subs) {
           const { submission, dropped } = remap(sub, head);
           droppedFindings += dropped;
-          const result = await submitFindings(engine, { run_id: runId, lens, ...submission });
+          let result;
+          try {
+            result = await submitFindings(engine, { run_id: runId, lens, ...submission });
+          } catch {
+            // Lens already closed (accepted or gap): the recording had more submissions
+            // than HEAD's engine will accept. Stop replaying this lens.
+            flags.push({ kind: 'submission_rejected', detail: `HEAD closed ${lens} before all recorded submissions were replayed` });
+            break;
+          }
           if (!result.accepted && !result.gap) {
             flags.push({ kind: 'submission_rejected', detail: `HEAD rejected a ${lens} submission; using the retry policy` });
           }
+          if (result.accepted || result.gap) break; // lens is done
         }
       }
       const merged = await mergeFindings(engine, { run_id: runId });

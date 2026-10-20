@@ -158,6 +158,57 @@ describe('lockfile version reader', () => {
     }
   });
 
+  it('reads a nested yarn.lock when the root has no lockfile', () => {
+    const work = mkdtempSync(path.join(realpathSync(os.tmpdir()), 'mp-lock-'));
+    try {
+      mkdirSync(path.join(work, 'app', 'web'), { recursive: true });
+      writeFileSync(path.join(work, 'app', 'web', 'package.json'), JSON.stringify({ dependencies: { next: '^15.5.7' } }));
+      writeFileSync(path.join(work, 'app', 'web', 'yarn.lock'), ['next@^15.5.7:', '  version "15.5.7"', ''].join('\n'));
+      expect(lockfileVersion(work, 'next')).toBe('15.5.7');
+      writeFileSync(path.join(work, 'package-lock.json'), JSON.stringify({ lockfileVersion: 3, packages: { 'node_modules/next': { version: '14.2.35' } } }));
+      expect(lockfileVersion(work, 'next')).toBe('14.2.35');
+    } finally {
+      rmSync(work, { recursive: true, force: true });
+    }
+  });
+
+  it('reads a poetry.lock pin, a requirements == pin, and a lockfile nested in a workspace', () => {
+    const work = mkdtempSync(path.join(realpathSync(os.tmpdir()), 'mp-lock-'));
+    try {
+      writeFileSync(path.join(work, 'requirements.txt'), 'Django==3.2.25\nrequests>=2\n');
+      expect(lockfileVersion(work, 'django')).toBe('3.2.25');
+      rmSync(path.join(work, 'requirements.txt'));
+      mkdirSync(path.join(work, 'django'), { recursive: true });
+      writeFileSync(
+        path.join(work, 'django', 'poetry.lock'),
+        '[[package]]\nname = "Django"\nversion = "3.1.7"\n\n[[package]]\nname = "requests"\nversion = "2.28.0"\n',
+      );
+      expect(lockfileVersion(work, 'django')).toBe('3.1.7');
+    } finally {
+      rmSync(work, { recursive: true, force: true });
+    }
+  });
+
+  it('does not guess a Python version from a range, two pins, or a lockfile that does not parse', () => {
+    const work = mkdtempSync(path.join(realpathSync(os.tmpdir()), 'mp-lock-'));
+    try {
+      writeFileSync(path.join(work, 'requirements.txt'), 'django>=3.2\n');
+      expect(lockfileVersion(work, 'django')).toBeNull();
+      writeFileSync(
+        path.join(work, 'poetry.lock'),
+        '[[package]]\nname = "django"\nversion = "3.1.7"\n\n[[package]]\nname = "django"\nversion = "4.2.30"\n',
+      );
+      expect(lockfileVersion(work, 'django')).toBeNull();
+      writeFileSync(path.join(work, 'requirements.txt'), 'django==3.2.25\n');
+      writeFileSync(path.join(work, 'poetry.lock'), '[[package]]\nname = "django"\nversion = "4.2.30"\n');
+      expect(lockfileVersion(work, 'django')).toBeNull();
+      writeFileSync(path.join(work, 'poetry.lock'), '[[package]]\nname =\n');
+      expect(lockfileVersion(work, 'django')).toBeNull();
+    } finally {
+      rmSync(work, { recursive: true, force: true });
+    }
+  });
+
   it('returns null when workspace manifests name two different versions and no lockfile pins one', () => {
     const work = mkdtempSync(path.join(realpathSync(os.tmpdir()), 'mp-lock-'));
     try {

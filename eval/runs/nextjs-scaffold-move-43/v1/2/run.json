@@ -1,0 +1,2518 @@
+{
+  "kind": "engine",
+  "case_id": "nextjs-scaffold-move-43",
+  "prompt_version": "v1",
+  "run": 2,
+  "ingest": {
+    "source": {
+      "name": "next",
+      "version": "14.2.28"
+    },
+    "target": {
+      "name": "next",
+      "version": "15.5.27"
+    }
+  },
+  "scope_answers": {},
+  "docs": [
+    {
+      "library": "react",
+      "version": "19",
+      "topic": "JSX",
+      "url": "https://react.dev/blog/2024/04/25/react-19-upgrade-guide#the-jsx-namespace-in-typescript",
+      "content": "The JSX namespace in TypeScript\n\nThe global JSX namespace is removed. Use React.JSX.\n\nold: JSX.Element\nnew: React.JSX.Element\n\n",
+      "doc_id": "04efb99412e0a5013bb8e900603c1bd3d51e81e298b3ab716c58f8f8df9a749e",
+      "fetched_by": "knowledge",
+      "official": true,
+      "status": "unverified"
+    },
+    {
+      "library": "next",
+      "version": "15",
+      "topic": "15.md",
+      "url": "pack://nextjs-upgrade@0.3.0/references/15.md",
+      "content": "<!-- do not edit; generated from pack v0.3.0 -->\n\n# nextjs-upgrade 15\n\n- `next/async-cookies` (changed_behavior): cookies() is async\n- `next/async-draft-mode` (changed_behavior): draftMode() is async\n- `next/async-headers` (changed_behavior): headers() is async\n- `next/async-params` (changed_behavior): params is a Promise\n- `next/async-request-ip` (removed): NextRequest.ip is removed\n- `next/async-search-params` (changed_behavior): searchParams is a Promise\n- `next/bundlepagesrouterdependencies` (renamed): bundlePagesRouterDependencies\n- `next/nextrequest-geolocation` (removed): NextRequest Geolocation\n- `next/react-19` (peer_requirement): App Router requires React 19\n- `next/route-handlers` (changed_default): Route Handlers\n- `next/runtime-configuration-breaking-change` (removed): runtime configuration (Breaking change)\n- `next/serverexternalpackages` (renamed): serverExternalPackages\n",
+      "doc_id": "12991973739f2926f4e9cf1a26157f181418224e44a9446f9d496e8b015ba348",
+      "fetched_by": "knowledge",
+      "official": false,
+      "status": "unverified"
+    },
+    {
+      "library": "next",
+      "version": "15",
+      "topic": "draftMode",
+      "url": "https://nextjs.org/docs/app/guides/upgrading/version-15#async-request-apis-breaking-change",
+      "content": "draftMode() is async\n\ndraftMode() from next/headers is asynchronous.\n\nold: const { isEnabled } = draftMode()\nnew: const { isEnabled } = await draftMode()\n\n",
+      "doc_id": "15327fbcefda68a6404bd77d4a64a785dfce05583aa97522f2215d27d86e9bde",
+      "fetched_by": "knowledge",
+      "official": true,
+      "status": "unverified"
+    },
+    {
+      "library": "react",
+      "version": "19",
+      "topic": "useRef",
+      "url": "https://react.dev/blog/2024/04/25/react-19-upgrade-guide#useref-requires-argument",
+      "content": "useRef requires an argument\n\nuseRef requires an argument, and MutableRefObject is deprecated in favour of RefObject.\n\nold: useRef()\nnew: useRef(undefined), or useRef(null)\n\n",
+      "doc_id": "22afa0e2f4bb1409b84ffdbbd08d125929b685d0e9164343d34d4a7e6f8034f0",
+      "fetched_by": "knowledge",
+      "official": true,
+      "status": "unverified"
+    },
+    {
+      "library": "next",
+      "version": "15",
+      "topic": "GET",
+      "url": "https://nextjs.org/docs/app/guides/upgrading/version-15#route-handlers",
+      "content": "Route Handlers\n\nGET route handlers are no longer cached by default.\n\nold: export function GET() {}\nnew: export const dynamic = 'force-static' when the old cached behaviour is required\n\n",
+      "doc_id": "33b12d62dd45cbe6d699efa6fde1c787ff4f9d78f355c25f94eacc6530a2c92a",
+      "fetched_by": "knowledge",
+      "official": true,
+      "status": "unverified"
+    },
+    {
+      "library": "react",
+      "version": "19",
+      "topic": "hydrate",
+      "url": "https://react.dev/blog/2024/04/25/react-19-upgrade-guide#removed-reactdom-hydrate",
+      "content": "Removed: ReactDOM.hydrate\n\nReactDOM.hydrate is removed. Use hydrateRoot.\n\nold: ReactDOM.hydrate(element, container)\nnew: hydrateRoot(container, element)\n\n",
+      "doc_id": "3d4ecbcc9454cc076907b0c431d6c7667bfb42ccc07e5ac9311d512a9435379d",
+      "fetched_by": "knowledge",
+      "official": true,
+      "status": "unverified"
+    },
+    {
+      "library": "react",
+      "version": "19",
+      "topic": "legacy_context",
+      "url": "https://react.dev/blog/2024/04/25/react-19-upgrade-guide#removed-removing-legacy-context",
+      "content": "Removed: Legacy Context using contextTypes and getChildContext\n\nLegacy context (contextTypes, childContextTypes, getChildContext) is removed.\n\nold: contextTypes and getChildContext\nnew: contextType or createContext\n\n",
+      "doc_id": "45afdf802d78011136f815aa5d73a500d79a9a2b371c08aef9219a3900f66ff4",
+      "fetched_by": "knowledge",
+      "official": true,
+      "status": "unverified"
+    },
+    {
+      "library": "react",
+      "version": "19",
+      "topic": "react-test-renderer/shallow",
+      "url": "https://react.dev/blog/2024/04/25/react-19-upgrade-guide#removed-react-test-renderer-shallow",
+      "content": "Removed: react-test-renderer/shallow\n\nreact-test-renderer/shallow is removed. Import react-shallow-renderer directly.\n\nold: import ShallowRenderer from 'react-test-renderer/shallow'\nnew: import ShallowRenderer from 'react-shallow-renderer'\n\n",
+      "doc_id": "4af48628073fab2cf3ead0b68d753980c7dd48b852e8546b3b69deb4b6b06e7d",
+      "fetched_by": "knowledge",
+      "official": true,
+      "status": "unverified"
+    },
+    {
+      "library": "next",
+      "version": "15",
+      "topic": "experimental.serverComponentsExternalPackages",
+      "url": "https://nextjs.org/docs/app/guides/upgrading/version-15#serverexternalpackages",
+      "content": "serverExternalPackages\n\nexperimental.serverComponentsExternalPackages was renamed to serverExternalPackages.\n\nold: experimental.serverComponentsExternalPackages\nnew: serverExternalPackages\n\n",
+      "doc_id": "549920971c723743789eaa773ddfb4a2cc1a7e491998ce0de9af4b3699e2bca7",
+      "fetched_by": "knowledge",
+      "official": true,
+      "status": "unverified"
+    },
+    {
+      "library": "react",
+      "version": "19",
+      "topic": "defaultProps",
+      "url": "https://react.dev/blog/2024/04/25/react-19-upgrade-guide#removed-proptypes-and-defaultprops",
+      "content": "Removed: propTypes and defaultProps for functions\n\npropTypes are ignored and defaultProps on function components are removed. Class components still support defaultProps.\n\nold: Component.defaultProps = { text: \"Hello\" }\nnew: a default parameter\n\nThe match binds defaultProps on function components. The section's prop-types-typescript codemod covers propTypes only, so it is not named here.",
+      "doc_id": "55206df6edb40790407939fb10252ec848e7cbc4206ae4f9c52aaefde6714ae9",
+      "fetched_by": "knowledge",
+      "official": true,
+      "status": "unverified"
+    },
+    {
+      "library": "next",
+      "version": "14",
+      "topic": "14.md",
+      "url": "pack://nextjs-upgrade@0.3.0/references/14.md",
+      "content": "<!-- do not edit; generated from pack v0.3.0 -->\n\n# nextjs-upgrade 14\n\n- `next/the-next-font-package-has-been-fully-removed-in-favor-of-the` (removed): The @next/font package has been fully removed in favor of the built-in next/font. A codemod is available to safely and automatically rename your imports.\n",
+      "doc_id": "5a84eeb7ab0dea631923fc249bf660c7e221ce4f760d8606533f18cb1900bb6c",
+      "fetched_by": "knowledge",
+      "official": false,
+      "status": "unverified"
+    },
+    {
+      "library": "react",
+      "version": "19",
+      "topic": "string_ref",
+      "url": "https://react.dev/blog/2024/04/25/react-19-upgrade-guide#removed-string-refs",
+      "content": "Removed: string refs\n\nString refs are removed.\n\nold: <div ref=\"input\" />\nnew: a ref callback or a ref object\n\n",
+      "doc_id": "619ce61d6779083b09ae630029d2e1fd0ba3fac4d339ed27dc0920b4b934df3e",
+      "fetched_by": "knowledge",
+      "official": true,
+      "status": "unverified"
+    },
+    {
+      "library": "react",
+      "version": "19",
+      "topic": "findDOMNode",
+      "url": "https://react.dev/blog/2024/04/25/react-19-upgrade-guide#removed-reactdom-finddomnode",
+      "content": "Removed: ReactDOM.findDOMNode\n\nfindDOMNode is removed.\n\nold: findDOMNode(component)\nnew: a ref on the DOM node\n\n",
+      "doc_id": "619f5b5a7acdb55f507b57b96b0930d5480aa2ac29c877810dd8634cfed3e74c",
+      "fetched_by": "knowledge",
+      "official": true,
+      "status": "unverified"
+    },
+    {
+      "library": "next",
+      "version": "15",
+      "topic": "NextRequest.ip",
+      "url": "https://nextjs.org/docs/app/guides/upgrading/version-15#nextrequest-geolocation",
+      "content": "NextRequest.ip is removed\n\nNextRequest.ip was removed along with geo.\n\nold: request.ip\nnew: the hosting provider\n\nThe version 15 geolocation section covers both geo and ip. geo has its own rule; this one binds ip.",
+      "doc_id": "6724ea6b1d8e2ba96d75de76e8030bf4841dc3bfb14edb8107c4b27203a9ebaf",
+      "fetched_by": "knowledge",
+      "official": true,
+      "status": "unverified"
+    },
+    {
+      "library": "next",
+      "version": "15",
+      "topic": "**/app/**/{page,layout,route,default,template}.{js,jsx,ts,tsx}",
+      "url": "https://nextjs.org/docs/app/guides/upgrading/version-15#react-19",
+      "content": "App Router requires React 19\n\nThe App Router requires react and react-dom 19. The Pages Router can stay on 18.\n\nold: react 18 with the App Router\nnew: react 19\n\nThe Pages Router may stay on React 18. The match is an app-router file, and the engine still applies the requirement when that match finds nothing, with a note that it may not be needed.",
+      "doc_id": "82e3906afa9e03f0276283431aadfe34ecd5b2298bc95303f4ac58420e697c5f",
+      "fetched_by": "knowledge",
+      "official": true,
+      "status": "unverified"
+    },
+    {
+      "library": "react",
+      "version": "19",
+      "topic": "createFactory",
+      "url": "https://react.dev/blog/2024/04/25/react-19-upgrade-guide#removed-createfactory",
+      "content": "Removed: React.createFactory\n\nReact.createFactory is removed.\n\nold: React.createFactory(Component)\nnew: the component itself, as JSX\n\n",
+      "doc_id": "8e777c28c4b1f6d0bca195984211b92e9879e4817f5fb452f08328a92a7bc182",
+      "fetched_by": "knowledge",
+      "official": true,
+      "status": "unverified"
+    },
+    {
+      "library": "next",
+      "version": "15",
+      "topic": "runtime",
+      "url": "https://nextjs.org/docs/app/guides/upgrading/version-15#runtime-configuration-breaking-change",
+      "content": "runtime configuration (Breaking change)\n\nSegment config runtime: 'experimental-edge' is rejected; use 'edge'.\n\nold: export const runtime = 'experimental-edge'\nnew: export const runtime = 'edge'\n\n",
+      "doc_id": "9044b6a3767fd6b68199fa4113e5779cc157e5404602b07f4e59c8b6b38d2af4",
+      "fetched_by": "knowledge",
+      "official": true,
+      "status": "unverified"
+    },
+    {
+      "library": "react",
+      "version": "19",
+      "topic": "react-dom/test-utils",
+      "url": "https://react.dev/blog/2024/04/25/react-19-upgrade-guide#removed-react-dom-test-utils",
+      "content": "Removed: react-dom/test-utils\n\nreact-dom/test-utils is removed. Import act from react.\n\nold: import { act } from 'react-dom/test-utils'\nnew: import { act } from 'react'\n\n",
+      "doc_id": "90829e63c9492da89fc836381ca69731d1019d69e393404e8fd7b60797d1a3ee",
+      "fetched_by": "knowledge",
+      "official": true,
+      "status": "unverified"
+    },
+    {
+      "library": "react",
+      "version": "19",
+      "topic": "unmountComponentAtNode",
+      "url": "https://react.dev/blog/2024/04/25/react-19-upgrade-guide#removed-unmountcomponentatnode",
+      "content": "Removed: unmountComponentAtNode\n\nunmountComponentAtNode is removed. Use root.unmount().\n\nold: unmountComponentAtNode(container)\nnew: root.unmount()\n\n",
+      "doc_id": "95c82ed3d8e5aee9d79db3ecd0cd7b86e4c82a0a85fd8bd145882718a609b99f",
+      "fetched_by": "knowledge",
+      "official": true,
+      "status": "unverified"
+    },
+    {
+      "library": "next",
+      "version": "15",
+      "topic": "searchParams",
+      "url": "https://nextjs.org/docs/app/guides/upgrading/version-15#async-request-apis-breaking-change",
+      "content": "searchParams is a Promise\n\nsearchParams in page props is a Promise.\n\nold: const { q } = searchParams\nnew: const { q } = await searchParams\n\n",
+      "doc_id": "96baa5667776bce037085e0e9713541d2638dda8062a4129b3b6ce327d559468",
+      "fetched_by": "knowledge",
+      "official": true,
+      "status": "unverified"
+    },
+    {
+      "library": "react",
+      "version": "19",
+      "topic": "render",
+      "url": "https://react.dev/blog/2024/04/25/react-19-upgrade-guide#removed-reactdom-render",
+      "content": "Removed: ReactDOM.render\n\nReactDOM.render is removed. Use createRoot.\n\nold: ReactDOM.render(element, container)\nnew: createRoot(container).render(element)\n\n",
+      "doc_id": "aae70badc9ddbf7551c713f60a60ec31b31eb72c0fa586fe2a70516eca7e56c1",
+      "fetched_by": "knowledge",
+      "official": true,
+      "status": "unverified"
+    },
+    {
+      "library": "next",
+      "version": "15",
+      "topic": "headers",
+      "url": "https://nextjs.org/docs/app/guides/upgrading/version-15#async-request-apis-breaking-change",
+      "content": "headers() is async\n\nheaders() from next/headers is asynchronous.\n\nold: const headersList = headers()\nnew: const headersList = await headers()\n\n",
+      "doc_id": "bd1ef650ff3dc2ebc73f5623c89aa6913b517f57b2f1398e0c198a7f9e5a5f0c",
+      "fetched_by": "knowledge",
+      "official": true,
+      "status": "unverified"
+    },
+    {
+      "library": "next",
+      "version": "15",
+      "topic": "@next/font",
+      "url": "https://nextjs.org/docs/app/guides/upgrading/version-14#the-next-font-package-has-been-fully-removed-in-favor-of-the-built-in-next-font-a-codemod-is-available-to-safely-and-automatically-rename-your-imports",
+      "content": "The @next/font package has been fully removed in favor of the built-in next/font. A codemod is available to safely and automatically rename your imports.\n\nThe @next/font package is gone; the built-in next/font replaces it.\n\nold: import { Inter } from '@next/font/google'\nnew: import { Inter } from 'next/font/google'\n\n",
+      "doc_id": "c859946be08aef17229b80a6283755f56ad0f792b439bb4da749ce47347529a3",
+      "fetched_by": "knowledge",
+      "official": true,
+      "status": "unverified"
+    },
+    {
+      "library": "next",
+      "version": "15",
+      "topic": "params",
+      "url": "https://nextjs.org/docs/app/guides/upgrading/version-15#async-request-apis-breaking-change",
+      "content": "params is a Promise\n\nparams in page, layout and route props is a Promise.\n\nold: const { slug } = params\nnew: const { slug } = await params\n\n",
+      "doc_id": "cf8922dd923eead9d1306283061fddbca408b8ef9a46556045896229af016cce",
+      "fetched_by": "knowledge",
+      "official": true,
+      "status": "unverified"
+    },
+    {
+      "library": "react",
+      "version": "19",
+      "topic": "react-changes.md",
+      "url": "pack://nextjs-upgrade@0.3.0/references/react-changes.md",
+      "content": "<!-- do not edit; generated from pack v0.3.0 -->\n\n# react changes\n\n- `react/removed-legacy-context-using-contexttypes-and-getchildcontex` (19, removed): Removed: Legacy Context using contextTypes and getChildContext\n- `react/removed-proptypes-and-defaultprops-for-functions` (19, removed): Removed: propTypes and defaultProps for functions\n- `react/removed-react-createfactory` (19, removed): Removed: React.createFactory\n- `react/removed-react-dom-test-utils` (19, removed): Removed: react-dom/test-utils\n- `react/removed-react-test-renderer-shallow` (19, removed): Removed: react-test-renderer/shallow\n- `react/removed-reactdom-finddomnode` (19, removed): Removed: ReactDOM.findDOMNode\n- `react/removed-reactdom-hydrate` (19, removed): Removed: ReactDOM.hydrate\n- `react/removed-reactdom-render` (19, removed): Removed: ReactDOM.render\n- `react/removed-string-refs` (19, removed): Removed: string refs\n- `react/removed-unmountcomponentatnode` (19, removed): Removed: unmountComponentAtNode\n- `react/the-jsx-namespace-in-typescript` (19, removed): The JSX namespace in TypeScript\n- `react/useref-requires-an-argument` (19, changed_behavior): useRef requires an argument\n",
+      "doc_id": "d12dd30ba60f3d1f3adbbcb226519fe45ac6a0d8d86aba14af05643c150439f4",
+      "fetched_by": "knowledge",
+      "official": false,
+      "status": "unverified"
+    },
+    {
+      "library": "next",
+      "version": "15",
+      "topic": "experimental.bundlePagesExternals",
+      "url": "https://nextjs.org/docs/app/guides/upgrading/version-15#bundlepagesrouterdependencies",
+      "content": "bundlePagesRouterDependencies\n\nexperimental.bundlePagesExternals was renamed to bundlePagesRouterDependencies.\n\nold: experimental.bundlePagesExternals\nnew: bundlePagesRouterDependencies\n\n",
+      "doc_id": "d376d84e96e4ea606568b9b4acfb8d2d4309190767707dee0d921346ce7200cc",
+      "fetched_by": "knowledge",
+      "official": true,
+      "status": "unverified"
+    },
+    {
+      "library": "next",
+      "version": "15",
+      "topic": "cookies",
+      "url": "https://nextjs.org/docs/app/guides/upgrading/version-15#async-request-apis-breaking-change",
+      "content": "cookies() is async\n\ncookies() from next/headers is asynchronous. A synchronous call warns, and the warning becomes an error in 16.\n\nold: const cookieStore = cookies()\nnew: const cookieStore = await cookies()\n\n",
+      "doc_id": "e483d9df3cde82b350013d48477d34165c74461bb8a074d3dc48f47a45464e39",
+      "fetched_by": "knowledge",
+      "official": true,
+      "status": "unverified"
+    },
+    {
+      "library": "next",
+      "version": "15",
+      "topic": "NextRequest.geo",
+      "url": "https://nextjs.org/docs/app/guides/upgrading/version-15#nextrequest-geolocation",
+      "content": "NextRequest Geolocation\n\nNextRequest.geo and NextRequest.ip were removed. The host provides those values.\n\nold: request.geo and request.ip\nnew: the hosting provider, for example geolocation() from @vercel/functions\n\nThe same removal covers NextRequest.ip. One match binds the geo property; ip is the same section.",
+      "doc_id": "f2fc86015676553bc55ad8a0f449a2879ff9681f253c30e5c1238f45b1564009",
+      "fetched_by": "knowledge",
+      "official": true,
+      "status": "unverified"
+    },
+    {
+      "library": "next",
+      "version": "15",
+      "topic": "codemods.md",
+      "url": "pack://nextjs-upgrade@0.3.0/references/codemods.md",
+      "content": "<!-- do not edit; generated from pack v0.3.0 -->\n\n# Codemods\n\n- `next-codemod:app-dir-runtime-config-experimental-edge`: next/runtime-configuration-breaking-change\n- `next-codemod:built-in-next-font`: next/the-next-font-package-has-been-fully-removed-in-favor-of-the\n- `next-codemod:metadata-to-viewport-export`: no reviewed rule names it\n- `next-codemod:middleware-to-proxy`: next/middleware-to-proxy\n- `next-codemod:next-async-request-api`: next/async-cookies, next/async-draft-mode, next/async-headers, next/async-params, next/async-search-params\n- `next-codemod:next-lint-to-eslint-cli`: next/next-lint-command\n- `next-codemod:next-og-import`: no reviewed rule names it\n- `next-codemod:next-request-geo-ip`: next/async-request-ip, next/nextrequest-geolocation\n- `next-codemod:remove-experimental-ppr`: no reviewed rule names it\n- `next-codemod:remove-unstable-prefix`: next/cachelife-and-cachetag\n- `next-codemod:upgrade`: no reviewed rule names it\n- `react-codemod:migration-recipe-19`: no reviewed rule names it\n- `react-codemod:prop-types-typescript`: no reviewed rule names it\n- `react-codemod:replace-act-import`: react/removed-react-dom-test-utils\n- `react-codemod:replace-reactdom-render`: react/removed-reactdom-hydrate, react/removed-reactdom-render, react/removed-unmountcomponentatnode\n- `react-codemod:replace-string-ref`: react/removed-string-refs\n- `react-codemod:replace-use-form-state`: no reviewed rule names it\n- `types-react-codemod:no-implicit-ref-callback-return`: no reviewed rule names it\n- `types-react-codemod:preset-19`: react/the-jsx-namespace-in-typescript\n- `types-react-codemod:refobject-defaults`: react/useref-requires-an-argument\n",
+      "doc_id": "f46d0546606b3118a33ff65a09265143dce057f6dbcab16daab94187d0dd0d60",
+      "fetched_by": "knowledge",
+      "official": false,
+      "status": "unverified"
+    }
+  ],
+  "rounds": [
+    {
+      "submissions": [
+        {
+          "lens": "api",
+          "packet_usages": [
+            {
+              "file": ".yarn/plugins/@yarnpkg/plugin-interactive-tools.cjs",
+              "line_start": 6,
+              "line_end": 6,
+              "snippet_hash": "ca12fb15d5b603a1ef1cbcc1673623b1a63b05e4a7673546ef8ea4d188a76c4f",
+              "usage_id": "9ee90e36d339056ef7f14e06"
+            },
+            {
+              "file": ".yarn/plugins/@yarnpkg/plugin-interactive-tools.cjs",
+              "line_start": 8,
+              "line_end": 8,
+              "snippet_hash": "343e1b970a1ce6db7e6b962fc3d6ef15ad666b5324aaa419d09aceaeb8839a62",
+              "usage_id": "a4f3c9f4d29a1043e5efd7ce"
+            },
+            {
+              "file": ".yarn/plugins/@yarnpkg/plugin-interactive-tools.cjs",
+              "line_start": 391,
+              "line_end": 391,
+              "snippet_hash": "5b68d192264c16a8343b26c1d37d809066dcf2989240924587fb8470709e02ae",
+              "usage_id": "93720e106c2823d19b5547fd"
+            }
+          ],
+          "submission": {
+            "findings": [
+              {
+                "id": "api-9ee90e36d339056ef7f14e06",
+                "repo_id": "1e39c80a511c18da",
+                "lens": "api",
+                "concern": "api_change",
+                "severity": "high",
+                "evidence": [
+                  {
+                    "repo_id": "1e39c80a511c18da",
+                    "file": ".yarn/plugins/@yarnpkg/plugin-interactive-tools.cjs",
+                    "line_start": 6,
+                    "line_end": 6,
+                    "snippet_hash": "ca12fb15d5b603a1ef1cbcc1673623b1a63b05e4a7673546ef8ea4d188a76c4f"
+                  }
+                ],
+                "doc_refs": [],
+                "reasoning": "NextRequest.ip is removed: NextRequest.ip was removed along with geo.",
+                "action": "Update to: the hosting provider",
+                "step_kind": "codemod",
+                "verify": "Load the affected page or run the build, and confirm the new behaviour.",
+                "confidence": 0.85,
+                "source": "rule_pack",
+                "usage_ids": [
+                  "9ee90e36d339056ef7f14e06"
+                ],
+                "docs_status": "unverified",
+                "prompt_version": "v1",
+                "rule_id": "next/async-request-ip",
+                "codemod": "next-codemod:next-request-geo-ip",
+                "rollback": "Return to the previous release of the library."
+              },
+              {
+                "id": "api-a4f3c9f4d29a1043e5efd7ce",
+                "repo_id": "1e39c80a511c18da",
+                "lens": "api",
+                "concern": "api_change",
+                "severity": "high",
+                "evidence": [
+                  {
+                    "repo_id": "1e39c80a511c18da",
+                    "file": ".yarn/plugins/@yarnpkg/plugin-interactive-tools.cjs",
+                    "line_start": 8,
+                    "line_end": 8,
+                    "snippet_hash": "343e1b970a1ce6db7e6b962fc3d6ef15ad666b5324aaa419d09aceaeb8839a62"
+                  }
+                ],
+                "doc_refs": [],
+                "reasoning": "NextRequest.ip is removed: NextRequest.ip was removed along with geo.",
+                "action": "Update to: the hosting provider",
+                "step_kind": "codemod",
+                "verify": "Load the affected page or run the build, and confirm the new behaviour.",
+                "confidence": 0.85,
+                "source": "rule_pack",
+                "usage_ids": [
+                  "a4f3c9f4d29a1043e5efd7ce"
+                ],
+                "docs_status": "unverified",
+                "prompt_version": "v1",
+                "rule_id": "next/async-request-ip",
+                "codemod": "next-codemod:next-request-geo-ip",
+                "rollback": "Return to the previous release of the library."
+              },
+              {
+                "id": "api-93720e106c2823d19b5547fd",
+                "repo_id": "1e39c80a511c18da",
+                "lens": "api",
+                "concern": "api_change",
+                "severity": "high",
+                "evidence": [
+                  {
+                    "repo_id": "1e39c80a511c18da",
+                    "file": ".yarn/plugins/@yarnpkg/plugin-interactive-tools.cjs",
+                    "line_start": 391,
+                    "line_end": 391,
+                    "snippet_hash": "5b68d192264c16a8343b26c1d37d809066dcf2989240924587fb8470709e02ae"
+                  }
+                ],
+                "doc_refs": [],
+                "reasoning": "NextRequest.ip is removed: NextRequest.ip was removed along with geo.",
+                "action": "Update to: the hosting provider",
+                "step_kind": "codemod",
+                "verify": "Load the affected page or run the build, and confirm the new behaviour.",
+                "confidence": 0.85,
+                "source": "rule_pack",
+                "usage_ids": [
+                  "93720e106c2823d19b5547fd"
+                ],
+                "docs_status": "unverified",
+                "prompt_version": "v1",
+                "rule_id": "next/async-request-ip",
+                "codemod": "next-codemod:next-request-geo-ip",
+                "rollback": "Return to the previous release of the library."
+              }
+            ],
+            "out_of_scope": []
+          }
+        },
+        {
+          "lens": "dependency_build",
+          "packet_usages": [
+            {
+              "file": "packages/nextjs/next.config.js",
+              "line_start": 5,
+              "line_end": 5,
+              "snippet_hash": "9adb17243762b045ed203370486b684ad57fc4bc77a76a89e2fb79c32b5716d3",
+              "usage_id": "4882f37bba240c38a7368418"
+            },
+            {
+              "file": "packages/nextjs/next.config.js",
+              "line_start": 6,
+              "line_end": 6,
+              "snippet_hash": "24ce0c1062f5b8a1fe8724e3bb1457845bc0d5970ff2b7f5b4c1cf6328ad158d",
+              "usage_id": "143dabefb80c6cc46b912e30"
+            },
+            {
+              "file": "packages/nextjs/next.config.js",
+              "line_start": 7,
+              "line_end": 7,
+              "snippet_hash": "050f77c5e548cf032daed8c659dcda69a6a608fcadd5a48cd6f38ea8ebacc846",
+              "usage_id": "79fda63c87a3748eba07924e"
+            },
+            {
+              "file": "packages/nextjs/next.config.js",
+              "line_start": 8,
+              "line_end": 8,
+              "snippet_hash": "354b4a44186f14a2e2db4f0fd7825ada89008937c66acf1b7edacda45d2c35a7",
+              "usage_id": "b11be40c78d75b867eed30ee"
+            },
+            {
+              "file": "packages/nextjs/next.config.js",
+              "line_start": 10,
+              "line_end": 10,
+              "snippet_hash": "d9aae700b1152f04f35a8a2b27273dd22c1aed988656d0668055a0e87a42c687",
+              "usage_id": "900fd97812a4468c593eaab9"
+            },
+            {
+              "file": "packages/nextjs/next.config.js",
+              "line_start": 11,
+              "line_end": 11,
+              "snippet_hash": "e0617aced2a02b83ed84c348fcd70111331ca081e855c6f19c8c4ede3e91000b",
+              "usage_id": "a6e2e7e41af8638ddfbd407a"
+            },
+            {
+              "file": "packages/nextjs/next.config.js",
+              "line_start": 13,
+              "line_end": 13,
+              "snippet_hash": "69174abd569f5a2e988c87127a2aab8619f93f344814f42d7a5d409888fc202e",
+              "usage_id": "0df8cf473959fb61a9910a6d"
+            },
+            {
+              "file": "packages/nextjs/package.json",
+              "line_start": 10,
+              "line_end": 10,
+              "snippet_hash": "bd17ce788bcd8389bf66bc28673d101e924d02698a6c30b90b496e550cc67844",
+              "usage_id": "17db2c6b6d116602e6777ede"
+            },
+            {
+              "file": "packages/nextjs/package.json",
+              "line_start": 33,
+              "line_end": 33,
+              "snippet_hash": "382f55d55f00334a7480c68aa204a8e48ba0616eaa9ab0f73b4fb24d94848eeb",
+              "usage_id": "2b5a92c1288bbdae3ca65b0b"
+            },
+            {
+              "file": "packages/nextjs/package.json",
+              "line_start": 37,
+              "line_end": 37,
+              "snippet_hash": "ede90f68eb618808859c87cecd78acb284952e7681cc3196432f452fa227f127",
+              "usage_id": "a8100cdb8c730b710ef7bebd"
+            },
+            {
+              "file": "packages/nextjs/package.json",
+              "line_start": 39,
+              "line_end": 39,
+              "snippet_hash": "3c88010faa1a355f011dcde4840fa7efab30b59db2157d161d2f92ad3030fba6",
+              "usage_id": "886279ed9272e532b052812e"
+            },
+            {
+              "file": "packages/nextjs/package.json",
+              "line_start": 52,
+              "line_end": 52,
+              "snippet_hash": "aea328f97d5c6d270be0d718871c1c772a542f23e9633f4a1b672866cb6f5e42",
+              "usage_id": "1f74b722787da0922d7794df"
+            },
+            {
+              "file": "packages/nextjs/package.json",
+              "line_start": 57,
+              "line_end": 57,
+              "snippet_hash": "8f214de34d5aa6e6beca3f7fcdd9501eb0a90c4a2c919c96f14ccf0c8c876193",
+              "usage_id": "2c03ef124ce0017d34147c41"
+            },
+            {
+              "file": "packages/nextjs/package.json",
+              "line_start": 64,
+              "line_end": 64,
+              "snippet_hash": "8614c47cf561095bad7a5b096add5cf4ea3a5fa52a49b5c12ea8a70ebac631e6",
+              "usage_id": "69597b38ce13610ff6a80023"
+            },
+            {
+              "file": "yarn.lock",
+              "line_start": 22,
+              "line_end": 22,
+              "snippet_hash": "81e0c7ab1f28725b07d76e92b533b236bce8f2ce75937e74398b1cfe392a0630",
+              "usage_id": "93895db78b3ee6fcbca34d03"
+            },
+            {
+              "file": "yarn.lock",
+              "line_start": 22,
+              "line_end": 22,
+              "snippet_hash": "81e0c7ab1f28725b07d76e92b533b236bce8f2ce75937e74398b1cfe392a0630",
+              "usage_id": "16c965a5cf629ec8a6c0a7b8"
+            },
+            {
+              "file": "yarn.lock",
+              "line_start": 159,
+              "line_end": 159,
+              "snippet_hash": "75e4501e861948ec53bf4ae320e1daf874eab60cb497c3b44d77ad38c3254aae",
+              "usage_id": "e9b153132016d5d2ed26ea4d"
+            },
+            {
+              "file": "yarn.lock",
+              "line_start": 538,
+              "line_end": 538,
+              "snippet_hash": "fbfb76b47c19d8ffc5fd890a6f87d87582b1c87433a42b8d6d0ec3976cd0d099",
+              "usage_id": "8f880647ce2df074a3c41949"
+            },
+            {
+              "file": "yarn.lock",
+              "line_start": 1259,
+              "line_end": 1259,
+              "snippet_hash": "c643ffd44b30307ae9c0c1583ee8ab71755b8ab69334bab32f77f1be30991c40",
+              "usage_id": "51d62391ba058754a02dbbaa"
+            },
+            {
+              "file": "yarn.lock",
+              "line_start": 1272,
+              "line_end": 1272,
+              "snippet_hash": "d973fcc2d0dee009144779d228d08c6184b5577a8df38a38326e8b40ff90568c",
+              "usage_id": "d3650c02b39f80559dd5e30d"
+            },
+            {
+              "file": "yarn.lock",
+              "line_start": 1287,
+              "line_end": 1287,
+              "snippet_hash": "33b2eac1803290ffb01fe85efb146b441b1bc30bb127cd3186e2af5a3097cb87",
+              "usage_id": "45a50fee5611632073ac5b2c"
+            },
+            {
+              "file": "yarn.lock",
+              "line_start": 1287,
+              "line_end": 1287,
+              "snippet_hash": "33b2eac1803290ffb01fe85efb146b441b1bc30bb127cd3186e2af5a3097cb87",
+              "usage_id": "6a401071cdfee55b6d192f43"
+            },
+            {
+              "file": "yarn.lock",
+              "line_start": 1755,
+              "line_end": 1755,
+              "snippet_hash": "c1e644ebe40dcef168742daff0341416893b2e7df54e62fbb5e50f729bee3944",
+              "usage_id": "dc2b0942e5e6f9c1a642e142"
+            },
+            {
+              "file": "yarn.lock",
+              "line_start": 5698,
+              "line_end": 5698,
+              "snippet_hash": "38f619470e854013b3498f936e8a3445863262c47b8ebde02845dfa74980020d",
+              "usage_id": "2398565b9de3c8953560e5d0"
+            },
+            {
+              "file": "yarn.lock",
+              "line_start": 7716,
+              "line_end": 7716,
+              "snippet_hash": "2f869a1ca6115a0f95004a0eeacb8425ff926d69908737096ed8a647a8de6151",
+              "usage_id": "c8d3ca618c27196a5edd9e27"
+            },
+            {
+              "file": "yarn.lock",
+              "line_start": 7716,
+              "line_end": 7716,
+              "snippet_hash": "2f869a1ca6115a0f95004a0eeacb8425ff926d69908737096ed8a647a8de6151",
+              "usage_id": "e3e7182ae6b16b6943f38c10"
+            },
+            {
+              "file": "yarn.lock",
+              "line_start": 7716,
+              "line_end": 7716,
+              "snippet_hash": "2f869a1ca6115a0f95004a0eeacb8425ff926d69908737096ed8a647a8de6151",
+              "usage_id": "32223f7f60a0dd7795bdab07"
+            },
+            {
+              "file": "yarn.lock",
+              "line_start": 7727,
+              "line_end": 7727,
+              "snippet_hash": "f83f10f84155f486750d9497860d03136173de2cffde29985c6631e8462e0e48",
+              "usage_id": "e6e1326a76daaff61a2fdbc8"
+            },
+            {
+              "file": "yarn.lock",
+              "line_start": 7727,
+              "line_end": 7727,
+              "snippet_hash": "f83f10f84155f486750d9497860d03136173de2cffde29985c6631e8462e0e48",
+              "usage_id": "c17a1c64095a55a24ca74b0d"
+            },
+            {
+              "file": "yarn.lock",
+              "line_start": 8741,
+              "line_end": 8741,
+              "snippet_hash": "6fdbb6cae8b61b0ca101837af28127c7cd2f194f2ba74d673c7e6cd0912f5984",
+              "usage_id": "88006b6e674e0752ca03382c"
+            },
+            {
+              "file": "yarn.lock",
+              "line_start": 8841,
+              "line_end": 8841,
+              "snippet_hash": "e2226db2a5b4162fa97c9eb1cfa996d1f0b84efbdd57930cfe010fe3655ef91c",
+              "usage_id": "11914e77f1312f8e1ada87ca"
+            },
+            {
+              "file": "yarn.lock",
+              "line_start": 8853,
+              "line_end": 8853,
+              "snippet_hash": "4a637fa66a9b138898b73941fb90b463995256481e95a09e4fbfb96b892bc09f",
+              "usage_id": "edaf0062259730a7b8c0e42f"
+            },
+            {
+              "file": "yarn.lock",
+              "line_start": 8865,
+              "line_end": 8865,
+              "snippet_hash": "6d038c29bcbf9ba74c4c0f704d17a6b194cb1448819a49f5040826ca8c821577",
+              "usage_id": "cc5fbe2b5c67223838cc2c1d"
+            },
+            {
+              "file": "yarn.lock",
+              "line_start": 8865,
+              "line_end": 8865,
+              "snippet_hash": "6d038c29bcbf9ba74c4c0f704d17a6b194cb1448819a49f5040826ca8c821577",
+              "usage_id": "40a2fe0a52354317de1bbc00"
+            },
+            {
+              "file": "yarn.lock",
+              "line_start": 8885,
+              "line_end": 8885,
+              "snippet_hash": "1dc06b8053eb134ec970f6249b7643407fba6279b1aea4d56116356423ae80bd",
+              "usage_id": "e03e4a2a0ad0cca6670f2231"
+            },
+            {
+              "file": "yarn.lock",
+              "line_start": 8885,
+              "line_end": 8885,
+              "snippet_hash": "1dc06b8053eb134ec970f6249b7643407fba6279b1aea4d56116356423ae80bd",
+              "usage_id": "7f81e97922cbefd70824304c"
+            },
+            {
+              "file": "yarn.lock",
+              "line_start": 8907,
+              "line_end": 8907,
+              "snippet_hash": "00f0776c7683b476dd9d2d5b50cdd62a4a7f06cc5c8810f2f0de7a3d0a17c339",
+              "usage_id": "35db722825a99d0dad31bdd5"
+            },
+            {
+              "file": "yarn.lock",
+              "line_start": 8923,
+              "line_end": 8923,
+              "snippet_hash": "81b0c649d97c4016496f3b0ce2d9f4a1a584e36f4598e9787c780ba57d73a2c1",
+              "usage_id": "b1f7f3442a887c99ec6cfda1"
+            },
+            {
+              "file": "yarn.lock",
+              "line_start": 8942,
+              "line_end": 8942,
+              "snippet_hash": "0c54bc64fc0b75baf21f9e9be8fd39ed9577d94026ddacf9d10a4770d7b8a037",
+              "usage_id": "5acd692281e2aba87acfdf02"
+            },
+            {
+              "file": "yarn.lock",
+              "line_start": 8958,
+              "line_end": 8958,
+              "snippet_hash": "f44be9112bf624024f6748f179b835ea4e9a89059d455fe82b524b67871d64e9",
+              "usage_id": "998fd5e6dd1eccf6e9242ff4"
+            },
+            {
+              "file": "yarn.lock",
+              "line_start": 9088,
+              "line_end": 9088,
+              "snippet_hash": "ef88b6d743c1a9d81d41935fc650cad8e273ebdd3e0328bdb2bd4ac304356826",
+              "usage_id": "a7ecb4d7bd33bc86786256b4"
+            },
+            {
+              "file": "yarn.lock",
+              "line_start": 9885,
+              "line_end": 9885,
+              "snippet_hash": "bd915980fcf5041c6b8b11342c5b3add44299e4e8ad7dd85234497e0790a820c",
+              "usage_id": "45f81faffd14ea875ffdcdcf"
+            },
+            {
+              "file": "yarn.lock",
+              "line_start": 10695,
+              "line_end": 10695,
+              "snippet_hash": "c1d75f7cda28bbe44af1e72c2bb95ed9fbe9a12f0d73ded0855d8d1e9fb00085",
+              "usage_id": "7fb9e36df52cfb396a24cce6"
+            },
+            {
+              "file": "yarn.lock",
+              "line_start": 10710,
+              "line_end": 10710,
+              "snippet_hash": "f92d41c6f924c83cd0a9334b8c2366c4653f1a53738affcf84c2e16dc9497751",
+              "usage_id": "731b55ca84786a50df9dde4a"
+            },
+            {
+              "file": "yarn.lock",
+              "line_start": 10722,
+              "line_end": 10722,
+              "snippet_hash": "80b0e4d951ad4b6b59c03e59965df21dc186d52eecfb4ee34847425457fd191c",
+              "usage_id": "83565ea7d6fd5ec266630b70"
+            },
+            {
+              "file": "yarn.lock",
+              "line_start": 10731,
+              "line_end": 10731,
+              "snippet_hash": "87a217dce1a4b1437f1f1f4cf4946394c492430ce9c821c6f3db5c1a79c0b1e1",
+              "usage_id": "b616a039cd4f4745fa99da63"
+            },
+            {
+              "file": "yarn.lock",
+              "line_start": 10743,
+              "line_end": 10743,
+              "snippet_hash": "d533f590375c739128df7dd6fbb7f7b615a532d662bd4a58699ddbd29ce72967",
+              "usage_id": "5a3228316250b2c35b128b6c"
+            },
+            {
+              "file": "yarn.lock",
+              "line_start": 10757,
+              "line_end": 10757,
+              "snippet_hash": "1d3e89653bc40620f02858985287a6d7a0a8047bb09817ab6bc03b0006328245",
+              "usage_id": "f2638fa61b8374e0b4cf471e"
+            },
+            {
+              "file": "yarn.lock",
+              "line_start": 10773,
+              "line_end": 10773,
+              "snippet_hash": "d614bf725d58c21d77fa1b5f04bd64be5c142f9d114d47ca4db0aa04e663fbc2",
+              "usage_id": "f76894b0a4eede36f29eb182"
+            },
+            {
+              "file": "yarn.lock",
+              "line_start": 10782,
+              "line_end": 10782,
+              "snippet_hash": "7a1b63a46b34b6659f19a137498a82800f45cf6571f1261ceef88fb712ce8c58",
+              "usage_id": "d4576d79c2d7e5608b53c4ac"
+            },
+            {
+              "file": "yarn.lock",
+              "line_start": 10791,
+              "line_end": 10791,
+              "snippet_hash": "0a96c51874a3baaa5192ddbde1a64a6d61d07eef724219a2d880aee637828888",
+              "usage_id": "e3649be0b7d434725b789466"
+            },
+            {
+              "file": "yarn.lock",
+              "line_start": 10800,
+              "line_end": 10800,
+              "snippet_hash": "1251000b3daf5f33efa0489c38b5a6fec2f28dba56f2391f06ea82c9ef5d3613",
+              "usage_id": "cd892cdfa84520e4688b2ac7"
+            },
+            {
+              "file": "yarn.lock",
+              "line_start": 10875,
+              "line_end": 10875,
+              "snippet_hash": "c0319e070aa750b858664c97407338a6516a0ccee45c96d9a64122825d34ef2f",
+              "usage_id": "5c53ff0262f6518c7e4c233b"
+            },
+            {
+              "file": "yarn.lock",
+              "line_start": 10959,
+              "line_end": 10959,
+              "snippet_hash": "1f6a88316755bcfd3724e74f5448106fe7dc19b29d7cbd29703d1053bf39254a",
+              "usage_id": "7c18d8b69902d1e000e6aeaf"
+            },
+            {
+              "file": "yarn.lock",
+              "line_start": 11370,
+              "line_end": 11370,
+              "snippet_hash": "215fe6e050383186b7cf5cfec9a63a0ccf843e3ce58ae2e3d391c28c92b07b5f",
+              "usage_id": "28a28043ed2d4e538af6da2b"
+            },
+            {
+              "file": "yarn.lock",
+              "line_start": 11391,
+              "line_end": 11391,
+              "snippet_hash": "39940a54c7badc663792016d81013a45c4b38e10863bf4ff46401ff03b8f983a",
+              "usage_id": "e8bc2b67732dc65a1f47dd4d"
+            }
+          ],
+          "submission": {
+            "findings": [
+              {
+                "id": "dependency_build-4882f37bba240c38a7368418",
+                "repo_id": "1e39c80a511c18da",
+                "lens": "dependency_build",
+                "concern": "dependency",
+                "severity": "medium",
+                "evidence": [
+                  {
+                    "repo_id": "1e39c80a511c18da",
+                    "file": "packages/nextjs/next.config.js",
+                    "line_start": 5,
+                    "line_end": 5,
+                    "snippet_hash": "9adb17243762b045ed203370486b684ad57fc4bc77a76a89e2fb79c32b5716d3"
+                  }
+                ],
+                "doc_refs": [],
+                "reasoning": "bundlePagesRouterDependencies: experimental.bundlePagesExternals was renamed to bundlePagesRouterDependencies.",
+                "action": "Update to: bundlePagesRouterDependencies",
+                "step_kind": "manual",
+                "verify": "Load the affected page or run the build, and confirm the new behaviour.",
+                "confidence": 0.85,
+                "source": "rule_pack",
+                "usage_ids": [
+                  "4882f37bba240c38a7368418"
+                ],
+                "docs_status": "unverified",
+                "prompt_version": "v1",
+                "rule_id": "next/bundlepagesrouterdependencies"
+              },
+              {
+                "id": "dependency_build-143dabefb80c6cc46b912e30",
+                "repo_id": "1e39c80a511c18da",
+                "lens": "dependency_build",
+                "concern": "dependency",
+                "severity": "medium",
+                "evidence": [
+                  {
+                    "repo_id": "1e39c80a511c18da",
+                    "file": "packages/nextjs/next.config.js",
+                    "line_start": 6,
+                    "line_end": 6,
+                    "snippet_hash": "24ce0c1062f5b8a1fe8724e3bb1457845bc0d5970ff2b7f5b4c1cf6328ad158d"
+                  }
+                ],
+                "doc_refs": [],
+                "reasoning": "bundlePagesRouterDependencies: experimental.bundlePagesExternals was renamed to bundlePagesRouterDependencies.",
+                "action": "Update to: bundlePagesRouterDependencies",
+                "step_kind": "manual",
+                "verify": "Load the affected page or run the build, and confirm the new behaviour.",
+                "confidence": 0.85,
+                "source": "rule_pack",
+                "usage_ids": [
+                  "143dabefb80c6cc46b912e30"
+                ],
+                "docs_status": "unverified",
+                "prompt_version": "v1",
+                "rule_id": "next/bundlepagesrouterdependencies"
+              },
+              {
+                "id": "dependency_build-79fda63c87a3748eba07924e",
+                "repo_id": "1e39c80a511c18da",
+                "lens": "dependency_build",
+                "concern": "dependency",
+                "severity": "medium",
+                "evidence": [
+                  {
+                    "repo_id": "1e39c80a511c18da",
+                    "file": "packages/nextjs/next.config.js",
+                    "line_start": 7,
+                    "line_end": 7,
+                    "snippet_hash": "050f77c5e548cf032daed8c659dcda69a6a608fcadd5a48cd6f38ea8ebacc846"
+                  }
+                ],
+                "doc_refs": [],
+                "reasoning": "bundlePagesRouterDependencies: experimental.bundlePagesExternals was renamed to bundlePagesRouterDependencies.",
+                "action": "Update to: bundlePagesRouterDependencies",
+                "step_kind": "manual",
+                "verify": "Load the affected page or run the build, and confirm the new behaviour.",
+                "confidence": 0.85,
+                "source": "rule_pack",
+                "usage_ids": [
+                  "79fda63c87a3748eba07924e"
+                ],
+                "docs_status": "unverified",
+                "prompt_version": "v1",
+                "rule_id": "next/bundlepagesrouterdependencies"
+              },
+              {
+                "id": "dependency_build-b11be40c78d75b867eed30ee",
+                "repo_id": "1e39c80a511c18da",
+                "lens": "dependency_build",
+                "concern": "dependency",
+                "severity": "medium",
+                "evidence": [
+                  {
+                    "repo_id": "1e39c80a511c18da",
+                    "file": "packages/nextjs/next.config.js",
+                    "line_start": 8,
+                    "line_end": 8,
+                    "snippet_hash": "354b4a44186f14a2e2db4f0fd7825ada89008937c66acf1b7edacda45d2c35a7"
+                  }
+                ],
+                "doc_refs": [],
+                "reasoning": "bundlePagesRouterDependencies: experimental.bundlePagesExternals was renamed to bundlePagesRouterDependencies.",
+                "action": "Update to: bundlePagesRouterDependencies",
+                "step_kind": "manual",
+                "verify": "Load the affected page or run the build, and confirm the new behaviour.",
+                "confidence": 0.85,
+                "source": "rule_pack",
+                "usage_ids": [
+                  "b11be40c78d75b867eed30ee"
+                ],
+                "docs_status": "unverified",
+                "prompt_version": "v1",
+                "rule_id": "next/bundlepagesrouterdependencies"
+              },
+              {
+                "id": "dependency_build-900fd97812a4468c593eaab9",
+                "repo_id": "1e39c80a511c18da",
+                "lens": "dependency_build",
+                "concern": "dependency",
+                "severity": "medium",
+                "evidence": [
+                  {
+                    "repo_id": "1e39c80a511c18da",
+                    "file": "packages/nextjs/next.config.js",
+                    "line_start": 10,
+                    "line_end": 10,
+                    "snippet_hash": "d9aae700b1152f04f35a8a2b27273dd22c1aed988656d0668055a0e87a42c687"
+                  }
+                ],
+                "doc_refs": [],
+                "reasoning": "bundlePagesRouterDependencies: experimental.bundlePagesExternals was renamed to bundlePagesRouterDependencies.",
+                "action": "Update to: bundlePagesRouterDependencies",
+                "step_kind": "manual",
+                "verify": "Load the affected page or run the build, and confirm the new behaviour.",
+                "confidence": 0.85,
+                "source": "rule_pack",
+                "usage_ids": [
+                  "900fd97812a4468c593eaab9"
+                ],
+                "docs_status": "unverified",
+                "prompt_version": "v1",
+                "rule_id": "next/bundlepagesrouterdependencies"
+              },
+              {
+                "id": "dependency_build-a6e2e7e41af8638ddfbd407a",
+                "repo_id": "1e39c80a511c18da",
+                "lens": "dependency_build",
+                "concern": "dependency",
+                "severity": "medium",
+                "evidence": [
+                  {
+                    "repo_id": "1e39c80a511c18da",
+                    "file": "packages/nextjs/next.config.js",
+                    "line_start": 11,
+                    "line_end": 11,
+                    "snippet_hash": "e0617aced2a02b83ed84c348fcd70111331ca081e855c6f19c8c4ede3e91000b"
+                  }
+                ],
+                "doc_refs": [],
+                "reasoning": "bundlePagesRouterDependencies: experimental.bundlePagesExternals was renamed to bundlePagesRouterDependencies.",
+                "action": "Update to: bundlePagesRouterDependencies",
+                "step_kind": "manual",
+                "verify": "Load the affected page or run the build, and confirm the new behaviour.",
+                "confidence": 0.85,
+                "source": "rule_pack",
+                "usage_ids": [
+                  "a6e2e7e41af8638ddfbd407a"
+                ],
+                "docs_status": "unverified",
+                "prompt_version": "v1",
+                "rule_id": "next/bundlepagesrouterdependencies"
+              },
+              {
+                "id": "dependency_build-0df8cf473959fb61a9910a6d",
+                "repo_id": "1e39c80a511c18da",
+                "lens": "dependency_build",
+                "concern": "dependency",
+                "severity": "medium",
+                "evidence": [
+                  {
+                    "repo_id": "1e39c80a511c18da",
+                    "file": "packages/nextjs/next.config.js",
+                    "line_start": 13,
+                    "line_end": 13,
+                    "snippet_hash": "69174abd569f5a2e988c87127a2aab8619f93f344814f42d7a5d409888fc202e"
+                  }
+                ],
+                "doc_refs": [],
+                "reasoning": "bundlePagesRouterDependencies: experimental.bundlePagesExternals was renamed to bundlePagesRouterDependencies.",
+                "action": "Update to: bundlePagesRouterDependencies",
+                "step_kind": "manual",
+                "verify": "Load the affected page or run the build, and confirm the new behaviour.",
+                "confidence": 0.85,
+                "source": "rule_pack",
+                "usage_ids": [
+                  "0df8cf473959fb61a9910a6d"
+                ],
+                "docs_status": "unverified",
+                "prompt_version": "v1",
+                "rule_id": "next/bundlepagesrouterdependencies"
+              },
+              {
+                "id": "dependency_build-17db2c6b6d116602e6777ede",
+                "repo_id": "1e39c80a511c18da",
+                "lens": "dependency_build",
+                "concern": "dependency",
+                "severity": "medium",
+                "evidence": [
+                  {
+                    "repo_id": "1e39c80a511c18da",
+                    "file": "packages/nextjs/package.json",
+                    "line_start": 10,
+                    "line_end": 10,
+                    "snippet_hash": "bd17ce788bcd8389bf66bc28673d101e924d02698a6c30b90b496e550cc67844"
+                  }
+                ],
+                "doc_refs": [],
+                "reasoning": "bundlePagesRouterDependencies: experimental.bundlePagesExternals was renamed to bundlePagesRouterDependencies.",
+                "action": "Update to: bundlePagesRouterDependencies",
+                "step_kind": "manual",
+                "verify": "Load the affected page or run the build, and confirm the new behaviour.",
+                "confidence": 0.85,
+                "source": "rule_pack",
+                "usage_ids": [
+                  "17db2c6b6d116602e6777ede"
+                ],
+                "docs_status": "unverified",
+                "prompt_version": "v1",
+                "rule_id": "next/bundlepagesrouterdependencies"
+              },
+              {
+                "id": "dependency_build-2b5a92c1288bbdae3ca65b0b",
+                "repo_id": "1e39c80a511c18da",
+                "lens": "dependency_build",
+                "concern": "dependency",
+                "severity": "medium",
+                "evidence": [
+                  {
+                    "repo_id": "1e39c80a511c18da",
+                    "file": "packages/nextjs/package.json",
+                    "line_start": 33,
+                    "line_end": 33,
+                    "snippet_hash": "382f55d55f00334a7480c68aa204a8e48ba0616eaa9ab0f73b4fb24d94848eeb"
+                  }
+                ],
+                "doc_refs": [],
+                "reasoning": "bundlePagesRouterDependencies: experimental.bundlePagesExternals was renamed to bundlePagesRouterDependencies.",
+                "action": "Update to: bundlePagesRouterDependencies",
+                "step_kind": "manual",
+                "verify": "Load the affected page or run the build, and confirm the new behaviour.",
+                "confidence": 0.85,
+                "source": "rule_pack",
+                "usage_ids": [
+                  "2b5a92c1288bbdae3ca65b0b"
+                ],
+                "docs_status": "unverified",
+                "prompt_version": "v1",
+                "rule_id": "next/bundlepagesrouterdependencies"
+              },
+              {
+                "id": "dependency_build-a8100cdb8c730b710ef7bebd",
+                "repo_id": "1e39c80a511c18da",
+                "lens": "dependency_build",
+                "concern": "dependency",
+                "severity": "medium",
+                "evidence": [
+                  {
+                    "repo_id": "1e39c80a511c18da",
+                    "file": "packages/nextjs/package.json",
+                    "line_start": 37,
+                    "line_end": 37,
+                    "snippet_hash": "ede90f68eb618808859c87cecd78acb284952e7681cc3196432f452fa227f127"
+                  }
+                ],
+                "doc_refs": [],
+                "reasoning": "bundlePagesRouterDependencies: experimental.bundlePagesExternals was renamed to bundlePagesRouterDependencies.",
+                "action": "Update to: bundlePagesRouterDependencies",
+                "step_kind": "manual",
+                "verify": "Load the affected page or run the build, and confirm the new behaviour.",
+                "confidence": 0.85,
+                "source": "rule_pack",
+                "usage_ids": [
+                  "a8100cdb8c730b710ef7bebd"
+                ],
+                "docs_status": "unverified",
+                "prompt_version": "v1",
+                "rule_id": "next/bundlepagesrouterdependencies"
+              },
+              {
+                "id": "dependency_build-886279ed9272e532b052812e",
+                "repo_id": "1e39c80a511c18da",
+                "lens": "dependency_build",
+                "concern": "dependency",
+                "severity": "medium",
+                "evidence": [
+                  {
+                    "repo_id": "1e39c80a511c18da",
+                    "file": "packages/nextjs/package.json",
+                    "line_start": 39,
+                    "line_end": 39,
+                    "snippet_hash": "3c88010faa1a355f011dcde4840fa7efab30b59db2157d161d2f92ad3030fba6"
+                  }
+                ],
+                "doc_refs": [],
+                "reasoning": "bundlePagesRouterDependencies: experimental.bundlePagesExternals was renamed to bundlePagesRouterDependencies.",
+                "action": "Update to: bundlePagesRouterDependencies",
+                "step_kind": "manual",
+                "verify": "Load the affected page or run the build, and confirm the new behaviour.",
+                "confidence": 0.85,
+                "source": "rule_pack",
+                "usage_ids": [
+                  "886279ed9272e532b052812e"
+                ],
+                "docs_status": "unverified",
+                "prompt_version": "v1",
+                "rule_id": "next/bundlepagesrouterdependencies"
+              },
+              {
+                "id": "dependency_build-1f74b722787da0922d7794df",
+                "repo_id": "1e39c80a511c18da",
+                "lens": "dependency_build",
+                "concern": "dependency",
+                "severity": "medium",
+                "evidence": [
+                  {
+                    "repo_id": "1e39c80a511c18da",
+                    "file": "packages/nextjs/package.json",
+                    "line_start": 52,
+                    "line_end": 52,
+                    "snippet_hash": "aea328f97d5c6d270be0d718871c1c772a542f23e9633f4a1b672866cb6f5e42"
+                  }
+                ],
+                "doc_refs": [],
+                "reasoning": "bundlePagesRouterDependencies: experimental.bundlePagesExternals was renamed to bundlePagesRouterDependencies.",
+                "action": "Update to: bundlePagesRouterDependencies",
+                "step_kind": "manual",
+                "verify": "Load the affected page or run the build, and confirm the new behaviour.",
+                "confidence": 0.85,
+                "source": "rule_pack",
+                "usage_ids": [
+                  "1f74b722787da0922d7794df"
+                ],
+                "docs_status": "unverified",
+                "prompt_version": "v1",
+                "rule_id": "next/bundlepagesrouterdependencies"
+              },
+              {
+                "id": "dependency_build-2c03ef124ce0017d34147c41",
+                "repo_id": "1e39c80a511c18da",
+                "lens": "dependency_build",
+                "concern": "dependency",
+                "severity": "medium",
+                "evidence": [
+                  {
+                    "repo_id": "1e39c80a511c18da",
+                    "file": "packages/nextjs/package.json",
+                    "line_start": 57,
+                    "line_end": 57,
+                    "snippet_hash": "8f214de34d5aa6e6beca3f7fcdd9501eb0a90c4a2c919c96f14ccf0c8c876193"
+                  }
+                ],
+                "doc_refs": [],
+                "reasoning": "bundlePagesRouterDependencies: experimental.bundlePagesExternals was renamed to bundlePagesRouterDependencies.",
+                "action": "Update to: bundlePagesRouterDependencies",
+                "step_kind": "manual",
+                "verify": "Load the affected page or run the build, and confirm the new behaviour.",
+                "confidence": 0.85,
+                "source": "rule_pack",
+                "usage_ids": [
+                  "2c03ef124ce0017d34147c41"
+                ],
+                "docs_status": "unverified",
+                "prompt_version": "v1",
+                "rule_id": "next/bundlepagesrouterdependencies"
+              },
+              {
+                "id": "dependency_build-69597b38ce13610ff6a80023",
+                "repo_id": "1e39c80a511c18da",
+                "lens": "dependency_build",
+                "concern": "dependency",
+                "severity": "medium",
+                "evidence": [
+                  {
+                    "repo_id": "1e39c80a511c18da",
+                    "file": "packages/nextjs/package.json",
+                    "line_start": 64,
+                    "line_end": 64,
+                    "snippet_hash": "8614c47cf561095bad7a5b096add5cf4ea3a5fa52a49b5c12ea8a70ebac631e6"
+                  }
+                ],
+                "doc_refs": [],
+                "reasoning": "bundlePagesRouterDependencies: experimental.bundlePagesExternals was renamed to bundlePagesRouterDependencies.",
+                "action": "Update to: bundlePagesRouterDependencies",
+                "step_kind": "manual",
+                "verify": "Load the affected page or run the build, and confirm the new behaviour.",
+                "confidence": 0.85,
+                "source": "rule_pack",
+                "usage_ids": [
+                  "69597b38ce13610ff6a80023"
+                ],
+                "docs_status": "unverified",
+                "prompt_version": "v1",
+                "rule_id": "next/bundlepagesrouterdependencies"
+              },
+              {
+                "id": "dependency_build-93895db78b3ee6fcbca34d03",
+                "repo_id": "1e39c80a511c18da",
+                "lens": "dependency_build",
+                "concern": "dependency",
+                "severity": "medium",
+                "evidence": [
+                  {
+                    "repo_id": "1e39c80a511c18da",
+                    "file": "yarn.lock",
+                    "line_start": 22,
+                    "line_end": 22,
+                    "snippet_hash": "81e0c7ab1f28725b07d76e92b533b236bce8f2ce75937e74398b1cfe392a0630"
+                  }
+                ],
+                "doc_refs": [],
+                "reasoning": "bundlePagesRouterDependencies: experimental.bundlePagesExternals was renamed to bundlePagesRouterDependencies.",
+                "action": "Update to: bundlePagesRouterDependencies",
+                "step_kind": "manual",
+                "verify": "Load the affected page or run the build, and confirm the new behaviour.",
+                "confidence": 0.85,
+                "source": "rule_pack",
+                "usage_ids": [
+                  "93895db78b3ee6fcbca34d03"
+                ],
+                "docs_status": "unverified",
+                "prompt_version": "v1",
+                "rule_id": "next/bundlepagesrouterdependencies"
+              },
+              {
+                "id": "dependency_build-16c965a5cf629ec8a6c0a7b8",
+                "repo_id": "1e39c80a511c18da",
+                "lens": "dependency_build",
+                "concern": "dependency",
+                "severity": "medium",
+                "evidence": [
+                  {
+                    "repo_id": "1e39c80a511c18da",
+                    "file": "yarn.lock",
+                    "line_start": 22,
+                    "line_end": 22,
+                    "snippet_hash": "81e0c7ab1f28725b07d76e92b533b236bce8f2ce75937e74398b1cfe392a0630"
+                  }
+                ],
+                "doc_refs": [],
+                "reasoning": "bundlePagesRouterDependencies: experimental.bundlePagesExternals was renamed to bundlePagesRouterDependencies.",
+                "action": "Update to: bundlePagesRouterDependencies",
+                "step_kind": "manual",
+                "verify": "Load the affected page or run the build, and confirm the new behaviour.",
+                "confidence": 0.85,
+                "source": "rule_pack",
+                "usage_ids": [
+                  "16c965a5cf629ec8a6c0a7b8"
+                ],
+                "docs_status": "unverified",
+                "prompt_version": "v1",
+                "rule_id": "next/bundlepagesrouterdependencies"
+              },
+              {
+                "id": "dependency_build-e9b153132016d5d2ed26ea4d",
+                "repo_id": "1e39c80a511c18da",
+                "lens": "dependency_build",
+                "concern": "dependency",
+                "severity": "medium",
+                "evidence": [
+                  {
+                    "repo_id": "1e39c80a511c18da",
+                    "file": "yarn.lock",
+                    "line_start": 159,
+                    "line_end": 159,
+                    "snippet_hash": "75e4501e861948ec53bf4ae320e1daf874eab60cb497c3b44d77ad38c3254aae"
+                  }
+                ],
+                "doc_refs": [],
+                "reasoning": "bundlePagesRouterDependencies: experimental.bundlePagesExternals was renamed to bundlePagesRouterDependencies.",
+                "action": "Update to: bundlePagesRouterDependencies",
+                "step_kind": "manual",
+                "verify": "Load the affected page or run the build, and confirm the new behaviour.",
+                "confidence": 0.85,
+                "source": "rule_pack",
+                "usage_ids": [
+                  "e9b153132016d5d2ed26ea4d"
+                ],
+                "docs_status": "unverified",
+                "prompt_version": "v1",
+                "rule_id": "next/bundlepagesrouterdependencies"
+              },
+              {
+                "id": "dependency_build-8f880647ce2df074a3c41949",
+                "repo_id": "1e39c80a511c18da",
+                "lens": "dependency_build",
+                "concern": "dependency",
+                "severity": "medium",
+                "evidence": [
+                  {
+                    "repo_id": "1e39c80a511c18da",
+                    "file": "yarn.lock",
+                    "line_start": 538,
+                    "line_end": 538,
+                    "snippet_hash": "fbfb76b47c19d8ffc5fd890a6f87d87582b1c87433a42b8d6d0ec3976cd0d099"
+                  }
+                ],
+                "doc_refs": [],
+                "reasoning": "bundlePagesRouterDependencies: experimental.bundlePagesExternals was renamed to bundlePagesRouterDependencies.",
+                "action": "Update to: bundlePagesRouterDependencies",
+                "step_kind": "manual",
+                "verify": "Load the affected page or run the build, and confirm the new behaviour.",
+                "confidence": 0.85,
+                "source": "rule_pack",
+                "usage_ids": [
+                  "8f880647ce2df074a3c41949"
+                ],
+                "docs_status": "unverified",
+                "prompt_version": "v1",
+                "rule_id": "next/bundlepagesrouterdependencies"
+              },
+              {
+                "id": "dependency_build-51d62391ba058754a02dbbaa",
+                "repo_id": "1e39c80a511c18da",
+                "lens": "dependency_build",
+                "concern": "dependency",
+                "severity": "medium",
+                "evidence": [
+                  {
+                    "repo_id": "1e39c80a511c18da",
+                    "file": "yarn.lock",
+                    "line_start": 1259,
+                    "line_end": 1259,
+                    "snippet_hash": "c643ffd44b30307ae9c0c1583ee8ab71755b8ab69334bab32f77f1be30991c40"
+                  }
+                ],
+                "doc_refs": [],
+                "reasoning": "bundlePagesRouterDependencies: experimental.bundlePagesExternals was renamed to bundlePagesRouterDependencies.",
+                "action": "Update to: bundlePagesRouterDependencies",
+                "step_kind": "manual",
+                "verify": "Load the affected page or run the build, and confirm the new behaviour.",
+                "confidence": 0.85,
+                "source": "rule_pack",
+                "usage_ids": [
+                  "51d62391ba058754a02dbbaa"
+                ],
+                "docs_status": "unverified",
+                "prompt_version": "v1",
+                "rule_id": "next/bundlepagesrouterdependencies"
+              },
+              {
+                "id": "dependency_build-d3650c02b39f80559dd5e30d",
+                "repo_id": "1e39c80a511c18da",
+                "lens": "dependency_build",
+                "concern": "dependency",
+                "severity": "medium",
+                "evidence": [
+                  {
+                    "repo_id": "1e39c80a511c18da",
+                    "file": "yarn.lock",
+                    "line_start": 1272,
+                    "line_end": 1272,
+                    "snippet_hash": "d973fcc2d0dee009144779d228d08c6184b5577a8df38a38326e8b40ff90568c"
+                  }
+                ],
+                "doc_refs": [],
+                "reasoning": "bundlePagesRouterDependencies: experimental.bundlePagesExternals was renamed to bundlePagesRouterDependencies.",
+                "action": "Update to: bundlePagesRouterDependencies",
+                "step_kind": "manual",
+                "verify": "Load the affected page or run the build, and confirm the new behaviour.",
+                "confidence": 0.85,
+                "source": "rule_pack",
+                "usage_ids": [
+                  "d3650c02b39f80559dd5e30d"
+                ],
+                "docs_status": "unverified",
+                "prompt_version": "v1",
+                "rule_id": "next/bundlepagesrouterdependencies"
+              },
+              {
+                "id": "dependency_build-45a50fee5611632073ac5b2c",
+                "repo_id": "1e39c80a511c18da",
+                "lens": "dependency_build",
+                "concern": "dependency",
+                "severity": "medium",
+                "evidence": [
+                  {
+                    "repo_id": "1e39c80a511c18da",
+                    "file": "yarn.lock",
+                    "line_start": 1287,
+                    "line_end": 1287,
+                    "snippet_hash": "33b2eac1803290ffb01fe85efb146b441b1bc30bb127cd3186e2af5a3097cb87"
+                  }
+                ],
+                "doc_refs": [],
+                "reasoning": "bundlePagesRouterDependencies: experimental.bundlePagesExternals was renamed to bundlePagesRouterDependencies.",
+                "action": "Update to: bundlePagesRouterDependencies",
+                "step_kind": "manual",
+                "verify": "Load the affected page or run the build, and confirm the new behaviour.",
+                "confidence": 0.85,
+                "source": "rule_pack",
+                "usage_ids": [
+                  "45a50fee5611632073ac5b2c"
+                ],
+                "docs_status": "unverified",
+                "prompt_version": "v1",
+                "rule_id": "next/bundlepagesrouterdependencies"
+              },
+              {
+                "id": "dependency_build-6a401071cdfee55b6d192f43",
+                "repo_id": "1e39c80a511c18da",
+                "lens": "dependency_build",
+                "concern": "dependency",
+                "severity": "medium",
+                "evidence": [
+                  {
+                    "repo_id": "1e39c80a511c18da",
+                    "file": "yarn.lock",
+                    "line_start": 1287,
+                    "line_end": 1287,
+                    "snippet_hash": "33b2eac1803290ffb01fe85efb146b441b1bc30bb127cd3186e2af5a3097cb87"
+                  }
+                ],
+                "doc_refs": [],
+                "reasoning": "bundlePagesRouterDependencies: experimental.bundlePagesExternals was renamed to bundlePagesRouterDependencies.",
+                "action": "Update to: bundlePagesRouterDependencies",
+                "step_kind": "manual",
+                "verify": "Load the affected page or run the build, and confirm the new behaviour.",
+                "confidence": 0.85,
+                "source": "rule_pack",
+                "usage_ids": [
+                  "6a401071cdfee55b6d192f43"
+                ],
+                "docs_status": "unverified",
+                "prompt_version": "v1",
+                "rule_id": "next/bundlepagesrouterdependencies"
+              },
+              {
+                "id": "dependency_build-dc2b0942e5e6f9c1a642e142",
+                "repo_id": "1e39c80a511c18da",
+                "lens": "dependency_build",
+                "concern": "dependency",
+                "severity": "medium",
+                "evidence": [
+                  {
+                    "repo_id": "1e39c80a511c18da",
+                    "file": "yarn.lock",
+                    "line_start": 1755,
+                    "line_end": 1755,
+                    "snippet_hash": "c1e644ebe40dcef168742daff0341416893b2e7df54e62fbb5e50f729bee3944"
+                  }
+                ],
+                "doc_refs": [],
+                "reasoning": "bundlePagesRouterDependencies: experimental.bundlePagesExternals was renamed to bundlePagesRouterDependencies.",
+                "action": "Update to: bundlePagesRouterDependencies",
+                "step_kind": "manual",
+                "verify": "Load the affected page or run the build, and confirm the new behaviour.",
+                "confidence": 0.85,
+                "source": "rule_pack",
+                "usage_ids": [
+                  "dc2b0942e5e6f9c1a642e142"
+                ],
+                "docs_status": "unverified",
+                "prompt_version": "v1",
+                "rule_id": "next/bundlepagesrouterdependencies"
+              },
+              {
+                "id": "dependency_build-2398565b9de3c8953560e5d0",
+                "repo_id": "1e39c80a511c18da",
+                "lens": "dependency_build",
+                "concern": "dependency",
+                "severity": "medium",
+                "evidence": [
+                  {
+                    "repo_id": "1e39c80a511c18da",
+                    "file": "yarn.lock",
+                    "line_start": 5698,
+                    "line_end": 5698,
+                    "snippet_hash": "38f619470e854013b3498f936e8a3445863262c47b8ebde02845dfa74980020d"
+                  }
+                ],
+                "doc_refs": [],
+                "reasoning": "bundlePagesRouterDependencies: experimental.bundlePagesExternals was renamed to bundlePagesRouterDependencies.",
+                "action": "Update to: bundlePagesRouterDependencies",
+                "step_kind": "manual",
+                "verify": "Load the affected page or run the build, and confirm the new behaviour.",
+                "confidence": 0.85,
+                "source": "rule_pack",
+                "usage_ids": [
+                  "2398565b9de3c8953560e5d0"
+                ],
+                "docs_status": "unverified",
+                "prompt_version": "v1",
+                "rule_id": "next/bundlepagesrouterdependencies"
+              },
+              {
+                "id": "dependency_build-c8d3ca618c27196a5edd9e27",
+                "repo_id": "1e39c80a511c18da",
+                "lens": "dependency_build",
+                "concern": "dependency",
+                "severity": "medium",
+                "evidence": [
+                  {
+                    "repo_id": "1e39c80a511c18da",
+                    "file": "yarn.lock",
+                    "line_start": 7716,
+                    "line_end": 7716,
+                    "snippet_hash": "2f869a1ca6115a0f95004a0eeacb8425ff926d69908737096ed8a647a8de6151"
+                  }
+                ],
+                "doc_refs": [],
+                "reasoning": "bundlePagesRouterDependencies: experimental.bundlePagesExternals was renamed to bundlePagesRouterDependencies.",
+                "action": "Update to: bundlePagesRouterDependencies",
+                "step_kind": "manual",
+                "verify": "Load the affected page or run the build, and confirm the new behaviour.",
+                "confidence": 0.85,
+                "source": "rule_pack",
+                "usage_ids": [
+                  "c8d3ca618c27196a5edd9e27"
+                ],
+                "docs_status": "unverified",
+                "prompt_version": "v1",
+                "rule_id": "next/bundlepagesrouterdependencies"
+              },
+              {
+                "id": "dependency_build-e3e7182ae6b16b6943f38c10",
+                "repo_id": "1e39c80a511c18da",
+                "lens": "dependency_build",
+                "concern": "dependency",
+                "severity": "medium",
+                "evidence": [
+                  {
+                    "repo_id": "1e39c80a511c18da",
+                    "file": "yarn.lock",
+                    "line_start": 7716,
+                    "line_end": 7716,
+                    "snippet_hash": "2f869a1ca6115a0f95004a0eeacb8425ff926d69908737096ed8a647a8de6151"
+                  }
+                ],
+                "doc_refs": [],
+                "reasoning": "bundlePagesRouterDependencies: experimental.bundlePagesExternals was renamed to bundlePagesRouterDependencies.",
+                "action": "Update to: bundlePagesRouterDependencies",
+                "step_kind": "manual",
+                "verify": "Load the affected page or run the build, and confirm the new behaviour.",
+                "confidence": 0.85,
+                "source": "rule_pack",
+                "usage_ids": [
+                  "e3e7182ae6b16b6943f38c10"
+                ],
+                "docs_status": "unverified",
+                "prompt_version": "v1",
+                "rule_id": "next/bundlepagesrouterdependencies"
+              },
+              {
+                "id": "dependency_build-32223f7f60a0dd7795bdab07",
+                "repo_id": "1e39c80a511c18da",
+                "lens": "dependency_build",
+                "concern": "dependency",
+                "severity": "medium",
+                "evidence": [
+                  {
+                    "repo_id": "1e39c80a511c18da",
+                    "file": "yarn.lock",
+                    "line_start": 7716,
+                    "line_end": 7716,
+                    "snippet_hash": "2f869a1ca6115a0f95004a0eeacb8425ff926d69908737096ed8a647a8de6151"
+                  }
+                ],
+                "doc_refs": [],
+                "reasoning": "bundlePagesRouterDependencies: experimental.bundlePagesExternals was renamed to bundlePagesRouterDependencies.",
+                "action": "Update to: bundlePagesRouterDependencies",
+                "step_kind": "manual",
+                "verify": "Load the affected page or run the build, and confirm the new behaviour.",
+                "confidence": 0.85,
+                "source": "rule_pack",
+                "usage_ids": [
+                  "32223f7f60a0dd7795bdab07"
+                ],
+                "docs_status": "unverified",
+                "prompt_version": "v1",
+                "rule_id": "next/bundlepagesrouterdependencies"
+              },
+              {
+                "id": "dependency_build-e6e1326a76daaff61a2fdbc8",
+                "repo_id": "1e39c80a511c18da",
+                "lens": "dependency_build",
+                "concern": "dependency",
+                "severity": "medium",
+                "evidence": [
+                  {
+                    "repo_id": "1e39c80a511c18da",
+                    "file": "yarn.lock",
+                    "line_start": 7727,
+                    "line_end": 7727,
+                    "snippet_hash": "f83f10f84155f486750d9497860d03136173de2cffde29985c6631e8462e0e48"
+                  }
+                ],
+                "doc_refs": [],
+                "reasoning": "bundlePagesRouterDependencies: experimental.bundlePagesExternals was renamed to bundlePagesRouterDependencies.",
+                "action": "Update to: bundlePagesRouterDependencies",
+                "step_kind": "manual",
+                "verify": "Load the affected page or run the build, and confirm the new behaviour.",
+                "confidence": 0.85,
+                "source": "rule_pack",
+                "usage_ids": [
+                  "e6e1326a76daaff61a2fdbc8"
+                ],
+                "docs_status": "unverified",
+                "prompt_version": "v1",
+                "rule_id": "next/bundlepagesrouterdependencies"
+              },
+              {
+                "id": "dependency_build-c17a1c64095a55a24ca74b0d",
+                "repo_id": "1e39c80a511c18da",
+                "lens": "dependency_build",
+                "concern": "dependency",
+                "severity": "medium",
+                "evidence": [
+                  {
+                    "repo_id": "1e39c80a511c18da",
+                    "file": "yarn.lock",
+                    "line_start": 7727,
+                    "line_end": 7727,
+                    "snippet_hash": "f83f10f84155f486750d9497860d03136173de2cffde29985c6631e8462e0e48"
+                  }
+                ],
+                "doc_refs": [],
+                "reasoning": "bundlePagesRouterDependencies: experimental.bundlePagesExternals was renamed to bundlePagesRouterDependencies.",
+                "action": "Update to: bundlePagesRouterDependencies",
+                "step_kind": "manual",
+                "verify": "Load the affected page or run the build, and confirm the new behaviour.",
+                "confidence": 0.85,
+                "source": "rule_pack",
+                "usage_ids": [
+                  "c17a1c64095a55a24ca74b0d"
+                ],
+                "docs_status": "unverified",
+                "prompt_version": "v1",
+                "rule_id": "next/bundlepagesrouterdependencies"
+              },
+              {
+                "id": "dependency_build-88006b6e674e0752ca03382c",
+                "repo_id": "1e39c80a511c18da",
+                "lens": "dependency_build",
+                "concern": "dependency",
+                "severity": "medium",
+                "evidence": [
+                  {
+                    "repo_id": "1e39c80a511c18da",
+                    "file": "yarn.lock",
+                    "line_start": 8741,
+                    "line_end": 8741,
+                    "snippet_hash": "6fdbb6cae8b61b0ca101837af28127c7cd2f194f2ba74d673c7e6cd0912f5984"
+                  }
+                ],
+                "doc_refs": [],
+                "reasoning": "bundlePagesRouterDependencies: experimental.bundlePagesExternals was renamed to bundlePagesRouterDependencies.",
+                "action": "Update to: bundlePagesRouterDependencies",
+                "step_kind": "manual",
+                "verify": "Load the affected page or run the build, and confirm the new behaviour.",
+                "confidence": 0.85,
+                "source": "rule_pack",
+                "usage_ids": [
+                  "88006b6e674e0752ca03382c"
+                ],
+                "docs_status": "unverified",
+                "prompt_version": "v1",
+                "rule_id": "next/bundlepagesrouterdependencies"
+              },
+              {
+                "id": "dependency_build-11914e77f1312f8e1ada87ca",
+                "repo_id": "1e39c80a511c18da",
+                "lens": "dependency_build",
+                "concern": "dependency",
+                "severity": "medium",
+                "evidence": [
+                  {
+                    "repo_id": "1e39c80a511c18da",
+                    "file": "yarn.lock",
+                    "line_start": 8841,
+                    "line_end": 8841,
+                    "snippet_hash": "e2226db2a5b4162fa97c9eb1cfa996d1f0b84efbdd57930cfe010fe3655ef91c"
+                  }
+                ],
+                "doc_refs": [],
+                "reasoning": "bundlePagesRouterDependencies: experimental.bundlePagesExternals was renamed to bundlePagesRouterDependencies.",
+                "action": "Update to: bundlePagesRouterDependencies",
+                "step_kind": "manual",
+                "verify": "Load the affected page or run the build, and confirm the new behaviour.",
+                "confidence": 0.85,
+                "source": "rule_pack",
+                "usage_ids": [
+                  "11914e77f1312f8e1ada87ca"
+                ],
+                "docs_status": "unverified",
+                "prompt_version": "v1",
+                "rule_id": "next/bundlepagesrouterdependencies"
+              },
+              {
+                "id": "dependency_build-edaf0062259730a7b8c0e42f",
+                "repo_id": "1e39c80a511c18da",
+                "lens": "dependency_build",
+                "concern": "dependency",
+                "severity": "medium",
+                "evidence": [
+                  {
+                    "repo_id": "1e39c80a511c18da",
+                    "file": "yarn.lock",
+                    "line_start": 8853,
+                    "line_end": 8853,
+                    "snippet_hash": "4a637fa66a9b138898b73941fb90b463995256481e95a09e4fbfb96b892bc09f"
+                  }
+                ],
+                "doc_refs": [],
+                "reasoning": "bundlePagesRouterDependencies: experimental.bundlePagesExternals was renamed to bundlePagesRouterDependencies.",
+                "action": "Update to: bundlePagesRouterDependencies",
+                "step_kind": "manual",
+                "verify": "Load the affected page or run the build, and confirm the new behaviour.",
+                "confidence": 0.85,
+                "source": "rule_pack",
+                "usage_ids": [
+                  "edaf0062259730a7b8c0e42f"
+                ],
+                "docs_status": "unverified",
+                "prompt_version": "v1",
+                "rule_id": "next/bundlepagesrouterdependencies"
+              },
+              {
+                "id": "dependency_build-cc5fbe2b5c67223838cc2c1d",
+                "repo_id": "1e39c80a511c18da",
+                "lens": "dependency_build",
+                "concern": "dependency",
+                "severity": "medium",
+                "evidence": [
+                  {
+                    "repo_id": "1e39c80a511c18da",
+                    "file": "yarn.lock",
+                    "line_start": 8865,
+                    "line_end": 8865,
+                    "snippet_hash": "6d038c29bcbf9ba74c4c0f704d17a6b194cb1448819a49f5040826ca8c821577"
+                  }
+                ],
+                "doc_refs": [],
+                "reasoning": "bundlePagesRouterDependencies: experimental.bundlePagesExternals was renamed to bundlePagesRouterDependencies.",
+                "action": "Update to: bundlePagesRouterDependencies",
+                "step_kind": "manual",
+                "verify": "Load the affected page or run the build, and confirm the new behaviour.",
+                "confidence": 0.85,
+                "source": "rule_pack",
+                "usage_ids": [
+                  "cc5fbe2b5c67223838cc2c1d"
+                ],
+                "docs_status": "unverified",
+                "prompt_version": "v1",
+                "rule_id": "next/bundlepagesrouterdependencies"
+              },
+              {
+                "id": "dependency_build-40a2fe0a52354317de1bbc00",
+                "repo_id": "1e39c80a511c18da",
+                "lens": "dependency_build",
+                "concern": "dependency",
+                "severity": "medium",
+                "evidence": [
+                  {
+                    "repo_id": "1e39c80a511c18da",
+                    "file": "yarn.lock",
+                    "line_start": 8865,
+                    "line_end": 8865,
+                    "snippet_hash": "6d038c29bcbf9ba74c4c0f704d17a6b194cb1448819a49f5040826ca8c821577"
+                  }
+                ],
+                "doc_refs": [],
+                "reasoning": "bundlePagesRouterDependencies: experimental.bundlePagesExternals was renamed to bundlePagesRouterDependencies.",
+                "action": "Update to: bundlePagesRouterDependencies",
+                "step_kind": "manual",
+                "verify": "Load the affected page or run the build, and confirm the new behaviour.",
+                "confidence": 0.85,
+                "source": "rule_pack",
+                "usage_ids": [
+                  "40a2fe0a52354317de1bbc00"
+                ],
+                "docs_status": "unverified",
+                "prompt_version": "v1",
+                "rule_id": "next/bundlepagesrouterdependencies"
+              },
+              {
+                "id": "dependency_build-e03e4a2a0ad0cca6670f2231",
+                "repo_id": "1e39c80a511c18da",
+                "lens": "dependency_build",
+                "concern": "dependency",
+                "severity": "medium",
+                "evidence": [
+                  {
+                    "repo_id": "1e39c80a511c18da",
+                    "file": "yarn.lock",
+                    "line_start": 8885,
+                    "line_end": 8885,
+                    "snippet_hash": "1dc06b8053eb134ec970f6249b7643407fba6279b1aea4d56116356423ae80bd"
+                  }
+                ],
+                "doc_refs": [],
+                "reasoning": "bundlePagesRouterDependencies: experimental.bundlePagesExternals was renamed to bundlePagesRouterDependencies.",
+                "action": "Update to: bundlePagesRouterDependencies",
+                "step_kind": "manual",
+                "verify": "Load the affected page or run the build, and confirm the new behaviour.",
+                "confidence": 0.85,
+                "source": "rule_pack",
+                "usage_ids": [
+                  "e03e4a2a0ad0cca6670f2231"
+                ],
+                "docs_status": "unverified",
+                "prompt_version": "v1",
+                "rule_id": "next/bundlepagesrouterdependencies"
+              },
+              {
+                "id": "dependency_build-7f81e97922cbefd70824304c",
+                "repo_id": "1e39c80a511c18da",
+                "lens": "dependency_build",
+                "concern": "dependency",
+                "severity": "medium",
+                "evidence": [
+                  {
+                    "repo_id": "1e39c80a511c18da",
+                    "file": "yarn.lock",
+                    "line_start": 8885,
+                    "line_end": 8885,
+                    "snippet_hash": "1dc06b8053eb134ec970f6249b7643407fba6279b1aea4d56116356423ae80bd"
+                  }
+                ],
+                "doc_refs": [],
+                "reasoning": "bundlePagesRouterDependencies: experimental.bundlePagesExternals was renamed to bundlePagesRouterDependencies.",
+                "action": "Update to: bundlePagesRouterDependencies",
+                "step_kind": "manual",
+                "verify": "Load the affected page or run the build, and confirm the new behaviour.",
+                "confidence": 0.85,
+                "source": "rule_pack",
+                "usage_ids": [
+                  "7f81e97922cbefd70824304c"
+                ],
+                "docs_status": "unverified",
+                "prompt_version": "v1",
+                "rule_id": "next/bundlepagesrouterdependencies"
+              },
+              {
+                "id": "dependency_build-35db722825a99d0dad31bdd5",
+                "repo_id": "1e39c80a511c18da",
+                "lens": "dependency_build",
+                "concern": "dependency",
+                "severity": "medium",
+                "evidence": [
+                  {
+                    "repo_id": "1e39c80a511c18da",
+                    "file": "yarn.lock",
+                    "line_start": 8907,
+                    "line_end": 8907,
+                    "snippet_hash": "00f0776c7683b476dd9d2d5b50cdd62a4a7f06cc5c8810f2f0de7a3d0a17c339"
+                  }
+                ],
+                "doc_refs": [],
+                "reasoning": "bundlePagesRouterDependencies: experimental.bundlePagesExternals was renamed to bundlePagesRouterDependencies.",
+                "action": "Update to: bundlePagesRouterDependencies",
+                "step_kind": "manual",
+                "verify": "Load the affected page or run the build, and confirm the new behaviour.",
+                "confidence": 0.85,
+                "source": "rule_pack",
+                "usage_ids": [
+                  "35db722825a99d0dad31bdd5"
+                ],
+                "docs_status": "unverified",
+                "prompt_version": "v1",
+                "rule_id": "next/bundlepagesrouterdependencies"
+              },
+              {
+                "id": "dependency_build-b1f7f3442a887c99ec6cfda1",
+                "repo_id": "1e39c80a511c18da",
+                "lens": "dependency_build",
+                "concern": "dependency",
+                "severity": "medium",
+                "evidence": [
+                  {
+                    "repo_id": "1e39c80a511c18da",
+                    "file": "yarn.lock",
+                    "line_start": 8923,
+                    "line_end": 8923,
+                    "snippet_hash": "81b0c649d97c4016496f3b0ce2d9f4a1a584e36f4598e9787c780ba57d73a2c1"
+                  }
+                ],
+                "doc_refs": [],
+                "reasoning": "bundlePagesRouterDependencies: experimental.bundlePagesExternals was renamed to bundlePagesRouterDependencies.",
+                "action": "Update to: bundlePagesRouterDependencies",
+                "step_kind": "manual",
+                "verify": "Load the affected page or run the build, and confirm the new behaviour.",
+                "confidence": 0.85,
+                "source": "rule_pack",
+                "usage_ids": [
+                  "b1f7f3442a887c99ec6cfda1"
+                ],
+                "docs_status": "unverified",
+                "prompt_version": "v1",
+                "rule_id": "next/bundlepagesrouterdependencies"
+              },
+              {
+                "id": "dependency_build-5acd692281e2aba87acfdf02",
+                "repo_id": "1e39c80a511c18da",
+                "lens": "dependency_build",
+                "concern": "dependency",
+                "severity": "medium",
+                "evidence": [
+                  {
+                    "repo_id": "1e39c80a511c18da",
+                    "file": "yarn.lock",
+                    "line_start": 8942,
+                    "line_end": 8942,
+                    "snippet_hash": "0c54bc64fc0b75baf21f9e9be8fd39ed9577d94026ddacf9d10a4770d7b8a037"
+                  }
+                ],
+                "doc_refs": [],
+                "reasoning": "bundlePagesRouterDependencies: experimental.bundlePagesExternals was renamed to bundlePagesRouterDependencies.",
+                "action": "Update to: bundlePagesRouterDependencies",
+                "step_kind": "manual",
+                "verify": "Load the affected page or run the build, and confirm the new behaviour.",
+                "confidence": 0.85,
+                "source": "rule_pack",
+                "usage_ids": [
+                  "5acd692281e2aba87acfdf02"
+                ],
+                "docs_status": "unverified",
+                "prompt_version": "v1",
+                "rule_id": "next/bundlepagesrouterdependencies"
+              },
+              {
+                "id": "dependency_build-998fd5e6dd1eccf6e9242ff4",
+                "repo_id": "1e39c80a511c18da",
+                "lens": "dependency_build",
+                "concern": "dependency",
+                "severity": "medium",
+                "evidence": [
+                  {
+                    "repo_id": "1e39c80a511c18da",
+                    "file": "yarn.lock",
+                    "line_start": 8958,
+                    "line_end": 8958,
+                    "snippet_hash": "f44be9112bf624024f6748f179b835ea4e9a89059d455fe82b524b67871d64e9"
+                  }
+                ],
+                "doc_refs": [],
+                "reasoning": "bundlePagesRouterDependencies: experimental.bundlePagesExternals was renamed to bundlePagesRouterDependencies.",
+                "action": "Update to: bundlePagesRouterDependencies",
+                "step_kind": "manual",
+                "verify": "Load the affected page or run the build, and confirm the new behaviour.",
+                "confidence": 0.85,
+                "source": "rule_pack",
+                "usage_ids": [
+                  "998fd5e6dd1eccf6e9242ff4"
+                ],
+                "docs_status": "unverified",
+                "prompt_version": "v1",
+                "rule_id": "next/bundlepagesrouterdependencies"
+              },
+              {
+                "id": "dependency_build-a7ecb4d7bd33bc86786256b4",
+                "repo_id": "1e39c80a511c18da",
+                "lens": "dependency_build",
+                "concern": "dependency",
+                "severity": "medium",
+                "evidence": [
+                  {
+                    "repo_id": "1e39c80a511c18da",
+                    "file": "yarn.lock",
+                    "line_start": 9088,
+                    "line_end": 9088,
+                    "snippet_hash": "ef88b6d743c1a9d81d41935fc650cad8e273ebdd3e0328bdb2bd4ac304356826"
+                  }
+                ],
+                "doc_refs": [],
+                "reasoning": "bundlePagesRouterDependencies: experimental.bundlePagesExternals was renamed to bundlePagesRouterDependencies.",
+                "action": "Update to: bundlePagesRouterDependencies",
+                "step_kind": "manual",
+                "verify": "Load the affected page or run the build, and confirm the new behaviour.",
+                "confidence": 0.85,
+                "source": "rule_pack",
+                "usage_ids": [
+                  "a7ecb4d7bd33bc86786256b4"
+                ],
+                "docs_status": "unverified",
+                "prompt_version": "v1",
+                "rule_id": "next/bundlepagesrouterdependencies"
+              },
+              {
+                "id": "dependency_build-45f81faffd14ea875ffdcdcf",
+                "repo_id": "1e39c80a511c18da",
+                "lens": "dependency_build",
+                "concern": "dependency",
+                "severity": "medium",
+                "evidence": [
+                  {
+                    "repo_id": "1e39c80a511c18da",
+                    "file": "yarn.lock",
+                    "line_start": 9885,
+                    "line_end": 9885,
+                    "snippet_hash": "bd915980fcf5041c6b8b11342c5b3add44299e4e8ad7dd85234497e0790a820c"
+                  }
+                ],
+                "doc_refs": [],
+                "reasoning": "bundlePagesRouterDependencies: experimental.bundlePagesExternals was renamed to bundlePagesRouterDependencies.",
+                "action": "Update to: bundlePagesRouterDependencies",
+                "step_kind": "manual",
+                "verify": "Load the affected page or run the build, and confirm the new behaviour.",
+                "confidence": 0.85,
+                "source": "rule_pack",
+                "usage_ids": [
+                  "45f81faffd14ea875ffdcdcf"
+                ],
+                "docs_status": "unverified",
+                "prompt_version": "v1",
+                "rule_id": "next/bundlepagesrouterdependencies"
+              },
+              {
+                "id": "dependency_build-7fb9e36df52cfb396a24cce6",
+                "repo_id": "1e39c80a511c18da",
+                "lens": "dependency_build",
+                "concern": "dependency",
+                "severity": "medium",
+                "evidence": [
+                  {
+                    "repo_id": "1e39c80a511c18da",
+                    "file": "yarn.lock",
+                    "line_start": 10695,
+                    "line_end": 10695,
+                    "snippet_hash": "c1d75f7cda28bbe44af1e72c2bb95ed9fbe9a12f0d73ded0855d8d1e9fb00085"
+                  }
+                ],
+                "doc_refs": [],
+                "reasoning": "bundlePagesRouterDependencies: experimental.bundlePagesExternals was renamed to bundlePagesRouterDependencies.",
+                "action": "Update to: bundlePagesRouterDependencies",
+                "step_kind": "manual",
+                "verify": "Load the affected page or run the build, and confirm the new behaviour.",
+                "confidence": 0.85,
+                "source": "rule_pack",
+                "usage_ids": [
+                  "7fb9e36df52cfb396a24cce6"
+                ],
+                "docs_status": "unverified",
+                "prompt_version": "v1",
+                "rule_id": "next/bundlepagesrouterdependencies"
+              },
+              {
+                "id": "dependency_build-731b55ca84786a50df9dde4a",
+                "repo_id": "1e39c80a511c18da",
+                "lens": "dependency_build",
+                "concern": "dependency",
+                "severity": "medium",
+                "evidence": [
+                  {
+                    "repo_id": "1e39c80a511c18da",
+                    "file": "yarn.lock",
+                    "line_start": 10710,
+                    "line_end": 10710,
+                    "snippet_hash": "f92d41c6f924c83cd0a9334b8c2366c4653f1a53738affcf84c2e16dc9497751"
+                  }
+                ],
+                "doc_refs": [],
+                "reasoning": "bundlePagesRouterDependencies: experimental.bundlePagesExternals was renamed to bundlePagesRouterDependencies.",
+                "action": "Update to: bundlePagesRouterDependencies",
+                "step_kind": "manual",
+                "verify": "Load the affected page or run the build, and confirm the new behaviour.",
+                "confidence": 0.85,
+                "source": "rule_pack",
+                "usage_ids": [
+                  "731b55ca84786a50df9dde4a"
+                ],
+                "docs_status": "unverified",
+                "prompt_version": "v1",
+                "rule_id": "next/bundlepagesrouterdependencies"
+              },
+              {
+                "id": "dependency_build-83565ea7d6fd5ec266630b70",
+                "repo_id": "1e39c80a511c18da",
+                "lens": "dependency_build",
+                "concern": "dependency",
+                "severity": "medium",
+                "evidence": [
+                  {
+                    "repo_id": "1e39c80a511c18da",
+                    "file": "yarn.lock",
+                    "line_start": 10722,
+                    "line_end": 10722,
+                    "snippet_hash": "80b0e4d951ad4b6b59c03e59965df21dc186d52eecfb4ee34847425457fd191c"
+                  }
+                ],
+                "doc_refs": [],
+                "reasoning": "bundlePagesRouterDependencies: experimental.bundlePagesExternals was renamed to bundlePagesRouterDependencies.",
+                "action": "Update to: bundlePagesRouterDependencies",
+                "step_kind": "manual",
+                "verify": "Load the affected page or run the build, and confirm the new behaviour.",
+                "confidence": 0.85,
+                "source": "rule_pack",
+                "usage_ids": [
+                  "83565ea7d6fd5ec266630b70"
+                ],
+                "docs_status": "unverified",
+                "prompt_version": "v1",
+                "rule_id": "next/bundlepagesrouterdependencies"
+              },
+              {
+                "id": "dependency_build-b616a039cd4f4745fa99da63",
+                "repo_id": "1e39c80a511c18da",
+                "lens": "dependency_build",
+                "concern": "dependency",
+                "severity": "medium",
+                "evidence": [
+                  {
+                    "repo_id": "1e39c80a511c18da",
+                    "file": "yarn.lock",
+                    "line_start": 10731,
+                    "line_end": 10731,
+                    "snippet_hash": "87a217dce1a4b1437f1f1f4cf4946394c492430ce9c821c6f3db5c1a79c0b1e1"
+                  }
+                ],
+                "doc_refs": [],
+                "reasoning": "bundlePagesRouterDependencies: experimental.bundlePagesExternals was renamed to bundlePagesRouterDependencies.",
+                "action": "Update to: bundlePagesRouterDependencies",
+                "step_kind": "manual",
+                "verify": "Load the affected page or run the build, and confirm the new behaviour.",
+                "confidence": 0.85,
+                "source": "rule_pack",
+                "usage_ids": [
+                  "b616a039cd4f4745fa99da63"
+                ],
+                "docs_status": "unverified",
+                "prompt_version": "v1",
+                "rule_id": "next/bundlepagesrouterdependencies"
+              },
+              {
+                "id": "dependency_build-5a3228316250b2c35b128b6c",
+                "repo_id": "1e39c80a511c18da",
+                "lens": "dependency_build",
+                "concern": "dependency",
+                "severity": "medium",
+                "evidence": [
+                  {
+                    "repo_id": "1e39c80a511c18da",
+                    "file": "yarn.lock",
+                    "line_start": 10743,
+                    "line_end": 10743,
+                    "snippet_hash": "d533f590375c739128df7dd6fbb7f7b615a532d662bd4a58699ddbd29ce72967"
+                  }
+                ],
+                "doc_refs": [],
+                "reasoning": "bundlePagesRouterDependencies: experimental.bundlePagesExternals was renamed to bundlePagesRouterDependencies.",
+                "action": "Update to: bundlePagesRouterDependencies",
+                "step_kind": "manual",
+                "verify": "Load the affected page or run the build, and confirm the new behaviour.",
+                "confidence": 0.85,
+                "source": "rule_pack",
+                "usage_ids": [
+                  "5a3228316250b2c35b128b6c"
+                ],
+                "docs_status": "unverified",
+                "prompt_version": "v1",
+                "rule_id": "next/bundlepagesrouterdependencies"
+              },
+              {
+                "id": "dependency_build-f2638fa61b8374e0b4cf471e",
+                "repo_id": "1e39c80a511c18da",
+                "lens": "dependency_build",
+                "concern": "dependency",
+                "severity": "medium",
+                "evidence": [
+                  {
+                    "repo_id": "1e39c80a511c18da",
+                    "file": "yarn.lock",
+                    "line_start": 10757,
+                    "line_end": 10757,
+                    "snippet_hash": "1d3e89653bc40620f02858985287a6d7a0a8047bb09817ab6bc03b0006328245"
+                  }
+                ],
+                "doc_refs": [],
+                "reasoning": "bundlePagesRouterDependencies: experimental.bundlePagesExternals was renamed to bundlePagesRouterDependencies.",
+                "action": "Update to: bundlePagesRouterDependencies",
+                "step_kind": "manual",
+                "verify": "Load the affected page or run the build, and confirm the new behaviour.",
+                "confidence": 0.85,
+                "source": "rule_pack",
+                "usage_ids": [
+                  "f2638fa61b8374e0b4cf471e"
+                ],
+                "docs_status": "unverified",
+                "prompt_version": "v1",
+                "rule_id": "next/bundlepagesrouterdependencies"
+              },
+              {
+                "id": "dependency_build-f76894b0a4eede36f29eb182",
+                "repo_id": "1e39c80a511c18da",
+                "lens": "dependency_build",
+                "concern": "dependency",
+                "severity": "medium",
+                "evidence": [
+                  {
+                    "repo_id": "1e39c80a511c18da",
+                    "file": "yarn.lock",
+                    "line_start": 10773,
+                    "line_end": 10773,
+                    "snippet_hash": "d614bf725d58c21d77fa1b5f04bd64be5c142f9d114d47ca4db0aa04e663fbc2"
+                  }
+                ],
+                "doc_refs": [],
+                "reasoning": "bundlePagesRouterDependencies: experimental.bundlePagesExternals was renamed to bundlePagesRouterDependencies.",
+                "action": "Update to: bundlePagesRouterDependencies",
+                "step_kind": "manual",
+                "verify": "Load the affected page or run the build, and confirm the new behaviour.",
+                "confidence": 0.85,
+                "source": "rule_pack",
+                "usage_ids": [
+                  "f76894b0a4eede36f29eb182"
+                ],
+                "docs_status": "unverified",
+                "prompt_version": "v1",
+                "rule_id": "next/bundlepagesrouterdependencies"
+              },
+              {
+                "id": "dependency_build-d4576d79c2d7e5608b53c4ac",
+                "repo_id": "1e39c80a511c18da",
+                "lens": "dependency_build",
+                "concern": "dependency",
+                "severity": "medium",
+                "evidence": [
+                  {
+                    "repo_id": "1e39c80a511c18da",
+                    "file": "yarn.lock",
+                    "line_start": 10782,
+                    "line_end": 10782,
+                    "snippet_hash": "7a1b63a46b34b6659f19a137498a82800f45cf6571f1261ceef88fb712ce8c58"
+                  }
+                ],
+                "doc_refs": [],
+                "reasoning": "bundlePagesRouterDependencies: experimental.bundlePagesExternals was renamed to bundlePagesRouterDependencies.",
+                "action": "Update to: bundlePagesRouterDependencies",
+                "step_kind": "manual",
+                "verify": "Load the affected page or run the build, and confirm the new behaviour.",
+                "confidence": 0.85,
+                "source": "rule_pack",
+                "usage_ids": [
+                  "d4576d79c2d7e5608b53c4ac"
+                ],
+                "docs_status": "unverified",
+                "prompt_version": "v1",
+                "rule_id": "next/bundlepagesrouterdependencies"
+              },
+              {
+                "id": "dependency_build-e3649be0b7d434725b789466",
+                "repo_id": "1e39c80a511c18da",
+                "lens": "dependency_build",
+                "concern": "dependency",
+                "severity": "medium",
+                "evidence": [
+                  {
+                    "repo_id": "1e39c80a511c18da",
+                    "file": "yarn.lock",
+                    "line_start": 10791,
+                    "line_end": 10791,
+                    "snippet_hash": "0a96c51874a3baaa5192ddbde1a64a6d61d07eef724219a2d880aee637828888"
+                  }
+                ],
+                "doc_refs": [],
+                "reasoning": "bundlePagesRouterDependencies: experimental.bundlePagesExternals was renamed to bundlePagesRouterDependencies.",
+                "action": "Update to: bundlePagesRouterDependencies",
+                "step_kind": "manual",
+                "verify": "Load the affected page or run the build, and confirm the new behaviour.",
+                "confidence": 0.85,
+                "source": "rule_pack",
+                "usage_ids": [
+                  "e3649be0b7d434725b789466"
+                ],
+                "docs_status": "unverified",
+                "prompt_version": "v1",
+                "rule_id": "next/bundlepagesrouterdependencies"
+              },
+              {
+                "id": "dependency_build-cd892cdfa84520e4688b2ac7",
+                "repo_id": "1e39c80a511c18da",
+                "lens": "dependency_build",
+                "concern": "dependency",
+                "severity": "medium",
+                "evidence": [
+                  {
+                    "repo_id": "1e39c80a511c18da",
+                    "file": "yarn.lock",
+                    "line_start": 10800,
+                    "line_end": 10800,
+                    "snippet_hash": "1251000b3daf5f33efa0489c38b5a6fec2f28dba56f2391f06ea82c9ef5d3613"
+                  }
+                ],
+                "doc_refs": [],
+                "reasoning": "bundlePagesRouterDependencies: experimental.bundlePagesExternals was renamed to bundlePagesRouterDependencies.",
+                "action": "Update to: bundlePagesRouterDependencies",
+                "step_kind": "manual",
+                "verify": "Load the affected page or run the build, and confirm the new behaviour.",
+                "confidence": 0.85,
+                "source": "rule_pack",
+                "usage_ids": [
+                  "cd892cdfa84520e4688b2ac7"
+                ],
+                "docs_status": "unverified",
+                "prompt_version": "v1",
+                "rule_id": "next/bundlepagesrouterdependencies"
+              },
+              {
+                "id": "dependency_build-5c53ff0262f6518c7e4c233b",
+                "repo_id": "1e39c80a511c18da",
+                "lens": "dependency_build",
+                "concern": "dependency",
+                "severity": "medium",
+                "evidence": [
+                  {
+                    "repo_id": "1e39c80a511c18da",
+                    "file": "yarn.lock",
+                    "line_start": 10875,
+                    "line_end": 10875,
+                    "snippet_hash": "c0319e070aa750b858664c97407338a6516a0ccee45c96d9a64122825d34ef2f"
+                  }
+                ],
+                "doc_refs": [],
+                "reasoning": "bundlePagesRouterDependencies: experimental.bundlePagesExternals was renamed to bundlePagesRouterDependencies.",
+                "action": "Update to: bundlePagesRouterDependencies",
+                "step_kind": "manual",
+                "verify": "Load the affected page or run the build, and confirm the new behaviour.",
+                "confidence": 0.85,
+                "source": "rule_pack",
+                "usage_ids": [
+                  "5c53ff0262f6518c7e4c233b"
+                ],
+                "docs_status": "unverified",
+                "prompt_version": "v1",
+                "rule_id": "next/bundlepagesrouterdependencies"
+              },
+              {
+                "id": "dependency_build-7c18d8b69902d1e000e6aeaf",
+                "repo_id": "1e39c80a511c18da",
+                "lens": "dependency_build",
+                "concern": "dependency",
+                "severity": "medium",
+                "evidence": [
+                  {
+                    "repo_id": "1e39c80a511c18da",
+                    "file": "yarn.lock",
+                    "line_start": 10959,
+                    "line_end": 10959,
+                    "snippet_hash": "1f6a88316755bcfd3724e74f5448106fe7dc19b29d7cbd29703d1053bf39254a"
+                  }
+                ],
+                "doc_refs": [],
+                "reasoning": "bundlePagesRouterDependencies: experimental.bundlePagesExternals was renamed to bundlePagesRouterDependencies.",
+                "action": "Update to: bundlePagesRouterDependencies",
+                "step_kind": "manual",
+                "verify": "Load the affected page or run the build, and confirm the new behaviour.",
+                "confidence": 0.85,
+                "source": "rule_pack",
+                "usage_ids": [
+                  "7c18d8b69902d1e000e6aeaf"
+                ],
+                "docs_status": "unverified",
+                "prompt_version": "v1",
+                "rule_id": "next/bundlepagesrouterdependencies"
+              },
+              {
+                "id": "dependency_build-28a28043ed2d4e538af6da2b",
+                "repo_id": "1e39c80a511c18da",
+                "lens": "dependency_build",
+                "concern": "dependency",
+                "severity": "medium",
+                "evidence": [
+                  {
+                    "repo_id": "1e39c80a511c18da",
+                    "file": "yarn.lock",
+                    "line_start": 11370,
+                    "line_end": 11370,
+                    "snippet_hash": "215fe6e050383186b7cf5cfec9a63a0ccf843e3ce58ae2e3d391c28c92b07b5f"
+                  }
+                ],
+                "doc_refs": [],
+                "reasoning": "bundlePagesRouterDependencies: experimental.bundlePagesExternals was renamed to bundlePagesRouterDependencies.",
+                "action": "Update to: bundlePagesRouterDependencies",
+                "step_kind": "manual",
+                "verify": "Load the affected page or run the build, and confirm the new behaviour.",
+                "confidence": 0.85,
+                "source": "rule_pack",
+                "usage_ids": [
+                  "28a28043ed2d4e538af6da2b"
+                ],
+                "docs_status": "unverified",
+                "prompt_version": "v1",
+                "rule_id": "next/bundlepagesrouterdependencies"
+              },
+              {
+                "id": "dependency_build-e8bc2b67732dc65a1f47dd4d",
+                "repo_id": "1e39c80a511c18da",
+                "lens": "dependency_build",
+                "concern": "dependency",
+                "severity": "medium",
+                "evidence": [
+                  {
+                    "repo_id": "1e39c80a511c18da",
+                    "file": "yarn.lock",
+                    "line_start": 11391,
+                    "line_end": 11391,
+                    "snippet_hash": "39940a54c7badc663792016d81013a45c4b38e10863bf4ff46401ff03b8f983a"
+                  }
+                ],
+                "doc_refs": [],
+                "reasoning": "bundlePagesRouterDependencies: experimental.bundlePagesExternals was renamed to bundlePagesRouterDependencies.",
+                "action": "Update to: bundlePagesRouterDependencies",
+                "step_kind": "manual",
+                "verify": "Load the affected page or run the build, and confirm the new behaviour.",
+                "confidence": 0.85,
+                "source": "rule_pack",
+                "usage_ids": [
+                  "e8bc2b67732dc65a1f47dd4d"
+                ],
+                "docs_status": "unverified",
+                "prompt_version": "v1",
+                "rule_id": "next/bundlepagesrouterdependencies"
+              }
+            ],
+            "out_of_scope": []
+          }
+        },
+        {
+          "lens": "behavior_runtime",
+          "packet_usages": [],
+          "submission": {
+            "findings": [],
+            "out_of_scope": []
+          }
+        },
+        {
+          "lens": "verification",
+          "packet_usages": [],
+          "submission": {
+            "findings": [],
+            "out_of_scope": []
+          }
+        }
+      ]
+    }
+  ],
+  "size": "full",
+  "cost_tokens": 0,
+  "wall_ms": 1274,
+  "host": {
+    "product": "Cursor",
+    "model": "databricks-claude-sonnet-4-6",
+    "cli_version": "3.25.6"
+  }
+}

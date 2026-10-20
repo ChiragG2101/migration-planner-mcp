@@ -146,6 +146,61 @@ describe('replay re-runs HEAD engine deterministically', () => {
     expect(r.score.recall).toEqual({ found: 1, total: 1 });
   });
 
+  it('stops replaying a lens once it is accepted, ignoring extra recorded submissions', async () => {
+    // The live agent may submit a lens twice (first rejected, second accepted).
+    // After the second submission is accepted, the lens is closed. A third
+    // submission (if the exporter stored one) must be silently skipped, not thrown.
+    const sub = recorded.rounds[0]!.submissions[0]!;
+    const extraRun: EngineRun = {
+      ...recorded,
+      rounds: [
+        {
+          submissions: [
+            // First: will be accepted (same as the original).
+            sub,
+            // Second: same lens again — would throw "lens is closed" without the fix.
+            { ...sub, submission: { findings: [], out_of_scope: [] } },
+          ],
+        },
+      ],
+    };
+    // Should not throw; the second submission is skipped.
+    const r = await replayEngineRun(extraRun, truth, root);
+    expect(r.score.recall.found).toBeGreaterThan(0);
+  });
+
+  it('deduplicates out_of_scope entries when two recorded IDs remap to the same HEAD ID', async () => {
+    // Two recorded packet_usages with different IDs but the same span (as happens when the
+    // adapter merges spans between the live run and HEAD). Both appear in out_of_scope.
+    // Without dedup, HEAD's engine rejects the submission with "marked more than once".
+    const sub = recorded.rounds[0]!.submissions[0]!;
+    const firstUsage = sub.packet_usages[0]!;
+    const dupRun: EngineRun = {
+      ...recorded,
+      rounds: [
+        {
+          submissions: [
+            {
+              ...sub,
+              // Two entries with the same span but different recorded IDs.
+              packet_usages: [firstUsage, { ...firstUsage, usage_id: 'dup-id' }],
+              submission: {
+                findings: [],
+                out_of_scope: [
+                  { usage_id: firstUsage.usage_id, reason: 'no change needed' },
+                  { usage_id: 'dup-id', reason: 'same span, different id' },
+                ],
+              },
+            },
+          ],
+        },
+      ],
+    };
+    // Should not throw a "marked more than once" error; the second entry is silently dropped.
+    const r = await replayEngineRun(dupRun, truth, root);
+    expect(r.flags.every((f) => f.kind !== 'submission_rejected')).toBe(true);
+  });
+
   it('drops a recorded finding whose usage HEAD no longer finds, counting it a miss', async () => {
     const ghostTruth: Truth = {
       ...truth,

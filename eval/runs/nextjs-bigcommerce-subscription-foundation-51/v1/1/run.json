@@ -1,0 +1,3764 @@
+{
+  "kind": "engine",
+  "case_id": "nextjs-bigcommerce-subscription-foundation-51",
+  "prompt_version": "v1",
+  "run": 1,
+  "ingest": {
+    "source": {
+      "name": "next",
+      "version": "14.2.35"
+    },
+    "target": {
+      "name": "next",
+      "version": "15.5.21"
+    }
+  },
+  "scope_answers": {},
+  "docs": [
+    {
+      "library": "react",
+      "version": "19",
+      "topic": "JSX",
+      "url": "https://react.dev/blog/2024/04/25/react-19-upgrade-guide#the-jsx-namespace-in-typescript",
+      "content": "The JSX namespace in TypeScript\n\nThe global JSX namespace is removed. Use React.JSX.\n\nold: JSX.Element\nnew: React.JSX.Element\n\n",
+      "doc_id": "04efb99412e0a5013bb8e900603c1bd3d51e81e298b3ab716c58f8f8df9a749e",
+      "fetched_by": "knowledge",
+      "official": true,
+      "status": "unverified"
+    },
+    {
+      "library": "next",
+      "version": "15",
+      "topic": "15.md",
+      "url": "pack://nextjs-upgrade@0.3.0/references/15.md",
+      "content": "<!-- do not edit; generated from pack v0.3.0 -->\n\n# nextjs-upgrade 15\n\n- `next/async-cookies` (changed_behavior): cookies() is async\n- `next/async-draft-mode` (changed_behavior): draftMode() is async\n- `next/async-headers` (changed_behavior): headers() is async\n- `next/async-params` (changed_behavior): params is a Promise\n- `next/async-request-ip` (removed): NextRequest.ip is removed\n- `next/async-search-params` (changed_behavior): searchParams is a Promise\n- `next/bundlepagesrouterdependencies` (renamed): bundlePagesRouterDependencies\n- `next/nextrequest-geolocation` (removed): NextRequest Geolocation\n- `next/react-19` (peer_requirement): App Router requires React 19\n- `next/route-handlers` (changed_default): Route Handlers\n- `next/runtime-configuration-breaking-change` (removed): runtime configuration (Breaking change)\n- `next/serverexternalpackages` (renamed): serverExternalPackages\n",
+      "doc_id": "12991973739f2926f4e9cf1a26157f181418224e44a9446f9d496e8b015ba348",
+      "fetched_by": "knowledge",
+      "official": false,
+      "status": "unverified"
+    },
+    {
+      "library": "next",
+      "version": "15",
+      "topic": "draftMode",
+      "url": "https://nextjs.org/docs/app/guides/upgrading/version-15#async-request-apis-breaking-change",
+      "content": "draftMode() is async\n\ndraftMode() from next/headers is asynchronous.\n\nold: const { isEnabled } = draftMode()\nnew: const { isEnabled } = await draftMode()\n\n",
+      "doc_id": "15327fbcefda68a6404bd77d4a64a785dfce05583aa97522f2215d27d86e9bde",
+      "fetched_by": "knowledge",
+      "official": true,
+      "status": "unverified"
+    },
+    {
+      "library": "react",
+      "version": "19",
+      "topic": "useRef",
+      "url": "https://react.dev/blog/2024/04/25/react-19-upgrade-guide#useref-requires-argument",
+      "content": "useRef requires an argument\n\nuseRef requires an argument, and MutableRefObject is deprecated in favour of RefObject.\n\nold: useRef()\nnew: useRef(undefined), or useRef(null)\n\n",
+      "doc_id": "22afa0e2f4bb1409b84ffdbbd08d125929b685d0e9164343d34d4a7e6f8034f0",
+      "fetched_by": "knowledge",
+      "official": true,
+      "status": "unverified"
+    },
+    {
+      "library": "next",
+      "version": "15",
+      "topic": "GET",
+      "url": "https://nextjs.org/docs/app/guides/upgrading/version-15#route-handlers",
+      "content": "Route Handlers\n\nGET route handlers are no longer cached by default.\n\nold: export function GET() {}\nnew: export const dynamic = 'force-static' when the old cached behaviour is required\n\n",
+      "doc_id": "33b12d62dd45cbe6d699efa6fde1c787ff4f9d78f355c25f94eacc6530a2c92a",
+      "fetched_by": "knowledge",
+      "official": true,
+      "status": "unverified"
+    },
+    {
+      "library": "react",
+      "version": "19",
+      "topic": "hydrate",
+      "url": "https://react.dev/blog/2024/04/25/react-19-upgrade-guide#removed-reactdom-hydrate",
+      "content": "Removed: ReactDOM.hydrate\n\nReactDOM.hydrate is removed. Use hydrateRoot.\n\nold: ReactDOM.hydrate(element, container)\nnew: hydrateRoot(container, element)\n\n",
+      "doc_id": "3d4ecbcc9454cc076907b0c431d6c7667bfb42ccc07e5ac9311d512a9435379d",
+      "fetched_by": "knowledge",
+      "official": true,
+      "status": "unverified"
+    },
+    {
+      "library": "react",
+      "version": "19",
+      "topic": "legacy_context",
+      "url": "https://react.dev/blog/2024/04/25/react-19-upgrade-guide#removed-removing-legacy-context",
+      "content": "Removed: Legacy Context using contextTypes and getChildContext\n\nLegacy context (contextTypes, childContextTypes, getChildContext) is removed.\n\nold: contextTypes and getChildContext\nnew: contextType or createContext\n\n",
+      "doc_id": "45afdf802d78011136f815aa5d73a500d79a9a2b371c08aef9219a3900f66ff4",
+      "fetched_by": "knowledge",
+      "official": true,
+      "status": "unverified"
+    },
+    {
+      "library": "react",
+      "version": "19",
+      "topic": "react-test-renderer/shallow",
+      "url": "https://react.dev/blog/2024/04/25/react-19-upgrade-guide#removed-react-test-renderer-shallow",
+      "content": "Removed: react-test-renderer/shallow\n\nreact-test-renderer/shallow is removed. Import react-shallow-renderer directly.\n\nold: import ShallowRenderer from 'react-test-renderer/shallow'\nnew: import ShallowRenderer from 'react-shallow-renderer'\n\n",
+      "doc_id": "4af48628073fab2cf3ead0b68d753980c7dd48b852e8546b3b69deb4b6b06e7d",
+      "fetched_by": "knowledge",
+      "official": true,
+      "status": "unverified"
+    },
+    {
+      "library": "next",
+      "version": "15",
+      "topic": "experimental.serverComponentsExternalPackages",
+      "url": "https://nextjs.org/docs/app/guides/upgrading/version-15#serverexternalpackages",
+      "content": "serverExternalPackages\n\nexperimental.serverComponentsExternalPackages was renamed to serverExternalPackages.\n\nold: experimental.serverComponentsExternalPackages\nnew: serverExternalPackages\n\n",
+      "doc_id": "549920971c723743789eaa773ddfb4a2cc1a7e491998ce0de9af4b3699e2bca7",
+      "fetched_by": "knowledge",
+      "official": true,
+      "status": "unverified"
+    },
+    {
+      "library": "react",
+      "version": "19",
+      "topic": "defaultProps",
+      "url": "https://react.dev/blog/2024/04/25/react-19-upgrade-guide#removed-proptypes-and-defaultprops",
+      "content": "Removed: propTypes and defaultProps for functions\n\npropTypes are ignored and defaultProps on function components are removed. Class components still support defaultProps.\n\nold: Component.defaultProps = { text: \"Hello\" }\nnew: a default parameter\n\nThe match binds defaultProps on function components. The section's prop-types-typescript codemod covers propTypes only, so it is not named here.",
+      "doc_id": "55206df6edb40790407939fb10252ec848e7cbc4206ae4f9c52aaefde6714ae9",
+      "fetched_by": "knowledge",
+      "official": true,
+      "status": "unverified"
+    },
+    {
+      "library": "next",
+      "version": "14",
+      "topic": "14.md",
+      "url": "pack://nextjs-upgrade@0.3.0/references/14.md",
+      "content": "<!-- do not edit; generated from pack v0.3.0 -->\n\n# nextjs-upgrade 14\n\n- `next/the-next-font-package-has-been-fully-removed-in-favor-of-the` (removed): The @next/font package has been fully removed in favor of the built-in next/font. A codemod is available to safely and automatically rename your imports.\n",
+      "doc_id": "5a84eeb7ab0dea631923fc249bf660c7e221ce4f760d8606533f18cb1900bb6c",
+      "fetched_by": "knowledge",
+      "official": false,
+      "status": "unverified"
+    },
+    {
+      "library": "react",
+      "version": "19",
+      "topic": "string_ref",
+      "url": "https://react.dev/blog/2024/04/25/react-19-upgrade-guide#removed-string-refs",
+      "content": "Removed: string refs\n\nString refs are removed.\n\nold: <div ref=\"input\" />\nnew: a ref callback or a ref object\n\n",
+      "doc_id": "619ce61d6779083b09ae630029d2e1fd0ba3fac4d339ed27dc0920b4b934df3e",
+      "fetched_by": "knowledge",
+      "official": true,
+      "status": "unverified"
+    },
+    {
+      "library": "react",
+      "version": "19",
+      "topic": "findDOMNode",
+      "url": "https://react.dev/blog/2024/04/25/react-19-upgrade-guide#removed-reactdom-finddomnode",
+      "content": "Removed: ReactDOM.findDOMNode\n\nfindDOMNode is removed.\n\nold: findDOMNode(component)\nnew: a ref on the DOM node\n\n",
+      "doc_id": "619f5b5a7acdb55f507b57b96b0930d5480aa2ac29c877810dd8634cfed3e74c",
+      "fetched_by": "knowledge",
+      "official": true,
+      "status": "unverified"
+    },
+    {
+      "library": "next",
+      "version": "15",
+      "topic": "NextRequest.ip",
+      "url": "https://nextjs.org/docs/app/guides/upgrading/version-15#nextrequest-geolocation",
+      "content": "NextRequest.ip is removed\n\nNextRequest.ip was removed along with geo.\n\nold: request.ip\nnew: the hosting provider\n\nThe version 15 geolocation section covers both geo and ip. geo has its own rule; this one binds ip.",
+      "doc_id": "6724ea6b1d8e2ba96d75de76e8030bf4841dc3bfb14edb8107c4b27203a9ebaf",
+      "fetched_by": "knowledge",
+      "official": true,
+      "status": "unverified"
+    },
+    {
+      "library": "next",
+      "version": "15",
+      "topic": "**/app/**/{page,layout,route,default,template}.{js,jsx,ts,tsx}",
+      "url": "https://nextjs.org/docs/app/guides/upgrading/version-15#react-19",
+      "content": "App Router requires React 19\n\nThe App Router requires react and react-dom 19. The Pages Router can stay on 18.\n\nold: react 18 with the App Router\nnew: react 19\n\nThe Pages Router may stay on React 18. The match is an app-router file, and the engine still applies the requirement when that match finds nothing, with a note that it may not be needed.",
+      "doc_id": "82e3906afa9e03f0276283431aadfe34ecd5b2298bc95303f4ac58420e697c5f",
+      "fetched_by": "knowledge",
+      "official": true,
+      "status": "unverified"
+    },
+    {
+      "library": "react",
+      "version": "19",
+      "topic": "createFactory",
+      "url": "https://react.dev/blog/2024/04/25/react-19-upgrade-guide#removed-createfactory",
+      "content": "Removed: React.createFactory\n\nReact.createFactory is removed.\n\nold: React.createFactory(Component)\nnew: the component itself, as JSX\n\n",
+      "doc_id": "8e777c28c4b1f6d0bca195984211b92e9879e4817f5fb452f08328a92a7bc182",
+      "fetched_by": "knowledge",
+      "official": true,
+      "status": "unverified"
+    },
+    {
+      "library": "next",
+      "version": "15",
+      "topic": "runtime",
+      "url": "https://nextjs.org/docs/app/guides/upgrading/version-15#runtime-configuration-breaking-change",
+      "content": "runtime configuration (Breaking change)\n\nSegment config runtime: 'experimental-edge' is rejected; use 'edge'.\n\nold: export const runtime = 'experimental-edge'\nnew: export const runtime = 'edge'\n\n",
+      "doc_id": "9044b6a3767fd6b68199fa4113e5779cc157e5404602b07f4e59c8b6b38d2af4",
+      "fetched_by": "knowledge",
+      "official": true,
+      "status": "unverified"
+    },
+    {
+      "library": "react",
+      "version": "19",
+      "topic": "react-dom/test-utils",
+      "url": "https://react.dev/blog/2024/04/25/react-19-upgrade-guide#removed-react-dom-test-utils",
+      "content": "Removed: react-dom/test-utils\n\nreact-dom/test-utils is removed. Import act from react.\n\nold: import { act } from 'react-dom/test-utils'\nnew: import { act } from 'react'\n\n",
+      "doc_id": "90829e63c9492da89fc836381ca69731d1019d69e393404e8fd7b60797d1a3ee",
+      "fetched_by": "knowledge",
+      "official": true,
+      "status": "unverified"
+    },
+    {
+      "library": "react",
+      "version": "19",
+      "topic": "unmountComponentAtNode",
+      "url": "https://react.dev/blog/2024/04/25/react-19-upgrade-guide#removed-unmountcomponentatnode",
+      "content": "Removed: unmountComponentAtNode\n\nunmountComponentAtNode is removed. Use root.unmount().\n\nold: unmountComponentAtNode(container)\nnew: root.unmount()\n\n",
+      "doc_id": "95c82ed3d8e5aee9d79db3ecd0cd7b86e4c82a0a85fd8bd145882718a609b99f",
+      "fetched_by": "knowledge",
+      "official": true,
+      "status": "unverified"
+    },
+    {
+      "library": "next",
+      "version": "15",
+      "topic": "searchParams",
+      "url": "https://nextjs.org/docs/app/guides/upgrading/version-15#async-request-apis-breaking-change",
+      "content": "searchParams is a Promise\n\nsearchParams in page props is a Promise.\n\nold: const { q } = searchParams\nnew: const { q } = await searchParams\n\n",
+      "doc_id": "96baa5667776bce037085e0e9713541d2638dda8062a4129b3b6ce327d559468",
+      "fetched_by": "knowledge",
+      "official": true,
+      "status": "unverified"
+    },
+    {
+      "library": "react",
+      "version": "19",
+      "topic": "render",
+      "url": "https://react.dev/blog/2024/04/25/react-19-upgrade-guide#removed-reactdom-render",
+      "content": "Removed: ReactDOM.render\n\nReactDOM.render is removed. Use createRoot.\n\nold: ReactDOM.render(element, container)\nnew: createRoot(container).render(element)\n\n",
+      "doc_id": "aae70badc9ddbf7551c713f60a60ec31b31eb72c0fa586fe2a70516eca7e56c1",
+      "fetched_by": "knowledge",
+      "official": true,
+      "status": "unverified"
+    },
+    {
+      "library": "next",
+      "version": "15",
+      "topic": "headers",
+      "url": "https://nextjs.org/docs/app/guides/upgrading/version-15#async-request-apis-breaking-change",
+      "content": "headers() is async\n\nheaders() from next/headers is asynchronous.\n\nold: const headersList = headers()\nnew: const headersList = await headers()\n\n",
+      "doc_id": "bd1ef650ff3dc2ebc73f5623c89aa6913b517f57b2f1398e0c198a7f9e5a5f0c",
+      "fetched_by": "knowledge",
+      "official": true,
+      "status": "unverified"
+    },
+    {
+      "library": "next",
+      "version": "15",
+      "topic": "@next/font",
+      "url": "https://nextjs.org/docs/app/guides/upgrading/version-14#the-next-font-package-has-been-fully-removed-in-favor-of-the-built-in-next-font-a-codemod-is-available-to-safely-and-automatically-rename-your-imports",
+      "content": "The @next/font package has been fully removed in favor of the built-in next/font. A codemod is available to safely and automatically rename your imports.\n\nThe @next/font package is gone; the built-in next/font replaces it.\n\nold: import { Inter } from '@next/font/google'\nnew: import { Inter } from 'next/font/google'\n\n",
+      "doc_id": "c859946be08aef17229b80a6283755f56ad0f792b439bb4da749ce47347529a3",
+      "fetched_by": "knowledge",
+      "official": true,
+      "status": "unverified"
+    },
+    {
+      "library": "next",
+      "version": "15",
+      "topic": "params",
+      "url": "https://nextjs.org/docs/app/guides/upgrading/version-15#async-request-apis-breaking-change",
+      "content": "params is a Promise\n\nparams in page, layout and route props is a Promise.\n\nold: const { slug } = params\nnew: const { slug } = await params\n\n",
+      "doc_id": "cf8922dd923eead9d1306283061fddbca408b8ef9a46556045896229af016cce",
+      "fetched_by": "knowledge",
+      "official": true,
+      "status": "unverified"
+    },
+    {
+      "library": "react",
+      "version": "19",
+      "topic": "react-changes.md",
+      "url": "pack://nextjs-upgrade@0.3.0/references/react-changes.md",
+      "content": "<!-- do not edit; generated from pack v0.3.0 -->\n\n# react changes\n\n- `react/removed-legacy-context-using-contexttypes-and-getchildcontex` (19, removed): Removed: Legacy Context using contextTypes and getChildContext\n- `react/removed-proptypes-and-defaultprops-for-functions` (19, removed): Removed: propTypes and defaultProps for functions\n- `react/removed-react-createfactory` (19, removed): Removed: React.createFactory\n- `react/removed-react-dom-test-utils` (19, removed): Removed: react-dom/test-utils\n- `react/removed-react-test-renderer-shallow` (19, removed): Removed: react-test-renderer/shallow\n- `react/removed-reactdom-finddomnode` (19, removed): Removed: ReactDOM.findDOMNode\n- `react/removed-reactdom-hydrate` (19, removed): Removed: ReactDOM.hydrate\n- `react/removed-reactdom-render` (19, removed): Removed: ReactDOM.render\n- `react/removed-string-refs` (19, removed): Removed: string refs\n- `react/removed-unmountcomponentatnode` (19, removed): Removed: unmountComponentAtNode\n- `react/the-jsx-namespace-in-typescript` (19, removed): The JSX namespace in TypeScript\n- `react/useref-requires-an-argument` (19, changed_behavior): useRef requires an argument\n",
+      "doc_id": "d12dd30ba60f3d1f3adbbcb226519fe45ac6a0d8d86aba14af05643c150439f4",
+      "fetched_by": "knowledge",
+      "official": false,
+      "status": "unverified"
+    },
+    {
+      "library": "next",
+      "version": "15",
+      "topic": "experimental.bundlePagesExternals",
+      "url": "https://nextjs.org/docs/app/guides/upgrading/version-15#bundlepagesrouterdependencies",
+      "content": "bundlePagesRouterDependencies\n\nexperimental.bundlePagesExternals was renamed to bundlePagesRouterDependencies.\n\nold: experimental.bundlePagesExternals\nnew: bundlePagesRouterDependencies\n\n",
+      "doc_id": "d376d84e96e4ea606568b9b4acfb8d2d4309190767707dee0d921346ce7200cc",
+      "fetched_by": "knowledge",
+      "official": true,
+      "status": "unverified"
+    },
+    {
+      "library": "next",
+      "version": "15",
+      "topic": "cookies",
+      "url": "https://nextjs.org/docs/app/guides/upgrading/version-15#async-request-apis-breaking-change",
+      "content": "cookies() is async\n\ncookies() from next/headers is asynchronous. A synchronous call warns, and the warning becomes an error in 16.\n\nold: const cookieStore = cookies()\nnew: const cookieStore = await cookies()\n\n",
+      "doc_id": "e483d9df3cde82b350013d48477d34165c74461bb8a074d3dc48f47a45464e39",
+      "fetched_by": "knowledge",
+      "official": true,
+      "status": "unverified"
+    },
+    {
+      "library": "next",
+      "version": "15",
+      "topic": "NextRequest.geo",
+      "url": "https://nextjs.org/docs/app/guides/upgrading/version-15#nextrequest-geolocation",
+      "content": "NextRequest Geolocation\n\nNextRequest.geo and NextRequest.ip were removed. The host provides those values.\n\nold: request.geo and request.ip\nnew: the hosting provider, for example geolocation() from @vercel/functions\n\nThe same removal covers NextRequest.ip. One match binds the geo property; ip is the same section.",
+      "doc_id": "f2fc86015676553bc55ad8a0f449a2879ff9681f253c30e5c1238f45b1564009",
+      "fetched_by": "knowledge",
+      "official": true,
+      "status": "unverified"
+    },
+    {
+      "library": "next",
+      "version": "15",
+      "topic": "codemods.md",
+      "url": "pack://nextjs-upgrade@0.3.0/references/codemods.md",
+      "content": "<!-- do not edit; generated from pack v0.3.0 -->\n\n# Codemods\n\n- `next-codemod:app-dir-runtime-config-experimental-edge`: next/runtime-configuration-breaking-change\n- `next-codemod:built-in-next-font`: next/the-next-font-package-has-been-fully-removed-in-favor-of-the\n- `next-codemod:metadata-to-viewport-export`: no reviewed rule names it\n- `next-codemod:middleware-to-proxy`: next/middleware-to-proxy\n- `next-codemod:next-async-request-api`: next/async-cookies, next/async-draft-mode, next/async-headers, next/async-params, next/async-search-params\n- `next-codemod:next-lint-to-eslint-cli`: next/next-lint-command\n- `next-codemod:next-og-import`: no reviewed rule names it\n- `next-codemod:next-request-geo-ip`: next/async-request-ip, next/nextrequest-geolocation\n- `next-codemod:remove-experimental-ppr`: no reviewed rule names it\n- `next-codemod:remove-unstable-prefix`: next/cachelife-and-cachetag\n- `next-codemod:upgrade`: no reviewed rule names it\n- `react-codemod:migration-recipe-19`: no reviewed rule names it\n- `react-codemod:prop-types-typescript`: no reviewed rule names it\n- `react-codemod:replace-act-import`: react/removed-react-dom-test-utils\n- `react-codemod:replace-reactdom-render`: react/removed-reactdom-hydrate, react/removed-reactdom-render, react/removed-unmountcomponentatnode\n- `react-codemod:replace-string-ref`: react/removed-string-refs\n- `react-codemod:replace-use-form-state`: no reviewed rule names it\n- `types-react-codemod:no-implicit-ref-callback-return`: no reviewed rule names it\n- `types-react-codemod:preset-19`: react/the-jsx-namespace-in-typescript\n- `types-react-codemod:refobject-defaults`: react/useref-requires-an-argument\n",
+      "doc_id": "f46d0546606b3118a33ff65a09265143dce057f6dbcab16daab94187d0dd0d60",
+      "fetched_by": "knowledge",
+      "official": false,
+      "status": "unverified"
+    }
+  ],
+  "rounds": [
+    {
+      "submissions": [
+        {
+          "lens": "api",
+          "packet_usages": [
+            {
+              "file": "shared/handlers/getUserAndStore.ts",
+              "line_start": 2,
+              "line_end": 2,
+              "snippet_hash": "a930c233eb000bcd3e54b0b45e54e2243d7d302beeca4bc6e1daa3d4e9c5ada9",
+              "usage_id": "70d4184db7b015b36631003e"
+            },
+            {
+              "file": "shared/types/styled/WrapperConfig.d.ts",
+              "line_start": 6,
+              "line_end": 6,
+              "snippet_hash": "0da1b0b003351e1b101a5c8d3ae20208ec79962cbab588bcf027bac9ab58d79a",
+              "usage_id": "0c57f8b12850b97f318884eb"
+            },
+            {
+              "file": "src/components/Base/ActionBar.tsx",
+              "line_start": 38,
+              "line_end": 38,
+              "snippet_hash": "41d688f580f7cd41e93699bbd758260df3f317d98a6574a23b2c495727980703",
+              "usage_id": "d2dd9ddf647346dc0b22195e"
+            },
+            {
+              "file": "src/components/Base/ActionBar.tsx",
+              "line_start": 39,
+              "line_end": 39,
+              "snippet_hash": "62d01e8b2f3a0dcc1bc45533f7ecb4000b4bd49876a3fcde7c3c4baed858798b",
+              "usage_id": "0884fb91ad1b69967045f844"
+            },
+            {
+              "file": "src/components/Base/AsyncButton.tsx",
+              "line_start": 8,
+              "line_end": 8,
+              "snippet_hash": "13706712605a790928282ba28b4e522be037fd0612d01c1d807ba364ec5385f0",
+              "usage_id": "0f849b1fb594f7618aca22a7"
+            },
+            {
+              "file": "src/components/Base/ColorPicker.tsx",
+              "line_start": 26,
+              "line_end": 26,
+              "snippet_hash": "11c523de2d6d666a2732bc8878b886bb1db9d0e2805b12a77611fb71fd1cdd2e",
+              "usage_id": "ec94b7d6800ea43127bcf2bb"
+            },
+            {
+              "file": "src/components/Base/LoadingScreen.tsx",
+              "line_start": 17,
+              "line_end": 17,
+              "snippet_hash": "c6efb4f4058814829b6a649f4dbffb34247b2c31f9732307fcdc8920b8ae6748",
+              "usage_id": "9c1ef6be81a8aed6c52b0eba"
+            },
+            {
+              "file": "src/components/Base/PageLayout.tsx",
+              "line_start": 4,
+              "line_end": 4,
+              "snippet_hash": "74886dadcd6ba4770dadf261181636ed943440eb020fb839cf588dd6d2c021e8",
+              "usage_id": "0dbe48baef7f2064285e5c1b"
+            },
+            {
+              "file": "src/components/Onboarding/CheckoutSettings.tsx",
+              "line_start": 20,
+              "line_end": 20,
+              "snippet_hash": "faac1263ac864044540c9c3374219e172bfb4769391bc54c72de48cda0eebdc2",
+              "usage_id": "858d8e11f345be79f66ffcce"
+            },
+            {
+              "file": "src/components/Onboarding/DisplaySettings/SubscriptionPreview.tsx",
+              "line_start": 10,
+              "line_end": 10,
+              "snippet_hash": "62d01e8b2f3a0dcc1bc45533f7ecb4000b4bd49876a3fcde7c3c4baed858798b",
+              "usage_id": "85af94666697a5834ad286d0"
+            },
+            {
+              "file": "src/components/Onboarding/DisplaySettings/index.tsx",
+              "line_start": 21,
+              "line_end": 21,
+              "snippet_hash": "bad595721b0207fa9a2d3cb46185c98ee65236f7b5f8e04b1d32d28946eb734b",
+              "usage_id": "e4f8187657d32367eb49147d"
+            },
+            {
+              "file": "src/components/Onboarding/StripeConnect.tsx",
+              "line_start": 20,
+              "line_end": 20,
+              "snippet_hash": "62a61a9eb05fdb78ddbcde5b5aee5dbc2562a6dbf5bf56dc17898c54606a6c39",
+              "usage_id": "c418641f5045729383fb2082"
+            },
+            {
+              "file": "src/components/Onboarding/index.tsx",
+              "line_start": 34,
+              "line_end": 34,
+              "snippet_hash": "bc6633bc2a71ad76c6ecd363b793cb9fad4201af0c068e86ab54665cdfc613a0",
+              "usage_id": "03e67090e489b9e13ee8ad63"
+            },
+            {
+              "file": "src/components/Products/Items/EnabledSubscriptionCheck.tsx",
+              "line_start": 12,
+              "line_end": 12,
+              "snippet_hash": "69c76bd1b8947a56404f1bdd3e653b212a37d0b5d2e84fe3e9ad90eac656ccc7",
+              "usage_id": "f7b3eb58f2ec75ef3cd43609"
+            },
+            {
+              "file": "src/components/Products/List.tsx",
+              "line_start": 30,
+              "line_end": 30,
+              "snippet_hash": "62d01e8b2f3a0dcc1bc45533f7ecb4000b4bd49876a3fcde7c3c4baed858798b",
+              "usage_id": "48e2a2197836483cb8a120b0"
+            },
+            {
+              "file": "src/components/Products/Panes/ListPane.tsx",
+              "line_start": 19,
+              "line_end": 19,
+              "snippet_hash": "7ab1a0cbea5a67254d3ed4e1048e747c0bda3fbda84ae2ad454df54a49b7ea52",
+              "usage_id": "07ff664329e592d0a06510e6"
+            },
+            {
+              "file": "src/components/Products/Panes/ListPane.tsx",
+              "line_start": 34,
+              "line_end": 34,
+              "snippet_hash": "5aaea9f92b31d212ce9eac40f0ed74d6d71631f2c57e5fef2285ed68f38b22b1",
+              "usage_id": "6ed92570fcbbd572d46deecf"
+            },
+            {
+              "file": "src/components/Products/Panes/SubscriptionEditPane.tsx",
+              "line_start": 18,
+              "line_end": 18,
+              "snippet_hash": "5c41987fbd433f6fba2333eec1809d9fd517b564f36d419497b7a32e2588b218",
+              "usage_id": "9be141181e1068cda407e131"
+            },
+            {
+              "file": "src/components/Products/Panes/VariantProductListPane.tsx",
+              "line_start": 21,
+              "line_end": 21,
+              "snippet_hash": "00f89fe2f0731be9a49cd649c0445a6d669f0444fb3830439c22854e0d7d45d7",
+              "usage_id": "0e8a0015535114daa7cc85c7"
+            },
+            {
+              "file": "src/components/Products/Row/Action.tsx",
+              "line_start": 8,
+              "line_end": 8,
+              "snippet_hash": "4be5434632e9d13c953973ca10cfd7832240200453eed297838455d793b8be79",
+              "usage_id": "2d30ef274845b411a5c16f54"
+            },
+            {
+              "file": "src/components/Products/Row/ThumbnailWithName.tsx",
+              "line_start": 29,
+              "line_end": 29,
+              "snippet_hash": "69c76bd1b8947a56404f1bdd3e653b212a37d0b5d2e84fe3e9ad90eac656ccc7",
+              "usage_id": "15c6c2b1e0bd93eddef96dc8"
+            },
+            {
+              "file": "src/components/Products/Variant/List.tsx",
+              "line_start": 26,
+              "line_end": 26,
+              "snippet_hash": "62d01e8b2f3a0dcc1bc45533f7ecb4000b4bd49876a3fcde7c3c4baed858798b",
+              "usage_id": "5c9115681b4781e8de704188"
+            },
+            {
+              "file": "src/components/Products/Variant/SubscriptionToggle.tsx",
+              "line_start": 12,
+              "line_end": 12,
+              "snippet_hash": "69c76bd1b8947a56404f1bdd3e653b212a37d0b5d2e84fe3e9ad90eac656ccc7",
+              "usage_id": "98a85407e2cd7f1f42d79696"
+            },
+            {
+              "file": "src/components/Subscription/Option/Discount.tsx",
+              "line_start": 12,
+              "line_end": 12,
+              "snippet_hash": "62d01e8b2f3a0dcc1bc45533f7ecb4000b4bd49876a3fcde7c3c4baed858798b",
+              "usage_id": "42258567aa0370835d5fd284"
+            },
+            {
+              "file": "src/components/Subscription/Option/EditPanel.tsx",
+              "line_start": 19,
+              "line_end": 19,
+              "snippet_hash": "ad535295f2a96851c44a88e87f84228f99bea98fe609863577fbfb49e7bcc126",
+              "usage_id": "043ef04885acce77c6effc6f"
+            },
+            {
+              "file": "src/components/Subscription/Option/Frequencies.tsx",
+              "line_start": 15,
+              "line_end": 15,
+              "snippet_hash": "a0f804a788af330300895ad48bfed4cc76d5fc00408ff27a78ff6d4e8f85bcfa",
+              "usage_id": "357dff25202f51b98aa7f575"
+            },
+            {
+              "file": "src/components/Subscription/Option/RuleCondition.tsx",
+              "line_start": 13,
+              "line_end": 13,
+              "snippet_hash": "62d01e8b2f3a0dcc1bc45533f7ecb4000b4bd49876a3fcde7c3c4baed858798b",
+              "usage_id": "0ce7e4677f06140181400fdc"
+            },
+            {
+              "file": "src/components/Subscription/Widget/Button.tsx",
+              "line_start": 9,
+              "line_end": 9,
+              "snippet_hash": "11c523de2d6d666a2732bc8878b886bb1db9d0e2805b12a77611fb71fd1cdd2e",
+              "usage_id": "ad563ada1339b035f38b8a21"
+            },
+            {
+              "file": "src/components/Subscription/Widget/index.tsx",
+              "line_start": 14,
+              "line_end": 14,
+              "snippet_hash": "222da89937eca9ba854dcc27a3d3dc8f99bdfcde065703361865b13b4f644cd0",
+              "usage_id": "7fd8a4639c23af1839e3c998"
+            },
+            {
+              "file": "src/hocs/withStyle.tsx",
+              "line_start": 41,
+              "line_end": 41,
+              "snippet_hash": "13b85b08833cf0f0d62ce9109e7ee1531832e500962a65d943887e01390b4680",
+              "usage_id": "69492ef63698ce8f7c8853a1"
+            },
+            {
+              "file": "src/pages/index.tsx",
+              "line_start": 15,
+              "line_end": 15,
+              "snippet_hash": "8f08b6533a2336988702a7db9030d6eeffc88fd8a0cbf02b861f9f167df3c8e4",
+              "usage_id": "3e21e964ef3e633c861b4736"
+            },
+            {
+              "file": "src/pages/onboarding.tsx",
+              "line_start": 4,
+              "line_end": 4,
+              "snippet_hash": "8f08b6533a2336988702a7db9030d6eeffc88fd8a0cbf02b861f9f167df3c8e4",
+              "usage_id": "2f955572bf95bfdea25dd0e3"
+            },
+            {
+              "file": "src/pages/products.tsx",
+              "line_start": 49,
+              "line_end": 49,
+              "snippet_hash": "5c41eecb17edbef3eb6ec3901e063952449a68cc29691bcfdb9132f12cbe42f5",
+              "usage_id": "0b18859339b8c4a4ed70523c"
+            },
+            {
+              "file": "src/pages/products.tsx",
+              "line_start": 77,
+              "line_end": 77,
+              "snippet_hash": "69c76bd1b8947a56404f1bdd3e653b212a37d0b5d2e84fe3e9ad90eac656ccc7",
+              "usage_id": "4543c8ad87b01736cf8f4bb6"
+            },
+            {
+              "file": "src/pages/settings.tsx",
+              "line_start": 10,
+              "line_end": 10,
+              "snippet_hash": "ca134598b9e868349722d816ac8ef409008ebcd4bb322b6dbe980fbf3f69a9d2",
+              "usage_id": "2089fd73ff0c8598354146be"
+            },
+            {
+              "file": "src/pages/stripe/callback.tsx",
+              "line_start": 5,
+              "line_end": 5,
+              "snippet_hash": "59cf92a79275de7afd80e6440240f9defe02664ce384b47c6e02e15dce2f679a",
+              "usage_id": "da85ae13d8625d8e4d5cb6eb"
+            },
+            {
+              "file": "src/pages/support.tsx",
+              "line_start": 6,
+              "line_end": 6,
+              "snippet_hash": "a3899f6a857a6b240e96240a94e18249f38b5721a1b5e798ec32c8f99ef183ac",
+              "usage_id": "596b74931ca2f802faef6869"
+            }
+          ],
+          "submission": {
+            "findings": [
+              {
+                "id": "api-70d4184db7b015b36631003e",
+                "repo_id": "4448cbbe33260a1e",
+                "lens": "api",
+                "concern": "api_change",
+                "severity": "high",
+                "evidence": [
+                  {
+                    "repo_id": "4448cbbe33260a1e",
+                    "file": "shared/handlers/getUserAndStore.ts",
+                    "line_start": 2,
+                    "line_end": 2,
+                    "snippet_hash": "a930c233eb000bcd3e54b0b45e54e2243d7d302beeca4bc6e1daa3d4e9c5ada9"
+                  }
+                ],
+                "doc_refs": [],
+                "reasoning": "NextRequest.ip is removed: NextRequest.ip was removed along with geo.",
+                "action": "Update to: the hosting provider",
+                "step_kind": "codemod",
+                "verify": "Load the affected page or run the build, and confirm the new behaviour.",
+                "confidence": 0.85,
+                "source": "rule_pack",
+                "usage_ids": [
+                  "70d4184db7b015b36631003e"
+                ],
+                "docs_status": "unverified",
+                "prompt_version": "v1",
+                "rule_id": "next/async-request-ip",
+                "codemod": "next-codemod:next-request-geo-ip",
+                "rollback": "Return to the previous release of the library."
+              },
+              {
+                "id": "api-0c57f8b12850b97f318884eb",
+                "repo_id": "4448cbbe33260a1e",
+                "lens": "api",
+                "concern": "api_change",
+                "severity": "medium",
+                "evidence": [
+                  {
+                    "repo_id": "4448cbbe33260a1e",
+                    "file": "shared/types/styled/WrapperConfig.d.ts",
+                    "line_start": 6,
+                    "line_end": 6,
+                    "snippet_hash": "0da1b0b003351e1b101a5c8d3ae20208ec79962cbab588bcf027bac9ab58d79a"
+                  }
+                ],
+                "doc_refs": [],
+                "reasoning": "The JSX namespace in TypeScript: The global JSX namespace is removed. Use React.JSX.",
+                "action": "Update to: React.JSX.Element",
+                "step_kind": "codemod",
+                "verify": "Load the affected page or run the build, and confirm the new behaviour.",
+                "confidence": 0.85,
+                "source": "rule_pack",
+                "usage_ids": [
+                  "0c57f8b12850b97f318884eb"
+                ],
+                "docs_status": "unverified",
+                "prompt_version": "v1",
+                "rule_id": "react/the-jsx-namespace-in-typescript",
+                "codemod": "types-react-codemod:preset-19",
+                "rollback": "Return to the previous release of the library."
+              },
+              {
+                "id": "api-d2dd9ddf647346dc0b22195e",
+                "repo_id": "4448cbbe33260a1e",
+                "lens": "api",
+                "concern": "api_change",
+                "severity": "medium",
+                "evidence": [
+                  {
+                    "repo_id": "4448cbbe33260a1e",
+                    "file": "src/components/Base/ActionBar.tsx",
+                    "line_start": 38,
+                    "line_end": 38,
+                    "snippet_hash": "41d688f580f7cd41e93699bbd758260df3f317d98a6574a23b2c495727980703"
+                  }
+                ],
+                "doc_refs": [],
+                "reasoning": "The JSX namespace in TypeScript: The global JSX namespace is removed. Use React.JSX.",
+                "action": "Update to: React.JSX.Element",
+                "step_kind": "codemod",
+                "verify": "Load the affected page or run the build, and confirm the new behaviour.",
+                "confidence": 0.85,
+                "source": "rule_pack",
+                "usage_ids": [
+                  "d2dd9ddf647346dc0b22195e"
+                ],
+                "docs_status": "unverified",
+                "prompt_version": "v1",
+                "rule_id": "react/the-jsx-namespace-in-typescript",
+                "codemod": "types-react-codemod:preset-19",
+                "rollback": "Return to the previous release of the library."
+              },
+              {
+                "id": "api-0884fb91ad1b69967045f844",
+                "repo_id": "4448cbbe33260a1e",
+                "lens": "api",
+                "concern": "api_change",
+                "severity": "medium",
+                "evidence": [
+                  {
+                    "repo_id": "4448cbbe33260a1e",
+                    "file": "src/components/Base/ActionBar.tsx",
+                    "line_start": 39,
+                    "line_end": 39,
+                    "snippet_hash": "62d01e8b2f3a0dcc1bc45533f7ecb4000b4bd49876a3fcde7c3c4baed858798b"
+                  }
+                ],
+                "doc_refs": [],
+                "reasoning": "The JSX namespace in TypeScript: The global JSX namespace is removed. Use React.JSX.",
+                "action": "Update to: React.JSX.Element",
+                "step_kind": "codemod",
+                "verify": "Load the affected page or run the build, and confirm the new behaviour.",
+                "confidence": 0.85,
+                "source": "rule_pack",
+                "usage_ids": [
+                  "0884fb91ad1b69967045f844"
+                ],
+                "docs_status": "unverified",
+                "prompt_version": "v1",
+                "rule_id": "react/the-jsx-namespace-in-typescript",
+                "codemod": "types-react-codemod:preset-19",
+                "rollback": "Return to the previous release of the library."
+              },
+              {
+                "id": "api-0f849b1fb594f7618aca22a7",
+                "repo_id": "4448cbbe33260a1e",
+                "lens": "api",
+                "concern": "api_change",
+                "severity": "medium",
+                "evidence": [
+                  {
+                    "repo_id": "4448cbbe33260a1e",
+                    "file": "src/components/Base/AsyncButton.tsx",
+                    "line_start": 8,
+                    "line_end": 8,
+                    "snippet_hash": "13706712605a790928282ba28b4e522be037fd0612d01c1d807ba364ec5385f0"
+                  }
+                ],
+                "doc_refs": [],
+                "reasoning": "The JSX namespace in TypeScript: The global JSX namespace is removed. Use React.JSX.",
+                "action": "Update to: React.JSX.Element",
+                "step_kind": "codemod",
+                "verify": "Load the affected page or run the build, and confirm the new behaviour.",
+                "confidence": 0.85,
+                "source": "rule_pack",
+                "usage_ids": [
+                  "0f849b1fb594f7618aca22a7"
+                ],
+                "docs_status": "unverified",
+                "prompt_version": "v1",
+                "rule_id": "react/the-jsx-namespace-in-typescript",
+                "codemod": "types-react-codemod:preset-19",
+                "rollback": "Return to the previous release of the library."
+              },
+              {
+                "id": "api-ec94b7d6800ea43127bcf2bb",
+                "repo_id": "4448cbbe33260a1e",
+                "lens": "api",
+                "concern": "api_change",
+                "severity": "medium",
+                "evidence": [
+                  {
+                    "repo_id": "4448cbbe33260a1e",
+                    "file": "src/components/Base/ColorPicker.tsx",
+                    "line_start": 26,
+                    "line_end": 26,
+                    "snippet_hash": "11c523de2d6d666a2732bc8878b886bb1db9d0e2805b12a77611fb71fd1cdd2e"
+                  }
+                ],
+                "doc_refs": [],
+                "reasoning": "The JSX namespace in TypeScript: The global JSX namespace is removed. Use React.JSX.",
+                "action": "Update to: React.JSX.Element",
+                "step_kind": "codemod",
+                "verify": "Load the affected page or run the build, and confirm the new behaviour.",
+                "confidence": 0.85,
+                "source": "rule_pack",
+                "usage_ids": [
+                  "ec94b7d6800ea43127bcf2bb"
+                ],
+                "docs_status": "unverified",
+                "prompt_version": "v1",
+                "rule_id": "react/the-jsx-namespace-in-typescript",
+                "codemod": "types-react-codemod:preset-19",
+                "rollback": "Return to the previous release of the library."
+              },
+              {
+                "id": "api-9c1ef6be81a8aed6c52b0eba",
+                "repo_id": "4448cbbe33260a1e",
+                "lens": "api",
+                "concern": "api_change",
+                "severity": "medium",
+                "evidence": [
+                  {
+                    "repo_id": "4448cbbe33260a1e",
+                    "file": "src/components/Base/LoadingScreen.tsx",
+                    "line_start": 17,
+                    "line_end": 17,
+                    "snippet_hash": "c6efb4f4058814829b6a649f4dbffb34247b2c31f9732307fcdc8920b8ae6748"
+                  }
+                ],
+                "doc_refs": [],
+                "reasoning": "The JSX namespace in TypeScript: The global JSX namespace is removed. Use React.JSX.",
+                "action": "Update to: React.JSX.Element",
+                "step_kind": "codemod",
+                "verify": "Load the affected page or run the build, and confirm the new behaviour.",
+                "confidence": 0.85,
+                "source": "rule_pack",
+                "usage_ids": [
+                  "9c1ef6be81a8aed6c52b0eba"
+                ],
+                "docs_status": "unverified",
+                "prompt_version": "v1",
+                "rule_id": "react/the-jsx-namespace-in-typescript",
+                "codemod": "types-react-codemod:preset-19",
+                "rollback": "Return to the previous release of the library."
+              },
+              {
+                "id": "api-0dbe48baef7f2064285e5c1b",
+                "repo_id": "4448cbbe33260a1e",
+                "lens": "api",
+                "concern": "api_change",
+                "severity": "medium",
+                "evidence": [
+                  {
+                    "repo_id": "4448cbbe33260a1e",
+                    "file": "src/components/Base/PageLayout.tsx",
+                    "line_start": 4,
+                    "line_end": 4,
+                    "snippet_hash": "74886dadcd6ba4770dadf261181636ed943440eb020fb839cf588dd6d2c021e8"
+                  }
+                ],
+                "doc_refs": [],
+                "reasoning": "The JSX namespace in TypeScript: The global JSX namespace is removed. Use React.JSX.",
+                "action": "Update to: React.JSX.Element",
+                "step_kind": "codemod",
+                "verify": "Load the affected page or run the build, and confirm the new behaviour.",
+                "confidence": 0.85,
+                "source": "rule_pack",
+                "usage_ids": [
+                  "0dbe48baef7f2064285e5c1b"
+                ],
+                "docs_status": "unverified",
+                "prompt_version": "v1",
+                "rule_id": "react/the-jsx-namespace-in-typescript",
+                "codemod": "types-react-codemod:preset-19",
+                "rollback": "Return to the previous release of the library."
+              },
+              {
+                "id": "api-858d8e11f345be79f66ffcce",
+                "repo_id": "4448cbbe33260a1e",
+                "lens": "api",
+                "concern": "api_change",
+                "severity": "medium",
+                "evidence": [
+                  {
+                    "repo_id": "4448cbbe33260a1e",
+                    "file": "src/components/Onboarding/CheckoutSettings.tsx",
+                    "line_start": 20,
+                    "line_end": 20,
+                    "snippet_hash": "faac1263ac864044540c9c3374219e172bfb4769391bc54c72de48cda0eebdc2"
+                  }
+                ],
+                "doc_refs": [],
+                "reasoning": "The JSX namespace in TypeScript: The global JSX namespace is removed. Use React.JSX.",
+                "action": "Update to: React.JSX.Element",
+                "step_kind": "codemod",
+                "verify": "Load the affected page or run the build, and confirm the new behaviour.",
+                "confidence": 0.85,
+                "source": "rule_pack",
+                "usage_ids": [
+                  "858d8e11f345be79f66ffcce"
+                ],
+                "docs_status": "unverified",
+                "prompt_version": "v1",
+                "rule_id": "react/the-jsx-namespace-in-typescript",
+                "codemod": "types-react-codemod:preset-19",
+                "rollback": "Return to the previous release of the library."
+              },
+              {
+                "id": "api-85af94666697a5834ad286d0",
+                "repo_id": "4448cbbe33260a1e",
+                "lens": "api",
+                "concern": "api_change",
+                "severity": "medium",
+                "evidence": [
+                  {
+                    "repo_id": "4448cbbe33260a1e",
+                    "file": "src/components/Onboarding/DisplaySettings/SubscriptionPreview.tsx",
+                    "line_start": 10,
+                    "line_end": 10,
+                    "snippet_hash": "62d01e8b2f3a0dcc1bc45533f7ecb4000b4bd49876a3fcde7c3c4baed858798b"
+                  }
+                ],
+                "doc_refs": [],
+                "reasoning": "The JSX namespace in TypeScript: The global JSX namespace is removed. Use React.JSX.",
+                "action": "Update to: React.JSX.Element",
+                "step_kind": "codemod",
+                "verify": "Load the affected page or run the build, and confirm the new behaviour.",
+                "confidence": 0.85,
+                "source": "rule_pack",
+                "usage_ids": [
+                  "85af94666697a5834ad286d0"
+                ],
+                "docs_status": "unverified",
+                "prompt_version": "v1",
+                "rule_id": "react/the-jsx-namespace-in-typescript",
+                "codemod": "types-react-codemod:preset-19",
+                "rollback": "Return to the previous release of the library."
+              },
+              {
+                "id": "api-e4f8187657d32367eb49147d",
+                "repo_id": "4448cbbe33260a1e",
+                "lens": "api",
+                "concern": "api_change",
+                "severity": "medium",
+                "evidence": [
+                  {
+                    "repo_id": "4448cbbe33260a1e",
+                    "file": "src/components/Onboarding/DisplaySettings/index.tsx",
+                    "line_start": 21,
+                    "line_end": 21,
+                    "snippet_hash": "bad595721b0207fa9a2d3cb46185c98ee65236f7b5f8e04b1d32d28946eb734b"
+                  }
+                ],
+                "doc_refs": [],
+                "reasoning": "The JSX namespace in TypeScript: The global JSX namespace is removed. Use React.JSX.",
+                "action": "Update to: React.JSX.Element",
+                "step_kind": "codemod",
+                "verify": "Load the affected page or run the build, and confirm the new behaviour.",
+                "confidence": 0.85,
+                "source": "rule_pack",
+                "usage_ids": [
+                  "e4f8187657d32367eb49147d"
+                ],
+                "docs_status": "unverified",
+                "prompt_version": "v1",
+                "rule_id": "react/the-jsx-namespace-in-typescript",
+                "codemod": "types-react-codemod:preset-19",
+                "rollback": "Return to the previous release of the library."
+              },
+              {
+                "id": "api-c418641f5045729383fb2082",
+                "repo_id": "4448cbbe33260a1e",
+                "lens": "api",
+                "concern": "api_change",
+                "severity": "medium",
+                "evidence": [
+                  {
+                    "repo_id": "4448cbbe33260a1e",
+                    "file": "src/components/Onboarding/StripeConnect.tsx",
+                    "line_start": 20,
+                    "line_end": 20,
+                    "snippet_hash": "62a61a9eb05fdb78ddbcde5b5aee5dbc2562a6dbf5bf56dc17898c54606a6c39"
+                  }
+                ],
+                "doc_refs": [],
+                "reasoning": "The JSX namespace in TypeScript: The global JSX namespace is removed. Use React.JSX.",
+                "action": "Update to: React.JSX.Element",
+                "step_kind": "codemod",
+                "verify": "Load the affected page or run the build, and confirm the new behaviour.",
+                "confidence": 0.85,
+                "source": "rule_pack",
+                "usage_ids": [
+                  "c418641f5045729383fb2082"
+                ],
+                "docs_status": "unverified",
+                "prompt_version": "v1",
+                "rule_id": "react/the-jsx-namespace-in-typescript",
+                "codemod": "types-react-codemod:preset-19",
+                "rollback": "Return to the previous release of the library."
+              },
+              {
+                "id": "api-03e67090e489b9e13ee8ad63",
+                "repo_id": "4448cbbe33260a1e",
+                "lens": "api",
+                "concern": "api_change",
+                "severity": "medium",
+                "evidence": [
+                  {
+                    "repo_id": "4448cbbe33260a1e",
+                    "file": "src/components/Onboarding/index.tsx",
+                    "line_start": 34,
+                    "line_end": 34,
+                    "snippet_hash": "bc6633bc2a71ad76c6ecd363b793cb9fad4201af0c068e86ab54665cdfc613a0"
+                  }
+                ],
+                "doc_refs": [],
+                "reasoning": "The JSX namespace in TypeScript: The global JSX namespace is removed. Use React.JSX.",
+                "action": "Update to: React.JSX.Element",
+                "step_kind": "codemod",
+                "verify": "Load the affected page or run the build, and confirm the new behaviour.",
+                "confidence": 0.85,
+                "source": "rule_pack",
+                "usage_ids": [
+                  "03e67090e489b9e13ee8ad63"
+                ],
+                "docs_status": "unverified",
+                "prompt_version": "v1",
+                "rule_id": "react/the-jsx-namespace-in-typescript",
+                "codemod": "types-react-codemod:preset-19",
+                "rollback": "Return to the previous release of the library."
+              },
+              {
+                "id": "api-f7b3eb58f2ec75ef3cd43609",
+                "repo_id": "4448cbbe33260a1e",
+                "lens": "api",
+                "concern": "api_change",
+                "severity": "medium",
+                "evidence": [
+                  {
+                    "repo_id": "4448cbbe33260a1e",
+                    "file": "src/components/Products/Items/EnabledSubscriptionCheck.tsx",
+                    "line_start": 12,
+                    "line_end": 12,
+                    "snippet_hash": "69c76bd1b8947a56404f1bdd3e653b212a37d0b5d2e84fe3e9ad90eac656ccc7"
+                  }
+                ],
+                "doc_refs": [],
+                "reasoning": "The JSX namespace in TypeScript: The global JSX namespace is removed. Use React.JSX.",
+                "action": "Update to: React.JSX.Element",
+                "step_kind": "codemod",
+                "verify": "Load the affected page or run the build, and confirm the new behaviour.",
+                "confidence": 0.85,
+                "source": "rule_pack",
+                "usage_ids": [
+                  "f7b3eb58f2ec75ef3cd43609"
+                ],
+                "docs_status": "unverified",
+                "prompt_version": "v1",
+                "rule_id": "react/the-jsx-namespace-in-typescript",
+                "codemod": "types-react-codemod:preset-19",
+                "rollback": "Return to the previous release of the library."
+              },
+              {
+                "id": "api-48e2a2197836483cb8a120b0",
+                "repo_id": "4448cbbe33260a1e",
+                "lens": "api",
+                "concern": "api_change",
+                "severity": "medium",
+                "evidence": [
+                  {
+                    "repo_id": "4448cbbe33260a1e",
+                    "file": "src/components/Products/List.tsx",
+                    "line_start": 30,
+                    "line_end": 30,
+                    "snippet_hash": "62d01e8b2f3a0dcc1bc45533f7ecb4000b4bd49876a3fcde7c3c4baed858798b"
+                  }
+                ],
+                "doc_refs": [],
+                "reasoning": "The JSX namespace in TypeScript: The global JSX namespace is removed. Use React.JSX.",
+                "action": "Update to: React.JSX.Element",
+                "step_kind": "codemod",
+                "verify": "Load the affected page or run the build, and confirm the new behaviour.",
+                "confidence": 0.85,
+                "source": "rule_pack",
+                "usage_ids": [
+                  "48e2a2197836483cb8a120b0"
+                ],
+                "docs_status": "unverified",
+                "prompt_version": "v1",
+                "rule_id": "react/the-jsx-namespace-in-typescript",
+                "codemod": "types-react-codemod:preset-19",
+                "rollback": "Return to the previous release of the library."
+              },
+              {
+                "id": "api-07ff664329e592d0a06510e6",
+                "repo_id": "4448cbbe33260a1e",
+                "lens": "api",
+                "concern": "api_change",
+                "severity": "medium",
+                "evidence": [
+                  {
+                    "repo_id": "4448cbbe33260a1e",
+                    "file": "src/components/Products/Panes/ListPane.tsx",
+                    "line_start": 19,
+                    "line_end": 19,
+                    "snippet_hash": "7ab1a0cbea5a67254d3ed4e1048e747c0bda3fbda84ae2ad454df54a49b7ea52"
+                  }
+                ],
+                "doc_refs": [],
+                "reasoning": "The JSX namespace in TypeScript: The global JSX namespace is removed. Use React.JSX.",
+                "action": "Update to: React.JSX.Element",
+                "step_kind": "codemod",
+                "verify": "Load the affected page or run the build, and confirm the new behaviour.",
+                "confidence": 0.85,
+                "source": "rule_pack",
+                "usage_ids": [
+                  "07ff664329e592d0a06510e6"
+                ],
+                "docs_status": "unverified",
+                "prompt_version": "v1",
+                "rule_id": "react/the-jsx-namespace-in-typescript",
+                "codemod": "types-react-codemod:preset-19",
+                "rollback": "Return to the previous release of the library."
+              },
+              {
+                "id": "api-6ed92570fcbbd572d46deecf",
+                "repo_id": "4448cbbe33260a1e",
+                "lens": "api",
+                "concern": "api_change",
+                "severity": "medium",
+                "evidence": [
+                  {
+                    "repo_id": "4448cbbe33260a1e",
+                    "file": "src/components/Products/Panes/ListPane.tsx",
+                    "line_start": 34,
+                    "line_end": 34,
+                    "snippet_hash": "5aaea9f92b31d212ce9eac40f0ed74d6d71631f2c57e5fef2285ed68f38b22b1"
+                  }
+                ],
+                "doc_refs": [],
+                "reasoning": "useRef requires an argument: useRef requires an argument, and MutableRefObject is deprecated in favour of RefObject.",
+                "action": "Update to: useRef(undefined), or useRef(null)",
+                "step_kind": "codemod",
+                "verify": "Load the affected page or run the build, and confirm the new behaviour.",
+                "confidence": 0.85,
+                "source": "rule_pack",
+                "usage_ids": [
+                  "6ed92570fcbbd572d46deecf"
+                ],
+                "docs_status": "unverified",
+                "prompt_version": "v1",
+                "rule_id": "react/useref-requires-an-argument",
+                "codemod": "types-react-codemod:refobject-defaults",
+                "rollback": "Return to the previous release of the library."
+              },
+              {
+                "id": "api-9be141181e1068cda407e131",
+                "repo_id": "4448cbbe33260a1e",
+                "lens": "api",
+                "concern": "api_change",
+                "severity": "medium",
+                "evidence": [
+                  {
+                    "repo_id": "4448cbbe33260a1e",
+                    "file": "src/components/Products/Panes/SubscriptionEditPane.tsx",
+                    "line_start": 18,
+                    "line_end": 18,
+                    "snippet_hash": "5c41987fbd433f6fba2333eec1809d9fd517b564f36d419497b7a32e2588b218"
+                  }
+                ],
+                "doc_refs": [],
+                "reasoning": "The JSX namespace in TypeScript: The global JSX namespace is removed. Use React.JSX.",
+                "action": "Update to: React.JSX.Element",
+                "step_kind": "codemod",
+                "verify": "Load the affected page or run the build, and confirm the new behaviour.",
+                "confidence": 0.85,
+                "source": "rule_pack",
+                "usage_ids": [
+                  "9be141181e1068cda407e131"
+                ],
+                "docs_status": "unverified",
+                "prompt_version": "v1",
+                "rule_id": "react/the-jsx-namespace-in-typescript",
+                "codemod": "types-react-codemod:preset-19",
+                "rollback": "Return to the previous release of the library."
+              },
+              {
+                "id": "api-0e8a0015535114daa7cc85c7",
+                "repo_id": "4448cbbe33260a1e",
+                "lens": "api",
+                "concern": "api_change",
+                "severity": "medium",
+                "evidence": [
+                  {
+                    "repo_id": "4448cbbe33260a1e",
+                    "file": "src/components/Products/Panes/VariantProductListPane.tsx",
+                    "line_start": 21,
+                    "line_end": 21,
+                    "snippet_hash": "00f89fe2f0731be9a49cd649c0445a6d669f0444fb3830439c22854e0d7d45d7"
+                  }
+                ],
+                "doc_refs": [],
+                "reasoning": "The JSX namespace in TypeScript: The global JSX namespace is removed. Use React.JSX.",
+                "action": "Update to: React.JSX.Element",
+                "step_kind": "codemod",
+                "verify": "Load the affected page or run the build, and confirm the new behaviour.",
+                "confidence": 0.85,
+                "source": "rule_pack",
+                "usage_ids": [
+                  "0e8a0015535114daa7cc85c7"
+                ],
+                "docs_status": "unverified",
+                "prompt_version": "v1",
+                "rule_id": "react/the-jsx-namespace-in-typescript",
+                "codemod": "types-react-codemod:preset-19",
+                "rollback": "Return to the previous release of the library."
+              },
+              {
+                "id": "api-2d30ef274845b411a5c16f54",
+                "repo_id": "4448cbbe33260a1e",
+                "lens": "api",
+                "concern": "api_change",
+                "severity": "medium",
+                "evidence": [
+                  {
+                    "repo_id": "4448cbbe33260a1e",
+                    "file": "src/components/Products/Row/Action.tsx",
+                    "line_start": 8,
+                    "line_end": 8,
+                    "snippet_hash": "4be5434632e9d13c953973ca10cfd7832240200453eed297838455d793b8be79"
+                  }
+                ],
+                "doc_refs": [],
+                "reasoning": "The JSX namespace in TypeScript: The global JSX namespace is removed. Use React.JSX.",
+                "action": "Update to: React.JSX.Element",
+                "step_kind": "codemod",
+                "verify": "Load the affected page or run the build, and confirm the new behaviour.",
+                "confidence": 0.85,
+                "source": "rule_pack",
+                "usage_ids": [
+                  "2d30ef274845b411a5c16f54"
+                ],
+                "docs_status": "unverified",
+                "prompt_version": "v1",
+                "rule_id": "react/the-jsx-namespace-in-typescript",
+                "codemod": "types-react-codemod:preset-19",
+                "rollback": "Return to the previous release of the library."
+              },
+              {
+                "id": "api-15c6c2b1e0bd93eddef96dc8",
+                "repo_id": "4448cbbe33260a1e",
+                "lens": "api",
+                "concern": "api_change",
+                "severity": "medium",
+                "evidence": [
+                  {
+                    "repo_id": "4448cbbe33260a1e",
+                    "file": "src/components/Products/Row/ThumbnailWithName.tsx",
+                    "line_start": 29,
+                    "line_end": 29,
+                    "snippet_hash": "69c76bd1b8947a56404f1bdd3e653b212a37d0b5d2e84fe3e9ad90eac656ccc7"
+                  }
+                ],
+                "doc_refs": [],
+                "reasoning": "The JSX namespace in TypeScript: The global JSX namespace is removed. Use React.JSX.",
+                "action": "Update to: React.JSX.Element",
+                "step_kind": "codemod",
+                "verify": "Load the affected page or run the build, and confirm the new behaviour.",
+                "confidence": 0.85,
+                "source": "rule_pack",
+                "usage_ids": [
+                  "15c6c2b1e0bd93eddef96dc8"
+                ],
+                "docs_status": "unverified",
+                "prompt_version": "v1",
+                "rule_id": "react/the-jsx-namespace-in-typescript",
+                "codemod": "types-react-codemod:preset-19",
+                "rollback": "Return to the previous release of the library."
+              },
+              {
+                "id": "api-5c9115681b4781e8de704188",
+                "repo_id": "4448cbbe33260a1e",
+                "lens": "api",
+                "concern": "api_change",
+                "severity": "medium",
+                "evidence": [
+                  {
+                    "repo_id": "4448cbbe33260a1e",
+                    "file": "src/components/Products/Variant/List.tsx",
+                    "line_start": 26,
+                    "line_end": 26,
+                    "snippet_hash": "62d01e8b2f3a0dcc1bc45533f7ecb4000b4bd49876a3fcde7c3c4baed858798b"
+                  }
+                ],
+                "doc_refs": [],
+                "reasoning": "The JSX namespace in TypeScript: The global JSX namespace is removed. Use React.JSX.",
+                "action": "Update to: React.JSX.Element",
+                "step_kind": "codemod",
+                "verify": "Load the affected page or run the build, and confirm the new behaviour.",
+                "confidence": 0.85,
+                "source": "rule_pack",
+                "usage_ids": [
+                  "5c9115681b4781e8de704188"
+                ],
+                "docs_status": "unverified",
+                "prompt_version": "v1",
+                "rule_id": "react/the-jsx-namespace-in-typescript",
+                "codemod": "types-react-codemod:preset-19",
+                "rollback": "Return to the previous release of the library."
+              },
+              {
+                "id": "api-98a85407e2cd7f1f42d79696",
+                "repo_id": "4448cbbe33260a1e",
+                "lens": "api",
+                "concern": "api_change",
+                "severity": "medium",
+                "evidence": [
+                  {
+                    "repo_id": "4448cbbe33260a1e",
+                    "file": "src/components/Products/Variant/SubscriptionToggle.tsx",
+                    "line_start": 12,
+                    "line_end": 12,
+                    "snippet_hash": "69c76bd1b8947a56404f1bdd3e653b212a37d0b5d2e84fe3e9ad90eac656ccc7"
+                  }
+                ],
+                "doc_refs": [],
+                "reasoning": "The JSX namespace in TypeScript: The global JSX namespace is removed. Use React.JSX.",
+                "action": "Update to: React.JSX.Element",
+                "step_kind": "codemod",
+                "verify": "Load the affected page or run the build, and confirm the new behaviour.",
+                "confidence": 0.85,
+                "source": "rule_pack",
+                "usage_ids": [
+                  "98a85407e2cd7f1f42d79696"
+                ],
+                "docs_status": "unverified",
+                "prompt_version": "v1",
+                "rule_id": "react/the-jsx-namespace-in-typescript",
+                "codemod": "types-react-codemod:preset-19",
+                "rollback": "Return to the previous release of the library."
+              },
+              {
+                "id": "api-42258567aa0370835d5fd284",
+                "repo_id": "4448cbbe33260a1e",
+                "lens": "api",
+                "concern": "api_change",
+                "severity": "medium",
+                "evidence": [
+                  {
+                    "repo_id": "4448cbbe33260a1e",
+                    "file": "src/components/Subscription/Option/Discount.tsx",
+                    "line_start": 12,
+                    "line_end": 12,
+                    "snippet_hash": "62d01e8b2f3a0dcc1bc45533f7ecb4000b4bd49876a3fcde7c3c4baed858798b"
+                  }
+                ],
+                "doc_refs": [],
+                "reasoning": "The JSX namespace in TypeScript: The global JSX namespace is removed. Use React.JSX.",
+                "action": "Update to: React.JSX.Element",
+                "step_kind": "codemod",
+                "verify": "Load the affected page or run the build, and confirm the new behaviour.",
+                "confidence": 0.85,
+                "source": "rule_pack",
+                "usage_ids": [
+                  "42258567aa0370835d5fd284"
+                ],
+                "docs_status": "unverified",
+                "prompt_version": "v1",
+                "rule_id": "react/the-jsx-namespace-in-typescript",
+                "codemod": "types-react-codemod:preset-19",
+                "rollback": "Return to the previous release of the library."
+              },
+              {
+                "id": "api-043ef04885acce77c6effc6f",
+                "repo_id": "4448cbbe33260a1e",
+                "lens": "api",
+                "concern": "api_change",
+                "severity": "medium",
+                "evidence": [
+                  {
+                    "repo_id": "4448cbbe33260a1e",
+                    "file": "src/components/Subscription/Option/EditPanel.tsx",
+                    "line_start": 19,
+                    "line_end": 19,
+                    "snippet_hash": "ad535295f2a96851c44a88e87f84228f99bea98fe609863577fbfb49e7bcc126"
+                  }
+                ],
+                "doc_refs": [],
+                "reasoning": "The JSX namespace in TypeScript: The global JSX namespace is removed. Use React.JSX.",
+                "action": "Update to: React.JSX.Element",
+                "step_kind": "codemod",
+                "verify": "Load the affected page or run the build, and confirm the new behaviour.",
+                "confidence": 0.85,
+                "source": "rule_pack",
+                "usage_ids": [
+                  "043ef04885acce77c6effc6f"
+                ],
+                "docs_status": "unverified",
+                "prompt_version": "v1",
+                "rule_id": "react/the-jsx-namespace-in-typescript",
+                "codemod": "types-react-codemod:preset-19",
+                "rollback": "Return to the previous release of the library."
+              },
+              {
+                "id": "api-357dff25202f51b98aa7f575",
+                "repo_id": "4448cbbe33260a1e",
+                "lens": "api",
+                "concern": "api_change",
+                "severity": "medium",
+                "evidence": [
+                  {
+                    "repo_id": "4448cbbe33260a1e",
+                    "file": "src/components/Subscription/Option/Frequencies.tsx",
+                    "line_start": 15,
+                    "line_end": 15,
+                    "snippet_hash": "a0f804a788af330300895ad48bfed4cc76d5fc00408ff27a78ff6d4e8f85bcfa"
+                  }
+                ],
+                "doc_refs": [],
+                "reasoning": "The JSX namespace in TypeScript: The global JSX namespace is removed. Use React.JSX.",
+                "action": "Update to: React.JSX.Element",
+                "step_kind": "codemod",
+                "verify": "Load the affected page or run the build, and confirm the new behaviour.",
+                "confidence": 0.85,
+                "source": "rule_pack",
+                "usage_ids": [
+                  "357dff25202f51b98aa7f575"
+                ],
+                "docs_status": "unverified",
+                "prompt_version": "v1",
+                "rule_id": "react/the-jsx-namespace-in-typescript",
+                "codemod": "types-react-codemod:preset-19",
+                "rollback": "Return to the previous release of the library."
+              },
+              {
+                "id": "api-0ce7e4677f06140181400fdc",
+                "repo_id": "4448cbbe33260a1e",
+                "lens": "api",
+                "concern": "api_change",
+                "severity": "medium",
+                "evidence": [
+                  {
+                    "repo_id": "4448cbbe33260a1e",
+                    "file": "src/components/Subscription/Option/RuleCondition.tsx",
+                    "line_start": 13,
+                    "line_end": 13,
+                    "snippet_hash": "62d01e8b2f3a0dcc1bc45533f7ecb4000b4bd49876a3fcde7c3c4baed858798b"
+                  }
+                ],
+                "doc_refs": [],
+                "reasoning": "The JSX namespace in TypeScript: The global JSX namespace is removed. Use React.JSX.",
+                "action": "Update to: React.JSX.Element",
+                "step_kind": "codemod",
+                "verify": "Load the affected page or run the build, and confirm the new behaviour.",
+                "confidence": 0.85,
+                "source": "rule_pack",
+                "usage_ids": [
+                  "0ce7e4677f06140181400fdc"
+                ],
+                "docs_status": "unverified",
+                "prompt_version": "v1",
+                "rule_id": "react/the-jsx-namespace-in-typescript",
+                "codemod": "types-react-codemod:preset-19",
+                "rollback": "Return to the previous release of the library."
+              },
+              {
+                "id": "api-ad563ada1339b035f38b8a21",
+                "repo_id": "4448cbbe33260a1e",
+                "lens": "api",
+                "concern": "api_change",
+                "severity": "medium",
+                "evidence": [
+                  {
+                    "repo_id": "4448cbbe33260a1e",
+                    "file": "src/components/Subscription/Widget/Button.tsx",
+                    "line_start": 9,
+                    "line_end": 9,
+                    "snippet_hash": "11c523de2d6d666a2732bc8878b886bb1db9d0e2805b12a77611fb71fd1cdd2e"
+                  }
+                ],
+                "doc_refs": [],
+                "reasoning": "The JSX namespace in TypeScript: The global JSX namespace is removed. Use React.JSX.",
+                "action": "Update to: React.JSX.Element",
+                "step_kind": "codemod",
+                "verify": "Load the affected page or run the build, and confirm the new behaviour.",
+                "confidence": 0.85,
+                "source": "rule_pack",
+                "usage_ids": [
+                  "ad563ada1339b035f38b8a21"
+                ],
+                "docs_status": "unverified",
+                "prompt_version": "v1",
+                "rule_id": "react/the-jsx-namespace-in-typescript",
+                "codemod": "types-react-codemod:preset-19",
+                "rollback": "Return to the previous release of the library."
+              },
+              {
+                "id": "api-7fd8a4639c23af1839e3c998",
+                "repo_id": "4448cbbe33260a1e",
+                "lens": "api",
+                "concern": "api_change",
+                "severity": "medium",
+                "evidence": [
+                  {
+                    "repo_id": "4448cbbe33260a1e",
+                    "file": "src/components/Subscription/Widget/index.tsx",
+                    "line_start": 14,
+                    "line_end": 14,
+                    "snippet_hash": "222da89937eca9ba854dcc27a3d3dc8f99bdfcde065703361865b13b4f644cd0"
+                  }
+                ],
+                "doc_refs": [],
+                "reasoning": "The JSX namespace in TypeScript: The global JSX namespace is removed. Use React.JSX.",
+                "action": "Update to: React.JSX.Element",
+                "step_kind": "codemod",
+                "verify": "Load the affected page or run the build, and confirm the new behaviour.",
+                "confidence": 0.85,
+                "source": "rule_pack",
+                "usage_ids": [
+                  "7fd8a4639c23af1839e3c998"
+                ],
+                "docs_status": "unverified",
+                "prompt_version": "v1",
+                "rule_id": "react/the-jsx-namespace-in-typescript",
+                "codemod": "types-react-codemod:preset-19",
+                "rollback": "Return to the previous release of the library."
+              },
+              {
+                "id": "api-69492ef63698ce8f7c8853a1",
+                "repo_id": "4448cbbe33260a1e",
+                "lens": "api",
+                "concern": "api_change",
+                "severity": "medium",
+                "evidence": [
+                  {
+                    "repo_id": "4448cbbe33260a1e",
+                    "file": "src/hocs/withStyle.tsx",
+                    "line_start": 41,
+                    "line_end": 41,
+                    "snippet_hash": "13b85b08833cf0f0d62ce9109e7ee1531832e500962a65d943887e01390b4680"
+                  }
+                ],
+                "doc_refs": [],
+                "reasoning": "The JSX namespace in TypeScript: The global JSX namespace is removed. Use React.JSX.",
+                "action": "Update to: React.JSX.Element",
+                "step_kind": "codemod",
+                "verify": "Load the affected page or run the build, and confirm the new behaviour.",
+                "confidence": 0.85,
+                "source": "rule_pack",
+                "usage_ids": [
+                  "69492ef63698ce8f7c8853a1"
+                ],
+                "docs_status": "unverified",
+                "prompt_version": "v1",
+                "rule_id": "react/the-jsx-namespace-in-typescript",
+                "codemod": "types-react-codemod:preset-19",
+                "rollback": "Return to the previous release of the library."
+              },
+              {
+                "id": "api-3e21e964ef3e633c861b4736",
+                "repo_id": "4448cbbe33260a1e",
+                "lens": "api",
+                "concern": "api_change",
+                "severity": "medium",
+                "evidence": [
+                  {
+                    "repo_id": "4448cbbe33260a1e",
+                    "file": "src/pages/index.tsx",
+                    "line_start": 15,
+                    "line_end": 15,
+                    "snippet_hash": "8f08b6533a2336988702a7db9030d6eeffc88fd8a0cbf02b861f9f167df3c8e4"
+                  }
+                ],
+                "doc_refs": [],
+                "reasoning": "The JSX namespace in TypeScript: The global JSX namespace is removed. Use React.JSX.",
+                "action": "Update to: React.JSX.Element",
+                "step_kind": "codemod",
+                "verify": "Load the affected page or run the build, and confirm the new behaviour.",
+                "confidence": 0.85,
+                "source": "rule_pack",
+                "usage_ids": [
+                  "3e21e964ef3e633c861b4736"
+                ],
+                "docs_status": "unverified",
+                "prompt_version": "v1",
+                "rule_id": "react/the-jsx-namespace-in-typescript",
+                "codemod": "types-react-codemod:preset-19",
+                "rollback": "Return to the previous release of the library."
+              },
+              {
+                "id": "api-2f955572bf95bfdea25dd0e3",
+                "repo_id": "4448cbbe33260a1e",
+                "lens": "api",
+                "concern": "api_change",
+                "severity": "medium",
+                "evidence": [
+                  {
+                    "repo_id": "4448cbbe33260a1e",
+                    "file": "src/pages/onboarding.tsx",
+                    "line_start": 4,
+                    "line_end": 4,
+                    "snippet_hash": "8f08b6533a2336988702a7db9030d6eeffc88fd8a0cbf02b861f9f167df3c8e4"
+                  }
+                ],
+                "doc_refs": [],
+                "reasoning": "The JSX namespace in TypeScript: The global JSX namespace is removed. Use React.JSX.",
+                "action": "Update to: React.JSX.Element",
+                "step_kind": "codemod",
+                "verify": "Load the affected page or run the build, and confirm the new behaviour.",
+                "confidence": 0.85,
+                "source": "rule_pack",
+                "usage_ids": [
+                  "2f955572bf95bfdea25dd0e3"
+                ],
+                "docs_status": "unverified",
+                "prompt_version": "v1",
+                "rule_id": "react/the-jsx-namespace-in-typescript",
+                "codemod": "types-react-codemod:preset-19",
+                "rollback": "Return to the previous release of the library."
+              },
+              {
+                "id": "api-0b18859339b8c4a4ed70523c",
+                "repo_id": "4448cbbe33260a1e",
+                "lens": "api",
+                "concern": "api_change",
+                "severity": "medium",
+                "evidence": [
+                  {
+                    "repo_id": "4448cbbe33260a1e",
+                    "file": "src/pages/products.tsx",
+                    "line_start": 49,
+                    "line_end": 49,
+                    "snippet_hash": "5c41eecb17edbef3eb6ec3901e063952449a68cc29691bcfdb9132f12cbe42f5"
+                  }
+                ],
+                "doc_refs": [],
+                "reasoning": "The JSX namespace in TypeScript: The global JSX namespace is removed. Use React.JSX.",
+                "action": "Update to: React.JSX.Element",
+                "step_kind": "codemod",
+                "verify": "Load the affected page or run the build, and confirm the new behaviour.",
+                "confidence": 0.85,
+                "source": "rule_pack",
+                "usage_ids": [
+                  "0b18859339b8c4a4ed70523c"
+                ],
+                "docs_status": "unverified",
+                "prompt_version": "v1",
+                "rule_id": "react/the-jsx-namespace-in-typescript",
+                "codemod": "types-react-codemod:preset-19",
+                "rollback": "Return to the previous release of the library."
+              },
+              {
+                "id": "api-4543c8ad87b01736cf8f4bb6",
+                "repo_id": "4448cbbe33260a1e",
+                "lens": "api",
+                "concern": "api_change",
+                "severity": "medium",
+                "evidence": [
+                  {
+                    "repo_id": "4448cbbe33260a1e",
+                    "file": "src/pages/products.tsx",
+                    "line_start": 77,
+                    "line_end": 77,
+                    "snippet_hash": "69c76bd1b8947a56404f1bdd3e653b212a37d0b5d2e84fe3e9ad90eac656ccc7"
+                  }
+                ],
+                "doc_refs": [],
+                "reasoning": "The JSX namespace in TypeScript: The global JSX namespace is removed. Use React.JSX.",
+                "action": "Update to: React.JSX.Element",
+                "step_kind": "codemod",
+                "verify": "Load the affected page or run the build, and confirm the new behaviour.",
+                "confidence": 0.85,
+                "source": "rule_pack",
+                "usage_ids": [
+                  "4543c8ad87b01736cf8f4bb6"
+                ],
+                "docs_status": "unverified",
+                "prompt_version": "v1",
+                "rule_id": "react/the-jsx-namespace-in-typescript",
+                "codemod": "types-react-codemod:preset-19",
+                "rollback": "Return to the previous release of the library."
+              },
+              {
+                "id": "api-2089fd73ff0c8598354146be",
+                "repo_id": "4448cbbe33260a1e",
+                "lens": "api",
+                "concern": "api_change",
+                "severity": "medium",
+                "evidence": [
+                  {
+                    "repo_id": "4448cbbe33260a1e",
+                    "file": "src/pages/settings.tsx",
+                    "line_start": 10,
+                    "line_end": 10,
+                    "snippet_hash": "ca134598b9e868349722d816ac8ef409008ebcd4bb322b6dbe980fbf3f69a9d2"
+                  }
+                ],
+                "doc_refs": [],
+                "reasoning": "The JSX namespace in TypeScript: The global JSX namespace is removed. Use React.JSX.",
+                "action": "Update to: React.JSX.Element",
+                "step_kind": "codemod",
+                "verify": "Load the affected page or run the build, and confirm the new behaviour.",
+                "confidence": 0.85,
+                "source": "rule_pack",
+                "usage_ids": [
+                  "2089fd73ff0c8598354146be"
+                ],
+                "docs_status": "unverified",
+                "prompt_version": "v1",
+                "rule_id": "react/the-jsx-namespace-in-typescript",
+                "codemod": "types-react-codemod:preset-19",
+                "rollback": "Return to the previous release of the library."
+              },
+              {
+                "id": "api-da85ae13d8625d8e4d5cb6eb",
+                "repo_id": "4448cbbe33260a1e",
+                "lens": "api",
+                "concern": "api_change",
+                "severity": "medium",
+                "evidence": [
+                  {
+                    "repo_id": "4448cbbe33260a1e",
+                    "file": "src/pages/stripe/callback.tsx",
+                    "line_start": 5,
+                    "line_end": 5,
+                    "snippet_hash": "59cf92a79275de7afd80e6440240f9defe02664ce384b47c6e02e15dce2f679a"
+                  }
+                ],
+                "doc_refs": [],
+                "reasoning": "The JSX namespace in TypeScript: The global JSX namespace is removed. Use React.JSX.",
+                "action": "Update to: React.JSX.Element",
+                "step_kind": "codemod",
+                "verify": "Load the affected page or run the build, and confirm the new behaviour.",
+                "confidence": 0.85,
+                "source": "rule_pack",
+                "usage_ids": [
+                  "da85ae13d8625d8e4d5cb6eb"
+                ],
+                "docs_status": "unverified",
+                "prompt_version": "v1",
+                "rule_id": "react/the-jsx-namespace-in-typescript",
+                "codemod": "types-react-codemod:preset-19",
+                "rollback": "Return to the previous release of the library."
+              },
+              {
+                "id": "api-596b74931ca2f802faef6869",
+                "repo_id": "4448cbbe33260a1e",
+                "lens": "api",
+                "concern": "api_change",
+                "severity": "medium",
+                "evidence": [
+                  {
+                    "repo_id": "4448cbbe33260a1e",
+                    "file": "src/pages/support.tsx",
+                    "line_start": 6,
+                    "line_end": 6,
+                    "snippet_hash": "a3899f6a857a6b240e96240a94e18249f38b5721a1b5e798ec32c8f99ef183ac"
+                  }
+                ],
+                "doc_refs": [],
+                "reasoning": "The JSX namespace in TypeScript: The global JSX namespace is removed. Use React.JSX.",
+                "action": "Update to: React.JSX.Element",
+                "step_kind": "codemod",
+                "verify": "Load the affected page or run the build, and confirm the new behaviour.",
+                "confidence": 0.85,
+                "source": "rule_pack",
+                "usage_ids": [
+                  "596b74931ca2f802faef6869"
+                ],
+                "docs_status": "unverified",
+                "prompt_version": "v1",
+                "rule_id": "react/the-jsx-namespace-in-typescript",
+                "codemod": "types-react-codemod:preset-19",
+                "rollback": "Return to the previous release of the library."
+              }
+            ],
+            "out_of_scope": []
+          }
+        },
+        {
+          "lens": "dependency_build",
+          "packet_usages": [
+            {
+              "file": "next.config.js",
+              "line_start": 2,
+              "line_end": 2,
+              "snippet_hash": "60ac194b26d5b25cc4ae081b4383c5477b84692108a80bb3e66a809184d158b3",
+              "usage_id": "bac50daba0b5a24f3f629bd8"
+            },
+            {
+              "file": "next.config.js",
+              "line_start": 3,
+              "line_end": 3,
+              "snippet_hash": "87dea1cb52fb23b59037ee2d767944dd44e2baed88cd5c2acdc0b03148c17cc4",
+              "usage_id": "59287fcfa1994820a3de314b"
+            },
+            {
+              "file": "next.config.js",
+              "line_start": 4,
+              "line_end": 4,
+              "snippet_hash": "755988fe49e0dc120a199ee36c698bd54422b1890d54049c240b7b5c09d725ca",
+              "usage_id": "858b892d7562d6f4289c4d88"
+            },
+            {
+              "file": "package-lock.json",
+              "line_start": 775,
+              "line_end": 775,
+              "snippet_hash": "5157775b9e33a9050beb5cf57a5dbecb05b9b44760114f3bdbe831b42ac1cddc",
+              "usage_id": "97d0d1ab53b9236c31d45895"
+            },
+            {
+              "file": "package-lock.json",
+              "line_start": 775,
+              "line_end": 775,
+              "snippet_hash": "5157775b9e33a9050beb5cf57a5dbecb05b9b44760114f3bdbe831b42ac1cddc",
+              "usage_id": "de8af199765e5ba679a98f28"
+            },
+            {
+              "file": "package-lock.json",
+              "line_start": 800,
+              "line_end": 800,
+              "snippet_hash": "e8a6f2078bf7792b911ce972f07b9c7e9fc045e0aab0094fe48d6b12d9cc08b8",
+              "usage_id": "61115bd1dcb7f96fcb3a4c5f"
+            },
+            {
+              "file": "package-lock.json",
+              "line_start": 800,
+              "line_end": 800,
+              "snippet_hash": "e8a6f2078bf7792b911ce972f07b9c7e9fc045e0aab0094fe48d6b12d9cc08b8",
+              "usage_id": "53fcabfcc0121ef8fd519ea8"
+            },
+            {
+              "file": "package-lock.json",
+              "line_start": 814,
+              "line_end": 814,
+              "snippet_hash": "135f1dd754814ae7e3de03c249876117e97c16dcffb39dcb09e70a5d3ba17185",
+              "usage_id": "fb52483d0d974c1d562789c9"
+            },
+            {
+              "file": "package-lock.json",
+              "line_start": 814,
+              "line_end": 814,
+              "snippet_hash": "135f1dd754814ae7e3de03c249876117e97c16dcffb39dcb09e70a5d3ba17185",
+              "usage_id": "4d4855be7ed4287905701ba6"
+            },
+            {
+              "file": "package-lock.json",
+              "line_start": 1892,
+              "line_end": 1892,
+              "snippet_hash": "aaebd03555f3daf3828440edba4a038b17acb63cc9296fcb3a319c665dd262eb",
+              "usage_id": "9d3e8e269d55f9f89d0f6f79"
+            },
+            {
+              "file": "package-lock.json",
+              "line_start": 1892,
+              "line_end": 1892,
+              "snippet_hash": "aaebd03555f3daf3828440edba4a038b17acb63cc9296fcb3a319c665dd262eb",
+              "usage_id": "3693a66bf117d2e47b4afa22"
+            },
+            {
+              "file": "package-lock.json",
+              "line_start": 3807,
+              "line_end": 3807,
+              "snippet_hash": "e562287c5e2c1b931a3a5c57f980c5ebabd52c18da5203965097414eca04ed85",
+              "usage_id": "38afd55842e3a47877519a52"
+            },
+            {
+              "file": "package-lock.json",
+              "line_start": 7674,
+              "line_end": 7674,
+              "snippet_hash": "0aa341d4f0523a3cf6dc9ce8ac901d7a59d3aa35589977cdb3910fe7b2e79dfb",
+              "usage_id": "1aa910dba93af4768badee80"
+            },
+            {
+              "file": "package-lock.json",
+              "line_start": 7674,
+              "line_end": 7674,
+              "snippet_hash": "0aa341d4f0523a3cf6dc9ce8ac901d7a59d3aa35589977cdb3910fe7b2e79dfb",
+              "usage_id": "6b1abe20eb9e20fb7a6c8241"
+            },
+            {
+              "file": "package-lock.json",
+              "line_start": 7732,
+              "line_end": 7732,
+              "snippet_hash": "486f2e398ccf3c14e980a3009e5eb3b2df8eb5ccbc4ddf4f48dad5c5c5e0f10a",
+              "usage_id": "766780224fb8bda9bc7d964e"
+            },
+            {
+              "file": "package-lock.json",
+              "line_start": 7732,
+              "line_end": 7732,
+              "snippet_hash": "486f2e398ccf3c14e980a3009e5eb3b2df8eb5ccbc4ddf4f48dad5c5c5e0f10a",
+              "usage_id": "430d1af7f1e85dd4099c3286"
+            },
+            {
+              "file": "package-lock.json",
+              "line_start": 8519,
+              "line_end": 8519,
+              "snippet_hash": "016dc66605340b0f27a72d8bac32c10ae1bf392fda71644e65daec9cc8dc1d58",
+              "usage_id": "7381ca141c2cd80a916325d5"
+            },
+            {
+              "file": "package-lock.json",
+              "line_start": 8519,
+              "line_end": 8519,
+              "snippet_hash": "016dc66605340b0f27a72d8bac32c10ae1bf392fda71644e65daec9cc8dc1d58",
+              "usage_id": "ee69108948b54ab50aa66eb5"
+            },
+            {
+              "file": "package-lock.json",
+              "line_start": 8537,
+              "line_end": 8537,
+              "snippet_hash": "6616d0aa50eb2b0e80cfcec46f9406932ea8fd2d4db5be58472b95f9a5b16a9b",
+              "usage_id": "c2d26cfa01a62157dbbdeb58"
+            },
+            {
+              "file": "package-lock.json",
+              "line_start": 8537,
+              "line_end": 8537,
+              "snippet_hash": "6616d0aa50eb2b0e80cfcec46f9406932ea8fd2d4db5be58472b95f9a5b16a9b",
+              "usage_id": "b24eeb7228e36682b0a86611"
+            },
+            {
+              "file": "package-lock.json",
+              "line_start": 8554,
+              "line_end": 8554,
+              "snippet_hash": "5a90bd3dec182a8f0413366627d05b681d505138a8e2272ae7deaf8a2f8d2786",
+              "usage_id": "9449061ac69337e01637e57b"
+            },
+            {
+              "file": "package-lock.json",
+              "line_start": 8576,
+              "line_end": 8576,
+              "snippet_hash": "183f51e3fed2833069d90a66c40836506a43c0531c6f8a87510f6c6d621b0525",
+              "usage_id": "a33406b3f88a5a0bde390c5c"
+            },
+            {
+              "file": "package-lock.json",
+              "line_start": 8576,
+              "line_end": 8576,
+              "snippet_hash": "183f51e3fed2833069d90a66c40836506a43c0531c6f8a87510f6c6d621b0525",
+              "usage_id": "5204240a11b3317b11bc243c"
+            },
+            {
+              "file": "package-lock.json",
+              "line_start": 8589,
+              "line_end": 8589,
+              "snippet_hash": "3e5e048d170e8e72bf1da0768bdeb757c79648a0c82f6d6557cc5b0f6d3328f8",
+              "usage_id": "c5e5117634e07bd06dc9a126"
+            },
+            {
+              "file": "package-lock.json",
+              "line_start": 8589,
+              "line_end": 8589,
+              "snippet_hash": "3e5e048d170e8e72bf1da0768bdeb757c79648a0c82f6d6557cc5b0f6d3328f8",
+              "usage_id": "534ef13ea3ed9e0130a32626"
+            },
+            {
+              "file": "package-lock.json",
+              "line_start": 8603,
+              "line_end": 8603,
+              "snippet_hash": "d00e16eef20e1e988c8e69ea1e3ef9c51bb8db400c8a9023d17a1a14ddba2ebd",
+              "usage_id": "fdae9ad92830359744cc8672"
+            },
+            {
+              "file": "package-lock.json",
+              "line_start": 8627,
+              "line_end": 8627,
+              "snippet_hash": "5b006b2b84043ee6b041dd18bbb5de74d0ad83381fa9243c8691b34a52f5cb1d",
+              "usage_id": "af4d9ff780009e216e36033f"
+            },
+            {
+              "file": "package-lock.json",
+              "line_start": 8627,
+              "line_end": 8627,
+              "snippet_hash": "5b006b2b84043ee6b041dd18bbb5de74d0ad83381fa9243c8691b34a52f5cb1d",
+              "usage_id": "93e7e63364b617428b9fb50c"
+            },
+            {
+              "file": "package-lock.json",
+              "line_start": 9259,
+              "line_end": 9259,
+              "snippet_hash": "8bc10b90d407192fa04e4bea1cfe1e8092f2f1113bd85ae3b30cb0c20239c17d",
+              "usage_id": "acb9ced7aff78643dd28faca"
+            },
+            {
+              "file": "package-lock.json",
+              "line_start": 9259,
+              "line_end": 9259,
+              "snippet_hash": "8bc10b90d407192fa04e4bea1cfe1e8092f2f1113bd85ae3b30cb0c20239c17d",
+              "usage_id": "fdeafeda67cb079196263b9b"
+            },
+            {
+              "file": "package-lock.json",
+              "line_start": 9307,
+              "line_end": 9307,
+              "snippet_hash": "bcdded0a6ced8e6b1c0154d4b6cab0249f326bb9365b7e08c7383748f15eb01d",
+              "usage_id": "d0c58ef6caee04aa69b60e4b"
+            },
+            {
+              "file": "package-lock.json",
+              "line_start": 9617,
+              "line_end": 9617,
+              "snippet_hash": "51e5f728ca37c4d1485964f6fc94af131a3c44022879f45a2d2c63e9b299df11",
+              "usage_id": "fb839fdb915cda577fad1470"
+            },
+            {
+              "file": "package-lock.json",
+              "line_start": 9632,
+              "line_end": 9632,
+              "snippet_hash": "2a8ba8b114583ab8259888d47743a123be1217630c5227c4078e59385382ec32",
+              "usage_id": "d9e08986a5367a2fe41007cf"
+            },
+            {
+              "file": "package-lock.json",
+              "line_start": 9640,
+              "line_end": 9640,
+              "snippet_hash": "62ebadb75193762ea9ce98536e87c19ebe9d74c99ff1b5a25f0f6c40d6c762b8",
+              "usage_id": "2a795e3ef05bc4122c8e6ef2"
+            },
+            {
+              "file": "package-lock.json",
+              "line_start": 9986,
+              "line_end": 9986,
+              "snippet_hash": "7a73aef0e0262bbc0a800fdb1ff8dbb490e583ae52374943fc430c2c0c653620",
+              "usage_id": "73709c508fadda42a2b918c6"
+            },
+            {
+              "file": "package.json",
+              "line_start": 17,
+              "line_end": 17,
+              "snippet_hash": "bd17ce788bcd8389bf66bc28673d101e924d02698a6c30b90b496e550cc67844",
+              "usage_id": "e0fe08e91b08df844428865a"
+            },
+            {
+              "file": "package.json",
+              "line_start": 54,
+              "line_end": 54,
+              "snippet_hash": "98ca48099939d5ae233e769f88a31888917e40a04dbe4ff8ff486493c479e200",
+              "usage_id": "d5d76717af11f809fd63a256"
+            },
+            {
+              "file": "package.json",
+              "line_start": 60,
+              "line_end": 60,
+              "snippet_hash": "ede90f68eb618808859c87cecd78acb284952e7681cc3196432f452fa227f127",
+              "usage_id": "8e0873baaf113a2b3c3b6070"
+            },
+            {
+              "file": "package.json",
+              "line_start": 61,
+              "line_end": 61,
+              "snippet_hash": "7846b56a729284c978eef4b031b229e7b76529a4b2cb1608733f55750aec2f63",
+              "usage_id": "71c9854551e16a47a231ac4b"
+            },
+            {
+              "file": "package.json",
+              "line_start": 74,
+              "line_end": 74,
+              "snippet_hash": "0adde6ed6b91b5631925050bbda9efd829ebd8e8358e509272056a850d907159",
+              "usage_id": "8355906a2d39043d06f564f3"
+            },
+            {
+              "file": "package.json",
+              "line_start": 81,
+              "line_end": 81,
+              "snippet_hash": "0938ac66b668035d8e13f1c6293662705010536509c02196ee683c6c48fd53a6",
+              "usage_id": "81f424e0c169a4de50129b89"
+            },
+            {
+              "file": "package.json",
+              "line_start": 89,
+              "line_end": 89,
+              "snippet_hash": "35faad6136aadf4afda2fe036a14c20b35ed9ed15a6d46b727bf6d1211cb1482",
+              "usage_id": "2447b82863a4be3498f540fa"
+            },
+            {
+              "file": "package.json",
+              "line_start": 97,
+              "line_end": 97,
+              "snippet_hash": "e23983df59a2dbbf956ee3273f0361ce9d9a0f83bd843899ba31bf9d8fd690bf",
+              "usage_id": "099292e3618d7496320ec8d8"
+            }
+          ],
+          "submission": {
+            "findings": [
+              {
+                "id": "dependency_build-bac50daba0b5a24f3f629bd8",
+                "repo_id": "4448cbbe33260a1e",
+                "lens": "dependency_build",
+                "concern": "dependency",
+                "severity": "medium",
+                "evidence": [
+                  {
+                    "repo_id": "4448cbbe33260a1e",
+                    "file": "next.config.js",
+                    "line_start": 2,
+                    "line_end": 2,
+                    "snippet_hash": "60ac194b26d5b25cc4ae081b4383c5477b84692108a80bb3e66a809184d158b3"
+                  }
+                ],
+                "doc_refs": [],
+                "reasoning": "bundlePagesRouterDependencies: experimental.bundlePagesExternals was renamed to bundlePagesRouterDependencies.",
+                "action": "Update to: bundlePagesRouterDependencies",
+                "step_kind": "manual",
+                "verify": "Load the affected page or run the build, and confirm the new behaviour.",
+                "confidence": 0.85,
+                "source": "rule_pack",
+                "usage_ids": [
+                  "bac50daba0b5a24f3f629bd8"
+                ],
+                "docs_status": "unverified",
+                "prompt_version": "v1",
+                "rule_id": "next/bundlepagesrouterdependencies"
+              },
+              {
+                "id": "dependency_build-59287fcfa1994820a3de314b",
+                "repo_id": "4448cbbe33260a1e",
+                "lens": "dependency_build",
+                "concern": "dependency",
+                "severity": "medium",
+                "evidence": [
+                  {
+                    "repo_id": "4448cbbe33260a1e",
+                    "file": "next.config.js",
+                    "line_start": 3,
+                    "line_end": 3,
+                    "snippet_hash": "87dea1cb52fb23b59037ee2d767944dd44e2baed88cd5c2acdc0b03148c17cc4"
+                  }
+                ],
+                "doc_refs": [],
+                "reasoning": "bundlePagesRouterDependencies: experimental.bundlePagesExternals was renamed to bundlePagesRouterDependencies.",
+                "action": "Update to: bundlePagesRouterDependencies",
+                "step_kind": "manual",
+                "verify": "Load the affected page or run the build, and confirm the new behaviour.",
+                "confidence": 0.85,
+                "source": "rule_pack",
+                "usage_ids": [
+                  "59287fcfa1994820a3de314b"
+                ],
+                "docs_status": "unverified",
+                "prompt_version": "v1",
+                "rule_id": "next/bundlepagesrouterdependencies"
+              },
+              {
+                "id": "dependency_build-858b892d7562d6f4289c4d88",
+                "repo_id": "4448cbbe33260a1e",
+                "lens": "dependency_build",
+                "concern": "dependency",
+                "severity": "medium",
+                "evidence": [
+                  {
+                    "repo_id": "4448cbbe33260a1e",
+                    "file": "next.config.js",
+                    "line_start": 4,
+                    "line_end": 4,
+                    "snippet_hash": "755988fe49e0dc120a199ee36c698bd54422b1890d54049c240b7b5c09d725ca"
+                  }
+                ],
+                "doc_refs": [],
+                "reasoning": "bundlePagesRouterDependencies: experimental.bundlePagesExternals was renamed to bundlePagesRouterDependencies.",
+                "action": "Update to: bundlePagesRouterDependencies",
+                "step_kind": "manual",
+                "verify": "Load the affected page or run the build, and confirm the new behaviour.",
+                "confidence": 0.85,
+                "source": "rule_pack",
+                "usage_ids": [
+                  "858b892d7562d6f4289c4d88"
+                ],
+                "docs_status": "unverified",
+                "prompt_version": "v1",
+                "rule_id": "next/bundlepagesrouterdependencies"
+              },
+              {
+                "id": "dependency_build-97d0d1ab53b9236c31d45895",
+                "repo_id": "4448cbbe33260a1e",
+                "lens": "dependency_build",
+                "concern": "dependency",
+                "severity": "medium",
+                "evidence": [
+                  {
+                    "repo_id": "4448cbbe33260a1e",
+                    "file": "package-lock.json",
+                    "line_start": 775,
+                    "line_end": 775,
+                    "snippet_hash": "5157775b9e33a9050beb5cf57a5dbecb05b9b44760114f3bdbe831b42ac1cddc"
+                  }
+                ],
+                "doc_refs": [],
+                "reasoning": "bundlePagesRouterDependencies: experimental.bundlePagesExternals was renamed to bundlePagesRouterDependencies.",
+                "action": "Update to: bundlePagesRouterDependencies",
+                "step_kind": "manual",
+                "verify": "Load the affected page or run the build, and confirm the new behaviour.",
+                "confidence": 0.85,
+                "source": "rule_pack",
+                "usage_ids": [
+                  "97d0d1ab53b9236c31d45895"
+                ],
+                "docs_status": "unverified",
+                "prompt_version": "v1",
+                "rule_id": "next/bundlepagesrouterdependencies"
+              },
+              {
+                "id": "dependency_build-de8af199765e5ba679a98f28",
+                "repo_id": "4448cbbe33260a1e",
+                "lens": "dependency_build",
+                "concern": "dependency",
+                "severity": "medium",
+                "evidence": [
+                  {
+                    "repo_id": "4448cbbe33260a1e",
+                    "file": "package-lock.json",
+                    "line_start": 775,
+                    "line_end": 775,
+                    "snippet_hash": "5157775b9e33a9050beb5cf57a5dbecb05b9b44760114f3bdbe831b42ac1cddc"
+                  }
+                ],
+                "doc_refs": [],
+                "reasoning": "bundlePagesRouterDependencies: experimental.bundlePagesExternals was renamed to bundlePagesRouterDependencies.",
+                "action": "Update to: bundlePagesRouterDependencies",
+                "step_kind": "manual",
+                "verify": "Load the affected page or run the build, and confirm the new behaviour.",
+                "confidence": 0.85,
+                "source": "rule_pack",
+                "usage_ids": [
+                  "de8af199765e5ba679a98f28"
+                ],
+                "docs_status": "unverified",
+                "prompt_version": "v1",
+                "rule_id": "next/bundlepagesrouterdependencies"
+              },
+              {
+                "id": "dependency_build-61115bd1dcb7f96fcb3a4c5f",
+                "repo_id": "4448cbbe33260a1e",
+                "lens": "dependency_build",
+                "concern": "dependency",
+                "severity": "medium",
+                "evidence": [
+                  {
+                    "repo_id": "4448cbbe33260a1e",
+                    "file": "package-lock.json",
+                    "line_start": 800,
+                    "line_end": 800,
+                    "snippet_hash": "e8a6f2078bf7792b911ce972f07b9c7e9fc045e0aab0094fe48d6b12d9cc08b8"
+                  }
+                ],
+                "doc_refs": [],
+                "reasoning": "bundlePagesRouterDependencies: experimental.bundlePagesExternals was renamed to bundlePagesRouterDependencies.",
+                "action": "Update to: bundlePagesRouterDependencies",
+                "step_kind": "manual",
+                "verify": "Load the affected page or run the build, and confirm the new behaviour.",
+                "confidence": 0.85,
+                "source": "rule_pack",
+                "usage_ids": [
+                  "61115bd1dcb7f96fcb3a4c5f"
+                ],
+                "docs_status": "unverified",
+                "prompt_version": "v1",
+                "rule_id": "next/bundlepagesrouterdependencies"
+              },
+              {
+                "id": "dependency_build-53fcabfcc0121ef8fd519ea8",
+                "repo_id": "4448cbbe33260a1e",
+                "lens": "dependency_build",
+                "concern": "dependency",
+                "severity": "medium",
+                "evidence": [
+                  {
+                    "repo_id": "4448cbbe33260a1e",
+                    "file": "package-lock.json",
+                    "line_start": 800,
+                    "line_end": 800,
+                    "snippet_hash": "e8a6f2078bf7792b911ce972f07b9c7e9fc045e0aab0094fe48d6b12d9cc08b8"
+                  }
+                ],
+                "doc_refs": [],
+                "reasoning": "bundlePagesRouterDependencies: experimental.bundlePagesExternals was renamed to bundlePagesRouterDependencies.",
+                "action": "Update to: bundlePagesRouterDependencies",
+                "step_kind": "manual",
+                "verify": "Load the affected page or run the build, and confirm the new behaviour.",
+                "confidence": 0.85,
+                "source": "rule_pack",
+                "usage_ids": [
+                  "53fcabfcc0121ef8fd519ea8"
+                ],
+                "docs_status": "unverified",
+                "prompt_version": "v1",
+                "rule_id": "next/bundlepagesrouterdependencies"
+              },
+              {
+                "id": "dependency_build-fb52483d0d974c1d562789c9",
+                "repo_id": "4448cbbe33260a1e",
+                "lens": "dependency_build",
+                "concern": "dependency",
+                "severity": "medium",
+                "evidence": [
+                  {
+                    "repo_id": "4448cbbe33260a1e",
+                    "file": "package-lock.json",
+                    "line_start": 814,
+                    "line_end": 814,
+                    "snippet_hash": "135f1dd754814ae7e3de03c249876117e97c16dcffb39dcb09e70a5d3ba17185"
+                  }
+                ],
+                "doc_refs": [],
+                "reasoning": "bundlePagesRouterDependencies: experimental.bundlePagesExternals was renamed to bundlePagesRouterDependencies.",
+                "action": "Update to: bundlePagesRouterDependencies",
+                "step_kind": "manual",
+                "verify": "Load the affected page or run the build, and confirm the new behaviour.",
+                "confidence": 0.85,
+                "source": "rule_pack",
+                "usage_ids": [
+                  "fb52483d0d974c1d562789c9"
+                ],
+                "docs_status": "unverified",
+                "prompt_version": "v1",
+                "rule_id": "next/bundlepagesrouterdependencies"
+              },
+              {
+                "id": "dependency_build-4d4855be7ed4287905701ba6",
+                "repo_id": "4448cbbe33260a1e",
+                "lens": "dependency_build",
+                "concern": "dependency",
+                "severity": "medium",
+                "evidence": [
+                  {
+                    "repo_id": "4448cbbe33260a1e",
+                    "file": "package-lock.json",
+                    "line_start": 814,
+                    "line_end": 814,
+                    "snippet_hash": "135f1dd754814ae7e3de03c249876117e97c16dcffb39dcb09e70a5d3ba17185"
+                  }
+                ],
+                "doc_refs": [],
+                "reasoning": "bundlePagesRouterDependencies: experimental.bundlePagesExternals was renamed to bundlePagesRouterDependencies.",
+                "action": "Update to: bundlePagesRouterDependencies",
+                "step_kind": "manual",
+                "verify": "Load the affected page or run the build, and confirm the new behaviour.",
+                "confidence": 0.85,
+                "source": "rule_pack",
+                "usage_ids": [
+                  "4d4855be7ed4287905701ba6"
+                ],
+                "docs_status": "unverified",
+                "prompt_version": "v1",
+                "rule_id": "next/bundlepagesrouterdependencies"
+              },
+              {
+                "id": "dependency_build-9d3e8e269d55f9f89d0f6f79",
+                "repo_id": "4448cbbe33260a1e",
+                "lens": "dependency_build",
+                "concern": "dependency",
+                "severity": "medium",
+                "evidence": [
+                  {
+                    "repo_id": "4448cbbe33260a1e",
+                    "file": "package-lock.json",
+                    "line_start": 1892,
+                    "line_end": 1892,
+                    "snippet_hash": "aaebd03555f3daf3828440edba4a038b17acb63cc9296fcb3a319c665dd262eb"
+                  }
+                ],
+                "doc_refs": [],
+                "reasoning": "bundlePagesRouterDependencies: experimental.bundlePagesExternals was renamed to bundlePagesRouterDependencies.",
+                "action": "Update to: bundlePagesRouterDependencies",
+                "step_kind": "manual",
+                "verify": "Load the affected page or run the build, and confirm the new behaviour.",
+                "confidence": 0.85,
+                "source": "rule_pack",
+                "usage_ids": [
+                  "9d3e8e269d55f9f89d0f6f79"
+                ],
+                "docs_status": "unverified",
+                "prompt_version": "v1",
+                "rule_id": "next/bundlepagesrouterdependencies"
+              },
+              {
+                "id": "dependency_build-3693a66bf117d2e47b4afa22",
+                "repo_id": "4448cbbe33260a1e",
+                "lens": "dependency_build",
+                "concern": "dependency",
+                "severity": "medium",
+                "evidence": [
+                  {
+                    "repo_id": "4448cbbe33260a1e",
+                    "file": "package-lock.json",
+                    "line_start": 1892,
+                    "line_end": 1892,
+                    "snippet_hash": "aaebd03555f3daf3828440edba4a038b17acb63cc9296fcb3a319c665dd262eb"
+                  }
+                ],
+                "doc_refs": [],
+                "reasoning": "bundlePagesRouterDependencies: experimental.bundlePagesExternals was renamed to bundlePagesRouterDependencies.",
+                "action": "Update to: bundlePagesRouterDependencies",
+                "step_kind": "manual",
+                "verify": "Load the affected page or run the build, and confirm the new behaviour.",
+                "confidence": 0.85,
+                "source": "rule_pack",
+                "usage_ids": [
+                  "3693a66bf117d2e47b4afa22"
+                ],
+                "docs_status": "unverified",
+                "prompt_version": "v1",
+                "rule_id": "next/bundlepagesrouterdependencies"
+              },
+              {
+                "id": "dependency_build-38afd55842e3a47877519a52",
+                "repo_id": "4448cbbe33260a1e",
+                "lens": "dependency_build",
+                "concern": "dependency",
+                "severity": "medium",
+                "evidence": [
+                  {
+                    "repo_id": "4448cbbe33260a1e",
+                    "file": "package-lock.json",
+                    "line_start": 3807,
+                    "line_end": 3807,
+                    "snippet_hash": "e562287c5e2c1b931a3a5c57f980c5ebabd52c18da5203965097414eca04ed85"
+                  }
+                ],
+                "doc_refs": [],
+                "reasoning": "bundlePagesRouterDependencies: experimental.bundlePagesExternals was renamed to bundlePagesRouterDependencies.",
+                "action": "Update to: bundlePagesRouterDependencies",
+                "step_kind": "manual",
+                "verify": "Load the affected page or run the build, and confirm the new behaviour.",
+                "confidence": 0.85,
+                "source": "rule_pack",
+                "usage_ids": [
+                  "38afd55842e3a47877519a52"
+                ],
+                "docs_status": "unverified",
+                "prompt_version": "v1",
+                "rule_id": "next/bundlepagesrouterdependencies"
+              },
+              {
+                "id": "dependency_build-1aa910dba93af4768badee80",
+                "repo_id": "4448cbbe33260a1e",
+                "lens": "dependency_build",
+                "concern": "dependency",
+                "severity": "medium",
+                "evidence": [
+                  {
+                    "repo_id": "4448cbbe33260a1e",
+                    "file": "package-lock.json",
+                    "line_start": 7674,
+                    "line_end": 7674,
+                    "snippet_hash": "0aa341d4f0523a3cf6dc9ce8ac901d7a59d3aa35589977cdb3910fe7b2e79dfb"
+                  }
+                ],
+                "doc_refs": [],
+                "reasoning": "bundlePagesRouterDependencies: experimental.bundlePagesExternals was renamed to bundlePagesRouterDependencies.",
+                "action": "Update to: bundlePagesRouterDependencies",
+                "step_kind": "manual",
+                "verify": "Load the affected page or run the build, and confirm the new behaviour.",
+                "confidence": 0.85,
+                "source": "rule_pack",
+                "usage_ids": [
+                  "1aa910dba93af4768badee80"
+                ],
+                "docs_status": "unverified",
+                "prompt_version": "v1",
+                "rule_id": "next/bundlepagesrouterdependencies"
+              },
+              {
+                "id": "dependency_build-6b1abe20eb9e20fb7a6c8241",
+                "repo_id": "4448cbbe33260a1e",
+                "lens": "dependency_build",
+                "concern": "dependency",
+                "severity": "medium",
+                "evidence": [
+                  {
+                    "repo_id": "4448cbbe33260a1e",
+                    "file": "package-lock.json",
+                    "line_start": 7674,
+                    "line_end": 7674,
+                    "snippet_hash": "0aa341d4f0523a3cf6dc9ce8ac901d7a59d3aa35589977cdb3910fe7b2e79dfb"
+                  }
+                ],
+                "doc_refs": [],
+                "reasoning": "bundlePagesRouterDependencies: experimental.bundlePagesExternals was renamed to bundlePagesRouterDependencies.",
+                "action": "Update to: bundlePagesRouterDependencies",
+                "step_kind": "manual",
+                "verify": "Load the affected page or run the build, and confirm the new behaviour.",
+                "confidence": 0.85,
+                "source": "rule_pack",
+                "usage_ids": [
+                  "6b1abe20eb9e20fb7a6c8241"
+                ],
+                "docs_status": "unverified",
+                "prompt_version": "v1",
+                "rule_id": "next/bundlepagesrouterdependencies"
+              },
+              {
+                "id": "dependency_build-766780224fb8bda9bc7d964e",
+                "repo_id": "4448cbbe33260a1e",
+                "lens": "dependency_build",
+                "concern": "dependency",
+                "severity": "medium",
+                "evidence": [
+                  {
+                    "repo_id": "4448cbbe33260a1e",
+                    "file": "package-lock.json",
+                    "line_start": 7732,
+                    "line_end": 7732,
+                    "snippet_hash": "486f2e398ccf3c14e980a3009e5eb3b2df8eb5ccbc4ddf4f48dad5c5c5e0f10a"
+                  }
+                ],
+                "doc_refs": [],
+                "reasoning": "bundlePagesRouterDependencies: experimental.bundlePagesExternals was renamed to bundlePagesRouterDependencies.",
+                "action": "Update to: bundlePagesRouterDependencies",
+                "step_kind": "manual",
+                "verify": "Load the affected page or run the build, and confirm the new behaviour.",
+                "confidence": 0.85,
+                "source": "rule_pack",
+                "usage_ids": [
+                  "766780224fb8bda9bc7d964e"
+                ],
+                "docs_status": "unverified",
+                "prompt_version": "v1",
+                "rule_id": "next/bundlepagesrouterdependencies"
+              },
+              {
+                "id": "dependency_build-430d1af7f1e85dd4099c3286",
+                "repo_id": "4448cbbe33260a1e",
+                "lens": "dependency_build",
+                "concern": "dependency",
+                "severity": "medium",
+                "evidence": [
+                  {
+                    "repo_id": "4448cbbe33260a1e",
+                    "file": "package-lock.json",
+                    "line_start": 7732,
+                    "line_end": 7732,
+                    "snippet_hash": "486f2e398ccf3c14e980a3009e5eb3b2df8eb5ccbc4ddf4f48dad5c5c5e0f10a"
+                  }
+                ],
+                "doc_refs": [],
+                "reasoning": "bundlePagesRouterDependencies: experimental.bundlePagesExternals was renamed to bundlePagesRouterDependencies.",
+                "action": "Update to: bundlePagesRouterDependencies",
+                "step_kind": "manual",
+                "verify": "Load the affected page or run the build, and confirm the new behaviour.",
+                "confidence": 0.85,
+                "source": "rule_pack",
+                "usage_ids": [
+                  "430d1af7f1e85dd4099c3286"
+                ],
+                "docs_status": "unverified",
+                "prompt_version": "v1",
+                "rule_id": "next/bundlepagesrouterdependencies"
+              },
+              {
+                "id": "dependency_build-7381ca141c2cd80a916325d5",
+                "repo_id": "4448cbbe33260a1e",
+                "lens": "dependency_build",
+                "concern": "dependency",
+                "severity": "medium",
+                "evidence": [
+                  {
+                    "repo_id": "4448cbbe33260a1e",
+                    "file": "package-lock.json",
+                    "line_start": 8519,
+                    "line_end": 8519,
+                    "snippet_hash": "016dc66605340b0f27a72d8bac32c10ae1bf392fda71644e65daec9cc8dc1d58"
+                  }
+                ],
+                "doc_refs": [],
+                "reasoning": "bundlePagesRouterDependencies: experimental.bundlePagesExternals was renamed to bundlePagesRouterDependencies.",
+                "action": "Update to: bundlePagesRouterDependencies",
+                "step_kind": "manual",
+                "verify": "Load the affected page or run the build, and confirm the new behaviour.",
+                "confidence": 0.85,
+                "source": "rule_pack",
+                "usage_ids": [
+                  "7381ca141c2cd80a916325d5"
+                ],
+                "docs_status": "unverified",
+                "prompt_version": "v1",
+                "rule_id": "next/bundlepagesrouterdependencies"
+              },
+              {
+                "id": "dependency_build-ee69108948b54ab50aa66eb5",
+                "repo_id": "4448cbbe33260a1e",
+                "lens": "dependency_build",
+                "concern": "dependency",
+                "severity": "medium",
+                "evidence": [
+                  {
+                    "repo_id": "4448cbbe33260a1e",
+                    "file": "package-lock.json",
+                    "line_start": 8519,
+                    "line_end": 8519,
+                    "snippet_hash": "016dc66605340b0f27a72d8bac32c10ae1bf392fda71644e65daec9cc8dc1d58"
+                  }
+                ],
+                "doc_refs": [],
+                "reasoning": "bundlePagesRouterDependencies: experimental.bundlePagesExternals was renamed to bundlePagesRouterDependencies.",
+                "action": "Update to: bundlePagesRouterDependencies",
+                "step_kind": "manual",
+                "verify": "Load the affected page or run the build, and confirm the new behaviour.",
+                "confidence": 0.85,
+                "source": "rule_pack",
+                "usage_ids": [
+                  "ee69108948b54ab50aa66eb5"
+                ],
+                "docs_status": "unverified",
+                "prompt_version": "v1",
+                "rule_id": "next/bundlepagesrouterdependencies"
+              },
+              {
+                "id": "dependency_build-c2d26cfa01a62157dbbdeb58",
+                "repo_id": "4448cbbe33260a1e",
+                "lens": "dependency_build",
+                "concern": "dependency",
+                "severity": "medium",
+                "evidence": [
+                  {
+                    "repo_id": "4448cbbe33260a1e",
+                    "file": "package-lock.json",
+                    "line_start": 8537,
+                    "line_end": 8537,
+                    "snippet_hash": "6616d0aa50eb2b0e80cfcec46f9406932ea8fd2d4db5be58472b95f9a5b16a9b"
+                  }
+                ],
+                "doc_refs": [],
+                "reasoning": "bundlePagesRouterDependencies: experimental.bundlePagesExternals was renamed to bundlePagesRouterDependencies.",
+                "action": "Update to: bundlePagesRouterDependencies",
+                "step_kind": "manual",
+                "verify": "Load the affected page or run the build, and confirm the new behaviour.",
+                "confidence": 0.85,
+                "source": "rule_pack",
+                "usage_ids": [
+                  "c2d26cfa01a62157dbbdeb58"
+                ],
+                "docs_status": "unverified",
+                "prompt_version": "v1",
+                "rule_id": "next/bundlepagesrouterdependencies"
+              },
+              {
+                "id": "dependency_build-b24eeb7228e36682b0a86611",
+                "repo_id": "4448cbbe33260a1e",
+                "lens": "dependency_build",
+                "concern": "dependency",
+                "severity": "medium",
+                "evidence": [
+                  {
+                    "repo_id": "4448cbbe33260a1e",
+                    "file": "package-lock.json",
+                    "line_start": 8537,
+                    "line_end": 8537,
+                    "snippet_hash": "6616d0aa50eb2b0e80cfcec46f9406932ea8fd2d4db5be58472b95f9a5b16a9b"
+                  }
+                ],
+                "doc_refs": [],
+                "reasoning": "bundlePagesRouterDependencies: experimental.bundlePagesExternals was renamed to bundlePagesRouterDependencies.",
+                "action": "Update to: bundlePagesRouterDependencies",
+                "step_kind": "manual",
+                "verify": "Load the affected page or run the build, and confirm the new behaviour.",
+                "confidence": 0.85,
+                "source": "rule_pack",
+                "usage_ids": [
+                  "b24eeb7228e36682b0a86611"
+                ],
+                "docs_status": "unverified",
+                "prompt_version": "v1",
+                "rule_id": "next/bundlepagesrouterdependencies"
+              },
+              {
+                "id": "dependency_build-9449061ac69337e01637e57b",
+                "repo_id": "4448cbbe33260a1e",
+                "lens": "dependency_build",
+                "concern": "dependency",
+                "severity": "medium",
+                "evidence": [
+                  {
+                    "repo_id": "4448cbbe33260a1e",
+                    "file": "package-lock.json",
+                    "line_start": 8554,
+                    "line_end": 8554,
+                    "snippet_hash": "5a90bd3dec182a8f0413366627d05b681d505138a8e2272ae7deaf8a2f8d2786"
+                  }
+                ],
+                "doc_refs": [],
+                "reasoning": "bundlePagesRouterDependencies: experimental.bundlePagesExternals was renamed to bundlePagesRouterDependencies.",
+                "action": "Update to: bundlePagesRouterDependencies",
+                "step_kind": "manual",
+                "verify": "Load the affected page or run the build, and confirm the new behaviour.",
+                "confidence": 0.85,
+                "source": "rule_pack",
+                "usage_ids": [
+                  "9449061ac69337e01637e57b"
+                ],
+                "docs_status": "unverified",
+                "prompt_version": "v1",
+                "rule_id": "next/bundlepagesrouterdependencies"
+              },
+              {
+                "id": "dependency_build-a33406b3f88a5a0bde390c5c",
+                "repo_id": "4448cbbe33260a1e",
+                "lens": "dependency_build",
+                "concern": "dependency",
+                "severity": "medium",
+                "evidence": [
+                  {
+                    "repo_id": "4448cbbe33260a1e",
+                    "file": "package-lock.json",
+                    "line_start": 8576,
+                    "line_end": 8576,
+                    "snippet_hash": "183f51e3fed2833069d90a66c40836506a43c0531c6f8a87510f6c6d621b0525"
+                  }
+                ],
+                "doc_refs": [],
+                "reasoning": "bundlePagesRouterDependencies: experimental.bundlePagesExternals was renamed to bundlePagesRouterDependencies.",
+                "action": "Update to: bundlePagesRouterDependencies",
+                "step_kind": "manual",
+                "verify": "Load the affected page or run the build, and confirm the new behaviour.",
+                "confidence": 0.85,
+                "source": "rule_pack",
+                "usage_ids": [
+                  "a33406b3f88a5a0bde390c5c"
+                ],
+                "docs_status": "unverified",
+                "prompt_version": "v1",
+                "rule_id": "next/bundlepagesrouterdependencies"
+              },
+              {
+                "id": "dependency_build-5204240a11b3317b11bc243c",
+                "repo_id": "4448cbbe33260a1e",
+                "lens": "dependency_build",
+                "concern": "dependency",
+                "severity": "medium",
+                "evidence": [
+                  {
+                    "repo_id": "4448cbbe33260a1e",
+                    "file": "package-lock.json",
+                    "line_start": 8576,
+                    "line_end": 8576,
+                    "snippet_hash": "183f51e3fed2833069d90a66c40836506a43c0531c6f8a87510f6c6d621b0525"
+                  }
+                ],
+                "doc_refs": [],
+                "reasoning": "bundlePagesRouterDependencies: experimental.bundlePagesExternals was renamed to bundlePagesRouterDependencies.",
+                "action": "Update to: bundlePagesRouterDependencies",
+                "step_kind": "manual",
+                "verify": "Load the affected page or run the build, and confirm the new behaviour.",
+                "confidence": 0.85,
+                "source": "rule_pack",
+                "usage_ids": [
+                  "5204240a11b3317b11bc243c"
+                ],
+                "docs_status": "unverified",
+                "prompt_version": "v1",
+                "rule_id": "next/bundlepagesrouterdependencies"
+              },
+              {
+                "id": "dependency_build-c5e5117634e07bd06dc9a126",
+                "repo_id": "4448cbbe33260a1e",
+                "lens": "dependency_build",
+                "concern": "dependency",
+                "severity": "medium",
+                "evidence": [
+                  {
+                    "repo_id": "4448cbbe33260a1e",
+                    "file": "package-lock.json",
+                    "line_start": 8589,
+                    "line_end": 8589,
+                    "snippet_hash": "3e5e048d170e8e72bf1da0768bdeb757c79648a0c82f6d6557cc5b0f6d3328f8"
+                  }
+                ],
+                "doc_refs": [],
+                "reasoning": "bundlePagesRouterDependencies: experimental.bundlePagesExternals was renamed to bundlePagesRouterDependencies.",
+                "action": "Update to: bundlePagesRouterDependencies",
+                "step_kind": "manual",
+                "verify": "Load the affected page or run the build, and confirm the new behaviour.",
+                "confidence": 0.85,
+                "source": "rule_pack",
+                "usage_ids": [
+                  "c5e5117634e07bd06dc9a126"
+                ],
+                "docs_status": "unverified",
+                "prompt_version": "v1",
+                "rule_id": "next/bundlepagesrouterdependencies"
+              },
+              {
+                "id": "dependency_build-534ef13ea3ed9e0130a32626",
+                "repo_id": "4448cbbe33260a1e",
+                "lens": "dependency_build",
+                "concern": "dependency",
+                "severity": "medium",
+                "evidence": [
+                  {
+                    "repo_id": "4448cbbe33260a1e",
+                    "file": "package-lock.json",
+                    "line_start": 8589,
+                    "line_end": 8589,
+                    "snippet_hash": "3e5e048d170e8e72bf1da0768bdeb757c79648a0c82f6d6557cc5b0f6d3328f8"
+                  }
+                ],
+                "doc_refs": [],
+                "reasoning": "bundlePagesRouterDependencies: experimental.bundlePagesExternals was renamed to bundlePagesRouterDependencies.",
+                "action": "Update to: bundlePagesRouterDependencies",
+                "step_kind": "manual",
+                "verify": "Load the affected page or run the build, and confirm the new behaviour.",
+                "confidence": 0.85,
+                "source": "rule_pack",
+                "usage_ids": [
+                  "534ef13ea3ed9e0130a32626"
+                ],
+                "docs_status": "unverified",
+                "prompt_version": "v1",
+                "rule_id": "next/bundlepagesrouterdependencies"
+              },
+              {
+                "id": "dependency_build-fdae9ad92830359744cc8672",
+                "repo_id": "4448cbbe33260a1e",
+                "lens": "dependency_build",
+                "concern": "dependency",
+                "severity": "medium",
+                "evidence": [
+                  {
+                    "repo_id": "4448cbbe33260a1e",
+                    "file": "package-lock.json",
+                    "line_start": 8603,
+                    "line_end": 8603,
+                    "snippet_hash": "d00e16eef20e1e988c8e69ea1e3ef9c51bb8db400c8a9023d17a1a14ddba2ebd"
+                  }
+                ],
+                "doc_refs": [],
+                "reasoning": "bundlePagesRouterDependencies: experimental.bundlePagesExternals was renamed to bundlePagesRouterDependencies.",
+                "action": "Update to: bundlePagesRouterDependencies",
+                "step_kind": "manual",
+                "verify": "Load the affected page or run the build, and confirm the new behaviour.",
+                "confidence": 0.85,
+                "source": "rule_pack",
+                "usage_ids": [
+                  "fdae9ad92830359744cc8672"
+                ],
+                "docs_status": "unverified",
+                "prompt_version": "v1",
+                "rule_id": "next/bundlepagesrouterdependencies"
+              },
+              {
+                "id": "dependency_build-af4d9ff780009e216e36033f",
+                "repo_id": "4448cbbe33260a1e",
+                "lens": "dependency_build",
+                "concern": "dependency",
+                "severity": "medium",
+                "evidence": [
+                  {
+                    "repo_id": "4448cbbe33260a1e",
+                    "file": "package-lock.json",
+                    "line_start": 8627,
+                    "line_end": 8627,
+                    "snippet_hash": "5b006b2b84043ee6b041dd18bbb5de74d0ad83381fa9243c8691b34a52f5cb1d"
+                  }
+                ],
+                "doc_refs": [],
+                "reasoning": "bundlePagesRouterDependencies: experimental.bundlePagesExternals was renamed to bundlePagesRouterDependencies.",
+                "action": "Update to: bundlePagesRouterDependencies",
+                "step_kind": "manual",
+                "verify": "Load the affected page or run the build, and confirm the new behaviour.",
+                "confidence": 0.85,
+                "source": "rule_pack",
+                "usage_ids": [
+                  "af4d9ff780009e216e36033f"
+                ],
+                "docs_status": "unverified",
+                "prompt_version": "v1",
+                "rule_id": "next/bundlepagesrouterdependencies"
+              },
+              {
+                "id": "dependency_build-93e7e63364b617428b9fb50c",
+                "repo_id": "4448cbbe33260a1e",
+                "lens": "dependency_build",
+                "concern": "dependency",
+                "severity": "medium",
+                "evidence": [
+                  {
+                    "repo_id": "4448cbbe33260a1e",
+                    "file": "package-lock.json",
+                    "line_start": 8627,
+                    "line_end": 8627,
+                    "snippet_hash": "5b006b2b84043ee6b041dd18bbb5de74d0ad83381fa9243c8691b34a52f5cb1d"
+                  }
+                ],
+                "doc_refs": [],
+                "reasoning": "bundlePagesRouterDependencies: experimental.bundlePagesExternals was renamed to bundlePagesRouterDependencies.",
+                "action": "Update to: bundlePagesRouterDependencies",
+                "step_kind": "manual",
+                "verify": "Load the affected page or run the build, and confirm the new behaviour.",
+                "confidence": 0.85,
+                "source": "rule_pack",
+                "usage_ids": [
+                  "93e7e63364b617428b9fb50c"
+                ],
+                "docs_status": "unverified",
+                "prompt_version": "v1",
+                "rule_id": "next/bundlepagesrouterdependencies"
+              },
+              {
+                "id": "dependency_build-acb9ced7aff78643dd28faca",
+                "repo_id": "4448cbbe33260a1e",
+                "lens": "dependency_build",
+                "concern": "dependency",
+                "severity": "medium",
+                "evidence": [
+                  {
+                    "repo_id": "4448cbbe33260a1e",
+                    "file": "package-lock.json",
+                    "line_start": 9259,
+                    "line_end": 9259,
+                    "snippet_hash": "8bc10b90d407192fa04e4bea1cfe1e8092f2f1113bd85ae3b30cb0c20239c17d"
+                  }
+                ],
+                "doc_refs": [],
+                "reasoning": "bundlePagesRouterDependencies: experimental.bundlePagesExternals was renamed to bundlePagesRouterDependencies.",
+                "action": "Update to: bundlePagesRouterDependencies",
+                "step_kind": "manual",
+                "verify": "Load the affected page or run the build, and confirm the new behaviour.",
+                "confidence": 0.85,
+                "source": "rule_pack",
+                "usage_ids": [
+                  "acb9ced7aff78643dd28faca"
+                ],
+                "docs_status": "unverified",
+                "prompt_version": "v1",
+                "rule_id": "next/bundlepagesrouterdependencies"
+              },
+              {
+                "id": "dependency_build-fdeafeda67cb079196263b9b",
+                "repo_id": "4448cbbe33260a1e",
+                "lens": "dependency_build",
+                "concern": "dependency",
+                "severity": "medium",
+                "evidence": [
+                  {
+                    "repo_id": "4448cbbe33260a1e",
+                    "file": "package-lock.json",
+                    "line_start": 9259,
+                    "line_end": 9259,
+                    "snippet_hash": "8bc10b90d407192fa04e4bea1cfe1e8092f2f1113bd85ae3b30cb0c20239c17d"
+                  }
+                ],
+                "doc_refs": [],
+                "reasoning": "bundlePagesRouterDependencies: experimental.bundlePagesExternals was renamed to bundlePagesRouterDependencies.",
+                "action": "Update to: bundlePagesRouterDependencies",
+                "step_kind": "manual",
+                "verify": "Load the affected page or run the build, and confirm the new behaviour.",
+                "confidence": 0.85,
+                "source": "rule_pack",
+                "usage_ids": [
+                  "fdeafeda67cb079196263b9b"
+                ],
+                "docs_status": "unverified",
+                "prompt_version": "v1",
+                "rule_id": "next/bundlepagesrouterdependencies"
+              },
+              {
+                "id": "dependency_build-d0c58ef6caee04aa69b60e4b",
+                "repo_id": "4448cbbe33260a1e",
+                "lens": "dependency_build",
+                "concern": "dependency",
+                "severity": "medium",
+                "evidence": [
+                  {
+                    "repo_id": "4448cbbe33260a1e",
+                    "file": "package-lock.json",
+                    "line_start": 9307,
+                    "line_end": 9307,
+                    "snippet_hash": "bcdded0a6ced8e6b1c0154d4b6cab0249f326bb9365b7e08c7383748f15eb01d"
+                  }
+                ],
+                "doc_refs": [],
+                "reasoning": "bundlePagesRouterDependencies: experimental.bundlePagesExternals was renamed to bundlePagesRouterDependencies.",
+                "action": "Update to: bundlePagesRouterDependencies",
+                "step_kind": "manual",
+                "verify": "Load the affected page or run the build, and confirm the new behaviour.",
+                "confidence": 0.85,
+                "source": "rule_pack",
+                "usage_ids": [
+                  "d0c58ef6caee04aa69b60e4b"
+                ],
+                "docs_status": "unverified",
+                "prompt_version": "v1",
+                "rule_id": "next/bundlepagesrouterdependencies"
+              },
+              {
+                "id": "dependency_build-fb839fdb915cda577fad1470",
+                "repo_id": "4448cbbe33260a1e",
+                "lens": "dependency_build",
+                "concern": "dependency",
+                "severity": "medium",
+                "evidence": [
+                  {
+                    "repo_id": "4448cbbe33260a1e",
+                    "file": "package-lock.json",
+                    "line_start": 9617,
+                    "line_end": 9617,
+                    "snippet_hash": "51e5f728ca37c4d1485964f6fc94af131a3c44022879f45a2d2c63e9b299df11"
+                  }
+                ],
+                "doc_refs": [],
+                "reasoning": "bundlePagesRouterDependencies: experimental.bundlePagesExternals was renamed to bundlePagesRouterDependencies.",
+                "action": "Update to: bundlePagesRouterDependencies",
+                "step_kind": "manual",
+                "verify": "Load the affected page or run the build, and confirm the new behaviour.",
+                "confidence": 0.85,
+                "source": "rule_pack",
+                "usage_ids": [
+                  "fb839fdb915cda577fad1470"
+                ],
+                "docs_status": "unverified",
+                "prompt_version": "v1",
+                "rule_id": "next/bundlepagesrouterdependencies"
+              },
+              {
+                "id": "dependency_build-d9e08986a5367a2fe41007cf",
+                "repo_id": "4448cbbe33260a1e",
+                "lens": "dependency_build",
+                "concern": "dependency",
+                "severity": "medium",
+                "evidence": [
+                  {
+                    "repo_id": "4448cbbe33260a1e",
+                    "file": "package-lock.json",
+                    "line_start": 9632,
+                    "line_end": 9632,
+                    "snippet_hash": "2a8ba8b114583ab8259888d47743a123be1217630c5227c4078e59385382ec32"
+                  }
+                ],
+                "doc_refs": [],
+                "reasoning": "bundlePagesRouterDependencies: experimental.bundlePagesExternals was renamed to bundlePagesRouterDependencies.",
+                "action": "Update to: bundlePagesRouterDependencies",
+                "step_kind": "manual",
+                "verify": "Load the affected page or run the build, and confirm the new behaviour.",
+                "confidence": 0.85,
+                "source": "rule_pack",
+                "usage_ids": [
+                  "d9e08986a5367a2fe41007cf"
+                ],
+                "docs_status": "unverified",
+                "prompt_version": "v1",
+                "rule_id": "next/bundlepagesrouterdependencies"
+              },
+              {
+                "id": "dependency_build-2a795e3ef05bc4122c8e6ef2",
+                "repo_id": "4448cbbe33260a1e",
+                "lens": "dependency_build",
+                "concern": "dependency",
+                "severity": "medium",
+                "evidence": [
+                  {
+                    "repo_id": "4448cbbe33260a1e",
+                    "file": "package-lock.json",
+                    "line_start": 9640,
+                    "line_end": 9640,
+                    "snippet_hash": "62ebadb75193762ea9ce98536e87c19ebe9d74c99ff1b5a25f0f6c40d6c762b8"
+                  }
+                ],
+                "doc_refs": [],
+                "reasoning": "bundlePagesRouterDependencies: experimental.bundlePagesExternals was renamed to bundlePagesRouterDependencies.",
+                "action": "Update to: bundlePagesRouterDependencies",
+                "step_kind": "manual",
+                "verify": "Load the affected page or run the build, and confirm the new behaviour.",
+                "confidence": 0.85,
+                "source": "rule_pack",
+                "usage_ids": [
+                  "2a795e3ef05bc4122c8e6ef2"
+                ],
+                "docs_status": "unverified",
+                "prompt_version": "v1",
+                "rule_id": "next/bundlepagesrouterdependencies"
+              },
+              {
+                "id": "dependency_build-73709c508fadda42a2b918c6",
+                "repo_id": "4448cbbe33260a1e",
+                "lens": "dependency_build",
+                "concern": "dependency",
+                "severity": "medium",
+                "evidence": [
+                  {
+                    "repo_id": "4448cbbe33260a1e",
+                    "file": "package-lock.json",
+                    "line_start": 9986,
+                    "line_end": 9986,
+                    "snippet_hash": "7a73aef0e0262bbc0a800fdb1ff8dbb490e583ae52374943fc430c2c0c653620"
+                  }
+                ],
+                "doc_refs": [],
+                "reasoning": "bundlePagesRouterDependencies: experimental.bundlePagesExternals was renamed to bundlePagesRouterDependencies.",
+                "action": "Update to: bundlePagesRouterDependencies",
+                "step_kind": "manual",
+                "verify": "Load the affected page or run the build, and confirm the new behaviour.",
+                "confidence": 0.85,
+                "source": "rule_pack",
+                "usage_ids": [
+                  "73709c508fadda42a2b918c6"
+                ],
+                "docs_status": "unverified",
+                "prompt_version": "v1",
+                "rule_id": "next/bundlepagesrouterdependencies"
+              },
+              {
+                "id": "dependency_build-e0fe08e91b08df844428865a",
+                "repo_id": "4448cbbe33260a1e",
+                "lens": "dependency_build",
+                "concern": "dependency",
+                "severity": "medium",
+                "evidence": [
+                  {
+                    "repo_id": "4448cbbe33260a1e",
+                    "file": "package.json",
+                    "line_start": 17,
+                    "line_end": 17,
+                    "snippet_hash": "bd17ce788bcd8389bf66bc28673d101e924d02698a6c30b90b496e550cc67844"
+                  }
+                ],
+                "doc_refs": [],
+                "reasoning": "bundlePagesRouterDependencies: experimental.bundlePagesExternals was renamed to bundlePagesRouterDependencies.",
+                "action": "Update to: bundlePagesRouterDependencies",
+                "step_kind": "manual",
+                "verify": "Load the affected page or run the build, and confirm the new behaviour.",
+                "confidence": 0.85,
+                "source": "rule_pack",
+                "usage_ids": [
+                  "e0fe08e91b08df844428865a"
+                ],
+                "docs_status": "unverified",
+                "prompt_version": "v1",
+                "rule_id": "next/bundlepagesrouterdependencies"
+              },
+              {
+                "id": "dependency_build-d5d76717af11f809fd63a256",
+                "repo_id": "4448cbbe33260a1e",
+                "lens": "dependency_build",
+                "concern": "dependency",
+                "severity": "medium",
+                "evidence": [
+                  {
+                    "repo_id": "4448cbbe33260a1e",
+                    "file": "package.json",
+                    "line_start": 54,
+                    "line_end": 54,
+                    "snippet_hash": "98ca48099939d5ae233e769f88a31888917e40a04dbe4ff8ff486493c479e200"
+                  }
+                ],
+                "doc_refs": [],
+                "reasoning": "bundlePagesRouterDependencies: experimental.bundlePagesExternals was renamed to bundlePagesRouterDependencies.",
+                "action": "Update to: bundlePagesRouterDependencies",
+                "step_kind": "manual",
+                "verify": "Load the affected page or run the build, and confirm the new behaviour.",
+                "confidence": 0.85,
+                "source": "rule_pack",
+                "usage_ids": [
+                  "d5d76717af11f809fd63a256"
+                ],
+                "docs_status": "unverified",
+                "prompt_version": "v1",
+                "rule_id": "next/bundlepagesrouterdependencies"
+              },
+              {
+                "id": "dependency_build-8e0873baaf113a2b3c3b6070",
+                "repo_id": "4448cbbe33260a1e",
+                "lens": "dependency_build",
+                "concern": "dependency",
+                "severity": "medium",
+                "evidence": [
+                  {
+                    "repo_id": "4448cbbe33260a1e",
+                    "file": "package.json",
+                    "line_start": 60,
+                    "line_end": 60,
+                    "snippet_hash": "ede90f68eb618808859c87cecd78acb284952e7681cc3196432f452fa227f127"
+                  }
+                ],
+                "doc_refs": [],
+                "reasoning": "bundlePagesRouterDependencies: experimental.bundlePagesExternals was renamed to bundlePagesRouterDependencies.",
+                "action": "Update to: bundlePagesRouterDependencies",
+                "step_kind": "manual",
+                "verify": "Load the affected page or run the build, and confirm the new behaviour.",
+                "confidence": 0.85,
+                "source": "rule_pack",
+                "usage_ids": [
+                  "8e0873baaf113a2b3c3b6070"
+                ],
+                "docs_status": "unverified",
+                "prompt_version": "v1",
+                "rule_id": "next/bundlepagesrouterdependencies"
+              },
+              {
+                "id": "dependency_build-71c9854551e16a47a231ac4b",
+                "repo_id": "4448cbbe33260a1e",
+                "lens": "dependency_build",
+                "concern": "dependency",
+                "severity": "medium",
+                "evidence": [
+                  {
+                    "repo_id": "4448cbbe33260a1e",
+                    "file": "package.json",
+                    "line_start": 61,
+                    "line_end": 61,
+                    "snippet_hash": "7846b56a729284c978eef4b031b229e7b76529a4b2cb1608733f55750aec2f63"
+                  }
+                ],
+                "doc_refs": [],
+                "reasoning": "bundlePagesRouterDependencies: experimental.bundlePagesExternals was renamed to bundlePagesRouterDependencies.",
+                "action": "Update to: bundlePagesRouterDependencies",
+                "step_kind": "manual",
+                "verify": "Load the affected page or run the build, and confirm the new behaviour.",
+                "confidence": 0.85,
+                "source": "rule_pack",
+                "usage_ids": [
+                  "71c9854551e16a47a231ac4b"
+                ],
+                "docs_status": "unverified",
+                "prompt_version": "v1",
+                "rule_id": "next/bundlepagesrouterdependencies"
+              },
+              {
+                "id": "dependency_build-8355906a2d39043d06f564f3",
+                "repo_id": "4448cbbe33260a1e",
+                "lens": "dependency_build",
+                "concern": "dependency",
+                "severity": "medium",
+                "evidence": [
+                  {
+                    "repo_id": "4448cbbe33260a1e",
+                    "file": "package.json",
+                    "line_start": 74,
+                    "line_end": 74,
+                    "snippet_hash": "0adde6ed6b91b5631925050bbda9efd829ebd8e8358e509272056a850d907159"
+                  }
+                ],
+                "doc_refs": [],
+                "reasoning": "bundlePagesRouterDependencies: experimental.bundlePagesExternals was renamed to bundlePagesRouterDependencies.",
+                "action": "Update to: bundlePagesRouterDependencies",
+                "step_kind": "manual",
+                "verify": "Load the affected page or run the build, and confirm the new behaviour.",
+                "confidence": 0.85,
+                "source": "rule_pack",
+                "usage_ids": [
+                  "8355906a2d39043d06f564f3"
+                ],
+                "docs_status": "unverified",
+                "prompt_version": "v1",
+                "rule_id": "next/bundlepagesrouterdependencies"
+              },
+              {
+                "id": "dependency_build-81f424e0c169a4de50129b89",
+                "repo_id": "4448cbbe33260a1e",
+                "lens": "dependency_build",
+                "concern": "dependency",
+                "severity": "medium",
+                "evidence": [
+                  {
+                    "repo_id": "4448cbbe33260a1e",
+                    "file": "package.json",
+                    "line_start": 81,
+                    "line_end": 81,
+                    "snippet_hash": "0938ac66b668035d8e13f1c6293662705010536509c02196ee683c6c48fd53a6"
+                  }
+                ],
+                "doc_refs": [],
+                "reasoning": "bundlePagesRouterDependencies: experimental.bundlePagesExternals was renamed to bundlePagesRouterDependencies.",
+                "action": "Update to: bundlePagesRouterDependencies",
+                "step_kind": "manual",
+                "verify": "Load the affected page or run the build, and confirm the new behaviour.",
+                "confidence": 0.85,
+                "source": "rule_pack",
+                "usage_ids": [
+                  "81f424e0c169a4de50129b89"
+                ],
+                "docs_status": "unverified",
+                "prompt_version": "v1",
+                "rule_id": "next/bundlepagesrouterdependencies"
+              },
+              {
+                "id": "dependency_build-2447b82863a4be3498f540fa",
+                "repo_id": "4448cbbe33260a1e",
+                "lens": "dependency_build",
+                "concern": "dependency",
+                "severity": "medium",
+                "evidence": [
+                  {
+                    "repo_id": "4448cbbe33260a1e",
+                    "file": "package.json",
+                    "line_start": 89,
+                    "line_end": 89,
+                    "snippet_hash": "35faad6136aadf4afda2fe036a14c20b35ed9ed15a6d46b727bf6d1211cb1482"
+                  }
+                ],
+                "doc_refs": [],
+                "reasoning": "bundlePagesRouterDependencies: experimental.bundlePagesExternals was renamed to bundlePagesRouterDependencies.",
+                "action": "Update to: bundlePagesRouterDependencies",
+                "step_kind": "manual",
+                "verify": "Load the affected page or run the build, and confirm the new behaviour.",
+                "confidence": 0.85,
+                "source": "rule_pack",
+                "usage_ids": [
+                  "2447b82863a4be3498f540fa"
+                ],
+                "docs_status": "unverified",
+                "prompt_version": "v1",
+                "rule_id": "next/bundlepagesrouterdependencies"
+              },
+              {
+                "id": "dependency_build-099292e3618d7496320ec8d8",
+                "repo_id": "4448cbbe33260a1e",
+                "lens": "dependency_build",
+                "concern": "dependency",
+                "severity": "medium",
+                "evidence": [
+                  {
+                    "repo_id": "4448cbbe33260a1e",
+                    "file": "package.json",
+                    "line_start": 97,
+                    "line_end": 97,
+                    "snippet_hash": "e23983df59a2dbbf956ee3273f0361ce9d9a0f83bd843899ba31bf9d8fd690bf"
+                  }
+                ],
+                "doc_refs": [],
+                "reasoning": "bundlePagesRouterDependencies: experimental.bundlePagesExternals was renamed to bundlePagesRouterDependencies.",
+                "action": "Update to: bundlePagesRouterDependencies",
+                "step_kind": "manual",
+                "verify": "Load the affected page or run the build, and confirm the new behaviour.",
+                "confidence": 0.85,
+                "source": "rule_pack",
+                "usage_ids": [
+                  "099292e3618d7496320ec8d8"
+                ],
+                "docs_status": "unverified",
+                "prompt_version": "v1",
+                "rule_id": "next/bundlepagesrouterdependencies"
+              }
+            ],
+            "out_of_scope": []
+          }
+        },
+        {
+          "lens": "behavior_runtime",
+          "packet_usages": [],
+          "submission": {
+            "findings": [],
+            "out_of_scope": []
+          }
+        },
+        {
+          "lens": "verification",
+          "packet_usages": [
+            {
+              "file": "src/components/Onboarding/DisplaySettings/index.tsx",
+              "line_start": 172,
+              "line_end": 172,
+              "snippet_hash": "91b00c58aea9bb9cd1d03d5cbbdc8ec318ac244af440784ef5fdaac018c90001",
+              "usage_id": "46bc54d29bba5a40fdfff9db"
+            },
+            {
+              "file": "src/components/Onboarding/StripeConnect.tsx",
+              "line_start": 73,
+              "line_end": 73,
+              "snippet_hash": "642d06e92e0ba7057b3e9b5cc40976f1a5cc485e180f93cbde94f0e09efd346b",
+              "usage_id": "2bd69ffc8f72207e6e11496c"
+            },
+            {
+              "file": "src/components/Onboarding/index.tsx",
+              "line_start": 19,
+              "line_end": 19,
+              "snippet_hash": "292b16dc68dcff876fd8dacfd1fd9eb66d20f813bc71f855c48820123ef7354f",
+              "usage_id": "fe8f264bcee701654b0b1e62"
+            },
+            {
+              "file": "src/components/Products/Items/EnabledSubscriptionCheck.tsx",
+              "line_start": 45,
+              "line_end": 45,
+              "snippet_hash": "91b00c58aea9bb9cd1d03d5cbbdc8ec318ac244af440784ef5fdaac018c90001",
+              "usage_id": "7c8d1391682692520843ecc5"
+            },
+            {
+              "file": "src/components/Products/Panes/VariantProductListPane.tsx",
+              "line_start": 129,
+              "line_end": 129,
+              "snippet_hash": "91b00c58aea9bb9cd1d03d5cbbdc8ec318ac244af440784ef5fdaac018c90001",
+              "usage_id": "c0de6857dddf0f99f4040668"
+            },
+            {
+              "file": "src/components/Subscription/Widget/Button.tsx",
+              "line_start": 24,
+              "line_end": 24,
+              "snippet_hash": "91b00c58aea9bb9cd1d03d5cbbdc8ec318ac244af440784ef5fdaac018c90001",
+              "usage_id": "deb4ae755e47b93904072bdb"
+            },
+            {
+              "file": "src/components/Subscription/Widget/index.tsx",
+              "line_start": 70,
+              "line_end": 70,
+              "snippet_hash": "91b00c58aea9bb9cd1d03d5cbbdc8ec318ac244af440784ef5fdaac018c90001",
+              "usage_id": "24d54762774aadbc3caa7101"
+            },
+            {
+              "file": "src/pages/index.tsx",
+              "line_start": 71,
+              "line_end": 71,
+              "snippet_hash": "217a9aafd537dd2c92e6942221f7b818a488403f4c0fc67662ed08c94921b8d4",
+              "usage_id": "37a8247770c5f8f9fb1ae73f"
+            },
+            {
+              "file": "src/pages/onboarding.tsx",
+              "line_start": 15,
+              "line_end": 15,
+              "snippet_hash": "217a9aafd537dd2c92e6942221f7b818a488403f4c0fc67662ed08c94921b8d4",
+              "usage_id": "fc894e24062db1748387ff7a"
+            },
+            {
+              "file": "src/pages/products.tsx",
+              "line_start": 23,
+              "line_end": 23,
+              "snippet_hash": "292b16dc68dcff876fd8dacfd1fd9eb66d20f813bc71f855c48820123ef7354f",
+              "usage_id": "0015e2373d609d8a0f92fcf9"
+            },
+            {
+              "file": "src/pages/settings.tsx",
+              "line_start": 34,
+              "line_end": 34,
+              "snippet_hash": "217a9aafd537dd2c92e6942221f7b818a488403f4c0fc67662ed08c94921b8d4",
+              "usage_id": "991d334193a6dfe59e4cfd46"
+            },
+            {
+              "file": "src/pages/support.tsx",
+              "line_start": 19,
+              "line_end": 19,
+              "snippet_hash": "217a9aafd537dd2c92e6942221f7b818a488403f4c0fc67662ed08c94921b8d4",
+              "usage_id": "55aedfd7a86504bd76aa03a3"
+            }
+          ],
+          "submission": {
+            "findings": [
+              {
+                "id": "verification-46bc54d29bba5a40fdfff9db",
+                "repo_id": "4448cbbe33260a1e",
+                "lens": "verification",
+                "concern": "test",
+                "severity": "medium",
+                "evidence": [
+                  {
+                    "repo_id": "4448cbbe33260a1e",
+                    "file": "src/components/Onboarding/DisplaySettings/index.tsx",
+                    "line_start": 172,
+                    "line_end": 172,
+                    "snippet_hash": "91b00c58aea9bb9cd1d03d5cbbdc8ec318ac244af440784ef5fdaac018c90001"
+                  }
+                ],
+                "doc_refs": [],
+                "reasoning": "Usage of unresolved_dynamic at src/components/Onboarding/DisplaySettings/index.tsx:172 requires attention for next@15.5.21.",
+                "action": "Review and update this usage for next@15.5.21.",
+                "step_kind": "manual",
+                "verify": "Run the test suite and confirm the build passes.",
+                "confidence": 0.6,
+                "source": "usage_scan",
+                "usage_ids": [
+                  "46bc54d29bba5a40fdfff9db"
+                ],
+                "docs_status": "unverified",
+                "prompt_version": "v1"
+              },
+              {
+                "id": "verification-2bd69ffc8f72207e6e11496c",
+                "repo_id": "4448cbbe33260a1e",
+                "lens": "verification",
+                "concern": "test",
+                "severity": "medium",
+                "evidence": [
+                  {
+                    "repo_id": "4448cbbe33260a1e",
+                    "file": "src/components/Onboarding/StripeConnect.tsx",
+                    "line_start": 73,
+                    "line_end": 73,
+                    "snippet_hash": "642d06e92e0ba7057b3e9b5cc40976f1a5cc485e180f93cbde94f0e09efd346b"
+                  }
+                ],
+                "doc_refs": [],
+                "reasoning": "Usage of unresolved_dynamic at src/components/Onboarding/StripeConnect.tsx:73 requires attention for next@15.5.21.",
+                "action": "Review and update this usage for next@15.5.21.",
+                "step_kind": "manual",
+                "verify": "Run the test suite and confirm the build passes.",
+                "confidence": 0.6,
+                "source": "usage_scan",
+                "usage_ids": [
+                  "2bd69ffc8f72207e6e11496c"
+                ],
+                "docs_status": "unverified",
+                "prompt_version": "v1"
+              },
+              {
+                "id": "verification-fe8f264bcee701654b0b1e62",
+                "repo_id": "4448cbbe33260a1e",
+                "lens": "verification",
+                "concern": "test",
+                "severity": "medium",
+                "evidence": [
+                  {
+                    "repo_id": "4448cbbe33260a1e",
+                    "file": "src/components/Onboarding/index.tsx",
+                    "line_start": 19,
+                    "line_end": 19,
+                    "snippet_hash": "292b16dc68dcff876fd8dacfd1fd9eb66d20f813bc71f855c48820123ef7354f"
+                  }
+                ],
+                "doc_refs": [],
+                "reasoning": "Usage of unresolved_dynamic at src/components/Onboarding/index.tsx:19 requires attention for next@15.5.21.",
+                "action": "Review and update this usage for next@15.5.21.",
+                "step_kind": "manual",
+                "verify": "Run the test suite and confirm the build passes.",
+                "confidence": 0.6,
+                "source": "usage_scan",
+                "usage_ids": [
+                  "fe8f264bcee701654b0b1e62"
+                ],
+                "docs_status": "unverified",
+                "prompt_version": "v1"
+              },
+              {
+                "id": "verification-7c8d1391682692520843ecc5",
+                "repo_id": "4448cbbe33260a1e",
+                "lens": "verification",
+                "concern": "test",
+                "severity": "medium",
+                "evidence": [
+                  {
+                    "repo_id": "4448cbbe33260a1e",
+                    "file": "src/components/Products/Items/EnabledSubscriptionCheck.tsx",
+                    "line_start": 45,
+                    "line_end": 45,
+                    "snippet_hash": "91b00c58aea9bb9cd1d03d5cbbdc8ec318ac244af440784ef5fdaac018c90001"
+                  }
+                ],
+                "doc_refs": [],
+                "reasoning": "Usage of unresolved_dynamic at src/components/Products/Items/EnabledSubscriptionCheck.tsx:45 requires attention for next@15.5.21.",
+                "action": "Review and update this usage for next@15.5.21.",
+                "step_kind": "manual",
+                "verify": "Run the test suite and confirm the build passes.",
+                "confidence": 0.6,
+                "source": "usage_scan",
+                "usage_ids": [
+                  "7c8d1391682692520843ecc5"
+                ],
+                "docs_status": "unverified",
+                "prompt_version": "v1"
+              },
+              {
+                "id": "verification-c0de6857dddf0f99f4040668",
+                "repo_id": "4448cbbe33260a1e",
+                "lens": "verification",
+                "concern": "test",
+                "severity": "medium",
+                "evidence": [
+                  {
+                    "repo_id": "4448cbbe33260a1e",
+                    "file": "src/components/Products/Panes/VariantProductListPane.tsx",
+                    "line_start": 129,
+                    "line_end": 129,
+                    "snippet_hash": "91b00c58aea9bb9cd1d03d5cbbdc8ec318ac244af440784ef5fdaac018c90001"
+                  }
+                ],
+                "doc_refs": [],
+                "reasoning": "Usage of unresolved_dynamic at src/components/Products/Panes/VariantProductListPane.tsx:129 requires attention for next@15.5.21.",
+                "action": "Review and update this usage for next@15.5.21.",
+                "step_kind": "manual",
+                "verify": "Run the test suite and confirm the build passes.",
+                "confidence": 0.6,
+                "source": "usage_scan",
+                "usage_ids": [
+                  "c0de6857dddf0f99f4040668"
+                ],
+                "docs_status": "unverified",
+                "prompt_version": "v1"
+              },
+              {
+                "id": "verification-deb4ae755e47b93904072bdb",
+                "repo_id": "4448cbbe33260a1e",
+                "lens": "verification",
+                "concern": "test",
+                "severity": "medium",
+                "evidence": [
+                  {
+                    "repo_id": "4448cbbe33260a1e",
+                    "file": "src/components/Subscription/Widget/Button.tsx",
+                    "line_start": 24,
+                    "line_end": 24,
+                    "snippet_hash": "91b00c58aea9bb9cd1d03d5cbbdc8ec318ac244af440784ef5fdaac018c90001"
+                  }
+                ],
+                "doc_refs": [],
+                "reasoning": "Usage of unresolved_dynamic at src/components/Subscription/Widget/Button.tsx:24 requires attention for next@15.5.21.",
+                "action": "Review and update this usage for next@15.5.21.",
+                "step_kind": "manual",
+                "verify": "Run the test suite and confirm the build passes.",
+                "confidence": 0.6,
+                "source": "usage_scan",
+                "usage_ids": [
+                  "deb4ae755e47b93904072bdb"
+                ],
+                "docs_status": "unverified",
+                "prompt_version": "v1"
+              },
+              {
+                "id": "verification-24d54762774aadbc3caa7101",
+                "repo_id": "4448cbbe33260a1e",
+                "lens": "verification",
+                "concern": "test",
+                "severity": "medium",
+                "evidence": [
+                  {
+                    "repo_id": "4448cbbe33260a1e",
+                    "file": "src/components/Subscription/Widget/index.tsx",
+                    "line_start": 70,
+                    "line_end": 70,
+                    "snippet_hash": "91b00c58aea9bb9cd1d03d5cbbdc8ec318ac244af440784ef5fdaac018c90001"
+                  }
+                ],
+                "doc_refs": [],
+                "reasoning": "Usage of unresolved_dynamic at src/components/Subscription/Widget/index.tsx:70 requires attention for next@15.5.21.",
+                "action": "Review and update this usage for next@15.5.21.",
+                "step_kind": "manual",
+                "verify": "Run the test suite and confirm the build passes.",
+                "confidence": 0.6,
+                "source": "usage_scan",
+                "usage_ids": [
+                  "24d54762774aadbc3caa7101"
+                ],
+                "docs_status": "unverified",
+                "prompt_version": "v1"
+              },
+              {
+                "id": "verification-37a8247770c5f8f9fb1ae73f",
+                "repo_id": "4448cbbe33260a1e",
+                "lens": "verification",
+                "concern": "test",
+                "severity": "medium",
+                "evidence": [
+                  {
+                    "repo_id": "4448cbbe33260a1e",
+                    "file": "src/pages/index.tsx",
+                    "line_start": 71,
+                    "line_end": 71,
+                    "snippet_hash": "217a9aafd537dd2c92e6942221f7b818a488403f4c0fc67662ed08c94921b8d4"
+                  }
+                ],
+                "doc_refs": [],
+                "reasoning": "Usage of unresolved_dynamic at src/pages/index.tsx:71 requires attention for next@15.5.21.",
+                "action": "Review and update this usage for next@15.5.21.",
+                "step_kind": "manual",
+                "verify": "Run the test suite and confirm the build passes.",
+                "confidence": 0.6,
+                "source": "usage_scan",
+                "usage_ids": [
+                  "37a8247770c5f8f9fb1ae73f"
+                ],
+                "docs_status": "unverified",
+                "prompt_version": "v1"
+              },
+              {
+                "id": "verification-fc894e24062db1748387ff7a",
+                "repo_id": "4448cbbe33260a1e",
+                "lens": "verification",
+                "concern": "test",
+                "severity": "medium",
+                "evidence": [
+                  {
+                    "repo_id": "4448cbbe33260a1e",
+                    "file": "src/pages/onboarding.tsx",
+                    "line_start": 15,
+                    "line_end": 15,
+                    "snippet_hash": "217a9aafd537dd2c92e6942221f7b818a488403f4c0fc67662ed08c94921b8d4"
+                  }
+                ],
+                "doc_refs": [],
+                "reasoning": "Usage of unresolved_dynamic at src/pages/onboarding.tsx:15 requires attention for next@15.5.21.",
+                "action": "Review and update this usage for next@15.5.21.",
+                "step_kind": "manual",
+                "verify": "Run the test suite and confirm the build passes.",
+                "confidence": 0.6,
+                "source": "usage_scan",
+                "usage_ids": [
+                  "fc894e24062db1748387ff7a"
+                ],
+                "docs_status": "unverified",
+                "prompt_version": "v1"
+              },
+              {
+                "id": "verification-0015e2373d609d8a0f92fcf9",
+                "repo_id": "4448cbbe33260a1e",
+                "lens": "verification",
+                "concern": "test",
+                "severity": "medium",
+                "evidence": [
+                  {
+                    "repo_id": "4448cbbe33260a1e",
+                    "file": "src/pages/products.tsx",
+                    "line_start": 23,
+                    "line_end": 23,
+                    "snippet_hash": "292b16dc68dcff876fd8dacfd1fd9eb66d20f813bc71f855c48820123ef7354f"
+                  }
+                ],
+                "doc_refs": [],
+                "reasoning": "Usage of unresolved_dynamic at src/pages/products.tsx:23 requires attention for next@15.5.21.",
+                "action": "Review and update this usage for next@15.5.21.",
+                "step_kind": "manual",
+                "verify": "Run the test suite and confirm the build passes.",
+                "confidence": 0.6,
+                "source": "usage_scan",
+                "usage_ids": [
+                  "0015e2373d609d8a0f92fcf9"
+                ],
+                "docs_status": "unverified",
+                "prompt_version": "v1"
+              },
+              {
+                "id": "verification-991d334193a6dfe59e4cfd46",
+                "repo_id": "4448cbbe33260a1e",
+                "lens": "verification",
+                "concern": "test",
+                "severity": "medium",
+                "evidence": [
+                  {
+                    "repo_id": "4448cbbe33260a1e",
+                    "file": "src/pages/settings.tsx",
+                    "line_start": 34,
+                    "line_end": 34,
+                    "snippet_hash": "217a9aafd537dd2c92e6942221f7b818a488403f4c0fc67662ed08c94921b8d4"
+                  }
+                ],
+                "doc_refs": [],
+                "reasoning": "Usage of unresolved_dynamic at src/pages/settings.tsx:34 requires attention for next@15.5.21.",
+                "action": "Review and update this usage for next@15.5.21.",
+                "step_kind": "manual",
+                "verify": "Run the test suite and confirm the build passes.",
+                "confidence": 0.6,
+                "source": "usage_scan",
+                "usage_ids": [
+                  "991d334193a6dfe59e4cfd46"
+                ],
+                "docs_status": "unverified",
+                "prompt_version": "v1"
+              },
+              {
+                "id": "verification-55aedfd7a86504bd76aa03a3",
+                "repo_id": "4448cbbe33260a1e",
+                "lens": "verification",
+                "concern": "test",
+                "severity": "medium",
+                "evidence": [
+                  {
+                    "repo_id": "4448cbbe33260a1e",
+                    "file": "src/pages/support.tsx",
+                    "line_start": 19,
+                    "line_end": 19,
+                    "snippet_hash": "217a9aafd537dd2c92e6942221f7b818a488403f4c0fc67662ed08c94921b8d4"
+                  }
+                ],
+                "doc_refs": [],
+                "reasoning": "Usage of unresolved_dynamic at src/pages/support.tsx:19 requires attention for next@15.5.21.",
+                "action": "Review and update this usage for next@15.5.21.",
+                "step_kind": "manual",
+                "verify": "Run the test suite and confirm the build passes.",
+                "confidence": 0.6,
+                "source": "usage_scan",
+                "usage_ids": [
+                  "55aedfd7a86504bd76aa03a3"
+                ],
+                "docs_status": "unverified",
+                "prompt_version": "v1"
+              }
+            ],
+            "out_of_scope": []
+          }
+        }
+      ]
+    }
+  ],
+  "size": "full",
+  "cost_tokens": 0,
+  "wall_ms": 631,
+  "host": {
+    "product": "Cursor",
+    "model": "databricks-claude-sonnet-4-6",
+    "cli_version": "3.25.6"
+  }
+}

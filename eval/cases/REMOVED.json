@@ -3,5 +3,10 @@
     "id": "nextjs-chiarel-6-messy",
     "reason": "Unlicensed source repo (shams96/chiarel has no OSS licence; default copyright), so it fails the add-golden-case licence check and may not be cloned or have truth derived from it (eval/cases/README.md open items; M7 plan task 2 and acceptance; D15 exception b). It was a pending case (no recorded runs). Replaced by the licensed messy case nextjs-annuaire-entreprises-2146-messy (annuaire-entreprises-data-gouv-fr/site PR #2146, MIT, next 15.3.8 -> 16.1.1, a real upgrade -> revert saga).",
     "pr": "https://github.com/ChiragG2101/migration-planner-mcp/pull/TBD-m7-live-golden-data"
+  },
+  {
+    "id": "nextjs-wazaby-web-137",
+    "reason": "Pages-router-only case whose base commit has no test script and no GitHub Actions workflow, so cases:verify fails the test check and the case cannot support M8's verify loop. The pages-router cell stays filled by nextjs-couchers-web-9893 (Couchers-org/couchers PR #9893, MIT, next 15.5.7 -> 16.4.0, pages router, jest). It was a pending case (no recorded runs).",
+    "pr": "https://github.com/ChiragG2101/migration-planner-mcp/pull/TBD-m7-live-golden-data"
   }
 ]

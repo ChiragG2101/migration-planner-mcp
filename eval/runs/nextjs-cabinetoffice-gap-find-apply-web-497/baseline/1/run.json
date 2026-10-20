@@ -1,0 +1,14 @@
+{
+  "kind": "baseline",
+  "case_id": "nextjs-cabinetoffice-gap-find-apply-web-497",
+  "run": 1,
+  "markdown": "# Migration Plan: next 13.5.6 → 15.5.23\n\n## Summary\n\nUpgrade `next` from version `13.5.6` to `15.5.23`.\n\n## Required Changes\n\n- **[high]** `packages/admin/package.json` — Upgrade `next` from `13.5.6` to `15.5.23`. Update peer dependencies (`react`, `react-dom`, `eslint-config-next`) accordingly.\n- **[high]** `packages/applicant/package.json` — Upgrade `next` from `13.5.6` to `15.5.23`. Update peer dependencies (`react`, `react-dom`, `eslint-config-next`) accordingly.\n- **[medium]** `packages/admin/next.config.js` — Review Next.js configuration options that changed between 13.5.6 and 15.5.23 (e.g. experimental flags, image domains, webpack config).\n- **[medium]** `packages/applicant/next.config.js` — Review Next.js configuration options that changed between 13.5.6 and 15.5.23 (e.g. experimental flags, image domains, webpack config).\n",
+  "prompt_hash": "c2b4a0ad895125cbf6a3e721d55ebbd741b6e7b9d7edce7ebd63f8b828623550",
+  "cost_tokens": null,
+  "wall_ms": 14,
+  "host": {
+    "product": "Cursor",
+    "model": "databricks-claude-sonnet-4-6",
+    "cli_version": "3.25.6"
+  }
+}

@@ -15,6 +15,7 @@ import { parse as parseYaml } from 'yaml';
 import { hasTestAtBase, licenseAllowed, parentageHolds, versionFromLockfile, versionsMatch } from '../eval/caseVet.js';
 import { Case } from '../eval/schema.js';
 import { parsePackageJson, parsePackageLock, parsePnpmLock, parsePnpmWorkspace, parseYarnLock } from '../src/analysis/manifests/node.js';
+import { normalizePyName, parsePackageListLock, parsePyproject, parseRequirements, pinnedVersion } from '../src/analysis/manifests/python.js';
 
 const top = (): string => execFileSync('git', ['rev-parse', '--show-toplevel'], { encoding: 'utf8' }).trim();
 
@@ -154,6 +155,20 @@ function manifestInfo(root: string, library: string): { specs: (string | null)[]
   return { specs, importers };
 }
 
+/** Specs declared for `library` in the package.json beside a lockfile. */
+function librarySpecs(root: string, lockRel: string, library: string): (string | null)[] {
+  const dir = path.posix.dirname(lockRel);
+  const pkgPath = path.join(root, dir === '.' ? 'package.json' : path.join(dir, 'package.json'));
+  if (!existsSync(pkgPath)) return [];
+  try {
+    return parsePackageJson(readFileSync(pkgPath, 'utf8'))
+      .deps.filter((dep) => dep.name === library)
+      .map((dep) => dep.spec);
+  } catch {
+    return [];
+  }
+}
+
 function fromNpm(text: string, library: string, importers: readonly string[]): string[] {
   const lookup = parsePackageLock(text);
   const versions: string[] = [];
@@ -170,6 +185,46 @@ function fromYarn(text: string, library: string, specs: readonly (string | null)
   const picked = unique(selected);
   if (picked.length > 0) return picked;
   return unique(lookup(library, '', null));
+}
+
+const SKIP_DIRS = new Set(['node_modules', '.git', '.venv', 'venv', 'dist', '.next']);
+
+/** Repo-relative paths whose base name matches, skipping dependency and VCS dirs. */
+function findNamed(root: string, match: (rel: string, base: string) => boolean): string[] {
+  const out: string[] = [];
+  const walk = (rel: string): void => {
+    const dir = rel ? path.join(root, rel) : root;
+    if (!existsSync(dir)) return;
+    for (const ent of readdirSync(dir, { withFileTypes: true })) {
+      if (SKIP_DIRS.has(ent.name)) continue;
+      const child = rel ? `${rel}/${ent.name}` : ent.name;
+      if (ent.isDirectory()) walk(child);
+      else if (ent.isFile() && match(child, ent.name)) out.push(child);
+    }
+  };
+  walk('');
+  return out.sort();
+}
+
+function fromPyLock(text: string, library: string): string[] {
+  const lookup = parsePackageListLock(text) as (name: string) => string[];
+  return unique(lookup(library));
+}
+
+/** Exact `==` pins only. A range in a requirements file is not a version. */
+function fromRequirements(text: string, library: string): string[] {
+  const want = normalizePyName(library);
+  const pins: string[] = [];
+  for (const dep of parseRequirements(text, 'prod')) {
+    if (normalizePyName(dep.name) !== want) continue;
+    const pin = pinnedVersion(dep.spec);
+    if (pin) pins.push(pin);
+  }
+  return unique(pins);
+}
+
+function isRequirementsName(base: string, parent: string): boolean {
+  return /^requirements[^/]*\.txt$/.test(base) || (parent === 'requirements' && base.endsWith('.txt'));
 }
 
 function fromPnpm(text: string, library: string): string[] {
@@ -196,26 +251,68 @@ function readPin(file: string, read: (text: string) => string[]): PinRead {
   }
 }
 
+/** Exact `==` pins of `library` in every pyproject.toml. A range is not a pin. */
+function pyprojectPins(root: string, library: string): string[] {
+  const want = normalizePyName(library);
+  const pins: string[] = [];
+  for (const rel of findNamed(root, (_rel, base) => base === 'pyproject.toml')) {
+    try {
+      for (const dep of parsePyproject(readFileSync(path.join(root, rel), 'utf8')).deps) {
+        if (normalizePyName(dep.name) !== want) continue;
+        const pin = pinnedVersion(dep.spec);
+        if (pin) pins.push(pin);
+      }
+    } catch {
+      // One unreadable pyproject contributes no pin; a lockfile that does not parse still fails above.
+    }
+  }
+  return unique(pins);
+}
+
 /**
- * Installed version of `library` at a checkout. Reads `package-lock.json`,
- * `yarn.lock` and `pnpm-lock.yaml`, all of them. One unique pin across them
- * wins. Several pins in one file, pins that differ between files, or any
- * lockfile that does not parse return null rather than guessing. When no
- * lockfile mentions the library, falls back to the semver named in the root
- * or workspace manifest, and only when every manifest that names it agrees.
+ * Installed version of `library` at a checkout. Reads every Node lockfile
+ * (`package-lock.json`, `yarn.lock`, `pnpm-lock.yaml`) and every Python pin
+ * (`poetry.lock`, `uv.lock`, and `==` lines in requirements files), including
+ * ones nested in a workspace. One unique pin across them wins. Several pins
+ * in one file, pins that differ between files, or any lockfile that does not
+ * parse return null rather than guessing. When no lockfile mentions the
+ * library, falls back to one agreed manifest pin: a semver named in a Node
+ * manifest, or an `==` pin in a pyproject.toml.
  */
 export function lockfileVersion(root: string, library: string): string | null {
   const { specs, importers } = manifestInfo(root, library);
-  const reads = [
+  const rootNode = [
     readPin(path.join(root, 'package-lock.json'), (text) => fromNpm(text, library, importers)),
     readPin(path.join(root, 'yarn.lock'), (text) => fromYarn(text, library, specs)),
     readPin(path.join(root, 'pnpm-lock.yaml'), (text) => fromPnpm(text, library)),
+  ];
+  // A nested lockfile is read only when the root lockfiles do not pin the library,
+  // so a root pin is never overturned by an example app. Several nested pins still disagree.
+  const nestedNode =
+    rootNode.some((read) => read.kind === 'pin' || read.kind === 'ambiguous' || read.kind === 'unreadable')
+      ? []
+      : findNamed(root, (rel, base) => rel.includes('/') && (base === 'package-lock.json' || base === 'yarn.lock' || base === 'pnpm-lock.yaml')).map(
+          (rel) => {
+            if (rel.endsWith('package-lock.json')) return readPin(path.join(root, rel), (text) => fromNpm(text, library, ['']));
+            if (rel.endsWith('yarn.lock')) return readPin(path.join(root, rel), (text) => fromYarn(text, library, librarySpecs(root, rel, library)));
+            return readPin(path.join(root, rel), (text) => fromPnpm(text, library));
+          },
+        );
+  const reads = [
+    ...rootNode,
+    ...nestedNode,
+    ...findNamed(root, (_rel, base) => base === 'poetry.lock' || base === 'uv.lock').map((rel) =>
+      readPin(path.join(root, rel), (text) => fromPyLock(text, library)),
+    ),
+    ...findNamed(root, (rel, base) => isRequirementsName(base, path.posix.basename(path.posix.dirname(rel)))).map((rel) =>
+      readPin(path.join(root, rel), (text) => fromRequirements(text, library)),
+    ),
   ];
   if (reads.some((read) => read.kind === 'ambiguous' || read.kind === 'unreadable')) return null;
   const pins = unique(reads.flatMap((read) => (read.kind === 'pin' ? [read.version] : [])));
   if (pins.length > 1) return null;
   if (pins.length === 1) return versionFromLockfile({ [library]: pins[0]! }, library);
-  const fromManifest = sole(specs.map(semverInSpec).filter((v): v is string => v !== null));
+  const fromManifest = sole([...specs.map(semverInSpec).filter((v): v is string => v !== null), ...pyprojectPins(root, library)]);
   return fromManifest ? versionFromLockfile({ [library]: fromManifest }, library) : null;
 }
 
