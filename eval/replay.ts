@@ -21,7 +21,7 @@ import {
 import type { Usage } from '../src/schema/usage.js';
 import type { Plan, ValidatePlanOutput } from '../src/schema/plan.js';
 import { parseBaseline } from './baseline/parse.js';
-import { assertRepoUntouched, scanUsagesWith, tempOut } from './engineRun.js';
+import { REPLAY_DOCS, assertRepoUntouched, scanUsagesWith, tempOut } from './engineRun.js';
 import { sameSpan, score, type Score, type ScoredFinding } from './metrics.js';
 import type { BaselineRun, EngineRun, RecordedSubmission, Truth, UsageSpan } from './schema.js';
 
@@ -97,10 +97,16 @@ function asSeverity(s: string): (typeof SEVERITY_RANK)[number] {
  * merge_findings and validate_plan, stopping at the first round HEAD's gates
  * pass. Later rounds are not fed (D17).
  */
-export async function replayEngineRun(run: EngineRun, truth: Truth, baseCheckout: string): Promise<EngineReplayResult> {
+export async function replayEngineRun(
+  run: EngineRun,
+  truth: Truth,
+  baseCheckout: string,
+  /** Test-only: extra docs options merged onto REPLAY_DOCS (e.g. a throwing `fetch` to prove no network). Never used in CI runs. */
+  docsOverride?: Partial<NonNullable<typeof REPLAY_DOCS>>,
+): Promise<EngineReplayResult> {
   const flags: ReplayFlag[] = [];
   const { out, cleanup } = tempOut();
-  const engine: Engine = createEngine({ out, docs: { apiKey: null } });
+  const engine: Engine = createEngine({ out, docs: { ...REPLAY_DOCS, ...docsOverride } });
   try {
     return await assertRepoUntouched(baseCheckout, () => replayInner(engine, run, truth, baseCheckout, flags));
   } finally {

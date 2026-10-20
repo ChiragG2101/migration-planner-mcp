@@ -10,16 +10,24 @@ import {
   createEngine,
   findUsages,
   getLensPacket,
+  getMigrationDocs,
   proposeScope,
   scanRepo,
   setScope,
   type Engine,
 } from '../../../src/core/index.js';
 import { snippetHash, sliceLines } from '../../../src/analysis/snippet.js';
+import { docId } from '../../../src/docs/cache.js';
 import { readFileSync } from 'node:fs';
+import { REPLAY_DOCS } from '../../../eval/engineRun.js';
 import { replayBaselineRun, replayEngineRun } from '../../../eval/replay.js';
-import type { BaselineRun, EngineRun, RecordedSubmission, Truth, UsageSpan } from '../../../eval/schema.js';
+import type { BaselineRun, EngineRun, RecordedDoc, RecordedSubmission, Truth, UsageSpan } from '../../../eval/schema.js';
 import { repoRoot, tmpDir } from '../../helpers.js';
+
+/** A fetch that fails the test if the engine ever reaches the network under replay. */
+const throwingFetch = (() => {
+  throw new Error('replay reached the network (Context7 was not disabled)');
+}) as unknown as typeof fetch;
 
 const HOST = { product: 'claude-code', model: 'claude-opus-4-8' };
 
@@ -180,6 +188,96 @@ describe('baseline re-score', () => {
     expect(r.score.recall).toEqual({ found: 1, total: 1 });
     // the invalid citation is counted as an invalid change finding (evidence validity < 100%).
     expect(r.score.evidence_validity.found).toBeLessThan(r.score.evidence_validity.total);
+  });
+});
+
+describe('replay registers recorded docs with no network (INV-44, D17)', () => {
+  // A recorded run whose round registers a doc and whose finding cites it by
+  // the doc_id the engine will compute. Replay must re-register it and pass
+  // gate 3 with no Context7 call. A throwing fetch is injected so any network
+  // attempt fails the test.
+  const docPage = {
+    library: 'next',
+    version: '16.0.0',
+    topic: 'cookies',
+    url: 'https://nextjs.org/docs/app/api-reference/functions/cookies',
+    content: 'cookies() is async in Next.js 15+.',
+  };
+  const recordedDoc: RecordedDoc = {
+    ...docPage,
+    doc_id: docId(docPage.library, docPage.version, docPage.url, docPage.content),
+    fetched_by: 'agent',
+    official: true,
+    status: 'fresh',
+  };
+
+  function runWithCitedDoc(): EngineRun {
+    const span = truth.changed_usages[0]!;
+    // Reuse the repo_id the base recorded finding carried, so the finding's and
+    // evidence's repo_id match the run's repo at replay (C10, superRefine).
+    const recordedFinding = recorded.rounds[0]!.submissions[0]!.submission.findings[0] as {
+      repo_id: string;
+      evidence: { repo_id: string }[];
+    };
+    const repoId = recordedFinding.repo_id;
+    const finding = {
+      id: 'f1',
+      repo_id: repoId,
+      lens: 'api' as const,
+      concern: 'api_change' as const,
+      severity: 'high' as const,
+      evidence: [{ repo_id: repoId, file: span.file, line_start: span.line_start, line_end: span.line_end, snippet_hash: span.snippet_hash }],
+      doc_refs: [{ library: docPage.library, version: docPage.version, url: docPage.url, doc_id: recordedDoc.doc_id }],
+      reasoning: 'The packet lists this usage; the registered doc supports the change.',
+      action: 'Await cookies().',
+      step_kind: 'manual' as const,
+      rollback: 'Revert the edit.',
+      verify: 'Load the page.',
+      confidence: 0.8,
+      source: 'rule_pack' as const,
+      usage_ids: recorded.rounds[0]!.submissions[0]!.submission.findings.length
+        ? (recorded.rounds[0]!.submissions[0]!.submission.findings[0] as { usage_ids: string[] }).usage_ids
+        : [],
+      docs_status: 'verified' as const,
+      prompt_version: 'v1',
+    };
+    const sub: RecordedSubmission = {
+      ...recorded.rounds[0]!.submissions[0]!,
+      submission: { findings: [finding], out_of_scope: [] },
+    };
+    return { ...recorded, docs: [recordedDoc], rounds: [{ submissions: [sub] }] };
+  }
+
+  it('re-registers the cited doc, covers truth and never touches the network', async () => {
+    const run = runWithCitedDoc();
+    const r = await replayEngineRun(run, truth, root, { fetch: throwingFetch });
+    expect(r.score.recall).toEqual({ found: 1, total: 1 });
+    // The finding's evidence resolved (gate 1) and its doc_ref was registered (gate 3),
+    // so it is not dropped and no doc_refused/finding_dropped flag is raised.
+    expect(r.flags.some((f) => f.kind === 'doc_refused' || f.kind === 'finding_dropped')).toBe(false);
+  });
+
+  it('REPLAY_DOCS forces Context7 off, so a query takes the offline fallback, not the network', async () => {
+    // Prove the guard directly: with REPLAY_DOCS a query finds no transport and
+    // falls back as "unconfigured"; flipping apiKey away from null builds a
+    // transport that calls the (throwing) fetch and changes the reason, so this
+    // assertion goes red under that mutation.
+    const out = tmpDir();
+    const engine = createEngine({ out, docs: { ...REPLAY_DOCS, fetch: throwingFetch } });
+    try {
+      const scan = await scanRepo(engine, { repo_path: root, source: { name: 'next' }, target: { name: 'next', version: '16.0.0' } });
+      const id = scan.run!.run_id;
+      await findUsages(engine, { run_id: id });
+      await proposeScope(engine, { run_id: id });
+      await setScope(engine, { run_id: id, answers: {} });
+      const res = await getMigrationDocs(engine, {
+        run_id: id,
+        query: [{ library: 'next', version: '16.0.0', symbol: 'cookies' }],
+      });
+      expect(res.fallback?.reason).toBe('unconfigured');
+    } finally {
+      closeEngine(engine);
+    }
   });
 });
 

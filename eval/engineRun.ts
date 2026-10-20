@@ -7,9 +7,19 @@
 import { mkdtempSync, realpathSync, rmSync } from 'node:fs';
 import os from 'node:os';
 import path from 'node:path';
-import { closeEngine, createEngine, findUsages, scanRepo, type Engine } from '../src/core/index.js';
+import { closeEngine, createEngine, findUsages, scanRepo, type Engine, type EngineOptions } from '../src/core/index.js';
 import type { Usage } from '../src/schema/usage.js';
 import { repoHash } from '../scripts/repo-hash.js';
+
+/**
+ * The docs options every eval engine is built with: Context7 is forced OFF
+ * (`apiKey: null`) so no replay, scan or truth derivation ever touches the
+ * network, whatever `CONTEXT7_API_KEY` holds in the environment (C1, C6, D17,
+ * INV-44). This is the single source of that guard; both scanUsages and replay
+ * use it, and `test/unit/eval/replay.test.ts` proves flipping it reaches the
+ * network.
+ */
+export const REPLAY_DOCS: NonNullable<EngineOptions['docs']> = { apiKey: null };
 
 export interface ScanResult {
   usages: Usage[];
@@ -19,7 +29,7 @@ export interface ScanResult {
 /** Scan a repo path at HEAD's engine and page through all usages. The engine is created with Context7 off. */
 export async function scanUsages(repoPath: string, source: { name: string }, target: { name: string; version: string }): Promise<ScanResult> {
   const out = mkdtempSync(path.join(realpathSync(os.tmpdir()), 'mp-eval-'));
-  const engine = createEngine({ out, docs: { apiKey: null } });
+  const engine = createEngine({ out, docs: REPLAY_DOCS });
   try {
     return await scanUsagesWith(engine, repoPath, source, target);
   } finally {

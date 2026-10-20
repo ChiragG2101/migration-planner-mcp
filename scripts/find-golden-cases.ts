@@ -18,6 +18,15 @@ const top = (): string => execFileSync('git', ['rev-parse', '--show-toplevel'], 
 const sleep = (ms: number): Promise<void> => new Promise((r) => setTimeout(r, ms));
 const SEARCH_PACE_MS = 7000;
 
+/**
+ * The only directory the finder writes to: `eval/.work/candidates/` under the
+ * repo top (gitignored). It is never `eval/cases/`, so the finder can never add
+ * a case automatically (INV-41, D11). Exported so a test can pin this.
+ */
+export function candidatesDir(repoTop: string): string {
+  return path.join(repoTop, 'eval', '.work', 'candidates');
+}
+
 interface SearchHit {
   repo_url: string;
   pr_url: string;
@@ -45,7 +54,7 @@ function parseArgs(argv: string[]): { pack: string; from: string; to: string } {
 async function main(argv: string[]): Promise<number> {
   const { pack, from, to } = parseArgs(argv);
   const library = pack.startsWith('nextjs') ? 'next' : pack.startsWith('django') ? 'django' : pack;
-  const outDir = path.join(top(), 'eval', '.work', 'candidates');
+  const outDir = candidatesDir(top());
   mkdirSync(outDir, { recursive: true });
 
   // The real finder fetches commit metadata and lockfiles per hit; here we vet

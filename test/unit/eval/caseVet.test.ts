@@ -3,6 +3,7 @@
 // GitHub-shaped fixtures with no network.
 import { describe, expect, it } from 'vitest';
 import { isBotAuthor, licenseAllowed, parentageHolds, versionFromLockfile, versionsMatch, vetCandidate, type VetInput } from '../../../eval/caseVet.js';
+import { candidatesDir } from '../../../scripts/find-golden-cases.js';
 
 const good: VetInput = {
   candidate: { repo_url: 'https://github.com/acme/web', base_commit: 'base', merge_commit: 'merge', pr_url: 'https://github.com/acme/web/pull/1', source: '14.2.35', target: '15.5.0', license: 'MIT' },
@@ -68,5 +69,14 @@ describe('vetCandidate', () => {
     const r = vetCandidate({ ...good, testInfo: { hasTestScript: false, hasCiWorkflow: false } });
     expect(r.pass).toBe(false);
     expect(r.checks.find((c) => c.name === 'test or CI at base')!.ok).toBe(false);
+  });
+});
+
+describe('finder writes only under eval/.work/candidates (INV-41)', () => {
+  it('its output dir is eval/.work/candidates and never eval/cases', () => {
+    const dir = candidatesDir('/repo');
+    expect(dir).toBe('/repo/eval/.work/candidates');
+    expect(dir.startsWith('/repo/eval/.work/')).toBe(true);
+    expect(dir.includes('/eval/cases')).toBe(false);
   });
 });
