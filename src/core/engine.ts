@@ -51,6 +51,26 @@ export interface EngineOptions {
   };
   /** Lens packet JSON stays within this many characters. Truncation is reported. */
   packetMaxChars?: number;
+  /**
+   * User-declared check commands, frozen at startup (D44, C9).
+   * Only used at level 1. Empty at level 0.
+   */
+  checks?: import('../schema/verify.js').CheckConfig[];
+  /**
+   * User-declared install commands, frozen at startup (D44, C9).
+   * Only used at level 1. Empty at level 0.
+   */
+  installs?: import('../schema/verify.js').InstallConfig[];
+  /**
+   * Extra parent-env names the user allows the sandbox to inherit (--pass-env).
+   * Never from a tool arg, pack, knowledge or the agent. Only used at level 1.
+   */
+  passEnv?: readonly string[];
+  /**
+   * Sandbox mode. Only the clone sandbox is built in v0.1; container mode was
+   * cut (D42) and 'container' is refused with NotBuiltError (INV-63).
+   */
+  sandbox?: 'clone' | 'container';
 }
 
 export interface Session {
@@ -74,6 +94,11 @@ export interface Engine {
 }
 
 export function createEngine(options: EngineOptions = {}): Engine {
+  // Container sandbox mode was cut for v0.1 (D42, INV-63). Refuse it here so
+  // both the CLI and the MCP server reject it the same way.
+  if (options.sandbox === 'container') {
+    throw new NotBuiltError('container sandbox mode is not built in v0.1 (cut per D42); use the default clone sandbox');
+  }
   initLevel(options.level ?? 0);
   const log = options.log ?? (() => {});
   const bundle = loadBundled(options.rulesDir);

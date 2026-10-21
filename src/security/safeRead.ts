@@ -1,6 +1,6 @@
 // The read API. It takes only a SafePath from resolveInside and refuses
 // deny-listed files, so no caller can read past the boundary or the deny list.
-import { type Dirent, type Stats, lstatSync, readdirSync, readFileSync, statSync } from 'node:fs';
+import { type Dirent, type Stats, existsSync, lstatSync, readdirSync, readFileSync, statSync } from 'node:fs';
 import path from 'node:path';
 import { PermissionError } from './errors.js';
 import { isDenied } from './denyList.js';
@@ -34,4 +34,37 @@ export function lstatRequested(sp: SafePath): Stats {
 export function listDir(sp: SafePath): Dirent[] {
   check(sp);
   return readdirSync(sp.abs, { withFileTypes: true });
+}
+
+// ---------------------------------------------------------------------------
+// Sandbox-specific helpers (M8). These are for reading inside the sandbox
+// (under --out), not the source repo. They still take a SafePath so the
+// boundary check is enforced, but they skip the deny list (sandbox files are
+// not user secrets).
+// ---------------------------------------------------------------------------
+
+export function readTextSandbox(sp: SafePath): string {
+  if (!isSafePath(sp)) throw new PermissionError('forged_path', 'reads take only a SafePath from resolveInside');
+  return readFileSync(sp.abs, 'utf8');
+}
+
+export function readBytesSandbox(sp: SafePath): Buffer {
+  if (!isSafePath(sp)) throw new PermissionError('forged_path', 'reads take only a SafePath from resolveInside');
+  return readFileSync(sp.abs);
+}
+
+export function existsSandbox(abs: string): boolean {
+  return existsSync(abs);
+}
+
+export function statSandbox(abs: string): Stats {
+  return statSync(abs);
+}
+
+export function readdirSandbox(abs: string): string[] {
+  return readdirSync(abs);
+}
+
+export function readdirSandboxWithTypes(abs: string): Dirent[] {
+  return readdirSync(abs, { withFileTypes: true });
 }

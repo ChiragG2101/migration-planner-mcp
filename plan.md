@@ -13,8 +13,8 @@ A milestone is done only when every per-milestone gate holds (overview, "Per-mil
 | M4 | Context7 integration, retrieval log, cache | [04](docs/plans/04-context7-docs-cache.md) | done (review approved 2026-10-20, round 2) |
 | M5 | Finding schema, `plan_migration` prompt, four lenses | [05](docs/plans/05-finding-schema-prompt-lenses.md) | done (review approved 2026-10-20) |
 | M6 | `merge_findings`, `validate_plan` gates 1–6, emit | [06](docs/plans/06-merge-findings-validate-plan.md) | done (2026-10-20) |
-| M7 | Eval runner, 5 Next.js golden cases, baseline run, golden-case finder and re-checker | [07](docs/plans/07-eval-runner-golden-baseline.md) | not started |
-| M8 | Sandboxed verify loop (L1), codemod registry, gate 7 (test integrity) | [08](docs/plans/08-sandboxed-verify-loop.md) | not started |
+| M7 | Eval runner, 5 Next.js golden cases, baseline run, golden-case finder and re-checker | [07](docs/plans/07-eval-runner-golden-baseline.md) | done (2026-10-21, 7 Next.js golden cases, Cursor/databricks-claude-sonnet-4-6, engine 62.8% vs baseline 40.7% worst-case pooled recall) |
+| M8 | Sandboxed verify loop (L1), codemod registry, gate 7 (test integrity) | [08](docs/plans/08-sandboxed-verify-loop.md) | done (2026-10-21, container mode cut per D42) |
 | M9 | Confidence routing, `record_feedback`, run report | [09](docs/plans/09-confidence-feedback-report.md) | not started |
 | M10 | Django pack (no core changes), README, open-source files, demo, name decided | [10](docs/plans/10-django-pack-readme-oss-demo.md) | not started |
 | M11 | Publish to npm, tag v0.1 | [overview §M11](docs/plans/00-overview.md) | not started |

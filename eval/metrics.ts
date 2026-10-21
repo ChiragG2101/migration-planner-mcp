@@ -140,6 +140,56 @@ export function bestRun(runs: readonly CaseRunRecall[]): CaseRunRecall {
   return runs.reduce((hi, r) => (caseRatio(r) > caseRatio(hi) ? r : hi));
 }
 
+// -- L1 verify outcome metrics (M8 task 11, PRD §10) -------------------------
+
+/** One stage's recorded attempts in an L1 run, reduced to what the metrics read. */
+export interface L1StageOutcome {
+  stage_id: string;
+  /** The stage's final decision, or null if never attempted. */
+  decision: 'kept' | 'rejected' | 'unresolved' | 'skipped' | null;
+  /** Number of attempts recorded for the stage (0 if never attempted). */
+  attempts: number;
+  /** Gate 7 violations recorded across the stage's attempts. */
+  gate7_incidents: number;
+  /** Checks marked flaky across the stage's attempts. */
+  flaky_checks: number;
+}
+
+export interface OutcomeMetrics {
+  /** Stages kept on the first attempt, over stages that were attempted. */
+  first_pass_verify: Tally;
+  /** Mean attempts per attempted stage (0 when none attempted). */
+  mean_attempts: number;
+  /** Stages that ended unresolved, over stages that were attempted. */
+  unresolved_share: Tally;
+  /** Total gate 7 incidents across the run. */
+  gate7_incidents: number;
+  /** Total checks marked flaky across the run. */
+  flaky_checks: number;
+  /** Verify wall time in ms, taken from the recorded run (never measured here). */
+  verify_wall_ms: number;
+}
+
+/**
+ * Compute the L1 outcome metrics for one recorded run. Pure: `verifyWallMs`
+ * comes from the recorded run, never measured here (same rule as cost/time
+ * elsewhere in this file).
+ */
+export function outcomeMetrics(stages: readonly L1StageOutcome[], verifyWallMs: number): OutcomeMetrics {
+  const attempted = stages.filter((s) => s.attempts > 0);
+  const firstPass = attempted.filter((s) => s.decision === 'kept' && s.attempts === 1).length;
+  const unresolved = attempted.filter((s) => s.decision === 'unresolved').length;
+  const totalAttempts = attempted.reduce((n, s) => n + s.attempts, 0);
+  return {
+    first_pass_verify: { found: firstPass, total: attempted.length },
+    mean_attempts: attempted.length === 0 ? 0 : totalAttempts / attempted.length,
+    unresolved_share: { found: unresolved, total: attempted.length },
+    gate7_incidents: stages.reduce((n, s) => n + s.gate7_incidents, 0),
+    flaky_checks: stages.reduce((n, s) => n + s.flaky_checks, 0),
+    verify_wall_ms: verifyWallMs,
+  };
+}
+
 /**
  * A pack+side band: the engine's worst-case pooled recall and the baseline's
  * best-case pooled recall both come from here, with `pick` set to worstRun or

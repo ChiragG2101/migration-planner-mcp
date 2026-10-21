@@ -1,6 +1,6 @@
 // C3: the only module that writes files. Writes land under `--out`, never
 // inside a registered repo root, and each write declares the level it needs.
-import { lstatSync, mkdirSync, writeFileSync } from 'node:fs';
+import { lstatSync, mkdirSync, mkdtempSync, rmSync, writeFileSync } from 'node:fs';
 import path from 'node:path';
 import { PermissionError } from './errors.js';
 import { assertLevel, type Level } from './level.js';
@@ -68,6 +68,48 @@ function target(root: string, rel: string): SafePath {
     }
   }
   return sp;
+}
+
+// ---------------------------------------------------------------------------
+// Sandbox-specific helpers (M8). These write inside the sandbox subtree under
+// --out. They bypass the level check (the sandbox is already inside --out,
+// and the level check is in exec.ts). They still refuse writes inside a repo.
+// ---------------------------------------------------------------------------
+
+/** Write a file inside the sandbox (under --out). Refuses if the path resolves inside a repo. */
+export function writeFileSandbox(abs: string, data: string | Uint8Array): void {
+  for (const repo of repoRoots) {
+    if (isWithin(repo, realpathAllowMissing(abs))) {
+      throw new PermissionError('write_inside_repo', `write inside the repo refused: ${abs}`, { path: abs, repo });
+    }
+  }
+  mkdirSync(path.dirname(abs), { recursive: true });
+  writeFileSync(abs, data);
+}
+
+/** Create a directory inside the sandbox. Refuses if the path resolves inside a repo. */
+export function mkdirSandbox(abs: string): void {
+  for (const repo of repoRoots) {
+    if (isWithin(repo, realpathAllowMissing(abs))) {
+      throw new PermissionError('write_inside_repo', `mkdir inside the repo refused: ${abs}`, { path: abs, repo });
+    }
+  }
+  mkdirSync(abs, { recursive: true });
+}
+
+/** Create a temp directory (mkdtemp) for use by exec.ts's env scrubbing. Never inside a repo. */
+export function mkdtempSandbox(prefix: string): string {
+  return mkdtempSync(prefix);
+}
+
+/** Remove a directory inside the sandbox. Refuses if the path resolves inside a repo. */
+export function rmSandbox(abs: string): void {
+  for (const repo of repoRoots) {
+    if (isWithin(repo, realpathAllowMissing(abs))) {
+      throw new PermissionError('write_inside_repo', `rm inside the repo refused: ${abs}`, { path: abs, repo });
+    }
+  }
+  rmSync(abs, { recursive: true, force: true });
 }
 
 /** Creates the output folder (refused inside a registered repo) and returns its writer. */

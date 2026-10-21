@@ -10,6 +10,11 @@ export type PermissionCode =
   | 'out_inside_repo'
   | 'level'
   | 'exec_unavailable'
+  | 'exec_outside_sandbox'
+  | 'unlisted_argv'
+  | 'sandbox_inside_repo'
+  | 'dirty_tree'
+  | 'patch_escape'
   | 'network';
 
 export class PermissionError extends Error {

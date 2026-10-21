@@ -1,0 +1,10 @@
+{
+  "name": "l1-node-fixture",
+  "version": "0.0.0",
+  "private": true,
+  "type": "module",
+  "scripts": {
+    "test": "node --test",
+    "typecheck": "echo typecheck-ok"
+  }
+}

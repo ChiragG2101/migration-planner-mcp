@@ -16,6 +16,9 @@ import { submitFindingsTool } from './submitFindings.js';
 import { mergeFindingsTool } from './mergeFindings.js';
 import { validatePlanTool } from './validatePlan.js';
 import { emitPlanTool } from './emitPlan.js';
+import { verifyStageToolDef } from './verifyStage.js';
+import { submitStagePatchToolDef } from './submitStagePatch.js';
+import { getVerifyReportToolDef } from './getVerifyReport.js';
 
 export interface ToolDef {
   name: string;
@@ -39,6 +42,9 @@ export const tools: readonly ToolDef[] = [
   mergeFindingsTool,
   validatePlanTool,
   emitPlanTool,
+  verifyStageToolDef,
+  submitStagePatchToolDef,
+  getVerifyReportToolDef,
 ];
 
 export function registerTools(server: McpServer, engine: Engine): void {

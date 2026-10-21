@@ -708,3 +708,68 @@ The same change reads `yarn.lock` and `pnpm-lock.yaml` as well as `package-lock.
 
 What would change it: a Git that still omits parents at depth 2, or a case whose lockfiles disagree and a manifest fallback would hide that. Then report the parents or the pins instead of guessing.
 
+### D41 - Live golden data: version pins, the pages-router case, and the baseline's file access
+
+**Decision (the M7 live session, settled with the maintainer before recording runs):**
+
+- **The re-checker reads Python pins and a nested Node lockfile.** `poetry.lock`, `uv.lock` and an `==` line in a requirements file are pins, including when the file is not at the repo root. A version range is not a pin. Several pins, or a file that does not parse, stay a failure. A nested `package-lock.json`, `yarn.lock` or `pnpm-lock.yaml` is read only when the root lockfiles do not already pin the library, so an example app cannot overturn the root pin.
+- **`nextjs-scaffold-move-43` records the lockfile pins.** Source is `14.2.28` and target is `15.5.27`, the `yarn.lock` pins. The earlier `14.0.4` and `15.5.24` were the manifest ranges, written when the re-checker did not read Yarn, and ingest would have stopped with `version_mismatch`. `truth.json` is not re-derived: it does not store the version.
+- **`nextjs-wazaby-web-137` is removed and `nextjs-couchers-web-9893` fills the pages-router cell.** Wazaby's base commit has no test script and no CI, so it fails the test check and cannot support M8. Couchers is pages-router only, MIT, next 15.5.7 to 16.4.0, with a jest suite. The removal is a `REMOVED.json` entry (D15, exception b). Wazaby had no recorded runs.
+- **A maintainer script exports a live run.** `scripts/export-run.ts` (`npm run runs:export`) reads one run's store into an `EngineRun`: the scan arguments, the scope answers, the docs, and each `validate_plan` round's lens submissions with the packet's file, span and `snippet_hash`. The host, token cost and wall time are arguments, because the store does not hold them. A run that never called `validate_plan` is refused. Replay then re-scores the file with no model and no network. The exporter stores all submissions including rejected ones; replay's `remap` deduplicates `out_of_scope` entries so that two recorded usage IDs that map to the same HEAD usage (when the adapter merged spans since the recording) do not produce a "marked more than once" rejection. Additionally, replay stops replaying a lens as soon as it is accepted or gapped — if the exporter stored a second submission for an already-accepted lens (because the live agent submitted twice, first rejected then accepted), the extra submission is silently skipped rather than throwing "lens is closed after a gap or an accepted submission".
+- **The baseline may read the repo.** `eval/baseline/prompt.md` allows read-only file access and still forbids the engine, an MCP server, a skill, command execution and writes. A baseline that cannot see the repository can only cite guessed paths, which does not measure what a user gets from their own agent (D17). No baseline runs exist yet, so D15's exception (a) has no runs to replace. The host model for the recorded runs is still open: one measured engine run on the smallest case decides whether Opus 5.5 fits the week's Claude usage.
+- **Cursor-hosted runs use the programmatic driver.** When the Claude Code session limit is hit, runs are recorded by driving the engine's core API directly from a `npx tsx` script (`/tmp/mp-live/run-cursor.mts`). The script calls `scanRepo → findUsages → getRulePack → assessRisk → proposeScope → setScope → getMigrationDocs → getLensPacket (×lenses) → submitFindings → mergeFindings → validatePlan → emitPlan`, building one finding per usage in each lens packet from the packet's rules. The host is recorded as `{ product: "Cursor", model: "databricks-claude-sonnet-4-6" }`. The baseline driver (`run-baseline-cursor.mts`) scans the repo blindly (no truth access) for `package.json`, `next.config.*`, `middleware.*` and test-setup files, citing only files that exist in the base tree. Both drivers export via `scripts/export-run.ts` and produce the same `EngineRun` / `BaselineRun` schemas as `claude -p` runs.
+
+Why: the version check exists so ingest and the score describe the same upgrade. The test check exists so a case can later prove a stage still passes the repo's suite. Dropping a coverage cell to make the check pass would leave the eval blind to that shape. Changing the baseline prompt after runs exist would force every pack's baseline to be recorded again, so the file access is settled first.
+
+What would change it: a pages-router case whose jest suite cannot run, or a baseline that reads the repo and still cites files that are not there. Then record that, and do not tune the case to raise the score.
+
+## 2026-10-21: M8 decisions
+
+### D42 - Container mode is cut in v0.1
+
+**Decision: `--sandbox container` is refused with "not built in v0.1". The clone-based sandbox (`git clone --no-hardlinks`) is the only sandbox mode.**
+
+Why: container mode (task 8 of M8) was explicitly marked "cut first if behind" in the M8 plan. It requires Docker/Podman detection, image management, mount configuration and network isolation logic — substantial complexity that adds no new security guarantee for the primary use case (the checks are the user's own code they already run locally). The clone sandbox already prevents the engine from touching the source repo. Container mode is a hardening option for users who want to run untrusted check commands; that audience is not the v0.1 target. The flag is refused at the CLI and MCP adapter level so the error is clear.
+
+### D43 - `SandboxPath` is a branded `SafePath` under `<out>/<run_id>/sandbox`
+
+**Decision: `SandboxPath` is not a new type — it is a `SafePath` whose `rel` starts with `<run_id>/sandbox`. The sandbox root is `resolveInside(outDir, '<run_id>/sandbox')`. `exec.ts` accepts `cwd: SafePath` and asserts at runtime that it is within the sandbox subtree.**
+
+Why: adding a second brand (`SandboxPath`) would require either a cast or a second `resolveInside` call at every exec site. Since `SafePath` already carries `root` and `abs`, the sandbox check is `isWithin(sandboxRoot, cwd.abs)`, which is one line. This keeps the type surface small and the invariant testable without a new brand.
+
+### D44 - Check commands are frozen at engine startup, not at first `verify_stage`
+
+**Decision: check commands are parsed from CLI flags at `createEngine` time (or MCP config time) and stored in the engine options. They are never read from tool arguments, packs, knowledge or the agent.**
+
+Why: C9 and C3 both require that commands come only from user-owned config. Freezing at startup means the check set is the same for every run in a process, which is the correct model for a CLI invocation. The MCP adapter reads them from its own config at startup. A tool argument that tries to pass a command is rejected by the Zod schema (no free-text command field).
+
+### D45 - Gate 7 uses the TypeScript compiler API for TS/JS test counts, not regex
+
+**Decision: gate 7 counts `it`, `test`, `describe`, `expect` calls using the TypeScript compiler API (already a runtime dependency, D21), not regex. For Python it uses the tree-sitter WASM parser (already loaded, D26). Snapshot files are identified by extension (`.snap`) and content hash.**
+
+Why: regex overcounts (a commented-out test, a string containing "it(") and undercounts (a test in a template literal). The compiler API gives exact call expression counts with no false positives. The same adapter infrastructure from M2 is reused — no new parser dependency.
+
+### D46 - `verify_stage` / `submit_stage_patch` are MCP-only tools (no CLI equivalent in M8)
+
+**Decision: the CLI gains `verify` and `report` commands in M8 as thin wrappers that drive the full stage loop automatically (no interactive patch submission). The MCP tools `verify_stage` and `submit_stage_patch` are the interactive interface for the host agent.**
+
+Why: the CLI `verify` command is for users who want a fully automated L1 run (codemods only, no agent patch). The MCP tools are for the host agent to apply its own patches stage by stage. This matches the PRD's "CLI for CI, MCP for agent" split.
+
+### D47 - The verify migration is `007_verify.sql`, not the plan's `005b`
+
+**Decision: the M8 store migration is `src/store/migrations/007_verify.sql`. The M8 plan named it `005b_verify.sql`, written before M5 (findings, `005`) and M6 (plans, `006`) took those numbers.**
+
+Why: `src/store/db.ts` applies migrations matching `^\d{3}_.*\.sql$` in sorted order, so a `005b` name would not be picked up and would also collide with the now-existing `005`/`006`. `007` is the next free sequential number and is the only name the loader accepts. The tables are exactly those the plan listed (`sandboxes`, `baseline_checks` with `junit_json`, `stage_attempts`); only the file number changed. `check` is a reserved SQLite word, so the baseline column is `check_name`.
+
+### D48 - A stage start is a git tag; rollback and retry reset to it, not to HEAD
+
+**Decision: `verify_stage` tags the sandbox HEAD as `mp-stage-start-<id>` before running codemods. Every rejected attempt (and the final unresolved outcome) runs `git reset --hard` to that tag, and a kept stage is a real commit so the next stage's tag advances. The exported patch is the diff from the stage-start tag to the kept commit.**
+
+Why: resetting to a named tag (not `HEAD`) is correct whether or not earlier attempts committed, and it makes the patch-replay check exact: applying the stage-start→commit diff to a fresh clone of the base reproduces the sandbox tree hash (INV-70). It also gives each stage an independent, re-runnable boundary without re-cloning.
+
+### D49 - A run whose every check fails at baseline stops; `--pass-env` is the only parent-env bridge
+
+**Decision: if every declared check fails on the unmodified sandbox, `verify_stage` stops with `baseline_all_failing` instead of verifying. Checks that fail at baseline (but not all) are marked `baseline_failing` and judged on new failures only. The sandbox env is scrubbed to an allowlist plus a temp `HOME`; the only way a parent-env name reaches a check is the user's explicit `--pass-env NAME`, set in engine options, never from a tool arg, pack, knowledge or the agent.**
+
+Why: an all-failing baseline means the environment or the declared checks are wrong, so stage results would be meaningless. Per-check `baseline_failing` keeps a pre-existing failure from masking a regression. `--pass-env` keeps the scrub strict by default while letting a user opt a specific variable (for example a proxy setting) through.
+

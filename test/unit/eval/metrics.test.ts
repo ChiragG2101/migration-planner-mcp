@@ -4,12 +4,14 @@ import { describe, expect, it } from 'vitest';
 import {
   bandFigure,
   bestRun,
+  outcomeMetrics,
   pooledRecall,
   ratio,
   score,
   seededPrecision,
   worstRun,
   type CaseRunRecall,
+  type L1StageOutcome,
   type ScoredFinding,
 } from '../../../eval/metrics.js';
 import type { UsageSpan } from '../../../eval/schema.js';
@@ -156,5 +158,33 @@ describe('pooled recall and the band (D17)', () => {
     // worst of a = 1/4, worst of b = 1/2 -> pooled 2/6
     expect(fig.pooled).toEqual({ found: 2, total: 6 });
     expect(fig.perCase.map((c) => c.case_id)).toEqual(['a', 'b']);
+  });
+});
+
+describe('outcomeMetrics (M8 L1)', () => {
+  const stages: L1StageOutcome[] = [
+    { stage_id: 's1', decision: 'kept', attempts: 1, gate7_incidents: 0, flaky_checks: 1 },
+    { stage_id: 's2', decision: 'kept', attempts: 2, gate7_incidents: 1, flaky_checks: 0 },
+    { stage_id: 's3', decision: 'unresolved', attempts: 3, gate7_incidents: 2, flaky_checks: 0 },
+    { stage_id: 's4', decision: null, attempts: 0, gate7_incidents: 0, flaky_checks: 0 }, // never attempted
+  ];
+
+  it('computes first-pass, mean attempts, unresolved share, incidents and wall time', () => {
+    const m = outcomeMetrics(stages, 4200);
+    // attempted = s1,s2,s3 (3). first-pass kept = s1 only.
+    expect(m.first_pass_verify).toEqual({ found: 1, total: 3 });
+    // mean attempts over attempted = (1+2+3)/3 = 2
+    expect(m.mean_attempts).toBe(2);
+    expect(m.unresolved_share).toEqual({ found: 1, total: 3 });
+    expect(m.gate7_incidents).toBe(3);
+    expect(m.flaky_checks).toBe(1);
+    expect(m.verify_wall_ms).toBe(4200);
+  });
+
+  it('is well-defined with no attempted stages', () => {
+    const m = outcomeMetrics([{ stage_id: 'x', decision: null, attempts: 0, gate7_incidents: 0, flaky_checks: 0 }], 0);
+    expect(m.first_pass_verify).toEqual({ found: 0, total: 0 });
+    expect(m.mean_attempts).toBe(0);
+    expect(ratio(m.first_pass_verify)).toBe(1); // 0/0 -> 1 by convention
   });
 });

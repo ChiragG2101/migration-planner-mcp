@@ -22,8 +22,11 @@ import {
   scanRepo,
   setScope,
   validatePlan,
+  verifyStage,
+  getVerifyReport,
   type EngineOptions,
 } from '../core/index.js';
+import { parseChecksConfig } from '../verify/checks.js';
 import { formatMergeText, formatValidateText, formatEmitText } from './plan.js';
 import { SetScopeInput } from '../schema/scope.js';
 import { readOperatorFile } from '../security/operatorFile.js';
@@ -48,6 +51,9 @@ Usage:
   migration-planner-mcp merge <repo> --source <lib@ver> --target <lib@ver> [--answers <file.json>] [--format json|text]
   migration-planner-mcp validate <repo> --source <lib@ver> --target <lib@ver> [--answers <file.json>] [--format json|text]
   migration-planner-mcp emit <repo> --source <lib@ver> --target <lib@ver> [--answers <file.json>] [--format json|text]
+  migration-planner-mcp verify <repo> --source <lib@ver> --target <lib@ver> [--answers <file.json>] [--install "<cmd>"] [--check name="<cmd>"]
+                         [--junit name=<path>] [--pass-env NAME] [--format json|text]
+  migration-planner-mcp report <repo> --source <lib@ver> --target <lib@ver> [--format json|text]
   migration-planner-mcp mcp
 
 Shared flags:
@@ -92,6 +98,12 @@ async function main(argv: string[]): Promise<number> {
       'small-max': { type: 'string' },
       register: { type: 'string' },
       query: { type: 'string' },
+      install: { type: 'string', multiple: true },
+      check: { type: 'string', multiple: true },
+      junit: { type: 'string', multiple: true },
+      'pass-env': { type: 'string', multiple: true },
+      sandbox: { type: 'string' },
+      'sandbox-image': { type: 'string' },
       help: { type: 'boolean', short: 'h' },
     },
   });
@@ -100,10 +112,27 @@ async function main(argv: string[]): Promise<number> {
     process.stderr.write(usage);
     return values.help ? 0 : 1;
   }
-  const options: EngineOptions = { level: parseLevel(values.level), log: err };
+  // Container sandbox mode was cut for v0.1 (D42, INV-63). Only 'clone' and
+  // 'container' are recognised values; 'container' is refused by the engine.
+  if (values.sandbox !== undefined && values.sandbox !== 'clone' && values.sandbox !== 'container') {
+    throw new NotBuiltError(`--sandbox ${values.sandbox} is unknown (only 'clone' is built in v0.1); container mode was cut (D42)`);
+  }
+  const checksConfig = parseChecksConfig(
+    (values.install as string[] | undefined) ?? [],
+    (values.check as string[] | undefined) ?? [],
+    (values.junit as string[] | undefined) ?? [],
+  );
+  const options: EngineOptions = {
+    level: parseLevel(values.level),
+    log: err,
+    checks: checksConfig.checks as import('../schema/verify.js').CheckConfig[],
+    installs: checksConfig.install as import('../schema/verify.js').InstallConfig[],
+  };
   if (values.out) options.out = values.out;
   if (values.db) options.db = values.db;
   if (values['rules-dir']) options.rulesDir = values['rules-dir'];
+  if (values['pass-env']) options.passEnv = values['pass-env'] as string[];
+  if (values.sandbox === 'container') options.sandbox = 'container';
 
   switch (command) {
     case 'scan': {
@@ -248,6 +277,69 @@ async function main(argv: string[]): Promise<number> {
         }
         const emitted = await emitPlan(engine, { run_id });
         process.stdout.write(values.format === 'text' ? `${formatEmitText(emitted)}\n` : `${JSON.stringify(emitted, null, 2)}\n`);
+        return 0;
+      } finally {
+        closeEngine(engine);
+      }
+    }
+    case 'verify': {
+      if (values.format !== 'json' && values.format !== 'text') throw new InputError('bad_format', '--format must be json or text');
+      if (rest.length === 0) throw new InputError('missing_repo', 'verify needs a repo path');
+      const engine = createEngine(options);
+      try {
+        const scan = await scanRepo(engine, scanInput(rest, values));
+        if (scan.status !== 'ok' || !scan.run) {
+          process.stdout.write(`${JSON.stringify(scan, null, 2)}\n`);
+          return 3;
+        }
+        const run_id = scan.run.run_id;
+        await findUsages(engine, { run_id });
+        await getRulePack(engine, { run_id });
+        await proposeScope(engine, { run_id });
+        if (values.answers) {
+          let parsedAnswers: unknown;
+          try { parsedAnswers = JSON.parse(readOperatorFile(values.answers)); }
+          catch (e) { throw new InputError('bad_answers', `could not read --answers: ${e instanceof Error ? e.message : String(e)}`); }
+          const answers = SetScopeInput.shape.answers.safeParse(parsedAnswers);
+          if (!answers.success) throw new InputError('bad_answers', 'the answers file must be the answers object');
+          await setScope(engine, { run_id, answers: answers.data });
+        } else {
+          await setScope(engine, { run_id, answers: {} });
+        }
+        await mergeFindings(engine, { run_id });
+        await validatePlan(engine, { run_id });
+        await emitPlan(engine, { run_id });
+        // Run verify for each stage automatically (CLI mode: codemods only, no agent patch).
+        const storedPlan = (await import('../store/plans.js')).getPlan(
+          engine.sessions.values().next().value!.db, run_id,
+        );
+        const plan = (storedPlan?.plan ?? { stages: [] }) as { stages: Array<{ id: string }> };
+        const results: unknown[] = [];
+        for (const stage of plan.stages) {
+          const out = await verifyStage(engine, { run_id, stage_id: stage.id });
+          results.push(out);
+        }
+        const report = await getVerifyReport(engine, { run_id });
+        process.stdout.write(values.format === 'text'
+          ? `verify complete: ${results.length} stages\n${JSON.stringify(report, null, 2)}\n`
+          : `${JSON.stringify(report, null, 2)}\n`);
+        return 0;
+      } finally {
+        closeEngine(engine);
+      }
+    }
+    case 'report': {
+      if (values.format !== 'json' && values.format !== 'text') throw new InputError('bad_format', '--format must be json or text');
+      if (rest.length === 0) throw new InputError('missing_repo', 'report needs a repo path');
+      const engine = createEngine(options);
+      try {
+        const scan = await scanRepo(engine, scanInput(rest, values));
+        if (scan.status !== 'ok' || !scan.run) {
+          process.stdout.write(`${JSON.stringify(scan, null, 2)}\n`);
+          return 3;
+        }
+        const out = await getVerifyReport(engine, { run_id: scan.run.run_id });
+        process.stdout.write(`${JSON.stringify(out, null, 2)}\n`);
         return 0;
       } finally {
         closeEngine(engine);

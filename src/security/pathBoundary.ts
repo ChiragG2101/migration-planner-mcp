@@ -85,6 +85,11 @@ export function resolveInside(root: string, p: string, repoId: string | null = n
   return safe as unknown as SafePath;
 }
 
+/** Realpath of an absolute path. Convenience wrapper so callers outside src/security/ don't import node:fs. */
+export function realpathAbs(p: string): string {
+  return realpathSync.native(p);
+}
+
 /** Realpath of a repo folder given at ingest; the root every later read is resolved against. */
 export function resolveRepoRoot(repoPath: string): string {
   let root: string;

@@ -1,5 +1,5 @@
-// INV-2, INV-3 (C3, C5): only src/security/exec.ts may spawn a process, and in
-// M1 it refuses at every level.
+// INV-2, INV-3 (C3, C5): only src/security/exec.ts may spawn a process.
+// M8 implements the real runner; the legacy `exec` stub still throws.
 import { describe, expect, it, vi } from 'vitest';
 import { PermissionError } from '../../src/security/errors.js';
 import { allImports, lintAs } from '../static.js';
@@ -28,13 +28,13 @@ describe('single spawn point', () => {
   });
 });
 
-describe('exec in M1', () => {
-  it.each([0, 1] as const)('throws "execution not available" at level %i', async (level) => {
+describe('legacy exec stub', () => {
+  it('throws exec_unavailable (legacy stub)', async () => {
     vi.resetModules();
     const { initLevel } = await import('../../src/security/level.js');
     const { exec } = await import('../../src/security/exec.js');
     const errors = await import('../../src/security/errors.js');
-    initLevel(level);
+    initLevel(0);
     let caught: unknown;
     try {
       exec({ argv: ['echo', 'hi'], cwd: '/tmp' });
@@ -43,6 +43,5 @@ describe('exec in M1', () => {
     }
     expect(caught).toBeInstanceOf(errors.PermissionError);
     expect((caught as PermissionError).code).toBe('exec_unavailable');
-    expect((caught as PermissionError).message).toBe('execution not available');
   });
 });
