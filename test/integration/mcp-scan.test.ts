@@ -48,7 +48,7 @@ describe('scan_repo over MCP', () => {
       .prepare('SELECT e.kind, r.campaign_id, r.repo_id FROM events e JOIN runs r ON r.id = e.run_id WHERE r.id = ? ORDER BY e.id')
       .all(result.run!.run_id) as { kind: string; campaign_id: string; repo_id: string }[];
     db.close();
-    expect(rows.map((r) => r.kind)).toEqual(['tool.start', 'ingest.run', 'scan.result', 'tool.end']);
+    expect(rows.map((r) => r.kind)).toEqual(['tool.start', 'ingest.run', 'scan.result', 'repo.hash', 'tool.end']);
     for (const r of rows) expect(r).toMatchObject({ campaign_id: result.run!.campaign_id, repo_id: result.run!.repo_id });
   });
 

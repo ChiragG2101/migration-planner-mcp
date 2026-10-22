@@ -137,6 +137,20 @@ export const EmitPlanOutput = z
     plan_json: z.string(),
     plan_md: z.string(),
     unresolved: z.number().int(),
+    /** run_report.md beside the plan (M9). */
+    run_report: z.string(),
+    /** One CHECKLIST.md per stage, under stages/<n>/. */
+    checklists: z.array(z.string()),
+    /** verify_report.json, written only when the L1 verify loop ran for this run. */
+    verify_report: z.string().nullable(),
+    routing: z
+      .object({
+        threshold: z.number(),
+        threshold_source: z.enum(['default', 'flag']),
+        review_first: z.number().int(),
+        needs_human: z.number().int(),
+      })
+      .strict(),
   })
   .strict();
 export type EmitPlanOutput = z.infer<typeof EmitPlanOutput>;

@@ -78,6 +78,7 @@
      It writes candidate `case.json` files with `status: candidate` and a vetting report to `eval/.work/candidates/` (gitignored). Each candidate is marked with the coverage-matrix cell (task 2) it would fill. A human vets candidates with the `add-golden-case` skill and moves the accepted ones into `eval/cases/`. Nothing is added automatically.
    - **Re-checker (`scripts/verify-case.ts`, `npm run cases:verify -- <id>|--all`).** Re-checks committed cases against GitHub: the commits are still fetchable, the parentage holds, the versions at base and merge match the record, the licence is unchanged and on the open-licence allowlist, and the declared test command exists at base. It prints one line per check and exits non-zero on any mismatch. Run it before a live eval and whenever a case looks wrong.
 9. **Threshold tuning input.** Export the per-finding confidence vs. correctness pairs to `eval/calibration.csv`. M9 uses them to tune the 0.6 threshold.
+   - **Gap found in M9 (2026-10-22):** the runner never writes this file; it holds only its header. The recorded runs' confidences are driver constants anyway (D41), so the export is still to build, for live runs with agent-set confidences. Until then the threshold stays at 0.6 (`eval/threshold.md`, D51).
 
 ## Files and modules
 

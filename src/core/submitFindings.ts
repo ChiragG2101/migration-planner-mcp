@@ -74,6 +74,7 @@ export async function submitFindings(engine: Engine, raw: unknown): Promise<Subm
   const { lens } = parsed.data;
   return runTool(engine, opened.session, 'submit_findings', parsed.data, (call) => {
     call.attachRun(opened.run.id);
+    if (parsed.data.tokens) call.cost(parsed.data.tokens.in, parsed.data.tokens.out);
     const db = opened.session.db;
     const state = lensState(db, opened.run.id, lens);
     if (state.gap || state.accepted) throw new InputError('lens_closed', 'this lens is closed after a gap or an accepted submission');

@@ -128,12 +128,22 @@ export function parseFinding(raw: unknown, ctx: FindingContext): { ok: true; fin
   return errors.length ? { ok: false, errors } : { ok: true, finding };
 }
 
+/** Tokens the host spent on a step, when it reports them. Counted toward --budget-tokens and shown per step in the run report (M9). */
+export const ReportedTokens = z
+  .object({
+    in: z.number().int().nonnegative(),
+    out: z.number().int().nonnegative(),
+  })
+  .strict();
+export type ReportedTokens = z.infer<typeof ReportedTokens>;
+
 export const SubmitFindingsInput = z
   .object({
     run_id: z.string().min(1),
     lens: FindingLens,
     findings: z.array(z.unknown()),
     out_of_scope: z.array(z.object({ usage_id: z.string(), reason: z.string() }).strict()),
+    tokens: ReportedTokens.optional().describe('Tokens this lens turn used, if the host reports them. Counted toward the run budget.'),
   })
   .strict();
 export type SubmitFindingsInput = z.infer<typeof SubmitFindingsInput>;

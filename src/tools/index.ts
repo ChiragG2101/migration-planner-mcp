@@ -19,6 +19,7 @@ import { emitPlanTool } from './emitPlan.js';
 import { verifyStageToolDef } from './verifyStage.js';
 import { submitStagePatchToolDef } from './submitStagePatch.js';
 import { getVerifyReportToolDef } from './getVerifyReport.js';
+import { recordFeedbackTool } from './recordFeedback.js';
 
 export interface ToolDef {
   name: string;
@@ -45,6 +46,7 @@ export const tools: readonly ToolDef[] = [
   verifyStageToolDef,
   submitStagePatchToolDef,
   getVerifyReportToolDef,
+  recordFeedbackTool,
 ];
 
 export function registerTools(server: McpServer, engine: Engine): void {

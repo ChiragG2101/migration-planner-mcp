@@ -1,7 +1,9 @@
 // get_lens_packet. The first packet freezes scope by writing packet.fetched,
 // which set_scope already refuses on (D12).
 import { z } from 'zod';
+import { newCuts } from '../pipeline/budget.js';
 import { buildLensPacket } from '../pipeline/packets.js';
+import { SEPARATE_LENSES } from '../schema/finding.js';
 import { GetLensPacketOutput } from '../schema/packet.js';
 import { GetLensPacketInput } from '../schema/plan.js';
 import { ScanResult } from '../schema/scan.js';
@@ -30,6 +32,14 @@ export async function getLensPacket(engine: Engine, raw: unknown): Promise<GetLe
     if (size === 'none') throw new InputError('lens_refused', 'a none run has no lenses');
     if (lens === 'combined' && size !== 'small') throw new InputError('lens_refused', 'combined is only for a small run');
     if (lens !== 'combined' && size === 'small') throw new InputError('lens_refused', 'a small run uses the combined lens');
+    // Over budget: every lens not fetched yet is cut (recorded once each) and no new packet is given (M9 task 5).
+    const fetched = new Set(events.filter((e) => e.kind === 'packet.fetched').map((e) => (JSON.parse(e.payload_json) as { lens: string }).lens));
+    const lenses: readonly string[] = size === 'small' ? ['combined'] : SEPARATE_LENSES;
+    const over = newCuts(engine.options.budget, events, engine.now(), lenses.filter((l) => !fetched.has(l)).map((id) => ({ what: 'lens' as const, id })));
+    if (over.reason) {
+      for (const cut of over.cuts) call.event('budget.cut', cut);
+      throw new InputError('budget_cut', `the run is over budget (${over.reason}); lenses not fetched yet are recorded as budget_cut and their usages stay uncovered`);
+    }
     const scanEvent = events.findLast((e) => e.kind === 'scan.result');
     if (!scanEvent) throw new InputError('no_scan', `run ${opened.run.id} has no scan; call scan_repo first`);
     const scan = ScanResult.parse(JSON.parse(scanEvent.payload_json));
