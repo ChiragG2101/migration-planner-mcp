@@ -87,6 +87,7 @@ describe('record_feedback', () => {
 
   it('refuses a file on another kind, an unknown finding or stage, and an empty note', async () => {
     await expect(recordFeedback(engine, { run_id: id, kind: 'wrong', note: 'n', file: 'app/page.tsx' })).rejects.toBeInstanceOf(InputError);
+    await expect(recordFeedback(engine, { run_id: id, kind: 'missing', note: 'n', line: 3 })).rejects.toMatchObject({ code: 'invalid_input', message: expect.stringContaining('line needs a file') });
     await expect(recordFeedback(engine, { run_id: id, kind: 'wrong', note: 'n', finding_id: 'nope' })).rejects.toMatchObject({ code: 'unknown_finding' });
     await expect(recordFeedback(engine, { run_id: id, kind: 'bad_patch', note: 'n', stage_id: 'nope' })).rejects.toMatchObject({ code: 'unknown_stage' });
     await expect(recordFeedback(engine, { run_id: id, kind: 'other', note: '  ' })).rejects.toMatchObject({ code: 'invalid_input' });

@@ -227,4 +227,31 @@ describe('run_report.md from a real run', () => {
     expect(written).toContain('- Target repo untouched: yes (hash unchanged)');
     expect(written).toMatch(/- Usages found: \d+/);
   });
+
+  it('lists the usages each scope answer excluded, as set_scope recorded them', async () => {
+    const out = tmpDir();
+    const repo = path.join(tmpDir(), 'next-tricky');
+    cpSync(path.join(repoRoot, 'eval/seeded/next-tricky'), repo, { recursive: true });
+    const engine = createEngine({ out });
+    try {
+      const scan = await scanRepo(engine, { repo_path: repo, source: { name: 'next' }, target: { name: 'next', version: '16.0.0' } });
+      const id = scan.run!.run_id;
+      await findUsages(engine, { run_id: id });
+      const proposal = await proposeScope(engine, { run_id: id });
+      expect(proposal.questions.map((q) => q.id)).toContain('stop_at');
+      const set = await setScope(engine, { run_id: id, answers: { stop_at: '15' } });
+      expect(set.out_of_scope.length, 'stop_at=15 excludes the Next 16 usages').toBeGreaterThan(0);
+      await mergeFindings(engine, { run_id: id });
+      await validatePlan(engine, { run_id: id });
+      const emitted = await emitPlan(engine, { run_id: id });
+      const report = readFileSync(path.join(out, emitted.run_report), 'utf8');
+      const n = set.out_of_scope.length;
+      expect(report).toContain(`- stop_at: \`15\`\n`);
+      expect(report).toContain(`- scope: stop_at=15 excluded ${n} usage${n === 1 ? '' : 's'}:`);
+      for (const o of set.out_of_scope.slice(0, 20)) expect(report).toContain(`  - \`${o.usage_id}\``);
+      expect(report).not.toContain('The answers excluded no usage.');
+    } finally {
+      closeEngine(engine);
+    }
+  });
 });

@@ -50,7 +50,7 @@ describe('renderChecklist', () => {
     expect(codemods).toBeGreaterThan(0);
     expect(manual).toBeGreaterThan(codemods);
     expect(checks).toBeGreaterThan(manual);
-    expect(md.indexOf('next-codemod:next-async-request-api')).toBeLessThan(manual);
+    expect(md.slice(codemods, manual)).toContain('- [ ] Run `next-codemod:next-async-request-api` (cm) — `app/cm.ts:4`');
     expect(md.slice(checks)).toContain('npm test && npm run build');
   });
 
