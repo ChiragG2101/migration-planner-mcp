@@ -1,20 +1,34 @@
-// The "no core changes" allowlist check for pack PRs (M10 task, D15, INV-27).
-// It compares HEAD's tree against a base ref and fails a pack PR on any change
-// outside the allowlist the plan's "No core changes" definition describes. Runs
-// alongside scripts/check-eval-add-only.ts (the universal add-only rule, INV-45)
-// on every pack PR. Maintainer/CI tooling: it runs git, so it is outside the
-// engine (INV-40) and is never imported by src/.
+// The "no core changes" allowlist check for pack PRs (M10 task, D15, D57,
+// INV-27). It compares HEAD's tree against a base ref and fails a pack PR on any
+// change outside the allowlist the plan's "No core changes" definition
+// describes. Runs alongside scripts/check-eval-add-only.ts (the universal
+// add-only rule, INV-45) on every pack PR. Maintainer/CI tooling: it runs git,
+// so it is outside the engine (INV-40) and is never imported by src/.
 //
-//   npm run check:core-untouched -- [--base <ref>]   (default base: origin/main, else BASE_SHA)
+//   npm run check:core-untouched -- [--base <ref>]   (default base: BASE_SHA, else origin/main)
 //
 // A pack PR is one that changes anything under packs/ or knowledge/ (D15). On a
-// core PR (nothing under those paths) this check does nothing: the allowlist is
-// about what a pack PR may touch, and core changes are reviewed on their own.
+// core PR (nothing under those paths) this check does nothing. All of the
+// decision logic lives in pure functions in scripts/lib/coreUntouched.ts, which
+// test/unit/coreUntouched.test.ts drives directly; this wrapper only reads git.
 import { execFileSync } from 'node:child_process';
 import { realpathSync } from 'node:fs';
 import { fileURLToPath } from 'node:url';
-import { checkCoreUntouched, PINNED_CASE_FIELDS, type CaseMeta, type PathChange, type ChangeKind } from './lib/coreUntouched.js';
-import { caseOf, runSetKey } from '../eval/addOnly.js';
+import {
+  checkCoreUntouched,
+  isPackPR,
+  ownedPacks,
+  caseIdOf,
+  numstatChangedLines,
+  pinnedDiff,
+  nonMutableKeysChanged,
+  REGISTRY_FILE,
+  type CaseMeta,
+  type ChangeKind,
+  type CoreUntouchedInput,
+  type PathChange,
+} from './lib/coreUntouched.js';
+import { runSetKey } from '../eval/addOnly.js';
 import { measure, ratio, type Ratchet } from '../eval/seeded/recall.js';
 
 function git(...args: string[]): string {
@@ -68,42 +82,33 @@ function casesWithRunsAt(ref: string): Set<string> {
   return cases;
 }
 
-type CaseJson = Record<string, unknown> & { pack?: string };
-
-/**
- * The size of the change to one path, as the larger of added and removed lines.
- * A one-line registration edits a single line, which git counts as one added and
- * one removed line, so a single-line edit is 1, and anything bigger (two added, a
- * second edited line) is 2 or more. This is the "exactly one registry line" rule.
- */
-function changedLineCount(base: string, path: string): number {
-  // --numstat prints "<added>\t<removed>\t<path>".
-  const out = git('diff', '--numstat', `${base}...HEAD`, '--', path).trim();
-  if (!out) return 0;
-  const first = out.split('\n')[0]!.split('\t');
-  const added = Number(first[0]);
-  const removed = Number(first[1]);
-  if (Number.isNaN(added) || Number.isNaN(removed)) return Number.POSITIVE_INFINITY; // binary ("-\t-")
-  return Math.max(added, removed);
-}
-
-/** True when any existing line of a file was edited or removed between base and HEAD (only additions allowed). */
-function existingLinesTouched(base: string, path: string): boolean {
-  const out = git('diff', '--numstat', `${base}...HEAD`, '--', path).trim();
-  if (!out) return false;
-  const cols = out.split('\n')[0]!.split('\t');
-  const removed = Number(cols[1]);
-  return !Number.isNaN(removed) && removed > 0;
-}
-
-/** Pinned fields that differ between two case.json objects (JSON-stable comparison). */
-function pinnedDiff(baseCase: CaseJson | null, headCase: CaseJson | null): string[] {
-  if (!baseCase || !headCase) return [];
-  const changed: string[] = [];
-  for (const f of PINNED_CASE_FIELDS) {
-    if (JSON.stringify(baseCase[f]) !== JSON.stringify(headCase[f])) changed.push(f);
+/** True when a case.json exists at a ref. */
+function caseExistsAt(ref: string, id: string): boolean {
+  try {
+    git('cat-file', '-e', `${ref}:eval/cases/${id}/case.json`);
+    return true;
+  } catch {
+    return false;
   }
-  return changed;
+}
+
+/** "<added>\t<removed>" numstat for one path; [added, removed], with Infinity for a binary change. */
+function numstat(base: string, path: string): [number, number] {
+  const out = git('diff', '--numstat', `${base}...HEAD`, '--', path).trim();
+  if (!out) return [0, 0];
+  const cols = out.split('\n')[0]!.split('\t');
+  const added = cols[0] === '-' ? Number.POSITIVE_INFINITY : Number(cols[0]);
+  const removed = cols[1] === '-' ? Number.POSITIVE_INFINITY : Number(cols[1]);
+  return [added, removed];
+}
+
+type CaseJson = Record<string, unknown> & { pack?: string };
+type PackJson = { libraries?: ({ id?: string } | string)[]; seeded?: string | string[] };
+
+/** The library ids a pack.json names (`npm/next` from `{id}` or a bare string). */
+function packLibraries(pack: PackJson | null): string[] {
+  if (!pack?.libraries) return [];
+  return pack.libraries.map((l) => (typeof l === 'string' ? l : l.id)).filter((id): id is string => typeof id === 'string');
 }
 
 async function main(argv: string[]): Promise<number> {
@@ -111,72 +116,71 @@ async function main(argv: string[]): Promise<number> {
   const base = baseIdx >= 0 ? argv[baseIdx + 1]! : process.env.BASE_SHA || 'origin/main';
   const changes = changesSince(base);
 
-  const isPackPR = changes.some((c) => /^(packs|knowledge)\//.test(c.path));
-  if (!isPackPR) {
+  if (!isPackPR(changes)) {
     process.stdout.write(`core-untouched check: not a pack PR, nothing to enforce (base ${base})\n`);
     return 0;
   }
 
-  // The pack(s) this PR owns: every <pack> dir it changes under packs/.
-  const ownPacks = new Set<string>();
-  for (const c of changes) {
-    const m = c.path.match(/^packs\/([^/]+)\//);
-    if (m) ownPacks.add(m[1]!);
+  const ownPacks = ownedPacks(changes);
+
+  // The owned pack's libraries and seeded repos, read from its HEAD pack.json
+  // (only when exactly one pack is owned; the pure check refuses any other count).
+  const ownPackLibraries = new Set<string>();
+  const ownSeededRepos = new Set<string>();
+  if (ownPacks.size === 1) {
+    const pack = jsonAt<PackJson>('HEAD', `packs/${[...ownPacks][0]!}/pack.json`);
+    for (const id of packLibraries(pack)) ownPackLibraries.add(id);
+    const seeded = pack?.seeded;
+    for (const s of Array.isArray(seeded) ? seeded : seeded ? [seeded] : []) ownSeededRepos.add(s);
   }
 
   const runsAtBase = casesWithRunsAt(base);
 
-  // Per touched case: its pack (HEAD's case.json, else base's) and base state.
+  // Per touched case: its pack (HEAD's case.json, else base's) and base/HEAD state.
   const touchedCases = new Set<string>();
   for (const c of changes) {
-    const id = caseOf(c.path);
+    const id = caseIdOf(c.path);
     if (id) touchedCases.add(id);
-    const set = runSetKey(c.path);
-    if (set) touchedCases.add(set.case);
   }
   const caseMeta = new Map<string, CaseMeta>();
   const casesRemoved = new Set<string>();
-  const completions = new Map<string, { pinnedChanged: readonly string[] }>();
+  const completions = new Map<string, { pinnedChanged: readonly string[]; otherChanged: readonly string[] }>();
   for (const id of touchedCases) {
     const headCase = jsonAt<CaseJson>('HEAD', `eval/cases/${id}/case.json`);
     const baseCase = jsonAt<CaseJson>(base, `eval/cases/${id}/case.json`);
-    caseMeta.set(id, {
-      pack: headCase?.pack ?? baseCase?.pack ?? null,
-      hadRuns: runsAtBase.has(id),
-      existedOnBase: baseCase !== null,
-    });
-    if (!headCase && baseCase) casesRemoved.add(id);
-    // A completion: case.json present on base with no runs on base, and it changed on HEAD.
+    const existedOnBase = caseExistsAt(base, id);
+    const existsAtHead = caseExistsAt('HEAD', id);
+    caseMeta.set(id, { pack: headCase?.pack ?? baseCase?.pack ?? null, hadRuns: runsAtBase.has(id), existedOnBase, existsAtHead });
+    if (!existsAtHead && existedOnBase) casesRemoved.add(id);
+    // A completion: case.json on base with no base runs, and it changed on HEAD.
     const caseJsonChanged = changes.some((c) => c.path === `eval/cases/${id}/case.json` && c.kind === 'modified');
     if (baseCase && headCase && !runsAtBase.has(id) && caseJsonChanged) {
-      completions.set(id, { pinnedChanged: pinnedDiff(baseCase, headCase) });
+      completions.set(id, { pinnedChanged: pinnedDiff(baseCase, headCase), otherChanged: nonMutableKeysChanged(baseCase, headCase) });
     }
   }
 
-  // eval/cases/README.md: only added lines are allowed.
+  // eval/cases/README.md: only added lines are allowed (removed lines flag an edit/deletion).
   const readmeChanged = changes.some((c) => c.path === 'eval/cases/README.md');
-  const readmeExistingLineTouched = readmeChanged && existingLinesTouched(base, 'eval/cases/README.md');
+  const readmeExistingLineTouched = readmeChanged && numstat(base, 'eval/cases/README.md')[1] > 0;
 
-  // Registry line count.
-  const usagesIndexChangedLines = changes.some((c) => c.path === 'src/analysis/usages/index.ts')
-    ? changedLineCount(base, 'src/analysis/usages/index.ts')
+  // The registry line count and the set of new adapter files.
+  const registryChangedLines = changes.some((c) => c.path === REGISTRY_FILE)
+    ? numstatChangedLines(...numstat(base, REGISTRY_FILE))
     : 0;
+  const newAdapterFiles = changes
+    .filter((c) => c.kind === 'added' && /^src\/analysis\/usages\/[^/]+\.ts$/.test(c.path) && c.path !== 'src/analysis/usages/index.ts' && c.path !== REGISTRY_FILE)
+    .map((c) => c.path);
 
-  // Ratchet: another pack's entry may not change; a new entry must equal the measured recall.
+  // Ratchet: an entry on the base branch may not change; a new entry must equal the measured recall.
   const ratchetChanged = changes.some((c) => c.path === 'eval/seeded/ratchet.json');
-  let ratchetOtherPackChanged = false;
+  let ratchetExistingEntryChanged = false;
   const ratchetBadNewEntries: string[] = [];
   if (ratchetChanged) {
     const baseRatchet = jsonAt<Ratchet>(base, 'eval/seeded/ratchet.json') ?? {};
     const headRatchet = jsonAt<Ratchet>('HEAD', 'eval/seeded/ratchet.json') ?? {};
-    // A ratchet entry's "pack" is its seeded repo name; a PR owns a repo entry
-    // when it is a new entry this PR adds. Any change to an entry present on the
-    // base branch is a change to an existing (hence another pack's) floor here,
-    // since a pack PR never re-measures another pack's seeded repo.
     for (const repo of Object.keys(baseRatchet)) {
-      if (JSON.stringify(baseRatchet[repo]) !== JSON.stringify(headRatchet[repo])) ratchetOtherPackChanged = true;
+      if (JSON.stringify(baseRatchet[repo]) !== JSON.stringify(headRatchet[repo])) ratchetExistingEntryChanged = true;
     }
-    // New entries: measure their recall and require equality (INV-50 also checks this).
     for (const repo of Object.keys(headRatchet)) {
       if (repo in baseRatchet) continue;
       const floor = headRatchet[repo]?.overall;
@@ -191,19 +195,23 @@ async function main(argv: string[]): Promise<number> {
     }
   }
 
-  const problems = checkCoreUntouched({
+  const input: CoreUntouchedInput = {
     changes,
     ownPacks,
+    ownPackLibraries,
+    ownSeededRepos,
     caseMeta,
     casesRemoved,
     completions,
     readmeExistingLineTouched,
     ratchetBadNewEntries,
-    ratchetOtherPackChanged,
-    usagesIndexChangedLines,
-  });
+    ratchetExistingEntryChanged,
+    registryChangedLines,
+    newAdapterFiles,
+  };
+  const problems = checkCoreUntouched(input);
   for (const p of problems) process.stderr.write(`FAIL ${p}\n`);
-  if (problems.length === 0) process.stdout.write(`core-untouched check passed for pack(s) ${[...ownPacks].join(', ')} (base ${base})\n`);
+  if (problems.length === 0) process.stdout.write(`core-untouched check passed for pack ${[...ownPacks].join(', ')} (base ${base})\n`);
   return problems.length ? 1 : 0;
 }
 
