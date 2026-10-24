@@ -11,13 +11,17 @@ export function parseLibRef(raw: string | undefined): { name?: string; version?:
   return { name: raw };
 }
 
-export function scanInput(repos: string[], flags: { source?: string; target?: string; campaign?: string }): IngestInput {
+export function scanInput(
+  repos: string[],
+  flags: { source?: string; target?: string; campaign?: string; 'confirm-target'?: boolean },
+): IngestInput {
   const input: IngestInput = { repo_path: repos.length === 1 ? repos[0]! : repos };
   const source = parseLibRef(flags.source);
   const target = parseLibRef(flags.target);
   if (source) input.source = source;
   if (target) input.target = target;
   if (flags.campaign) input.campaign_id = flags.campaign;
+  if (flags['confirm-target'] === true) input.confirm_target = true;
   return input;
 }
 

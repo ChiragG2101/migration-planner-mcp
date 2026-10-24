@@ -69,6 +69,7 @@ Shared flags:
   --budget-tokens <n>   run budget in reported tokens; lenses and stages past it are recorded as budget_cut
   --budget-seconds <n>  run budget in seconds since the run started
   --trust-repo-checks   use checks from the repo's AGENTS.md snippet when no --install or --check was given
+  --confirm-target      plan the requested target when the snippet names a different one
 `;
 
 const err = (message: string): void => void process.stderr.write(`${message}\n`);
@@ -116,6 +117,7 @@ async function main(argv: string[]): Promise<number> {
       'budget-tokens': { type: 'string' },
       'budget-seconds': { type: 'string' },
       'trust-repo-checks': { type: 'boolean' },
+      'confirm-target': { type: 'boolean' },
       note: { type: 'string' },
       finding: { type: 'string' },
       stage: { type: 'string' },

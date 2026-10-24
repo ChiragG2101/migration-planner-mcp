@@ -73,12 +73,21 @@ async function withIngest<T>(engine: Engine, raw: unknown, step: string, then: (
       return then({ input, repo, session, facts, git, question: decided.question, run: null, versions: null }, call);
     }
     const targetQuestion = snippetTargetQuestion(decided.versions.target, snippet.targets);
-    if (targetQuestion) {
+    // confirm_target is the only answer, and it is exactly true. It keeps the
+    // requested target. It is not read for the level or the check config (D58).
+    const confirmed = targetQuestion !== null && input.confirm_target === true;
+    if (targetQuestion && !confirmed) {
       call.event('ingest.question', targetQuestion);
       return then({ input, repo, session, facts, git, question: targetQuestion, run: null, versions: null }, call);
     }
     const run = createOrReuseRun({ db: session.db, now: engine.now, randomBytes: engine.randomBytes }, input, repo, git, decided);
     call.attachRun(run.ref.run_id);
+    if (confirmed) {
+      call.event('ingest.target_confirmed', {
+        requested: `${decided.versions.target.name}@${decided.versions.target.version}`,
+        snippet_targets: [...snippet.targets],
+      });
+    }
     call.event('ingest.run', { run: run.ref, reused: run.reused, idem_key: run.idemKey, versions: decided.versions, pack: decided.pack?.ref ?? null, companions: decided.companions });
     return then({ input, repo, session, facts, git, question: null, run: run.ref, versions: decided.versions }, call);
   });

@@ -163,7 +163,7 @@ export function snippetTargetQuestion(requested: { name: string; version: string
   return {
     kind: 'ambiguous_target',
     field: 'target',
-    message: `AGENTS.md snippet targets ${targets.join(', ')}, which does not match ${requested.name}@${requested.version}. The snippet does not change the request; say which target to plan.`,
+    message: `AGENTS.md snippet targets ${targets.join(', ')}, which does not match ${requested.name}@${requested.version}. The snippet does not change the request. Pass confirm_target: true to plan ${requested.name}@${requested.version}.`,
     candidates: targets.map((value) => ({ value, where: ['AGENTS.md'] })),
   };
 }

@@ -87,9 +87,9 @@ The plan names three PRs but not their order. `scripts/check-core-untouched.ts` 
      - `planner_deny`: a list of globs
      - `targets`: for example `next@16` or `django@5.2`
    - Reader (`src/pipeline/agentsSnippet.ts`, called from ingest). It reads `AGENTS.md` at the repo root via `SafePath`, if present, and parses only the fenced block under that heading.
-     - `planner_deny` globs are **added** to the deny list. A glob that tries to un-deny (for example `!.env`) or point outside the root is rejected and logged.
-     - `checks` become a second source for M8's check config. The repo's own file may have been written by someone else, so checks from the snippet are printed at startup and are used only with `--trust-repo-checks`. CLI flags always win.
-     - `targets` is checked against the user's request. A mismatch produces an ambiguity question, not a silent override.
+     - `planner_deny` globs are **added** to the deny list. A glob that tries to un-deny (for example `!.env`) or point outside the root, including a Windows drive path, a UNC share or `..` on backslashes, is rejected and logged. So is a glob that is too long, has too many `**`, or is past the per-snippet cap (D58).
+     - `checks` become a second source for M8's check config. The repo's own file may have been written by someone else, so checks from the snippet are printed at startup and are used only with `--trust-repo-checks`. CLI flags always win. The first adopted set stays frozen for that engine.
+     - `targets` is checked against the user's request. A mismatch produces an ambiguity question, not a silent override. `confirm_target: true` (CLI `--confirm-target`) plans the requested target and records it. The snippet never rewrites the request.
    - The engine works without it, and its absence is logged as "AGENTS.md snippet: not found".
    - This touches `src/pipeline/ingest.ts`, `src/security/denyList.ts` and `src/verify/checks.ts`. Because it is a core change, it lands in its own PR, separate from the Django pack PR, so the "no core changes" check stays meaningful for the pack.
 5. **Open-source files.** `CONTRIBUTING.md` and `AI_POLICY.md` were added before M10; M10 brings them up to date with the points below. The rest are new.
@@ -155,9 +155,10 @@ The plan names three PRs but not their order. `scripts/check-core-untouched.ts` 
 - **AGENTS.md snippet:**
   - It parses only the dedicated block.
   - `planner_deny` adds entries.
-  - Permissions: `!.env`, `../outside` and absolute paths are rejected, and the boundary is unchanged (`agents-snippet-cannot-widen`).
-  - Checks from the snippet are ignored without `--trust-repo-checks`, and CLI flags override them (`repo-checks-need-trust`).
-  - A missing file is handled.
+  - Permissions: `!.env`, `../outside`, absolute paths, `C:\outside`, `\\server\share` and `foo\..\..\outside` are rejected, and the boundary is unchanged (`agents-snippet-cannot-widen`). A pathological `**` glob and a glob past the length or entry cap are rejected and not compiled.
+  - Checks from the snippet are ignored without `--trust-repo-checks`, and CLI flags override them (`repo-checks-need-trust`). A second repo does not replace the first adopted set.
+  - A missing file is handled. The section ends at the next `## ` heading.
+  - Without `confirm_target`, a snippet target that does not match the request is a question and no run. With `confirm_target: true`, the run uses the requested target.
 - **Plugin:** the generated bundle matches the packs (drift check).
 - **Regression:** the full eval reruns for both packs. The Next.js engine's worst-case pooled recall must not fall below the low end of its noise band in `eval/results.md` on the base branch, first recorded in M7. M7's CI pack gate checks this and the Django baseline comparison (D17): the engine's worst-case pooled recall (each Django case's lowest-recall run, pooled) must be above the baseline's best-case pooled recall (each case's highest-recall run, pooled). Every Django case has the same number N of recorded engine runs under HEAD's prompt version and the same N of baseline runs with HEAD's baseline prompt hash, with N at least 3, all made with the same host agent, and the gate fails on any other count. The Django pack has no band on the base branch, so it is beat-checked whichever PR adds its cases, and the regression check is skipped for it. A later PR that widens it is beat-checked again over all its cases.
 
