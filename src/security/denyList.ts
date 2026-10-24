@@ -3,13 +3,47 @@
 import type { SafePath } from './pathBoundary.js';
 
 const userEntries: RegExp[] = [];
+const userGlobs: string[] = [];
+
+/**
+ * Why a snippet glob cannot be added. `!` would un-deny (gitignore negation).
+ * An absolute path or a `..` segment points outside the repo root. Null means
+ * the glob only adds a denial.
+ */
+export function denyGlobRejection(glob: string): string | null {
+  const g = glob.trim();
+  if (g === '') return 'empty deny entry';
+  if (g.startsWith('!')) return 'a deny entry cannot remove a denial';
+  if (g.startsWith('/') || g.startsWith('\\') || /^[A-Za-z]:[\\/]/.test(g)) return 'path is outside the repo root';
+  if (g.split(/[\\/]+/).some((seg) => seg === '..')) return 'path is outside the repo root';
+  return null;
+}
+
+/** The globs actually added. A rejected glob is never in this list. */
+export function userDenyGlobs(): readonly string[] {
+  return userGlobs;
+}
 
 /**
  * Adds user deny entries. A trailing `/` denies a directory and everything in it,
- * `*` matches within one path segment and `**` across segments. There is no way to remove an entry.
+ * `*` matches within one path segment and `**` across segments. There is no way
+ * to remove an entry. A glob that would un-deny or point outside the root is
+ * rejected and not added (INV-5).
  */
-export function addUserDenies(entries: readonly string[]): void {
-  for (const entry of entries) userEntries.push(globToRegExp(entry));
+export function addUserDenies(entries: readonly string[]): { added: string[]; rejected: { glob: string; reason: string }[] } {
+  const added: string[] = [];
+  const rejected: { glob: string; reason: string }[] = [];
+  for (const entry of entries) {
+    const reason = denyGlobRejection(entry);
+    if (reason) {
+      rejected.push({ glob: entry, reason });
+      continue;
+    }
+    userGlobs.push(entry);
+    userEntries.push(globToRegExp(entry));
+    added.push(entry);
+  }
+  return { added, rejected };
 }
 
 function globToRegExp(glob: string): RegExp {

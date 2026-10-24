@@ -1,13 +1,18 @@
 // Core API for ingest and scan_repo. Adapters call these and nothing else.
 import { z } from 'zod';
 import { analyzeRepo, type RepoFacts } from '../analysis/scanner.js';
+import { applyAgentsSnippet, snippetTargetQuestion } from '../pipeline/agentsSnippet.js';
 import { treeHash } from '../pipeline/report.js';
 import { createOrReuseRun, decideVersions, readGitState, resolveRepo, singleRepoPath, type Repo } from '../pipeline/ingest.js';
 import { IngestInput, type GitState, type Question, type RunRef, type Versions } from '../schema/ingest.js';
 import type { ScanRepoOutput, ScanResult } from '../schema/scan.js';
 import { InputError } from '../security/errors.js';
 import { recordFiles, setRunStatus } from '../store/runs.js';
-import { openSession, runTool, type Engine, type Session, type ToolCall } from './engine.js';
+import { EMPTY_CHECKS, selectChecksConfig } from '../verify/checks.js';
+import { openSession, runTool, type Engine, type EngineOptions, type Session, type ToolCall } from './engine.js';
+
+/** Snippet checks are adopted once per engine, then the set stays frozen (D44, D58). */
+const snippetChecksAdopted = new WeakSet<Engine>();
 
 export interface IngestOutput {
   status: 'ok' | 'question';
@@ -40,12 +45,37 @@ async function withIngest<T>(engine: Engine, raw: unknown, step: string, then: (
   const repo = resolveRepo(singleRepoPath(input.repo_path));
   const session = openSession(engine, repo.root);
   return runTool(engine, session, step, input, (call) => {
+    // Before the walk, so planner_deny entries apply to this scan. The snippet
+    // is optional: a missing file is logged and the run continues (D58).
+    const snippet = applyAgentsSnippet(repo.root, repo.repoId, engine.log);
+    const selected = selectChecksConfig({
+      cli: { install: engine.options.installs ?? EMPTY_CHECKS.install, checks: engine.options.checks ?? EMPTY_CHECKS.checks },
+      cliProvided: engine.options.checksFromCli === true,
+      snippet: snippet.checks,
+      trustRepoChecks: engine.options.trustRepoChecks === true,
+    });
+    if (selected.decision === 'cli') engine.log('AGENTS.md snippet checks ignored: CLI flags set the check config');
+    else if (selected.decision === 'snippet_ignored') engine.log('AGENTS.md snippet checks ignored: pass --trust-repo-checks to use them');
+    else if (selected.decision === 'snippet' && snippetChecksAdopted.has(engine)) {
+      engine.log('AGENTS.md snippet checks ignored: the check config is already frozen');
+    } else if (selected.decision === 'snippet') {
+      const opts = engine.options as EngineOptions;
+      opts.installs = [...selected.config.install];
+      opts.checks = [...selected.config.checks];
+      snippetChecksAdopted.add(engine);
+      engine.log('AGENTS.md snippet checks used (--trust-repo-checks)');
+    }
     const facts = analyzeRepo(repo.root, repo.repoId, engine.limits);
     const git = readGitState(repo.root, repo.repoId, facts.walk);
     const decided = decideVersions(input, facts.packages, engine.bundle);
     if ('question' in decided) {
       call.event('ingest.question', decided.question);
       return then({ input, repo, session, facts, git, question: decided.question, run: null, versions: null }, call);
+    }
+    const targetQuestion = snippetTargetQuestion(decided.versions.target, snippet.targets);
+    if (targetQuestion) {
+      call.event('ingest.question', targetQuestion);
+      return then({ input, repo, session, facts, git, question: targetQuestion, run: null, versions: null }, call);
     }
     const run = createOrReuseRun({ db: session.db, now: engine.now, randomBytes: engine.randomBytes }, input, repo, git, decided);
     call.attachRun(run.ref.run_id);

@@ -26,7 +26,13 @@ export const IngestInput = z
   .strict();
 export type IngestInput = z.infer<typeof IngestInput>;
 
-export const QuestionKind = z.enum(['vague_input', 'ambiguous_version', 'unresolved_version', 'version_mismatch']);
+export const QuestionKind = z.enum([
+  'vague_input',
+  'ambiguous_version',
+  'unresolved_version',
+  'version_mismatch',
+  'ambiguous_target',
+]);
 
 export const Question = z.object({
   kind: QuestionKind,
