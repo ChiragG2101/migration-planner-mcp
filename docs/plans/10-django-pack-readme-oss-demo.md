@@ -35,6 +35,17 @@ The Python language adapter (M2), the text scanner (M2), the staging options (M6
 
 A CI check (`scripts/check-core-untouched.ts`) is an allowlist. It runs on every pack PR (a PR that changes anything under `packs/` or `knowledge/`, `docs/design.md` D15) and fails it on any changed file outside the list above, and on more than one changed line in `src/analysis/usages/index.ts`. It also enforces the pack-PR eval rules above: cases, completions and runs only for the PR's own pack, only `notes` and `checks` changed in a completed case's `case.json`, and only added lines in `eval/cases/README.md`. M7's `scripts/check-eval-add-only.ts` runs alongside it, as on every PR. So everything else is protected, notably all of `src/` apart from the new adapter (including `src/analysis/` risk, sizing, scanner and snippet code, `src/rules/`, `src/schema/` with the match kinds, `src/docs/`, `src/cli/`, `src/tools/` and `src/server.ts`), `prompts/`, `scripts/` (so a pack PR can't loosen the pack lint or the generator it is checked by), and the eval scoring code (`eval/runner.ts`, `eval/metrics.ts`, `eval/baseline/`, `eval/seeded/recall.ts`). If the pack cannot be added without a core change, that is a design bug. Fix it in a separate, reviewed core PR **before** the pack PR, and record the fix in `docs/design.md`.
 
+## Delivery order (gap found in the M9 review, 2026-10-24)
+
+The plan names three PRs but not their order. `scripts/check-core-untouched.ts` lives under `scripts/`, which the pack PR may not touch, so it cannot arrive in the pack PR it checks.
+
+1. **Core PR A:** `scripts/check-core-untouched.ts` with its planted-change tests (the "No core changes" test list below), wired into CI for pack PRs. It needs its own independent review before the pack PR opens.
+2. **Core PR B:** the AGENTS.md snippet (task 4), with its permissions tests.
+3. **Pack PR:** the Django adapter, knowledge, pack, eval cases and seeded repo (tasks 1 to 3). `check-core-untouched` and `check-eval-add-only` must pass on it unchanged. Any core fix it turns out to need is its own PR before this one (see "No core changes").
+4. **Docs and release PR:** open-source files, plugin bundle, name, README and demo (tasks 5 to 9). The name lands last because it renames the snippet heading and the bundle.
+
+**Live-run handover (D39, D41).** The Django golden runs (N of at least 3 engine runs and N baseline runs per case, one host agent) and the L1 run on a Django case need a live host session on the maintainer's own key. The builder prepares the cases, `truth.json`, `django-tricky` and the run instructions, then stops and hands over, as M7 did. The beat check and the `eval/results.md` acceptance line cannot pass before that. Decision to record: which host and model make the Django runs. Use the M7 host (Cursor/databricks-claude-sonnet-4-6) unless the maintainer says otherwise, so the two packs stay comparable.
+
 ## Tasks
 
 1. **Django usage adapter (`src/analysis/usages/django.ts`).** It uses the M2 `UsageAdapter` interface, the Python adapter and the text scanner. The starting list below is a draft. **Every item is checked against the official Django release notes and deprecation timeline for each feature release in the range (drafted with M3's release drafter) before rules are written.**
@@ -162,7 +173,7 @@ A CI check (`scripts/check-core-untouched.ts`) is an allowlist. It runs on every
 
 - **A hidden core coupling surfaces** (for example, JS-specific assumptions in staging, packets or gate 7 test counting). Mitigation: that is exactly what this milestone tests. Fix it in a separate core PR and record it.
 - **Django's string-based configuration hides usages from import graphs.** Mitigation: `string_ref` edges from M2, settings parsing, and seeded cases for each pattern.
-- **Django tests need a database or other services.** Mitigation: the user declares them in their checks; container mode (M8) lets them supply an image; missing services show up as baseline failures.
+- **Django tests need a database or other services.** Mitigation: the user declares them in their checks (for example a SQLite test settings module), and missing services show up as baseline failures. Container mode was cut in v0.1 (`docs/design.md` D42), so no image can be supplied; the README states this limit.
 - **AGENTS.md as an injection vector** (instructions or commands in the file). Mitigation: only three structured keys are parsed, the rest of the file is ignored, deny entries can only restrict, and checks need the trust flag.
 - **The demo overstates capability.** Mitigation: use a real repo, show unresolved and needs-human items honestly, and put no metrics on screen that are not in `eval/results.md`.
 
