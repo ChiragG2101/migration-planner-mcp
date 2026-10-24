@@ -155,7 +155,7 @@ The plan names three PRs but not their order. `scripts/check-core-untouched.ts` 
 - **AGENTS.md snippet:**
   - It parses only the dedicated block.
   - `planner_deny` adds entries.
-  - Permissions: `!.env`, `../outside`, absolute paths, `C:\outside`, `\\server\share` and `foo\..\..\outside` are rejected, and the boundary is unchanged (`agents-snippet-cannot-widen`). A pathological `**` glob and a glob past the length or entry cap are rejected and not compiled.
+  - Permissions: `!.env`, `../outside`, absolute paths, `C:\outside`, `\\server\share` and `foo\..\..\outside` are rejected, and the boundary is unchanged (`agents-snippet-cannot-widen`). A pathological `**` glob and a glob past the length or entry cap are rejected and not compiled. A chain of single `*` under the limits is accepted, and a scan over 200-character names stays under a second. Ingesting one repo again with one engine adds no glob twice. The matcher gives the old regex's answers on ordinary globs (`test/unit/denyGlob.test.ts`).
   - Checks from the snippet are ignored without `--trust-repo-checks`, and CLI flags override them (`repo-checks-need-trust`). A second repo does not replace the first adopted set.
   - A missing file is handled. The section ends at the next `## ` heading.
   - Without `confirm_target`, a snippet target that does not match the request is a question and no run. With `confirm_target: true`, the run uses the requested target.
