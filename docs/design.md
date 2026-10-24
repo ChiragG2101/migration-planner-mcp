@@ -739,7 +739,7 @@ Why: adding a second brand (`SandboxPath`) would require either a cast or a seco
 
 ### D44 - Check commands are frozen at engine startup, not at first `verify_stage`
 
-**Decision: check commands are parsed from CLI flags at `createEngine` time (or MCP config time) and stored in the engine options. They are never read from tool arguments, packs, knowledge or the agent.**
+**Decision: check commands are parsed from CLI flags at `createEngine` time (or MCP config time) and stored in the engine options. They are never read from tool arguments, packs, knowledge or the agent. M10 adds the AGENTS.md snippet as a second source under that same freeze (D58).**
 
 Why: C9 and C3 both require that commands come only from user-owned config. Freezing at startup means the check set is the same for every run in a process, which is the correct model for a CLI invocation. The MCP adapter reads them from its own config at startup. A tool argument that tries to pass a command is rejected by the Zod schema (no free-text command field).
 
@@ -856,4 +856,22 @@ Why: the plan asks for every command with its exit code and the network-using st
 Why a second module under `scripts/lib/`: the plan's Files list names only `scripts/check-core-untouched.ts`, but the repo's established pattern (`eval/addOnly.ts` + `scripts/check-eval-add-only.ts` + `test/unit/eval/addOnly.test.ts`) keeps the decision logic pure and fixture-testable, away from git. `scripts/lib/` is already un-ignored for exactly this. The test file is `test/unit/coreUntouched.test.ts` (the Tests section names it as the "No core changes" tests).
 
 **Scope note (PR A only).** Per the M10 "Delivery order", the Django adapter, knowledge, pack, cases, seeded repo, the AGENTS.md snippet and the docs/release work are later PRs. This PR adds only the check, its tests, the `registry.ts` core change it needs, and its CI wiring, so the check exists and is reviewed before the pack PR it guards opens. The check cannot run meaningfully here (PR A is a core PR and self-skips); its unit tests, and a throwaway-branch probe against a synthetic pack diff, are what prove it.
+
+## 2026-10-25: M10 Core PR B — the AGENTS.md snippet
+
+### D58 - The AGENTS.md snippet is a fenced block, read at ingest, and it cannot widen the boundary or the check config
+
+**Decision:** the snippet is a two-space YAML subset in the first fenced block under the heading `## migration-planner` (`examples/AGENTS.snippet.md`). The heading stays `migration-planner` until the docs-and-release PR renames it. The reader runs at the start of ingest, before the walk, through `resolveInside` and `safeRead`. A missing file or a missing block is logged as `AGENTS.md snippet: not found` and the run continues. A block that does not parse is logged and applied as nothing. Only `checks`, `planner_deny` and `targets` are read; every other key, and the rest of the file, is ignored.
+
+`planner_deny` globs are added through `addUserDenies`. A glob that starts with `!`, is absolute, or contains a `..` segment is rejected and logged. It is not added. The path boundary does not change.
+
+`checks.install` is one command string. Every other key under `checks` is a named check. Both are parsed with the same argv rules as the CLI flags (`parseChecksConfig`), so they run without a shell. They are printed at ingest, which is when the repo is known (including for MCP). They fill an empty check config only when the process was started with `--trust-repo-checks` and without any `--install` or `--check` flag. CLI flags win for the whole set. The trust flag is an engine option from the CLI or MCP config, never a tool argument. After the CLI set, or the first snippet set that is adopted, a later ingest does not replace it.
+
+`targets` entries are `name@version`. The request matches when the name is equal and every part of the snippet version equals the requested version, so `next@16` matches `16.2.0`. If none match, ingest returns `ambiguous_target` and creates no run. It does not change the request.
+
+**Why:** the repo file may have been written by someone else (M10 task 4). Three structured keys, deny-only globs, and a trust flag are what keep it from being an instruction or a command channel. Reading it at ingest, rather than at process start, is what makes the same rule work for the CLI and for MCP, where the repo arrives with the tool call. Freezing after the first adopted set keeps D44: a second repo in one process cannot swap the commands.
+
+**Alternatives:** JSON in the fence; merging CLI and snippet checks by name; treating a mismatch as a silent use of the snippet target. A merge would let a repo file add a command beside a flag the user set. A silent target change would hide a disagreement.
+
+**What would change it:** the docs-and-release PR renaming the heading with the final name. The three keys and the trust rule stay.
 
