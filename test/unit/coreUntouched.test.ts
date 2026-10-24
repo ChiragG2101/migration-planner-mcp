@@ -4,10 +4,15 @@
 // fails; a clean Django-shaped pack diff (including completing a pending M0
 // case with only notes/checks changed) passes. The wrapper's derivations are
 // pure functions here, so this file also tests them directly (round-1 review
-// must-fix 3).
+// must-fix 3, round-2 must-fix B).
+import { existsSync, readFileSync, statSync } from 'node:fs';
+import path from 'node:path';
+import { fileURLToPath } from 'node:url';
 import { describe, expect, it } from 'vitest';
 import {
   checkCoreUntouched,
+  coverageGapsProblems,
+  deriveCaseState,
   inAllowedArea,
   isPackPR,
   ownedPacks,
@@ -15,11 +20,16 @@ import {
   pinnedDiff,
   nonMutableKeysChanged,
   knowledgePrefix,
+  newAdapterFiles,
+  ratchetExistingEntryChanged,
+  readmeExistingLineTouched,
   REGISTRY_FILE,
   type CoreUntouchedInput,
   type CaseMeta,
   type PathChange,
 } from '../../scripts/lib/coreUntouched.js';
+
+const repoRoot = path.resolve(path.dirname(fileURLToPath(import.meta.url)), '../..');
 
 const ch = (path: string, kind: PathChange['kind'] = 'modified'): PathChange => ({ path, kind });
 
@@ -38,10 +48,11 @@ const base = (over: Partial<CoreUntouchedInput>): CoreUntouchedInput => ({
   casesRemoved: new Set(),
   completions: new Map(),
   readmeExistingLineTouched: false,
-  ratchetBadNewEntries: [],
   ratchetExistingEntryChanged: false,
-  registryChangedLines: 0,
+  registryAdded: 0,
+  registryRemoved: 0,
   newAdapterFiles: [],
+  coverageGaps: null,
   ...over,
 });
 
@@ -60,11 +71,72 @@ describe('pure derivations (round-1 must-fix 3: the wrapper logic is tested here
     expect([...ownedPacks([ch('knowledge/pypi/django/x.json', 'added')])]).toEqual([]);
   });
 
-  it('numstatChangedLines is the larger of added/removed (a one-line edit is 1)', () => {
-    expect(numstatChangedLines(1, 1)).toBe(1); // a single-line replacement
-    expect(numstatChangedLines(1, 0)).toBe(1); // one added
-    expect(numstatChangedLines(2, 1)).toBe(2); // import + array edit
-    expect(numstatChangedLines(Number.POSITIVE_INFINITY, Number.POSITIVE_INFINITY)).toBe(Number.POSITIVE_INFINITY);
+  it('numstatChangedLines accepts only a pure addition; a single-line replacement fails', () => {
+    expect(numstatChangedLines(1, 0)).toBe(1); // one added line
+    expect(numstatChangedLines(0, 0)).toBe(0);
+    expect(numstatChangedLines(2, 0)).toBe(2); // two added lines
+    expect(numstatChangedLines(1, 1)).toBe(Number.POSITIVE_INFINITY); // a single-line replacement
+    expect(numstatChangedLines(2, 1)).toBe(Number.POSITIVE_INFINITY);
+    expect(numstatChangedLines(Number.POSITIVE_INFINITY, 0)).toBe(Number.POSITIVE_INFINITY);
+  });
+
+  it('readmeExistingLineTouched is true when any line was removed', () => {
+    expect(readmeExistingLineTouched(0)).toBe(false);
+    expect(readmeExistingLineTouched(1)).toBe(true);
+    expect(readmeExistingLineTouched(Number.POSITIVE_INFINITY)).toBe(true);
+  });
+
+  it('newAdapterFiles keeps only added adapter files, not index.ts, registry.ts or an edit', () => {
+    const files = newAdapterFiles([
+      ch('src/analysis/usages/django.ts', 'added'),
+      ch('src/analysis/usages/nextjs.ts', 'modified'),
+      ch('src/analysis/usages/index.ts', 'added'),
+      ch(REGISTRY_FILE, 'added'),
+      ch('src/analysis/usages/flask.ts', 'deleted'),
+    ]);
+    expect(files).toEqual(['src/analysis/usages/django.ts']);
+  });
+
+  it('ratchetExistingEntryChanged compares base entries as JSON and ignores a new key', () => {
+    const baseRatchet = { 'next-tricky': { overall: 1 } };
+    expect(ratchetExistingEntryChanged(baseRatchet, { 'next-tricky': { overall: 1 }, 'django-tricky': { overall: 0.5 } })).toBe(false);
+    expect(ratchetExistingEntryChanged(baseRatchet, { 'next-tricky': { overall: 0.9 } })).toBe(true);
+    expect(ratchetExistingEntryChanged(baseRatchet, {})).toBe(true);
+    expect(ratchetExistingEntryChanged(null, { 'django-tricky': { overall: 1 } })).toBe(false);
+  });
+
+  it('deriveCaseState reports removal only when the case.json existed on the base and is gone at HEAD', () => {
+    const present = deriveCaseState('django-ror-api-548', { pack: 'django-upgrade' }, { pack: 'django-upgrade' }, true, true, false, []);
+    expect(present.removed).toBe(false);
+    expect(present.meta).toEqual({ pack: 'django-upgrade', hadRuns: false, existedOnBase: true, existsAtHead: true });
+    const gone = deriveCaseState('django-ror-api-548', { pack: 'django-upgrade' }, null, true, false, false, [ch('eval/cases/django-ror-api-548/case.json', 'deleted')]);
+    expect(gone.removed).toBe(true);
+    expect(gone.meta.pack).toBe('django-upgrade');
+    expect(gone.completion).toBeNull();
+  });
+
+  it('deriveCaseState treats a notes-only edit of a pending case as a completion, and a case with base runs as not one', () => {
+    const changes = [ch('eval/cases/django-ror-api-548/case.json', 'modified')];
+    const done = deriveCaseState('django-ror-api-548', { pack: 'django-upgrade', notes: 'a', target: { version: '4.2' } }, { pack: 'django-upgrade', notes: 'b', target: { version: '4.2' } }, true, true, false, changes);
+    expect(done.completion).toEqual({ pinnedChanged: [], otherChanged: [] });
+    const pinned = deriveCaseState('django-ror-api-548', { pack: 'django-upgrade', target: { version: '4.2' } }, { pack: 'django-upgrade', target: { version: '9.9' } }, true, true, false, changes);
+    expect(pinned.completion?.pinnedChanged).toEqual(['target']);
+    const hadRuns = deriveCaseState('django-ror-api-548', { pack: 'django-upgrade', notes: 'a' }, { pack: 'django-upgrade', notes: 'b' }, true, true, true, changes);
+    expect(hadRuns.completion).toBeNull();
+    const untouched = deriveCaseState('django-ror-api-548', { pack: 'django-upgrade' }, { pack: 'django-upgrade', notes: 'b' }, true, true, false, [ch('eval/cases/django-ror-api-548/truth.json', 'added')]);
+    expect(untouched.completion).toBeNull();
+  });
+
+  it('coverageGapsProblems keeps other packs entries and lets this pack add or remove its own', () => {
+    const baseGaps = ['nextjs-upgrade: a gap', 'django-upgrade: pending until the Django pack lands'];
+    expect(coverageGapsProblems(baseGaps, ['nextjs-upgrade: a gap'], 'django-upgrade')).toEqual([]);
+    expect(coverageGapsProblems(baseGaps, ['nextjs-upgrade: a gap', 'django-upgrade: settings covered'], 'django-upgrade')).toEqual([]);
+    const dropped = coverageGapsProblems(baseGaps, ['django-upgrade: pending until the Django pack lands'], 'django-upgrade');
+    expect(dropped.some((m) => m.includes('not owned by this pack') && m.includes('nextjs-upgrade: a gap'))).toBe(true);
+    expect(coverageGapsProblems(baseGaps, [], 'django-upgrade').some((m) => m.includes('nextjs-upgrade: a gap'))).toBe(true);
+    expect(coverageGapsProblems(baseGaps, {}, 'django-upgrade')).toEqual(['eval/cases/coverage-gaps.json: base and HEAD must both be a JSON array of strings (fail closed)']);
+    expect(coverageGapsProblems('nope', baseGaps, 'django-upgrade')).toEqual(['eval/cases/coverage-gaps.json: base and HEAD must both be a JSON array of strings (fail closed)']);
+    expect(coverageGapsProblems(baseGaps, [1, 2], 'django-upgrade')).toEqual(['eval/cases/coverage-gaps.json: base and HEAD must both be a JSON array of strings (fail closed)']);
   });
 
   it('pinnedDiff lists only changed pinned fields', () => {
@@ -163,8 +235,13 @@ describe('a clean Django-shaped pack diff passes', () => {
       changes,
       caseMeta,
       completions: new Map([['django-ror-api-548', { pinnedChanged: [], otherChanged: [] }]]),
-      registryChangedLines: 1,
+      registryAdded: 1,
+      registryRemoved: 0,
       newAdapterFiles: ['src/analysis/usages/django.ts'],
+      coverageGaps: {
+        base: ['nextjs-upgrade: a gap', 'django-upgrade: pending until the Django pack lands'],
+        head: ['nextjs-upgrade: a gap', 'django-upgrade: settings covered'],
+      },
     });
     expect(checkCoreUntouched(input)).toEqual(PASS);
   });
@@ -204,8 +281,13 @@ describe('a file outside the allowlist, the registry line, and the one-adapter r
   });
 
   it('a second registry line fails', () => {
-    const p = checkCoreUntouched(base({ changes: [ch(REGISTRY_FILE)], registryChangedLines: 2 }));
-    expect(p.some((m) => m.includes('exactly one registry line'))).toBe(true);
+    const p = checkCoreUntouched(base({ changes: [ch(REGISTRY_FILE)], registryAdded: 2, registryRemoved: 0 }));
+    expect(p.some((m) => m.includes('pure addition of at most one line'))).toBe(true);
+  });
+
+  it('a one-line registry swap fails (a removed line is not a pure addition)', () => {
+    const p = checkCoreUntouched(base({ changes: [ch(REGISTRY_FILE)], registryAdded: 1, registryRemoved: 1 }));
+    expect(p.some((m) => m.includes('pure addition of at most one line') && m.includes('removed 1'))).toBe(true);
   });
 
   it('two new adapter files fail', () => {
@@ -301,17 +383,104 @@ describe('eval/cases/README.md is add-only', () => {
 });
 
 describe('the seeded ratchet', () => {
-  it('a new entry that does not equal the measured recall fails', () => {
-    const p = checkCoreUntouched(base({ changes: [ch('eval/seeded/ratchet.json')], ratchetBadNewEntries: ['new entry django-tricky is 0.9, but the measured recall is 0.7500'] }));
-    expect(p.some((m) => m.includes('django-tricky') && m.includes('measured recall is'))).toBe(true);
-  });
-
   it('changing an existing ratchet entry fails', () => {
     const p = checkCoreUntouched(base({ changes: [ch('eval/seeded/ratchet.json')], ratchetExistingEntryChanged: true }));
     expect(p.some((m) => m.includes('a floor on the base branch is frozen'))).toBe(true);
   });
 
-  it('adding a valid new entry passes', () => {
+  it('adding a new entry passes this check (the measured-recall rule is INV-50)', () => {
     expect(checkCoreUntouched(base({ changes: [ch('eval/seeded/ratchet.json')] }))).toEqual(PASS);
+  });
+});
+
+describe('test/ is add-only', () => {
+  it('editing a test file fails', () => {
+    const p = checkCoreUntouched(base({ changes: [ch('test/permissions/deny-list.test.ts', 'modified')] }));
+    expect(p.some((m) => m.includes('may only add test files') && m.includes('modified test/permissions/deny-list.test.ts'))).toBe(true);
+  });
+
+  it('deleting a test file fails', () => {
+    const p = checkCoreUntouched(base({ changes: [ch('test/permissions/deny-list.test.ts', 'deleted')] }));
+    expect(p.some((m) => m.includes('may only add test files') && m.includes('deleted test/permissions/deny-list.test.ts'))).toBe(true);
+  });
+
+  it('adding a test file passes', () => {
+    expect(checkCoreUntouched(base({ changes: [ch('test/unit/usages/django.test.ts', 'added')] }))).toEqual(PASS);
+  });
+});
+
+describe('eval/cases/coverage-gaps.json keeps every other pack entry', () => {
+  const baseGaps = ['nextjs-upgrade: a gap', 'django-upgrade: pending until the Django pack lands'];
+
+  it('removing this pack entry passes', () => {
+    const p = checkCoreUntouched(base({
+      changes: [ch('eval/cases/coverage-gaps.json')],
+      coverageGaps: { base: baseGaps, head: ['nextjs-upgrade: a gap'] },
+    }));
+    expect(p).toEqual(PASS);
+  });
+
+  it('removing another pack entry fails', () => {
+    const p = checkCoreUntouched(base({
+      changes: [ch('eval/cases/coverage-gaps.json')],
+      coverageGaps: { base: baseGaps, head: [] },
+    }));
+    expect(p.some((m) => m.includes('not owned by this pack') && m.includes('nextjs-upgrade: a gap'))).toBe(true);
+  });
+
+  it('a non-array fails closed', () => {
+    const p = checkCoreUntouched(base({
+      changes: [ch('eval/cases/coverage-gaps.json')],
+      coverageGaps: { base: baseGaps, head: { gaps: [] } },
+    }));
+    expect(p.some((m) => m.includes('JSON array of strings'))).toBe(true);
+  });
+});
+
+describe('the check does not import src/ or the recall scorer (round-2 must-fix A)', () => {
+  function importSpecs(source: string): string[] {
+    // Comments can name an example specifier (registry.ts's './<pack>.js').
+    // They are not imports. A URL's :// is left intact.
+    const code = source.replace(/\/\*[\s\S]*?\*\//g, '').replace(/(^|[^:\\])\/\/.*$/gm, '$1');
+    const specs: string[] = [];
+    for (const match of code.matchAll(/\b(?:import|export)\b[\s\S]*?\bfrom\s+['"]([^'"]+)['"]/g)) specs.push(match[1]!);
+    for (const match of code.matchAll(/\bimport\s+['"]([^'"]+)['"]/g)) specs.push(match[1]!);
+    return specs;
+  }
+
+  function resolveRelative(fromFile: string, spec: string): string {
+    const abs = path.resolve(path.dirname(fromFile), spec);
+    const candidates = abs.endsWith('.js')
+      ? [abs.slice(0, -3) + '.ts', abs.slice(0, -3) + '.tsx', abs]
+      : [`${abs}.ts`, `${abs}.tsx`, path.join(abs, 'index.ts'), abs];
+    for (const candidate of candidates) {
+      if (existsSync(candidate) && statSync(candidate).isFile()) return candidate;
+    }
+    throw new Error(`cannot resolve ${spec} from ${fromFile}`);
+  }
+
+  function relativeImports(start: string): string[] {
+    const seen = new Set<string>();
+    const queue = [start];
+    const found: string[] = [];
+    while (queue.length > 0) {
+      const file = queue.pop()!;
+      if (seen.has(file)) continue;
+      seen.add(file);
+      found.push(path.relative(repoRoot, file).split(path.sep).join('/'));
+      for (const spec of importSpecs(readFileSync(file, 'utf8'))) {
+        if (spec.startsWith('.')) queue.push(resolveRelative(file, spec));
+      }
+    }
+    return found;
+  }
+
+  it('scripts/check-core-untouched.ts and scripts/lib/coreUntouched.ts reach neither src/ nor eval/seeded/recall.ts', () => {
+    const files = [
+      ...relativeImports(path.join(repoRoot, 'scripts/check-core-untouched.ts')),
+      ...relativeImports(path.join(repoRoot, 'scripts/lib/coreUntouched.ts')),
+    ];
+    const bad = files.filter((file) => file === 'eval/seeded/recall.ts' || file.startsWith('src/'));
+    expect(bad).toEqual([]);
   });
 });

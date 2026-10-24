@@ -1,9 +1,17 @@
 // The Next.js usage adapter: one test per usage kind, on small inline repos.
 import { describe, expect, it } from 'vitest';
 import { nextjsAdapter } from '../../../src/analysis/usages/nextjs.js';
+import { usageAdapters } from '../../../src/analysis/usages/index.js';
 import { brief, build, buildNext, ofKind } from '../../usages.js';
 
 const H = "import { cookies, headers, draftMode } from 'next/headers';\n";
+
+describe('collected usage adapters', () => {
+  it('includes the Next.js adapter', () => {
+    expect(usageAdapters.map((adapter) => adapter.id)).toContain(nextjsAdapter.id);
+    expect(usageAdapters).toContain(nextjsAdapter);
+  });
+});
 
 describe('Next.js adapter: request APIs (request_api)', () => {
   it('finds direct calls, aliased and namespace imports, and labels awaited ones', async () => {

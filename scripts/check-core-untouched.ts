@@ -11,6 +11,9 @@
 // core PR (nothing under those paths) this check does nothing. All of the
 // decision logic lives in pure functions in scripts/lib/coreUntouched.ts, which
 // test/unit/coreUntouched.test.ts drives directly; this wrapper only reads git.
+// It does not import eval/seeded/recall.ts or anything under src/: those load
+// the PR's own adapter, so a pack PR could exit before the allowlist ran (D57).
+// A new ratchet floor is measured by INV-50 (`npm run recall -- --check --base`).
 import { execFileSync } from 'node:child_process';
 import { realpathSync } from 'node:fs';
 import { fileURLToPath } from 'node:url';
@@ -19,9 +22,10 @@ import {
   isPackPR,
   ownedPacks,
   caseIdOf,
-  numstatChangedLines,
-  pinnedDiff,
-  nonMutableKeysChanged,
+  deriveCaseState,
+  readmeExistingLineTouched,
+  newAdapterFiles,
+  ratchetExistingEntryChanged,
   REGISTRY_FILE,
   type CaseMeta,
   type ChangeKind,
@@ -29,7 +33,6 @@ import {
   type PathChange,
 } from './lib/coreUntouched.js';
 import { runSetKey } from '../eval/addOnly.js';
-import { measure, ratio, type Ratchet } from '../eval/seeded/recall.js';
 
 function git(...args: string[]): string {
   // Swallow stderr: some probes (a file absent in a ref) throw and are handled here.
@@ -102,7 +105,6 @@ function numstat(base: string, path: string): [number, number] {
   return [added, removed];
 }
 
-type CaseJson = Record<string, unknown> & { pack?: string };
 type PackJson = { libraries?: ({ id?: string } | string)[]; seeded?: string | string[] };
 
 /** The library ids a pack.json names (`npm/next` from `{id}` or a bare string). */
@@ -111,7 +113,7 @@ function packLibraries(pack: PackJson | null): string[] {
   return pack.libraries.map((l) => (typeof l === 'string' ? l : l.id)).filter((id): id is string => typeof id === 'string');
 }
 
-async function main(argv: string[]): Promise<number> {
+function main(argv: string[]): number {
   const baseIdx = argv.indexOf('--base');
   const base = baseIdx >= 0 ? argv[baseIdx + 1]! : process.env.BASE_SHA || 'origin/main';
   const changes = changesSince(base);
@@ -146,54 +148,19 @@ async function main(argv: string[]): Promise<number> {
   const casesRemoved = new Set<string>();
   const completions = new Map<string, { pinnedChanged: readonly string[]; otherChanged: readonly string[] }>();
   for (const id of touchedCases) {
-    const headCase = jsonAt<CaseJson>('HEAD', `eval/cases/${id}/case.json`);
-    const baseCase = jsonAt<CaseJson>(base, `eval/cases/${id}/case.json`);
-    const existedOnBase = caseExistsAt(base, id);
-    const existsAtHead = caseExistsAt('HEAD', id);
-    caseMeta.set(id, { pack: headCase?.pack ?? baseCase?.pack ?? null, hadRuns: runsAtBase.has(id), existedOnBase, existsAtHead });
-    if (!existsAtHead && existedOnBase) casesRemoved.add(id);
-    // A completion: case.json on base with no base runs, and it changed on HEAD.
-    const caseJsonChanged = changes.some((c) => c.path === `eval/cases/${id}/case.json` && c.kind === 'modified');
-    if (baseCase && headCase && !runsAtBase.has(id) && caseJsonChanged) {
-      completions.set(id, { pinnedChanged: pinnedDiff(baseCase, headCase), otherChanged: nonMutableKeysChanged(baseCase, headCase) });
-    }
+    const headCase = jsonAt<Record<string, unknown>>('HEAD', `eval/cases/${id}/case.json`);
+    const baseCase = jsonAt<Record<string, unknown>>(base, `eval/cases/${id}/case.json`);
+    const state = deriveCaseState(id, baseCase, headCase, caseExistsAt(base, id), caseExistsAt('HEAD', id), runsAtBase.has(id), changes);
+    caseMeta.set(id, state.meta);
+    if (state.removed) casesRemoved.add(id);
+    if (state.completion) completions.set(id, state.completion);
   }
 
-  // eval/cases/README.md: only added lines are allowed (removed lines flag an edit/deletion).
-  const readmeChanged = changes.some((c) => c.path === 'eval/cases/README.md');
-  const readmeExistingLineTouched = readmeChanged && numstat(base, 'eval/cases/README.md')[1] > 0;
-
-  // The registry line count and the set of new adapter files.
-  const registryChangedLines = changes.some((c) => c.path === REGISTRY_FILE)
-    ? numstatChangedLines(...numstat(base, REGISTRY_FILE))
-    : 0;
-  const newAdapterFiles = changes
-    .filter((c) => c.kind === 'added' && /^src\/analysis\/usages\/[^/]+\.ts$/.test(c.path) && c.path !== 'src/analysis/usages/index.ts' && c.path !== REGISTRY_FILE)
-    .map((c) => c.path);
-
-  // Ratchet: an entry on the base branch may not change; a new entry must equal the measured recall.
+  // Raw counts and file contents. The comparisons live in the pure core.
+  const readmeRemoved = changes.some((c) => c.path === 'eval/cases/README.md') ? numstat(base, 'eval/cases/README.md')[1] : 0;
+  const [registryAdded, registryRemoved] = changes.some((c) => c.path === REGISTRY_FILE) ? numstat(base, REGISTRY_FILE) : [0, 0];
   const ratchetChanged = changes.some((c) => c.path === 'eval/seeded/ratchet.json');
-  let ratchetExistingEntryChanged = false;
-  const ratchetBadNewEntries: string[] = [];
-  if (ratchetChanged) {
-    const baseRatchet = jsonAt<Ratchet>(base, 'eval/seeded/ratchet.json') ?? {};
-    const headRatchet = jsonAt<Ratchet>('HEAD', 'eval/seeded/ratchet.json') ?? {};
-    for (const repo of Object.keys(baseRatchet)) {
-      if (JSON.stringify(baseRatchet[repo]) !== JSON.stringify(headRatchet[repo])) ratchetExistingEntryChanged = true;
-    }
-    for (const repo of Object.keys(headRatchet)) {
-      if (repo in baseRatchet) continue;
-      const floor = headRatchet[repo]?.overall;
-      try {
-        const measured = ratio((await measure(repo)).overall);
-        if (floor === undefined || Math.abs(measured - floor) > 1e-9) {
-          ratchetBadNewEntries.push(`new entry ${repo} is ${floor}, but the measured recall is ${measured.toFixed(4)}`);
-        }
-      } catch (err) {
-        ratchetBadNewEntries.push(`new entry ${repo} could not be measured: ${err instanceof Error ? err.message : String(err)}`);
-      }
-    }
-  }
+  const coverageChanged = changes.some((c) => c.path === 'eval/cases/coverage-gaps.json');
 
   const input: CoreUntouchedInput = {
     changes,
@@ -203,11 +170,16 @@ async function main(argv: string[]): Promise<number> {
     caseMeta,
     casesRemoved,
     completions,
-    readmeExistingLineTouched,
-    ratchetBadNewEntries,
-    ratchetExistingEntryChanged,
-    registryChangedLines,
-    newAdapterFiles,
+    readmeExistingLineTouched: readmeExistingLineTouched(readmeRemoved),
+    ratchetExistingEntryChanged: ratchetChanged
+      ? ratchetExistingEntryChanged(jsonAt<Record<string, unknown>>(base, 'eval/seeded/ratchet.json'), jsonAt<Record<string, unknown>>('HEAD', 'eval/seeded/ratchet.json'))
+      : false,
+    registryAdded,
+    registryRemoved,
+    newAdapterFiles: newAdapterFiles(changes),
+    coverageGaps: coverageChanged
+      ? { base: jsonAt<unknown>(base, 'eval/cases/coverage-gaps.json'), head: jsonAt<unknown>('HEAD', 'eval/cases/coverage-gaps.json') }
+      : null,
   };
   const problems = checkCoreUntouched(input);
   for (const p of problems) process.stderr.write(`FAIL ${p}\n`);
@@ -216,11 +188,10 @@ async function main(argv: string[]): Promise<number> {
 }
 
 if (process.argv[1] && realpathSync(process.argv[1]) === realpathSync(fileURLToPath(import.meta.url))) {
-  main(process.argv.slice(2)).then(
-    (code) => (process.exitCode = code),
-    (err: unknown) => {
-      process.stderr.write(`error: ${err instanceof Error ? err.message : String(err)}\n`);
-      process.exitCode = 1;
-    },
-  );
+  try {
+    process.exitCode = main(process.argv.slice(2));
+  } catch (err) {
+    process.stderr.write(`error: ${err instanceof Error ? err.message : String(err)}\n`);
+    process.exitCode = 1;
+  }
 }

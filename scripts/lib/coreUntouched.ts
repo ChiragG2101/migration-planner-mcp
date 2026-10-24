@@ -12,8 +12,13 @@
 // alongside scripts/check-eval-add-only.ts, which enforces the universal
 // add-only rule for existing cases and runs (INV-45); this one enforces the
 // pack-PR-specific rules (own-pack cases/completions/runs only, pinned case
-// fields frozen, one added adapter file and one registry line, knowledge under
-// the owned pack's libraries, README and history add-only, ratchet).
+// fields frozen, one added adapter file and one added registry line, knowledge
+// under the owned pack's libraries, README and history add-only, test/ add-only,
+// coverage-gaps entries of other packs frozen, a base-branch ratchet entry
+// frozen). A new ratchet floor equalling the measured recall is INV-50
+// (`npm run recall -- --check --base`), not this module: it must not import
+// eval/seeded/recall.ts or anything under src/, because those load the PR's
+// own adapter (D57).
 
 import { caseOf, runSetKey, type ChangeKind, type PathChange } from '../../eval/addOnly.js';
 
@@ -66,11 +71,107 @@ export function caseIdOf(path: string): string | null {
   return set ? set.case : null;
 }
 
-/** git numstat counts a one-line edit as one added and one removed line, so the
- * size of a change is the larger of the two. A single-line registration is 1. */
+/** Registry numstat as a line count. A pack may only append: no removed lines,
+ * and at most one added line (D57). Any removed line is a swap or an edit, not
+ * that addition, so it counts as more than one line and the registry rule
+ * rejects it. A non-finite count (a binary diff) does too. */
 export function numstatChangedLines(added: number, removed: number): number {
-  if (!Number.isFinite(added) || !Number.isFinite(removed)) return Number.POSITIVE_INFINITY;
-  return Math.max(added, removed);
+  if (!Number.isFinite(added) || !Number.isFinite(removed) || removed !== 0) return Number.POSITIVE_INFINITY;
+  return added;
+}
+
+/** True when an existing README line was edited or removed. A removed-line
+ * count above zero (or a non-finite one, such as a binary diff) is that edit. */
+export function readmeExistingLineTouched(removedLines: number): boolean {
+  return !(removedLines <= 0);
+}
+
+/** New usage-adapter files this diff adds. index.ts and registry.ts are engine
+ * files, not new adapters. An edit of an existing adapter is not in this list;
+ * the kind !== 'added' rule below rejects it. */
+export function newAdapterFiles(changes: readonly PathChange[]): string[] {
+  return changes
+    .filter((c) => c.kind === 'added' && /^src\/analysis\/usages\/[^/]+\.ts$/.test(c.path) && c.path !== 'src/analysis/usages/index.ts' && c.path !== REGISTRY_FILE)
+    .map((c) => c.path);
+}
+
+/** True when a ratchet entry present on the base branch differs at HEAD.
+ * Compares JSON only. A key that exists only at HEAD is a new floor, which
+ * INV-50 measures; this function does not. */
+export function ratchetExistingEntryChanged(
+  baseRatchet: { [repo: string]: unknown } | null,
+  headRatchet: { [repo: string]: unknown } | null,
+): boolean {
+  const base = baseRatchet ?? {};
+  const head = headRatchet ?? {};
+  for (const repo of Object.keys(base)) {
+    if (JSON.stringify(base[repo]) !== JSON.stringify(head[repo])) return true;
+  }
+  return false;
+}
+
+export interface DerivedCaseState {
+  meta: CaseMeta;
+  /** True when the case.json existed on the base and is gone at HEAD. */
+  removed: boolean;
+  /** Set when this PR completes a pending case (case.json on both sides, no base runs, and the file is modified). */
+  completion: { pinnedChanged: readonly string[]; otherChanged: readonly string[] } | null;
+}
+
+function packField(caseJson: Record<string, unknown> | null): string | null {
+  return typeof caseJson?.pack === 'string' ? caseJson.pack : null;
+}
+
+/** Case meta, folder removal and completion, from the raw case.json values and
+ * the diff. The wrapper only supplies those; the decisions are here. */
+export function deriveCaseState(
+  id: string,
+  baseCase: Record<string, unknown> | null,
+  headCase: Record<string, unknown> | null,
+  existedOnBase: boolean,
+  existsAtHead: boolean,
+  hadBaseRuns: boolean,
+  changes: readonly PathChange[],
+): DerivedCaseState {
+  const meta: CaseMeta = {
+    pack: packField(headCase) ?? packField(baseCase),
+    hadRuns: hadBaseRuns,
+    existedOnBase,
+    existsAtHead,
+  };
+  const removed = !existsAtHead && existedOnBase;
+  const caseJsonChanged = changes.some((c) => c.path === `eval/cases/${id}/case.json` && c.kind === 'modified');
+  const completion =
+    baseCase && headCase && !hadBaseRuns && caseJsonChanged
+      ? { pinnedChanged: pinnedDiff(baseCase, headCase), otherChanged: nonMutableKeysChanged(baseCase, headCase) }
+      : null;
+  return { meta, removed, completion };
+}
+
+function asStringArray(value: unknown): string[] | null {
+  if (!Array.isArray(value) || !value.every((entry) => typeof entry === 'string')) return null;
+  return value;
+}
+
+/** coverage-gaps.json: every base entry that does not start with `<ownPack>:`
+ * must still be present at HEAD. The owned pack's entries may be added or
+ * removed. ownPack null (not exactly one owned pack) treats every entry as
+ * foreign. Either side that is not a JSON array of strings fails closed. */
+export function coverageGapsProblems(baseRaw: unknown, headRaw: unknown, ownPack: string | null): string[] {
+  const base = asStringArray(baseRaw);
+  const head = asStringArray(headRaw);
+  if (!base || !head) {
+    return ['eval/cases/coverage-gaps.json: base and HEAD must both be a JSON array of strings (fail closed)'];
+  }
+  const prefix = ownPack === null ? null : `${ownPack}:`;
+  const problems: string[] = [];
+  for (const entry of base) {
+    if (prefix !== null && entry.startsWith(prefix)) continue;
+    if (!head.includes(entry)) {
+      problems.push(`eval/cases/coverage-gaps.json: an entry not owned by this pack is missing at HEAD (${JSON.stringify(entry)})`);
+    }
+  }
+  return problems;
 }
 
 /** Pinned fields that differ between two case.json objects (stable comparison). */
@@ -120,14 +221,15 @@ export interface CoreUntouchedInput {
   completions: ReadonlyMap<string, { pinnedChanged: readonly string[]; otherChanged: readonly string[] }>;
   /** True when any existing line of eval/cases/README.md was edited or removed (only added lines are allowed). */
   readmeExistingLineTouched: boolean;
-  /** Ratchet entries added by this PR whose value does not equal the measured recall (free-text reasons). */
-  ratchetBadNewEntries: readonly string[];
-  /** True when the PR changes a ratchet entry present on the base branch (another pack's floor is frozen in M10, D57). */
+  /** True when the PR changes a ratchet entry present on the base branch (a floor on the base is frozen; a new floor is INV-50). */
   ratchetExistingEntryChanged: boolean;
-  /** Changed-line count for src/analysis/usages/registry.ts (one added line registers an adapter). */
-  registryChangedLines: number;
-  /** Number of new adapter files added under src/analysis/usages/ (exactly one allowed, excluding index.ts and registry.ts). */
+  /** Numstat added/removed counts for src/analysis/usages/registry.ts. Zero when the file is unchanged. A pure addition is removed === 0 and added <= 1. */
+  registryAdded: number;
+  registryRemoved: number;
+  /** New adapter files added under src/analysis/usages/ (exactly one allowed, excluding index.ts and registry.ts). */
   newAdapterFiles: readonly string[];
+  /** Base and HEAD contents of eval/cases/coverage-gaps.json when that file changed; null when it did not. */
+  coverageGaps: { base: unknown; head: unknown } | null;
 }
 
 /**
@@ -165,7 +267,8 @@ export function inAllowedArea(
   if (p === 'eval/seeded/ratchet.json') return true;
   const seededM = p.match(/^eval\/seeded\/([^/]+)\//);
   if (seededM) return ownSeededRepos.has(seededM[1]!); // only the owned pack's declared seeded repo
-  // The adapter's tests and fixtures: added files only (the add-only rule below).
+  // The adapter's tests and fixtures. Only an added file is allowed; the
+  // add-only rule in checkCoreUntouched rejects a modified or deleted one.
   if (/^test\//.test(p)) return true;
   // Docs.
   if (/^docs\//.test(p)) return true;
@@ -190,9 +293,10 @@ export function checkCoreUntouched(input: CoreUntouchedInput): string[] {
     }
   }
 
-  // 2. The usage registry allows exactly one changed line; exactly one new adapter file, never an edit to an existing one.
-  if (input.registryChangedLines > 1) {
-    problems.push(`${REGISTRY_FILE} changed ${input.registryChangedLines} lines (a pack adds exactly one registry line)`);
+  // 2. The usage registry allows a pure addition of at most one line; exactly one new adapter file, never an edit to an existing one.
+  const registryLines = numstatChangedLines(input.registryAdded, input.registryRemoved);
+  if (registryLines > 1) {
+    problems.push(`${REGISTRY_FILE} must be a pure addition of at most one line (added ${input.registryAdded}, removed ${input.registryRemoved}); a pack adds exactly one registry line and removes none`);
   }
   if (input.newAdapterFiles.length > 1) {
     problems.push(`more than one new usage adapter added (${input.newAdapterFiles.join(', ')}); a pack adds exactly one`);
@@ -259,10 +363,24 @@ export function checkCoreUntouched(input: CoreUntouchedInput): string[] {
     problems.push('eval/cases/README.md: an existing line was edited or removed (the coverage matrix is add-only, one new line per new case)');
   }
 
-  // 7. The seeded ratchet: a new entry must equal the measured recall, and an entry on the base branch may not change.
-  for (const reason of input.ratchetBadNewEntries) {
-    problems.push(`eval/seeded/ratchet.json: ${reason}`);
+  // 6c. test/: a pack PR may only add files. Editing or deleting a test is a core change.
+  for (const c of input.changes) {
+    if (/^test\//.test(c.path) && c.kind !== 'added') {
+      problems.push(`test/: ${c.kind} ${c.path} (a pack PR may only add test files)`);
+    }
   }
+
+  // 6d. coverage-gaps.json: other packs' entries stay; this pack's may be added or removed.
+  if (input.changes.some((c) => c.path === 'eval/cases/coverage-gaps.json')) {
+    if (!input.coverageGaps) {
+      problems.push('eval/cases/coverage-gaps.json: changed without base and HEAD contents (fail closed)');
+    } else {
+      const own = input.ownPacks.size === 1 ? [...input.ownPacks][0]! : null;
+      problems.push(...coverageGapsProblems(input.coverageGaps.base, input.coverageGaps.head, own));
+    }
+  }
+
+  // 7. An entry on the base branch may not change. A new floor equalling the measured recall is INV-50, not this check.
   if (input.ratchetExistingEntryChanged) {
     problems.push("eval/seeded/ratchet.json: an existing ratchet entry was changed (a floor on the base branch is frozen; a new pack only adds its own entry)");
   }
