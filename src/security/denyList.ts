@@ -82,6 +82,80 @@ function globToRegExp(glob: string): RegExp {
   return new RegExp(`^${anywhere}${body}${dir ? '(?:/.*)?' : ''}$`);
 }
 
+/** `*` is a run without `/`, `**` any run. Everything else is a literal character. */
+type GlobToken = string | 1 | 2;
+
+export interface DenyGlob {
+  readonly tokens: readonly GlobToken[];
+  /** No `/` in the pattern, so it matches a name in any folder, like .gitignore. */
+  readonly anywhere: boolean;
+  /** A trailing `/`: the folder and everything in it. */
+  readonly dir: boolean;
+}
+
+/** Same reading as the old regex: a trailing `/` marks a folder, one leading `./` is dropped, `**` is read left to right. */
+export function compileDenyGlob(glob: string): DenyGlob {
+  const dir = glob.endsWith('/');
+  const trimmed = glob.replace(/\/+$/, '').replace(/^\.\//, '');
+  const tokens: GlobToken[] = [];
+  for (let i = 0; i < trimmed.length; i++) {
+    if (trimmed[i] !== '*') tokens.push(trimmed[i]!);
+    else if (trimmed[i + 1] === '*') {
+      tokens.push(2);
+      i++;
+    } else tokens.push(1);
+  }
+  return { tokens, anywhere: !trimmed.includes('/'), dir };
+}
+
+// The regex this replaces read `**` and the folder parts as `.`, which stops at
+// a line break. Kept so the answers stay the same.
+function isLineBreak(c: string): boolean {
+  return c === '\n' || c === '\r' || c === ' ' || c === ' ';
+}
+
+/**
+ * One pass per token over the path, so the cost is at most tokens × path
+ * length and never backtracks (D58). `reach[j]` is true when the tokens so far
+ * can end just before `rel[j]`.
+ */
+export function matchDenyGlob(g: DenyGlob, rel: string): boolean {
+  const n = rel.length;
+  let firstBreak = n;
+  let lastBreak = -1;
+  for (let j = 0; j < n; j++) {
+    if (isLineBreak(rel[j]!)) {
+      if (firstBreak === n) firstBreak = j;
+      lastBreak = j;
+    }
+  }
+  let reach = new Uint8Array(n + 1);
+  reach[0] = 1;
+  // The optional folder prefix: any start just after a `/` with no line break before it.
+  if (g.anywhere) for (let j = 1; j <= Math.min(n, firstBreak + 1); j++) if (rel[j - 1] === '/') reach[j] = 1;
+  let next = new Uint8Array(n + 1);
+  for (const t of g.tokens) {
+    next.fill(0);
+    if (typeof t === 'string') {
+      for (let j = 0; j < n; j++) if (reach[j] && rel[j] === t) next[j + 1] = 1;
+    } else {
+      for (let j = 0; j <= n; j++) {
+        if (reach[j]) next[j] = 1;
+        else if (j > 0 && next[j - 1]) {
+          const c = rel[j - 1]!;
+          if (t === 1 ? c !== '/' : !isLineBreak(c)) next[j] = 1;
+        }
+      }
+    }
+    [reach, next] = [next, reach];
+  }
+  if (reach[n]) return true;
+  if (!g.dir) return false;
+  // A folder entry also matches anything below it, again without a line break.
+  for (let k = Math.max(0, lastBreak); k < n; k++) if (reach[k] && rel[k] === '/') return true;
+  return false;
+}
+
 const virtualenvDirs = new Set(['.venv', 'venv', 'site-packages']);
 
 /** The default rules, on a root-relative path with `/` separators. */
