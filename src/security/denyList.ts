@@ -2,19 +2,20 @@
 // be removed; user entries (the AGENTS.md snippet, M10) can only add.
 import type { SafePath } from './pathBoundary.js';
 
-const userEntries: RegExp[] = [];
+const userEntries: DenyGlob[] = [];
 const userGlobs: string[] = [];
 
 /**
  * A snippet glob longer than this is rejected and never compiled. 128 covers a
- * deep relative pattern. A longer string is not a useful deny glob (D58).
+ * deep relative pattern. A longer string is not a useful deny glob. With the
+ * matcher's tokens × path length cost, it also bounds each check (D58).
  */
 export const MAX_USER_DENY_GLOB_LENGTH = 128;
 
 /**
- * More than this many `**` is rejected. Each `**` becomes `.*` in the matcher.
- * Two covers a prefix and a suffix, such as src then generated. Eight takes
- * about two seconds on one long path, and each extra "**" multiplies that (D58).
+ * More than this many `**` is rejected. Two covers a prefix and a suffix, such
+ * as src then generated. The matcher no longer backtracks on a chain of them,
+ * but a deny glob has no use for more (D58).
  */
 export const MAX_USER_DENY_DOUBLE_STARS = 2;
 
@@ -47,7 +48,7 @@ export function userDenyGlobs(): readonly string[] {
  * Adds user deny entries. A trailing `/` denies a directory and everything in it,
  * `*` matches within one path segment and `**` across segments. There is no way
  * to remove an entry. A glob that would un-deny, point outside the root, or
- * stall the matcher is rejected and not added. Past the per-snippet cap, the
+ * break a limit is rejected and not added. Past the per-snippet cap, the
  * rest are rejected too (INV-5).
  */
 export function addUserDenies(entries: readonly string[]): { added: string[]; rejected: { glob: string; reason: string }[] } {
@@ -64,22 +65,10 @@ export function addUserDenies(entries: readonly string[]): { added: string[]; re
       continue;
     }
     userGlobs.push(entry);
-    userEntries.push(globToRegExp(entry));
+    userEntries.push(compileDenyGlob(entry));
     added.push(entry);
   }
   return { added, rejected };
-}
-
-function globToRegExp(glob: string): RegExp {
-  const dir = glob.endsWith('/');
-  const trimmed = glob.replace(/\/+$/, '').replace(/^\.\//, '');
-  const body = trimmed
-    .split('**')
-    .map((part) => part.replace(/[.+^${}()|[\]\\?]/g, '\\$&').replace(/\*/g, '[^/]*'))
-    .join('.*');
-  // A pattern without a slash matches a name in any folder, like .gitignore.
-  const anywhere = !trimmed.includes('/') ? '(?:.*/)?' : '';
-  return new RegExp(`^${anywhere}${body}${dir ? '(?:/.*)?' : ''}$`);
 }
 
 /** `*` is a run without `/`, `**` any run. Everything else is a literal character. */
@@ -184,7 +173,7 @@ export function isDeniedRel(rel: string): boolean {
 
   if (segs.some((s) => virtualenvDirs.has(s))) return true;
 
-  return userEntries.some((re) => re.test(rel));
+  return userEntries.some((g) => matchDenyGlob(g, rel));
 }
 
 /** Checks both the requested path and where it really points, so a symlink can't launder a denied file. */

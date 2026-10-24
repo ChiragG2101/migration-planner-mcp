@@ -130,6 +130,47 @@ planner_deny:
     expect(res.scan!.files.read).toBeGreaterThan(0);
   });
 
+  it('accepts a chain of single `*` and still scans long file names quickly', async () => {
+    // No `**` and under the length limit, so every limit lets it in. As a
+    // regex each `*` was `[^/]*`, and a chain of them backtracks: 18 characters
+    // took 33 seconds on three 40-character names (D58).
+    const chain = `${'*a'.repeat(40)}*b`;
+    expect(chain).not.toContain('**');
+    expect(chain.length).toBeLessThanOrEqual(MAX_USER_DENY_GLOB_LENGTH);
+    const logs: string[] = [];
+    const e = createEngine({ out: tmpDir(), log: (m) => logs.push(m) });
+    open.push(e);
+    const root = tmpDir();
+    const names = [0, 1, 2].map((i) => `${'a'.repeat(200)}${i}.ts`);
+    const matching = `${'a'.repeat(210)}b`;
+    writeTree(root, {
+      'package.json': JSON.stringify({ dependencies: { next: '^14.2.0' } }),
+      'package-lock.json': JSON.stringify({ lockfileVersion: 3, packages: { 'node_modules/next': { version: '14.2.35' } } }),
+      'AGENTS.md': `
+## migration-planner
+\`\`\`yaml
+planner_deny:
+  - "${chain}"
+\`\`\`
+`,
+      ...Object.fromEntries(names.map((n) => [`src/${n}`, 'export const long = 1;\n'])),
+      [`src/${matching}`]: 'hidden\n',
+    });
+    const started = performance.now();
+    const res = await scanRepo(e, {
+      repo_path: root,
+      source: { name: 'next' },
+      target: { name: 'next', version: '15.1.0' },
+    });
+    const elapsed = performance.now() - started;
+    expect(res.status).toBe('ok');
+    expect(elapsed).toBeLessThan(1000);
+    expect(userDenyGlobs()).toContain(chain);
+    expect(logs.filter((l) => l.includes('rejected planner_deny'))).toEqual([]);
+    expect(res.scan!.skipped).toContainEqual({ path: `src/${matching}`, reason: 'denied' });
+    for (const n of names) expect(res.scan!.skipped).not.toContainEqual({ path: `src/${n}`, reason: 'denied' });
+  });
+
   it('rejects planner_deny entries past the cap for one snippet', async () => {
     const globs = Array.from({ length: MAX_USER_DENY_ENTRIES + 1 }, (_, i) => `capped-${i}/**`);
     const logs: string[] = [];
