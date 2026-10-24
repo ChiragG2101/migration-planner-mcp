@@ -6,9 +6,26 @@ const userEntries: RegExp[] = [];
 const userGlobs: string[] = [];
 
 /**
+ * A snippet glob longer than this is rejected and never compiled. 128 covers a
+ * deep relative pattern. A longer string is not a useful deny glob (D58).
+ */
+export const MAX_USER_DENY_GLOB_LENGTH = 128;
+
+/**
+ * More than this many `**` is rejected. Each `**` becomes `.*` in the matcher.
+ * Two covers a prefix and a suffix, such as src then generated. Eight takes
+ * about two seconds on one long path, and each extra "**" multiplies that (D58).
+ */
+export const MAX_USER_DENY_DOUBLE_STARS = 2;
+
+/** How many globs one snippet call can add. Further entries are rejected (D58). */
+export const MAX_USER_DENY_ENTRIES = 32;
+
+/**
  * Why a snippet glob cannot be added. `!` would un-deny (gitignore negation).
- * An absolute path or a `..` segment points outside the repo root. Null means
- * the glob only adds a denial.
+ * An absolute path or a `..` segment points outside the repo root. A glob that
+ * is too long, or that has too many `**`, is rejected before it is compiled.
+ * Null means the glob only adds a denial.
  */
 export function denyGlobRejection(glob: string): string | null {
   const g = glob.trim();
@@ -16,6 +33,8 @@ export function denyGlobRejection(glob: string): string | null {
   if (g.startsWith('!')) return 'a deny entry cannot remove a denial';
   if (g.startsWith('/') || g.startsWith('\\') || /^[A-Za-z]:[\\/]/.test(g)) return 'path is outside the repo root';
   if (g.split(/[\\/]+/).some((seg) => seg === '..')) return 'path is outside the repo root';
+  if (g.length > MAX_USER_DENY_GLOB_LENGTH) return `deny glob is longer than ${MAX_USER_DENY_GLOB_LENGTH} characters`;
+  if (g.split('**').length - 1 > MAX_USER_DENY_DOUBLE_STARS) return `deny glob has more than ${MAX_USER_DENY_DOUBLE_STARS} "**"`;
   return null;
 }
 
@@ -27,13 +46,18 @@ export function userDenyGlobs(): readonly string[] {
 /**
  * Adds user deny entries. A trailing `/` denies a directory and everything in it,
  * `*` matches within one path segment and `**` across segments. There is no way
- * to remove an entry. A glob that would un-deny or point outside the root is
- * rejected and not added (INV-5).
+ * to remove an entry. A glob that would un-deny, point outside the root, or
+ * stall the matcher is rejected and not added. Past the per-snippet cap, the
+ * rest are rejected too (INV-5).
  */
 export function addUserDenies(entries: readonly string[]): { added: string[]; rejected: { glob: string; reason: string }[] } {
   const added: string[] = [];
   const rejected: { glob: string; reason: string }[] = [];
   for (const entry of entries) {
+    if (added.length >= MAX_USER_DENY_ENTRIES) {
+      rejected.push({ glob: entry, reason: `planner_deny is limited to ${MAX_USER_DENY_ENTRIES} entries` });
+      continue;
+    }
     const reason = denyGlobRejection(entry);
     if (reason) {
       rejected.push({ glob: entry, reason });

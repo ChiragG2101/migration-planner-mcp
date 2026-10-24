@@ -80,6 +80,39 @@ describe('snippet checks need --trust-repo-checks', () => {
     expect(logs.join('\n')).not.toContain('checks used');
   });
 
+  it('keeps the first adopted snippet check set when a second repo names different checks', async () => {
+    const logs: string[] = [];
+    const e = start((m) => logs.push(m), { trustRepoChecks: true });
+    const first = repo();
+    const second = tmpDir();
+    writeTree(second, {
+      'package.json': JSON.stringify({ dependencies: { next: '^14.2.0' } }),
+      'package-lock.json': JSON.stringify({ lockfileVersion: 3, packages: { 'node_modules/next': { version: '14.2.35' } } }),
+      'src/ok.ts': 'export const ok = 1;\n',
+      'AGENTS.md': `
+## migration-planner
+\`\`\`yaml
+checks:
+  install: pip install -r requirements.txt
+  lint: ruff check .
+targets:
+  - next@15
+\`\`\`
+`,
+    });
+    const a = await ingest(e, input(first));
+    const b = await ingest(e, input(second));
+    expect(a.status).toBe('ok');
+    expect(b.status).toBe('ok');
+    expect(e.options.installs?.map((c) => c.argv)).toEqual([['npm', 'ci']]);
+    expect(e.options.checks?.map((c) => ({ name: c.name, argv: c.argv }))).toEqual([{ name: 'typecheck', argv: ['npx', 'tsc', '--noEmit'] }]);
+    expect(logs).toContain('AGENTS.md snippet checks used (--trust-repo-checks)');
+    expect(logs).toContain('AGENTS.md snippet checks ignored: the check config is already frozen');
+    expect(logs.filter((m) => m === 'AGENTS.md snippet checks ignored: the check config is already frozen')).toHaveLength(1);
+    expect(e.options.installs?.some((c) => c.argv.join(' ').includes('pip'))).toBe(false);
+    expect(e.options.checks?.some((c) => c.name === 'lint')).toBe(false);
+  });
+
   it('refuses a tool argument that tries to set the trust flag', async () => {
     const e = start(() => {});
     await expect(ingest(e, { ...input(repo()), trust_repo_checks: true })).rejects.toBeInstanceOf(InputError);
