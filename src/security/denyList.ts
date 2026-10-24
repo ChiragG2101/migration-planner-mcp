@@ -4,6 +4,7 @@ import type { SafePath } from './pathBoundary.js';
 
 const userEntries: DenyGlob[] = [];
 const userGlobs: string[] = [];
+const userGlobSet = new Set<string>();
 
 /**
  * A snippet glob longer than this is rejected and never compiled. 128 covers a
@@ -49,12 +50,14 @@ export function userDenyGlobs(): readonly string[] {
  * `*` matches within one path segment and `**` across segments. There is no way
  * to remove an entry. A glob that would un-deny, point outside the root, or
  * break a limit is rejected and not added. Past the per-snippet cap, the
- * rest are rejected too (INV-5).
+ * rest are rejected too. A glob already in the list is skipped and takes no
+ * slot, since every ingest re-reads the snippet (INV-5, D58).
  */
 export function addUserDenies(entries: readonly string[]): { added: string[]; rejected: { glob: string; reason: string }[] } {
   const added: string[] = [];
   const rejected: { glob: string; reason: string }[] = [];
   for (const entry of entries) {
+    if (userGlobSet.has(entry)) continue;
     if (added.length >= MAX_USER_DENY_ENTRIES) {
       rejected.push({ glob: entry, reason: `planner_deny is limited to ${MAX_USER_DENY_ENTRIES} entries` });
       continue;
@@ -65,6 +68,7 @@ export function addUserDenies(entries: readonly string[]): { added: string[]; re
       continue;
     }
     userGlobs.push(entry);
+    userGlobSet.add(entry);
     userEntries.push(compileDenyGlob(entry));
     added.push(entry);
   }

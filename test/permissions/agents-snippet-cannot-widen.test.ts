@@ -1,7 +1,7 @@
 // INV-5: the AGENTS.md snippet can add deny entries and cannot remove one or
 // point outside the root. The path boundary is unchanged.
 import { afterEach, describe, expect, it } from 'vitest';
-import { closeEngine, createEngine, scanRepo, type Engine } from '../../src/core/index.js';
+import { closeEngine, createEngine, ingest, scanRepo, type Engine } from '../../src/core/index.js';
 import { isDeniedRel, MAX_USER_DENY_DOUBLE_STARS, MAX_USER_DENY_ENTRIES, MAX_USER_DENY_GLOB_LENGTH, userDenyGlobs } from '../../src/security/denyList.js';
 import { resolveInside } from '../../src/security/pathBoundary.js';
 import { readText } from '../../src/security/safeRead.js';
@@ -169,6 +169,40 @@ planner_deny:
     expect(logs.filter((l) => l.includes('rejected planner_deny'))).toEqual([]);
     expect(res.scan!.skipped).toContainEqual({ path: `src/${matching}`, reason: 'denied' });
     for (const n of names) expect(res.scan!.skipped).not.toContainEqual({ path: `src/${n}`, reason: 'denied' });
+  });
+
+  it('does not add the same planner_deny globs again when one engine ingests the repo again', async () => {
+    // Every tool call that ingests re-reads the snippet. Without the identity
+    // check, ten calls left 320 globs, and every file check paid for all of them.
+    const globs = Array.from({ length: MAX_USER_DENY_ENTRIES }, (_, i) => `repeat-${i}/**`);
+    const logs: string[] = [];
+    const e = createEngine({ out: tmpDir(), log: (m) => logs.push(m) });
+    open.push(e);
+    const root = tmpDir();
+    writeTree(root, {
+      'package.json': JSON.stringify({ dependencies: { next: '^14.2.0' } }),
+      'package-lock.json': JSON.stringify({ lockfileVersion: 3, packages: { 'node_modules/next': { version: '14.2.35' } } }),
+      'AGENTS.md': `
+## migration-planner
+\`\`\`yaml
+planner_deny:
+${globs.map((g) => `  - ${g}`).join('\n')}
+\`\`\`
+`,
+      'src/ok.ts': 'export const ok = 1;\n',
+      'repeat-0/secret.txt': 'hidden\n',
+    });
+    const input = { repo_path: root, source: { name: 'next' }, target: { name: 'next', version: '15.1.0' } };
+    const first = await scanRepo(e, input);
+    const again = await ingest(e, input);
+    const third = await scanRepo(e, input);
+    expect(first.status).toBe('ok');
+    expect(again.status).toBe('ok');
+    expect(third.status).toBe('ok');
+    expect(userDenyGlobs().filter((g) => g.startsWith('repeat-'))).toHaveLength(MAX_USER_DENY_ENTRIES);
+    expect(new Set(userDenyGlobs()).size).toBe(userDenyGlobs().length);
+    expect(logs.filter((l) => l.includes('rejected planner_deny'))).toEqual([]);
+    expect(third.scan!.skipped).toContainEqual({ path: 'repeat-0/secret.txt', reason: 'denied' });
   });
 
   it('rejects planner_deny entries past the cap for one snippet', async () => {
