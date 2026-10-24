@@ -28,6 +28,7 @@
     "eval": "tsx eval/runner.ts",
     "eval:smoke": "tsx eval/runner.ts --smoke",
     "eval:add-only": "tsx scripts/check-eval-add-only.ts",
+    "check:core-untouched": "tsx scripts/check-core-untouched.ts",
     "eval:pack-gate": "tsx eval/runner.ts --pack-gate",
     "truth:derive": "tsx scripts/derive-truth.ts",
     "cases:find": "tsx scripts/find-golden-cases.ts",
