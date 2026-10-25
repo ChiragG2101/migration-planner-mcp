@@ -87,7 +87,7 @@ The plan names three PRs but not their order. `scripts/check-core-untouched.ts` 
      - `planner_deny`: a list of globs
      - `targets`: for example `next@16` or `django@5.2`
    - Reader (`src/pipeline/agentsSnippet.ts`, called from ingest). It reads `AGENTS.md` at the repo root via `SafePath`, if present, and parses only the fenced block under that heading.
-     - `planner_deny` globs are **added** to the deny list. A glob that tries to un-deny (for example `!.env`) or point outside the root, including a Windows drive path, a UNC share or `..` on backslashes, is rejected and logged. So is a glob that is too long, has too many `**`, or is past the per-snippet cap (D58).
+     - `planner_deny` globs are **added** to the deny list. A glob that tries to un-deny (for example `!.env`) or point outside the root, including a Windows drive path, a UNC share or `..` on backslashes, is rejected and logged. So is a glob that is too long, has too many `**`, or is past the per-snippet cap (D58). A rejected glob takes none of the cap's slots, so it cannot crowd out the valid globs after it.
      - `checks` become a second source for M8's check config. The repo's own file may have been written by someone else, so checks from the snippet are printed at startup and are used only with `--trust-repo-checks`. CLI flags always win. The first adopted set stays frozen for that engine.
      - `targets` is checked against the user's request. A mismatch produces an ambiguity question, not a silent override. `confirm_target: true` (CLI `--confirm-target`) plans the requested target and records it. The snippet never rewrites the request.
    - The engine works without it, and its absence is logged as "AGENTS.md snippet: not found".
