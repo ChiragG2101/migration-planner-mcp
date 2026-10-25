@@ -271,4 +271,52 @@ ${globs.map((g) => `  - ${g}`).join('\n')}
     expect(userDenyGlobs()).toContain(globs[MAX_USER_DENY_ENTRIES - 1]!);
     expect(userDenyGlobs().filter((g) => g.startsWith('capped-'))).toHaveLength(MAX_USER_DENY_ENTRIES);
   });
+
+  it('gives no slot to a rejected planner_deny glob, so the valid globs after it are all added', async () => {
+    // Fails if a rejected glob takes a slot: the 32 rejections would fill the
+    // cap and every valid glob after them would be rejected as over the limit.
+    const reasons = [
+      (i: number) => ({ glob: `!x-${i}`, reason: 'a deny entry cannot remove a denial' }),
+      (i: number) => ({ glob: `../x-${i}`, reason: 'path is outside the repo root' }),
+      (i: number) => ({ glob: `${'x'.repeat(MAX_USER_DENY_GLOB_LENGTH)}-${i}`, reason: `deny glob is longer than ${MAX_USER_DENY_GLOB_LENGTH} characters` }),
+      (i: number) => ({ glob: `a-${i}/**/b/**/c/**`, reason: `deny glob has more than ${MAX_USER_DENY_DOUBLE_STARS} "**"` }),
+    ];
+    const rejected = Array.from({ length: MAX_USER_DENY_ENTRIES }, (_, i) => reasons[i % reasons.length]!(i));
+    const valid = Array.from({ length: MAX_USER_DENY_ENTRIES }, (_, i) => `afterrej-${i}/**`);
+    const lastValid = `afterrej-${MAX_USER_DENY_ENTRIES - 1}/secret.txt`;
+    const logs: string[] = [];
+    const e = createEngine({ out: tmpDir(), log: (m) => logs.push(m) });
+    open.push(e);
+    const root = tmpDir();
+    writeTree(root, {
+      'package.json': JSON.stringify({ dependencies: { next: '^14.2.0' } }),
+      'package-lock.json': JSON.stringify({ lockfileVersion: 3, packages: { 'node_modules/next': { version: '14.2.35' } } }),
+      'AGENTS.md': `
+## migration-planner
+\`\`\`yaml
+planner_deny:
+${[...rejected.map((r) => r.glob), ...valid].map((g) => `  - "${g}"`).join('\n')}
+\`\`\`
+`,
+      'src/ok.ts': 'export const ok = 1;\n',
+      [lastValid]: 'hidden\n',
+    });
+    const res = await scanRepo(e, {
+      repo_path: root,
+      source: { name: 'next' },
+      target: { name: 'next', version: '15.1.0' },
+    });
+    expect(res.status).toBe('ok');
+    const kept = userDenyGlobs().filter((g) => g.startsWith('afterrej-'));
+    expect(kept).toHaveLength(MAX_USER_DENY_ENTRIES);
+    expect(kept).toEqual(valid);
+    for (const r of rejected) {
+      expect(logs).toContain(`AGENTS.md snippet: rejected planner_deny "${r.glob}" (${r.reason})`);
+      expect(userDenyGlobs()).not.toContain(r.glob);
+    }
+    expect(logs.filter((l) => l.includes('rejected planner_deny'))).toHaveLength(MAX_USER_DENY_ENTRIES);
+    expect(logs.filter((l) => l.includes('planner_deny is limited to'))).toEqual([]);
+    expect(isDeniedRel(lastValid)).toBe(true);
+    expect(res.scan!.skipped).toContainEqual({ path: lastValid, reason: 'denied' });
+  });
 });
