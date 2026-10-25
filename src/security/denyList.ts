@@ -20,7 +20,10 @@ export const MAX_USER_DENY_GLOB_LENGTH = 128;
  */
 export const MAX_USER_DENY_DOUBLE_STARS = 2;
 
-/** How many globs one snippet call can add. Further entries are rejected (D58). */
+/**
+ * How many slots one snippet has on each read. A glob added or already in the
+ * list takes one, so repeat reads add no more. Further entries are rejected (D58).
+ */
 export const MAX_USER_DENY_ENTRIES = 32;
 
 /**
@@ -50,16 +53,21 @@ export function userDenyGlobs(): readonly string[] {
  * `*` matches within one path segment and `**` across segments. There is no way
  * to remove an entry. A glob that would un-deny, point outside the root, or
  * break a limit is rejected and not added. Past the per-snippet cap, the
- * rest are rejected too. A glob already in the list is skipped and takes no
- * slot, since every ingest re-reads the snippet (INV-5, D58).
+ * rest are rejected too. A glob already in the list is skipped, since every
+ * ingest re-reads the snippet, but it still takes a slot, so one snippet adds
+ * at most the cap however often it is read (INV-5, D58).
  */
 export function addUserDenies(entries: readonly string[]): { added: string[]; rejected: { glob: string; reason: string }[] } {
   const added: string[] = [];
   const rejected: { glob: string; reason: string }[] = [];
+  let slots = 0;
   for (const entry of entries) {
-    if (userGlobSet.has(entry)) continue;
-    if (added.length >= MAX_USER_DENY_ENTRIES) {
+    if (slots >= MAX_USER_DENY_ENTRIES) {
       rejected.push({ glob: entry, reason: `planner_deny is limited to ${MAX_USER_DENY_ENTRIES} entries` });
+      continue;
+    }
+    if (userGlobSet.has(entry)) {
+      slots++;
       continue;
     }
     const reason = denyGlobRejection(entry);
@@ -71,6 +79,7 @@ export function addUserDenies(entries: readonly string[]): { added: string[]; re
     userGlobSet.add(entry);
     userEntries.push(compileDenyGlob(entry));
     added.push(entry);
+    slots++;
   }
   return { added, rejected };
 }

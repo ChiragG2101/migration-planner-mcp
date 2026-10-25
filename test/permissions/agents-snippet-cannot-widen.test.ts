@@ -205,6 +205,41 @@ ${globs.map((g) => `  - ${g}`).join('\n')}
     expect(third.scan!.skipped).toContainEqual({ path: 'repeat-0/secret.txt', reason: 'denied' });
   });
 
+  it('adds no more than the cap from one long snippet when one engine ingests the repo again', async () => {
+    // A glob already in the list still takes a slot. When it took none, five
+    // ingests of a 100-entry snippet left 32, 64, 96, 100 and 100 globs.
+    const globs = Array.from({ length: 2 * MAX_USER_DENY_ENTRIES }, (_, i) => `overcap-${i}/**`);
+    const capped = (g: string) => `AGENTS.md snippet: rejected planner_deny "${g}" (planner_deny is limited to ${MAX_USER_DENY_ENTRIES} entries)`;
+    const logs: string[] = [];
+    const e = createEngine({ out: tmpDir(), log: (m) => logs.push(m) });
+    open.push(e);
+    const root = tmpDir();
+    writeTree(root, {
+      'package.json': JSON.stringify({ dependencies: { next: '^14.2.0' } }),
+      'package-lock.json': JSON.stringify({ lockfileVersion: 3, packages: { 'node_modules/next': { version: '14.2.35' } } }),
+      'AGENTS.md': `
+## migration-planner
+\`\`\`yaml
+planner_deny:
+${globs.map((g) => `  - ${g}`).join('\n')}
+\`\`\`
+`,
+      'src/ok.ts': 'export const ok = 1;\n',
+    });
+    const input = { repo_path: root, source: { name: 'next' }, target: { name: 'next', version: '15.1.0' } };
+    const first = await scanRepo(e, input);
+    const firstLogs = logs.splice(0);
+    const again = await ingest(e, input);
+    const againLogs = logs.splice(0);
+    expect(first.status).toBe('ok');
+    expect(again.status).toBe('ok');
+    const kept = userDenyGlobs().filter((g) => g.startsWith('overcap-'));
+    expect(kept).toEqual(globs.slice(0, MAX_USER_DENY_ENTRIES));
+    for (const callLogs of [firstLogs, againLogs]) {
+      expect(callLogs.filter((l) => l.includes('rejected planner_deny'))).toEqual(globs.slice(MAX_USER_DENY_ENTRIES).map(capped));
+    }
+  });
+
   it('rejects planner_deny entries past the cap for one snippet', async () => {
     const globs = Array.from({ length: MAX_USER_DENY_ENTRIES + 1 }, (_, i) => `capped-${i}/**`);
     const logs: string[] = [];
