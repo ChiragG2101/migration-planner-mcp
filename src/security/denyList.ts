@@ -113,7 +113,7 @@ export function compileDenyGlob(glob: string): DenyGlob {
 // The regex this replaces read `**` and the folder parts as `.`, which stops at
 // a line break. Kept so the answers stay the same.
 function isLineBreak(c: string): boolean {
-  return c === '\n' || c === '\r' || c === ' ' || c === ' ';
+  return c === '\n' || c === '\r' || c === '\u2028' || c === '\u2029';
 }
 
 /**

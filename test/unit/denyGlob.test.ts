@@ -101,4 +101,35 @@ describe('deny glob matcher', () => {
     }
     expect(checked).toBe(shortGlobs.length * shortPaths.length);
   });
+
+  // The `**` token, a trailing-`/` folder entry and the folder prefix of a glob
+  // with no `/` each stop at a line break. A space is not one; U+2028 and
+  // U+2029 are, as they were for the old regex's `.`. Spelled as escapes here
+  // on purpose: some tools show the raw characters as spaces.
+  const spaceCases: [string, string][] = [
+    ['secrets/**', 'secrets/my file.txt'],
+    ['secrets/', 'secrets/a b/key.txt'],
+    ['*.txt', 'my docs/x.txt'],
+  ];
+  for (const [glob, path] of spaceCases) {
+    it(`${glob} denies ${JSON.stringify(path)}: a space is not a line break`, () => {
+      expect(matchDenyGlob(compileDenyGlob(glob), path)).toBe(true);
+    });
+  }
+
+  for (const [name, c] of [
+    ['U+2028', ' '],
+    ['U+2029', ' '],
+  ] as const) {
+    const breakCases: [string, string][] = [
+      ['secrets/**', `secrets/a${c}b.txt`],
+      ['secrets/', `secrets/a${c}b/key.txt`],
+      ['*.txt', `a${c}b/x.txt`],
+    ];
+    for (const [glob, path] of breakCases) {
+      it(`${glob} does not deny ${path.replace(c, `<${name}>`)}: ${name} is a line break`, () => {
+        expect(matchDenyGlob(compileDenyGlob(glob), path)).toBe(false);
+      });
+    }
+  }
 });
