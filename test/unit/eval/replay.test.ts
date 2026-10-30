@@ -126,6 +126,18 @@ describe('replay re-runs HEAD engine deterministically', () => {
     expect(a.wall_ms).toBe(5000);
   });
 
+  it('scores the same when the checkout sits at another path (the recording machine is not CI)', async () => {
+    // repo_id is a hash of the checkout's realpath, so the recorded findings name
+    // the recording machine's folder; replay must not depend on it (D17).
+    const elsewhere = path.join(tmpDir(), 'another-machine', 'nextjs-fixture');
+    cpSync(root, elsewhere, { recursive: true });
+    const here = await replayEngineRun(recorded, truth, root);
+    const there = await replayEngineRun(recorded, truth, elsewhere);
+    expect(there.score.recall).toEqual({ found: 1, total: 1 });
+    expect(there.flags).toEqual(here.flags);
+    expect(JSON.stringify(there.score)).toBe(JSON.stringify(here.score));
+  });
+
   it('matches recorded usage IDs to HEAD by span, so renumbered IDs change nothing', async () => {
     const renumbered: EngineRun = {
       ...recorded,
