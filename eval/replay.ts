@@ -57,22 +57,21 @@ function spanOf(u: Usage): UsageSpan {
  * recorded usage ID resolves through the packet's recorded span to a HEAD usage
  * ID; a finding whose usages have no HEAD match drops those IDs (and, if it is
  * left naming none, the finding is counted as a drop). Out-of-scope marks on a
- * vanished usage are dropped the same way. The recorded `repo_id` on a finding
- * and its evidence becomes HEAD's: it hashes the recording machine's checkout
- * path, so keeping it would make the score depend on where the case is checked
- * out (D17).
+ * vanished usage are dropped the same way. The run's recorded `repo_id` becomes
+ * HEAD's: it hashes the recording machine's checkout path, so keeping it would
+ * make the score depend on where the case is checked out (D17).
  */
 function remap(
   sub: RecordedSubmission,
   head: readonly Usage[],
-  repoId: string,
+  repoIds: RepoIdSwap | null,
 ): { submission: { findings: unknown[]; out_of_scope: unknown[] }; dropped: number } {
   const toHead = new Map<string, string | null>();
   for (const p of sub.packet_usages) toHead.set(p.usage_id, headUsageId(p, head));
 
   let dropped = 0;
   const findings = sub.submission.findings.map((recorded) => {
-    const raw = withRepoId(recorded, repoId);
+    const raw = repoIds ? withRepoId(recorded, repoIds) : recorded;
     const f = raw as { usage_ids?: unknown; evidence?: unknown };
     if (!Array.isArray(f.usage_ids)) return raw;
     const mapped: string[] = [];
@@ -98,14 +97,42 @@ function remap(
   return { submission: { findings, out_of_scope: outOfScope }, dropped };
 }
 
-/** A recorded finding with HEAD's repo ID on it and on each evidence item; other shapes pass through for HEAD to judge. */
-function withRepoId(raw: unknown, repoId: string): unknown {
+/** The recorded run's repo ID and HEAD's, for the swap. */
+interface RepoIdSwap {
+  recorded: string;
+  head: string;
+}
+
+/**
+ * The one `repo_id` the run's findings name (runs record no run-level ID), or
+ * null when the run has no finding. Findings that disagree have no recorded ID
+ * to swap, so replay fails loudly instead of guessing.
+ */
+export function recordedRepoId(run: EngineRun): string | null {
+  const seen = new Set<string>();
+  for (const round of run.rounds) {
+    for (const sub of round.submissions) {
+      for (const f of sub.submission.findings) {
+        const id = (f as { repo_id?: unknown } | null)?.repo_id;
+        if (typeof id === 'string') seen.add(id);
+      }
+    }
+  }
+  if (seen.size > 1) throw new Error(`engine run ${run.case_id}#${run.run} has no single recorded repo_id (${[...seen].sort().join(', ')})`);
+  return seen.size === 1 ? [...seen][0]! : null;
+}
+
+/**
+ * A recorded finding with the run's recorded repo ID swapped for HEAD's, on the
+ * finding and its evidence. Any other value is left as recorded, so an attempt
+ * the live gate refused for a wrong repo_id is still refused on replay.
+ */
+function withRepoId(raw: unknown, ids: RepoIdSwap): unknown {
   if (typeof raw !== 'object' || raw === null) return raw;
-  const f = raw as { repo_id?: unknown; evidence?: unknown };
-  const evidence = Array.isArray(f.evidence)
-    ? f.evidence.map((e: unknown) => (typeof e === 'object' && e !== null && 'repo_id' in e ? { ...e, repo_id: repoId } : e))
-    : f.evidence;
-  return { ...f, ...('repo_id' in f ? { repo_id: repoId } : {}), ...(Array.isArray(f.evidence) ? { evidence } : {}) };
+  const swap = <T extends object>(o: T): T => ((o as { repo_id?: unknown }).repo_id === ids.recorded ? { ...o, repo_id: ids.head } : o);
+  const f = swap(raw as { repo_id?: unknown; evidence?: unknown });
+  if (!Array.isArray(f.evidence)) return f;
+  return { ...f, evidence: f.evidence.map((e: unknown) => (typeof e === 'object' && e !== null ? swap(e) : e)) };
 }
 
 const SEVERITY_RANK = ['info', 'low', 'medium', 'high', 'blocker'] as const;
@@ -146,6 +173,8 @@ async function replayInner(engine: Engine, run: EngineRun, truth: Truth, baseChe
     const scan = await scanUsagesWith(engine, baseCheckout, source, target);
     const runId = scan.run_id;
     const head = scan.usages;
+    const recorded = recordedRepoId(run);
+    const repoIds: RepoIdSwap | null = recorded === null ? null : { recorded, head: scan.repo_id };
 
     // Scope. A recorded answer HEAD no longer offers takes the default (D17).
     const proposal = await proposeScope(engine, { run_id: runId });
@@ -186,7 +215,7 @@ async function replayInner(engine: Engine, run: EngineRun, truth: Truth, baseChe
           continue; // HEAD refuses this lens at this size; the recording's lens set differs.
         }
         for (const sub of subs) {
-          const { submission, dropped } = remap(sub, head, scan.repo_id);
+          const { submission, dropped } = remap(sub, head, repoIds);
           droppedFindings += dropped;
           let result;
           try {

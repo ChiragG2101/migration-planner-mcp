@@ -20,7 +20,7 @@ import { snippetHash, sliceLines } from '../../../src/analysis/snippet.js';
 import { docId } from '../../../src/docs/cache.js';
 import { readFileSync } from 'node:fs';
 import { REPLAY_DOCS } from '../../../eval/engineRun.js';
-import { replayBaselineRun, replayEngineRun } from '../../../eval/replay.js';
+import { recordedRepoId, replayBaselineRun, replayEngineRun } from '../../../eval/replay.js';
 import type { BaselineRun, EngineRun, RecordedDoc, RecordedSubmission, Truth, UsageSpan } from '../../../eval/schema.js';
 import { repoRoot, tmpDir } from '../../helpers.js';
 
@@ -136,6 +136,34 @@ describe('replay re-runs HEAD engine deterministically', () => {
     expect(there.score.recall).toEqual({ found: 1, total: 1 });
     expect(there.flags).toEqual(here.flags);
     expect(JSON.stringify(there.score)).toBe(JSON.stringify(here.score));
+  });
+
+  it('swaps only the run\'s recorded repo_id: an evidence item naming another repo is still rejected', async () => {
+    type F = { evidence: { repo_id: string }[] };
+    const wrongEvidence: EngineRun = {
+      ...recorded,
+      rounds: recorded.rounds.map((r) => ({
+        submissions: r.submissions.map((s) => ({
+          ...s,
+          submission: {
+            ...s.submission,
+            findings: (s.submission.findings as F[]).map((f) => ({ ...f, evidence: f.evidence.map((e) => ({ ...e, repo_id: 'not-this-repo' })) })),
+          },
+        })),
+      })),
+    };
+    const r = await replayEngineRun(wrongEvidence, truth, root);
+    expect(r.flags.some((f) => f.kind === 'submission_rejected')).toBe(true);
+    expect(r.score.recall).toEqual({ found: 0, total: 1 });
+  });
+
+  it('fails loudly when a run\'s findings name more than one repo_id', async () => {
+    const sub = recorded.rounds[0]!.submissions[0]!;
+    const other = { ...sub, submission: { ...sub.submission, findings: (sub.submission.findings as object[]).map((f) => ({ ...f, repo_id: 'another-repo' })) } };
+    const split: EngineRun = { ...recorded, rounds: [{ submissions: [sub] }, { submissions: [other] }] };
+    expect(recordedRepoId(recorded)).toBe((sub.submission.findings[0] as { repo_id: string }).repo_id);
+    expect(() => recordedRepoId(split)).toThrow(/no single recorded repo_id/);
+    await expect(replayEngineRun(split, truth, root)).rejects.toThrow(/no single recorded repo_id/);
   });
 
   it('matches recorded usage IDs to HEAD by span, so renumbered IDs change nothing', async () => {
