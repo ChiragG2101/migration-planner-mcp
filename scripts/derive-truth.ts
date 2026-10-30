@@ -163,7 +163,7 @@ async function main(argv: string[]): Promise<number> {
   const clone = path.join(work, caseId);
   try {
     if (!existsSync(path.join(clone, '.git'))) {
-      execFileSync('git', ['clone', '--no-checkout', kase.repo_url, clone], { stdio: 'inherit' });
+      execFileSync('git', ['clone', '--no-checkout', '--', kase.repo_url, clone], { stdio: 'inherit' });
     }
     const git = (...args: string[]): string => execFileSync('git', ['-C', clone, ...args], { encoding: 'utf8' });
     git('fetch', '--depth', '1', 'origin', kase.base_commit);

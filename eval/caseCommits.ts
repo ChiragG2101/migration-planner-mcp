@@ -10,6 +10,7 @@ import { existsSync, mkdirSync, readFileSync, realpathSync } from 'node:fs';
 import path from 'node:path';
 import { fileURLToPath } from 'node:url';
 import { evalRoot, loadBaselineRuns, loadCases, loadEngineRuns, type LoadedCase } from './load.js';
+import { FULL_SHA, GITHUB_REPO_URL } from './schema.js';
 
 /** Runs git in one checkout folder and returns stdout; throws on a non-zero exit. */
 export type GitRunner = (...args: string[]) => string;
@@ -36,29 +37,61 @@ export function checkoutAtBase(dir: string, base: string): string | null {
   return atBase(gitIn(dir), base) ? realpathSync(dir) : null;
 }
 
-export type FetchOutcome = 'present' | 'fetched' | 'unavailable';
+/**
+ * `refused`: the URL or SHA is not one git may be given (nothing ran). `dirty`:
+ * the checkout has local edits, which are never discarded. `unavailable`: the
+ * pinned commit could not be fetched (`case_commit_unavailable`).
+ */
+export type FetchOutcome = 'present' | 'fetched' | 'refused' | 'dirty' | 'unavailable';
+
+const isGithubRepo = (url: string): boolean => GITHUB_REPO_URL.test(url);
 
 /**
  * Bring `dir` to the pinned base commit: a depth-1 fetch of that one commit and
- * a detached checkout. A checkout already at the base is left alone, and a dirty
- * one is never touched (a maintainer's edits are not discarded).
+ * a detached checkout, with hooks off. A checkout already at the base is left
+ * alone, and a dirty one is never touched (a maintainer's edits are not
+ * discarded). The URL and SHA are checked before git sees them, and `--` ends
+ * the options, so case data can never be read as a git option.
  */
-export function fetchCaseCommit(dir: string, repoUrl: string, base: string, makeGit: (dir: string) => GitRunner = gitIn): FetchOutcome {
+export function fetchCaseCommit(
+  dir: string,
+  repoUrl: string,
+  base: string,
+  makeGit: (dir: string) => GitRunner = gitIn,
+  /** Test-only: the offline tests fetch from a local file:// origin. */
+  allowUrl: (url: string) => boolean = isGithubRepo,
+): FetchOutcome {
+  if (!allowUrl(repoUrl) || repoUrl.startsWith('-') || !FULL_SHA.test(base)) return 'refused';
   const git = makeGit(dir);
   const isRepo = existsSync(path.join(dir, '.git'));
   if (isRepo && atBase(git, base)) return 'present';
-  if (isRepo && git('status', '--porcelain').trim() !== '') return 'unavailable';
+  if (isRepo && git('status', '--porcelain').trim() !== '') return 'dirty';
   try {
     if (!isRepo) {
       mkdirSync(dir, { recursive: true });
       git('init', '-q');
     }
-    git('fetch', '-q', '--depth', '1', '--no-tags', repoUrl, base);
-    git('-c', 'advice.detachedHead=false', 'checkout', '-q', '--force', '--detach', base);
+    git('-c', 'core.hooksPath=/dev/null', 'fetch', '-q', '--depth', '1', '--no-tags', '--', repoUrl, base);
+    git('-c', 'core.hooksPath=/dev/null', '-c', 'advice.detachedHead=false', 'checkout', '-q', '--force', '--detach', base);
   } catch {
     return 'unavailable';
   }
   return atBase(git, base) ? 'fetched' : 'unavailable';
+}
+
+/** The line `cases:fetch` prints for one case, with the remedy each failure needs. */
+export function outcomeLine(outcome: FetchOutcome, id: string, base: string): string {
+  switch (outcome) {
+    case 'present':
+    case 'fetched':
+      return `${outcome}: ${id} @ ${base}`;
+    case 'refused':
+      return `FAIL case_record_invalid: ${id}: repo_url must be https://github.com/<owner>/<repo> and base_commit a full SHA; nothing was run`;
+    case 'dirty':
+      return `FAIL case_checkout_dirty: ${id}: eval/.work/${id} has local edits; commit, stash or move them, then rerun`;
+    case 'unavailable':
+      return `FAIL case_commit_unavailable: ${id} @ ${base}: remedy is \`npm run cases:verify\` and the case-removal path (D15)`;
+  }
 }
 
 /** The cases replay needs a checkout for: those with truth and at least one recorded run. */
@@ -72,9 +105,9 @@ function main(): number {
   let failed = 0;
   for (const c of casesNeedingCommits(loadCases(), manifest.current)) {
     const outcome = fetchCaseCommit(path.join(workDir(), c.case.id), c.case.repo_url, c.case.base_commit);
-    if (outcome === 'unavailable') failed += 1;
-    const line = `${outcome === 'unavailable' ? 'FAIL case_commit_unavailable' : outcome}: ${c.case.id} @ ${c.case.base_commit}\n`;
-    (outcome === 'unavailable' ? process.stderr : process.stdout).write(line);
+    const ok = outcome === 'present' || outcome === 'fetched';
+    if (!ok) failed += 1;
+    (ok ? process.stdout : process.stderr).write(`${outcomeLine(outcome, c.case.id, c.case.base_commit)}\n`);
   }
   return failed ? 1 : 0;
 }
