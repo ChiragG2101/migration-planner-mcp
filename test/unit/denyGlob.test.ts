@@ -118,8 +118,8 @@ describe('deny glob matcher', () => {
   }
 
   for (const [name, c] of [
-    ['U+2028', ' '],
-    ['U+2029', ' '],
+    ['U+2028', '\u2028'],
+    ['U+2029', '\u2029'],
   ] as const) {
     const breakCases: [string, string][] = [
       ['secrets/**', `secrets/a${c}b.txt`],
