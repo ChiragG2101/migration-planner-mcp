@@ -53,15 +53,26 @@ export interface EngineOptions {
   /** Lens packet JSON stays within this many characters. Truncation is reported. */
   packetMaxChars?: number;
   /**
-   * User-declared check commands, frozen at startup (D44, C9).
-   * Only used at level 1. Empty at level 0.
+   * User-declared check commands, frozen at startup from CLI flags (D44, C9).
+   * The AGENTS.md snippet can fill an empty set at ingest, and only with
+   * `trustRepoChecks` (D58). Only used at level 1. Empty at level 0.
    */
   checks?: import('../schema/verify.js').CheckConfig[];
   /**
-   * User-declared install commands, frozen at startup (D44, C9).
-   * Only used at level 1. Empty at level 0.
+   * User-declared install commands, frozen at startup from CLI flags (D44, C9).
+   * The snippet is the second source, under the same rule as `checks` (D58).
    */
   installs?: import('../schema/verify.js').InstallConfig[];
+  /**
+   * True when the process was started with `--install` or `--check`. Those
+   * flags are the check config; the snippet cannot replace them (D58).
+   */
+  checksFromCli?: boolean;
+  /**
+   * Use the AGENTS.md snippet's checks when the CLI did not set any. A tool
+   * argument cannot set this (D58, INV-8).
+   */
+  trustRepoChecks?: boolean;
   /**
    * Extra parent-env names the user allows the sandbox to inherit (--pass-env).
    * Never from a tool arg, pack, knowledge or the agent. Only used at level 1.

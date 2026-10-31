@@ -54,7 +54,7 @@ Usage:
   migration-planner-mcp validate <repo> --source <lib@ver> --target <lib@ver> [--answers <file.json>] [--format json|text]
   migration-planner-mcp emit <repo> --source <lib@ver> --target <lib@ver> [--answers <file.json>] [--format json|text]
   migration-planner-mcp verify <repo> --source <lib@ver> --target <lib@ver> [--answers <file.json>] [--install "<cmd>"] [--check name="<cmd>"]
-                         [--junit name=<path>] [--pass-env NAME] [--format json|text]
+                         [--junit name=<path>] [--pass-env NAME] [--trust-repo-checks] [--format json|text]
   migration-planner-mcp report <repo> --source <lib@ver> --target <lib@ver> [--format json|text]
   migration-planner-mcp feedback <repo> --source <lib@ver> --target <lib@ver> --kind <k> --note "<text>"
                          [--finding <id>] [--stage <id>] [--file <f> --line <n>] [--format json|text]
@@ -68,6 +68,8 @@ Shared flags:
   --confidence-threshold <0..1>  findings below it go to "Needs human decision" (default 0.6)
   --budget-tokens <n>   run budget in reported tokens; lenses and stages past it are recorded as budget_cut
   --budget-seconds <n>  run budget in seconds since the run started
+  --trust-repo-checks   use checks from the repo's AGENTS.md snippet when no --install or --check was given
+  --confirm-target      plan the requested target when the snippet names a different one
 `;
 
 const err = (message: string): void => void process.stderr.write(`${message}\n`);
@@ -114,6 +116,8 @@ async function main(argv: string[]): Promise<number> {
       'confidence-threshold': { type: 'string' },
       'budget-tokens': { type: 'string' },
       'budget-seconds': { type: 'string' },
+      'trust-repo-checks': { type: 'boolean' },
+      'confirm-target': { type: 'boolean' },
       note: { type: 'string' },
       finding: { type: 'string' },
       stage: { type: 'string' },
@@ -131,16 +135,17 @@ async function main(argv: string[]): Promise<number> {
   if (values.sandbox !== undefined && values.sandbox !== 'clone' && values.sandbox !== 'container') {
     throw new NotBuiltError(`--sandbox ${values.sandbox} is unknown (only 'clone' is built in v0.1); container mode was cut (D42)`);
   }
-  const checksConfig = parseChecksConfig(
-    (values.install as string[] | undefined) ?? [],
-    (values.check as string[] | undefined) ?? [],
-    (values.junit as string[] | undefined) ?? [],
-  );
+  const installRaw = (values.install as string[] | undefined) ?? [];
+  const checkRaw = (values.check as string[] | undefined) ?? [];
+  const checksConfig = parseChecksConfig(installRaw, checkRaw, (values.junit as string[] | undefined) ?? []);
   const options: EngineOptions = {
     level: parseLevel(values.level),
     log: err,
     checks: checksConfig.checks as import('../schema/verify.js').CheckConfig[],
     installs: checksConfig.install as import('../schema/verify.js').InstallConfig[],
+    // Flags win over the snippet. The trust flag is process config, not a tool argument (D58).
+    checksFromCli: installRaw.length > 0 || checkRaw.length > 0,
+    trustRepoChecks: values['trust-repo-checks'] === true,
   };
   if (values.out) options.out = values.out;
   if (values.db) options.db = values.db;

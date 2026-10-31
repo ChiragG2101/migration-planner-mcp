@@ -46,6 +46,14 @@ The plan names three PRs but not their order. `scripts/check-core-untouched.ts` 
 
 **Live-run handover (D39, D41).** The Django golden runs (N of at least 3 engine runs and N baseline runs per case, one host agent) and the L1 run on a Django case need a live host session on the maintainer's own key. The builder prepares the cases, `truth.json`, `django-tricky` and the run instructions, then stops and hands over, as M7 did. The beat check and the `eval/results.md` acceptance line cannot pass before that. Decision to record: which host and model make the Django runs. Use the M7 host (Cursor/databricks-claude-sonnet-4-6) unless the maintainer says otherwise, so the two packs stay comparable.
 
+## Open items (deferred from the PR #5 review, 2026-10-31)
+
+PR #5 (`npm run cases:fetch` in CI, `docs/design.md` "Case commits") was approved with these left open. None is done yet.
+
+1. **CI step order.** In `.github/workflows/ci.yml`, move "Cache golden-case commits" and "Fetch golden-case commits" after the "Eval add-only" and "No core changes" steps, so a pack PR's case data is checked before git is given it. It was deferred so as not to conflict with the reviewed Core PR A (#3), which adds the "No core changes" step. Do it once the stack is on main, before the pack PR opens.
+2. **Named error for a malformed `case.json`.** `npm run cases:fetch` on a `case.json` that fails the case schema prints a raw ZodError stack, because `loadCases()` (`eval/load.ts`) runs `Case.parse` and throws before `eval/caseCommits.ts` reaches its own record checks. Catch the load error and print the named `FAIL case_record_invalid: <id>: ...` line instead, with a test.
+3. **Test for `--` in the maintainer clones.** The `--` before `kase.repo_url` in the `git clone` calls in `scripts/derive-truth.ts` and `scripts/verify-case.ts` has no test of its own. It backs up the tested `Case.parse` check. Add one if those scripts gain a seam for it (they clone over the network, so they have none today).
+
 ## Tasks
 
 1. **Django usage adapter (`src/analysis/usages/django.ts`).** It uses the M2 `UsageAdapter` interface, the Python adapter and the text scanner. The starting list below is a draft. **Every item is checked against the official Django release notes and deprecation timeline for each feature release in the range (drafted with M3's release drafter) before rules are written.**
@@ -87,9 +95,9 @@ The plan names three PRs but not their order. `scripts/check-core-untouched.ts` 
      - `planner_deny`: a list of globs
      - `targets`: for example `next@16` or `django@5.2`
    - Reader (`src/pipeline/agentsSnippet.ts`, called from ingest). It reads `AGENTS.md` at the repo root via `SafePath`, if present, and parses only the fenced block under that heading.
-     - `planner_deny` globs are **added** to the deny list. A glob that tries to un-deny (for example `!.env`) or point outside the root is rejected and logged.
-     - `checks` become a second source for M8's check config. The repo's own file may have been written by someone else, so checks from the snippet are printed at startup and are used only with `--trust-repo-checks`. CLI flags always win.
-     - `targets` is checked against the user's request. A mismatch produces an ambiguity question, not a silent override.
+     - `planner_deny` globs are **added** to the deny list. A glob that tries to un-deny (for example `!.env`) or point outside the root, including a Windows drive path, a UNC share or `..` on backslashes, is rejected and logged. So is a glob that is too long, has too many `**`, or is past the per-snippet cap (D58). A rejected glob takes none of the cap's slots, so it cannot crowd out the valid globs after it.
+     - `checks` become a second source for M8's check config. The repo's own file may have been written by someone else, so checks from the snippet are printed at startup and are used only with `--trust-repo-checks`. CLI flags always win. The first adopted set stays frozen for that engine.
+     - `targets` is checked against the user's request. A mismatch produces an ambiguity question, not a silent override. `confirm_target: true` (CLI `--confirm-target`) plans the requested target and records it. The snippet never rewrites the request.
    - The engine works without it, and its absence is logged as "AGENTS.md snippet: not found".
    - This touches `src/pipeline/ingest.ts`, `src/security/denyList.ts` and `src/verify/checks.ts`. Because it is a core change, it lands in its own PR, separate from the Django pack PR, so the "no core changes" check stays meaningful for the pack.
 5. **Open-source files.** `CONTRIBUTING.md` and `AI_POLICY.md` were added before M10; M10 brings them up to date with the points below. The rest are new.
@@ -155,9 +163,10 @@ The plan names three PRs but not their order. `scripts/check-core-untouched.ts` 
 - **AGENTS.md snippet:**
   - It parses only the dedicated block.
   - `planner_deny` adds entries.
-  - Permissions: `!.env`, `../outside` and absolute paths are rejected, and the boundary is unchanged (`agents-snippet-cannot-widen`).
-  - Checks from the snippet are ignored without `--trust-repo-checks`, and CLI flags override them (`repo-checks-need-trust`).
-  - A missing file is handled.
+  - Permissions: `!.env`, `../outside`, absolute paths, `C:\outside`, `\\server\share` and `foo\..\..\outside` are rejected, and the boundary is unchanged (`agents-snippet-cannot-widen`). A pathological `**` glob and a glob past the length or entry cap are rejected and not compiled. A chain of single `*` under the limits is accepted, and a scan over 200-character names stays under a second. Ingesting one repo again with one engine adds no glob twice. A snippet of twice the cap ingested twice by one engine leaves exactly the cap of its globs, and the cap rejection is logged on both calls. The matcher gives the old regex's answers on ordinary globs (`test/unit/denyGlob.test.ts`).
+  - Checks from the snippet are ignored without `--trust-repo-checks`, and CLI flags override them (`repo-checks-need-trust`). A second repo does not replace the first adopted set.
+  - A missing file is handled. The section ends at the next `## ` heading.
+  - Without `confirm_target`, a snippet target that does not match the request is a question and no run. With `confirm_target: true`, the run uses the requested target.
 - **Plugin:** the generated bundle matches the packs (drift check).
 - **Regression:** the full eval reruns for both packs. The Next.js engine's worst-case pooled recall must not fall below the low end of its noise band in `eval/results.md` on the base branch, first recorded in M7. M7's CI pack gate checks this and the Django baseline comparison (D17): the engine's worst-case pooled recall (each Django case's lowest-recall run, pooled) must be above the baseline's best-case pooled recall (each case's highest-recall run, pooled). Every Django case has the same number N of recorded engine runs under HEAD's prompt version and the same N of baseline runs with HEAD's baseline prompt hash, with N at least 3, all made with the same host agent, and the gate fails on any other count. The Django pack has no band on the base branch, so it is beat-checked whichever PR adds its cases, and the regression check is skipped for it. A later PR that widens it is beat-checked again over all its cases.
 

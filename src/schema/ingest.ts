@@ -22,11 +22,21 @@ export const IngestInput = z
       .regex(/^[A-Za-z0-9_-]{1,64}$/)
       .optional()
       .describe('Campaign to file the run under; created if absent.'),
+    confirm_target: z
+      .literal(true)
+      .optional()
+      .describe('Set to true to plan the requested target when the AGENTS.md snippet names a different one. Does not change the request, the level, or the check config.'),
   })
   .strict();
 export type IngestInput = z.infer<typeof IngestInput>;
 
-export const QuestionKind = z.enum(['vague_input', 'ambiguous_version', 'unresolved_version', 'version_mismatch']);
+export const QuestionKind = z.enum([
+  'vague_input',
+  'ambiguous_version',
+  'unresolved_version',
+  'version_mismatch',
+  'ambiguous_target',
+]);
 
 export const Question = z.object({
   kind: QuestionKind,
