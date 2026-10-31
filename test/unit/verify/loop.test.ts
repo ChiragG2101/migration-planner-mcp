@@ -130,8 +130,10 @@ describe('patch-replay', () => {
 
     // Apply a real patch via the file-list path.
     loop.applyPatch(sb, [{ path: 'add.js', content: 'export function add(a, b) {\n  return a + b;\n}\nexport const VERSION = 2;\n' }]);
-    // Commit it (what submitStagePatch does on kept) and export the diff.
-    gitIn(sb.root, ['commit', '-q', '-m', 'stage s1']);
+    // Commit it (what submitStagePatch does on kept) and export the diff. A clone
+    // does not copy makeRepo's local identity, and CI runners have no global one;
+    // the engine passes its own (SANDBOX_GIT_ENV), so the test names one too.
+    gitIn(sb.root, ['-c', 'user.name=test', '-c', 'user.email=t@t.local', 'commit', '-q', '-m', 'stage s1']);
     const diff = gitIn(sb.root, ['diff', 'mp-stage-start-s1', 'HEAD']);
     const finalTree = treeHash(sb.root);
 

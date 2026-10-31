@@ -20,6 +20,11 @@ export const CaseChecks = z
   .strict();
 export type CaseChecks = z.infer<typeof CaseChecks>;
 
+/** A public GitHub repo, `https://github.com/<owner>/<repo>`, with nothing git could read as an option. */
+export const GITHUB_REPO_URL = /^https:\/\/github\.com\/[\w.-]+\/[\w.-]+$/;
+/** A full 40-hex commit SHA. */
+export const FULL_SHA = /^[0-9a-f]{40}$/;
+
 /**
  * eval/cases/<id>/case.json. The pinned fields (everything but `notes` and
  * `checks`) are frozen once a case has recorded runs (D15); the add-only check
@@ -29,9 +34,13 @@ export const Case = z
   .object({
     id: z.string().min(1),
     pack: z.string().min(1),
-    repo_url: z.string().min(1),
-    base_commit: z.string().min(1),
-    merge_commit: z.string().min(1),
+    // Maintainer tools pass these to git (cases:fetch, cases:verify, truth:derive),
+    // so a case can name only a public GitHub repo and full commit SHAs: an
+    // option-shaped URL could otherwise run a command, and a short SHA never
+    // equals the full HEAD a checkout reports.
+    repo_url: z.string().regex(GITHUB_REPO_URL),
+    base_commit: z.string().regex(FULL_SHA),
+    merge_commit: z.string().regex(FULL_SHA),
     pr_url: z.string().min(1),
     source: CaseLib,
     target: CaseLib,
