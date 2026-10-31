@@ -48,10 +48,8 @@ The plan names three PRs but not their order. `scripts/check-core-untouched.ts` 
 
 ## Open items (deferred from the PR #5 review, 2026-10-31)
 
-PR #5 (`npm run cases:fetch` in CI, `docs/design.md` "Case commits") was approved with these left open. None is done yet.
+PR #5 (`npm run cases:fetch` in CI, `docs/design.md` "Case commits") was approved with three items left open. Items 1 (CI step order) and 2 (named error for a malformed `case.json`) were done in the CI case-fetch-order core PR (`docs/design.md` D59). Item 3 stays open, unchanged (D59).
 
-1. **CI step order.** In `.github/workflows/ci.yml`, move "Cache golden-case commits" and "Fetch golden-case commits" after the "Eval add-only" and "No core changes" steps, so a pack PR's case data is checked before git is given it. It was deferred so as not to conflict with the reviewed Core PR A (#3), which adds the "No core changes" step. Do it once the stack is on main, before the pack PR opens.
-2. **Named error for a malformed `case.json`.** `npm run cases:fetch` on a `case.json` that fails the case schema prints a raw ZodError stack, because `loadCases()` (`eval/load.ts`) runs `Case.parse` and throws before `eval/caseCommits.ts` reaches its own record checks. Catch the load error and print the named `FAIL case_record_invalid: <id>: ...` line instead, with a test.
 3. **Test for `--` in the maintainer clones.** The `--` before `kase.repo_url` in the `git clone` calls in `scripts/derive-truth.ts` and `scripts/verify-case.ts` has no test of its own. It backs up the tested `Case.parse` check. Add one if those scripts gain a seam for it (they clone over the network, so they have none today).
 
 ## Tasks

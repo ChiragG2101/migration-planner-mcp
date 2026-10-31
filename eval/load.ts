@@ -19,14 +19,50 @@ export interface LoadedCase {
   annotations: Annotation[];
 }
 
-/** Every case folder, with its truth and annotations when present. */
-export function loadCases(): LoadedCase[] {
+/**
+ * Control characters and line or paragraph separators. The message quotes the
+ * folder name and file text (V8's JSON error, Zod's unrecognized keys), and a
+ * line break there would let a pack PR's text start its own CI log line, which
+ * GitHub Actions reads as a workflow command when it starts with `::`.
+ */
+const BREAKS = /[\p{Cc}\p{Zl}\p{Zp}]/gu;
+const escapeBreaks = (s: string): string => s.replace(BREAKS, (c) => `\\u${c.charCodeAt(0).toString(16).padStart(4, '0')}`);
+
+/** A `case.json` that is not JSON or fails the case schema, named by its case folder. Callers fail on it; none skips the case. */
+export class CaseRecordInvalid extends Error {
+  constructor(
+    readonly caseId: string,
+    detail: string,
+  ) {
+    super(escapeBreaks(`case_record_invalid: ${caseId}: eval/cases/${caseId}/case.json ${detail}`));
+    this.name = 'CaseRecordInvalid';
+  }
+}
+
+function parseCase(id: string, casePath: string): Case {
+  const text = readFileSync(casePath, 'utf8');
+  let raw: unknown;
+  try {
+    raw = JSON.parse(text);
+  } catch (e) {
+    throw new CaseRecordInvalid(id, `is not valid JSON: ${(e as Error).message}`);
+  }
+  const parsed = Case.safeParse(raw);
+  if (!parsed.success) {
+    const issues = parsed.error.issues.map((i) => `${i.path.join('.') || '(root)'}: ${i.message}`).join('; ');
+    throw new CaseRecordInvalid(id, `fails the case schema: ${issues}`);
+  }
+  return parsed.data;
+}
+
+/** Every case folder, with its truth and annotations when present. Throws `CaseRecordInvalid` on the first bad `case.json`. */
+export function loadCases(root: string = casesDir()): LoadedCase[] {
   const out: LoadedCase[] = [];
-  for (const id of dirs(casesDir())) {
-    const dir = path.join(casesDir(), id);
+  for (const id of dirs(root)) {
+    const dir = path.join(root, id);
     const casePath = path.join(dir, 'case.json');
     if (!existsSync(casePath)) continue;
-    const kase = Case.parse(JSON.parse(readFileSync(casePath, 'utf8')));
+    const kase = parseCase(id, casePath);
     const truthPath = path.join(dir, 'truth.json');
     const annPath = path.join(dir, 'annotations.json');
     out.push({

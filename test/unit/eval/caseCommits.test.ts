@@ -3,15 +3,17 @@
 // results.md is never rendered without a case that has recorded runs. Offline:
 // a local origin stands in for the case's public repo.
 import { execFileSync } from 'node:child_process';
-import { mkdtempSync, readdirSync, readFileSync, realpathSync, rmSync, writeFileSync } from 'node:fs';
+import { cpSync, mkdirSync, mkdtempSync, readdirSync, readFileSync, realpathSync, rmSync, writeFileSync } from 'node:fs';
 import os from 'node:os';
 import path from 'node:path';
 import { pathToFileURL } from 'node:url';
 import { afterEach, describe, expect, it } from 'vitest';
-import { checkoutAtBase, fetchCaseCommit as fetchFrom, outcomeLine, type GitRunner } from '../../../eval/caseCommits.js';
+import { parse as parseYaml } from 'yaml';
+import { checkoutAtBase, fetchAll, fetchCaseCommit as fetchFrom, outcomeLine, type GitRunner } from '../../../eval/caseCommits.js';
+import { CaseRecordInvalid, loadCases } from '../../../eval/load.js';
 import { assertCommitsAvailable, generate } from '../../../eval/runner.js';
 import { Case } from '../../../eval/schema.js';
-import { repoRoot } from '../../helpers.js';
+import { repoRoot, tmpDir } from '../../helpers.js';
 
 const gitAt = (cwd: string, ...args: string[]): string => execFileSync('git', ['-C', cwd, ...args], { encoding: 'utf8', stdio: 'pipe' });
 
@@ -151,6 +153,119 @@ describe('case records name only a GitHub repo and full SHAs', () => {
       { base_commit: String(good['base_commit']).toUpperCase() },
     ];
     for (const patch of bad) expect(Case.safeParse({ ...good, ...patch }).success, JSON.stringify(patch)).toBe(false);
+  });
+});
+
+describe('a malformed case.json is a named error, never a stack or a skip', () => {
+  const good = path.join(repoRoot, 'eval/cases/nextjs-scaffold-move-43');
+
+  /** A cases folder holding a real case with recorded runs, plus `zz-bad-record` with the given case.json text. */
+  function casesWith(badText: string): string {
+    const root = tmpDir('mp-case-records-');
+    cpSync(good, path.join(root, 'nextjs-scaffold-move-43'), { recursive: true });
+    mkdirSync(path.join(root, 'zz-bad-record'));
+    writeFileSync(path.join(root, 'zz-bad-record', 'case.json'), badText);
+    return root;
+  }
+
+  function run(root: string): { code: number; out: string[]; err: string[]; fetched: string[] } {
+    const out: string[] = [];
+    const err: string[] = [];
+    const fetched: string[] = [];
+    const code = fetchAll(
+      'v1',
+      () => loadCases(root),
+      (dir) => {
+        fetched.push(path.basename(dir));
+        return 'present';
+      },
+      (stream, line) => (stream === 'out' ? out : err).push(line),
+    );
+    return { code, out, err, fetched };
+  }
+
+  it('cases:fetch prints FAIL case_record_invalid naming the folder, exits 1 and fetches nothing', () => {
+    const raw = JSON.parse(readFileSync(path.join(good, 'case.json'), 'utf8')) as Record<string, unknown>;
+    const r = run(casesWith(JSON.stringify({ ...raw, repo_url: '--upload-pack=touch /tmp/PWNED' })));
+    expect(r.code).toBe(1);
+    expect(r.err).toHaveLength(1);
+    expect(r.err[0]).toMatch(/^FAIL case_record_invalid: zz-bad-record: eval\/cases\/zz-bad-record\/case\.json fails the case schema: repo_url: /);
+    expect(r.err[0]).not.toMatch(/\n|\bat .*:\d+:\d+|ZodError/);
+    expect(r.out).toEqual([]);
+    expect(r.fetched).toEqual([]); // the good case sorts first and is still not fetched
+  });
+
+  it('a case.json that is not JSON is named the same way', () => {
+    const r = run(casesWith('{ not json'));
+    expect(r.code).toBe(1);
+    expect(r.err).toEqual([expect.stringMatching(/^FAIL case_record_invalid: zz-bad-record: eval\/cases\/zz-bad-record\/case\.json is not valid JSON: /)]);
+    expect(r.fetched).toEqual([]);
+  });
+
+  // A line break in the message would let file text start its own CI log line, and a
+  // line that starts with `::` is a GitHub Actions workflow command. U+2028 and U+2029
+  // are built with fromCharCode because some tools turn their escapes into raw characters.
+  const [LS, PS] = [String.fromCharCode(0x2028), String.fromCharCode(0x2029)];
+  const LINE_BREAK = new RegExp(`[\\x00-\\x1f\\x7f-\\x9f${LS}${PS}]`);
+
+  it('a not-JSON file cannot break the line or start a workflow command', () => {
+    const r = run(casesWith('x\n::error::planted-json'));
+    expect(r.code).toBe(1);
+    expect(r.err).toHaveLength(1);
+    expect(r.err[0]).toMatch(/^FAIL case_record_invalid: zz-bad-record: .* is not valid JSON: /);
+    expect(r.err[0]).not.toMatch(LINE_BREAK);
+  });
+
+  it('a folder name cannot break the line or start a workflow command', () => {
+    // Built directly: Windows cannot create a folder with a line break in its name.
+    for (const id of ['zz\n::warning::folder', 'zz\r::warning::folder', `zz${LS}::warning::folder`, 'zz\x85::warning::folder']) {
+      const message = new CaseRecordInvalid(id, 'is not valid JSON: x').message;
+      expect(message, JSON.stringify(id)).toMatch(/^case_record_invalid: zz\\u00(0a|0d|85)|^case_record_invalid: zz\\u2028/);
+      expect(message, JSON.stringify(id)).not.toMatch(LINE_BREAK);
+    }
+  });
+
+  it('a schema issue quoting a planted key cannot break the line or start a workflow command', () => {
+    const raw = JSON.parse(readFileSync(path.join(good, 'case.json'), 'utf8')) as Record<string, unknown>;
+    for (const key of ['k\n::warning::planted-key', 'k\r::warning::cr', `k${LS}::warning::ls`, `k${PS}::warning::ps`, 'k\x85::warning::nel']) {
+      const r = run(casesWith(JSON.stringify({ ...raw, [key]: 1 })));
+      expect(r.code, JSON.stringify(key)).toBe(1);
+      expect(r.err, JSON.stringify(key)).toHaveLength(1);
+      expect(r.err[0], JSON.stringify(key)).toMatch(/^FAIL case_record_invalid: zz-bad-record: .* fails the case schema: /);
+      expect(r.err[0], JSON.stringify(key)).not.toMatch(LINE_BREAK);
+    }
+  });
+
+  it('with good records only, every case that needs a commit is fetched', () => {
+    const root = tmpDir('mp-case-records-');
+    cpSync(good, path.join(root, 'nextjs-scaffold-move-43'), { recursive: true });
+    const r = run(root);
+    expect(r).toEqual({ code: 0, out: [`present: nextjs-scaffold-move-43 @ ${JSON.parse(readFileSync(path.join(good, 'case.json'), 'utf8')).base_commit}`], err: [], fetched: ['nextjs-scaffold-move-43'] });
+  });
+
+  it('the loader the eval runner uses throws on a bad record rather than skipping it', () => {
+    expect(() => loadCases(casesWith('{ not json'))).toThrow(CaseRecordInvalid);
+  });
+
+  it('any other load error is not swallowed', () => {
+    const boom = (): never => {
+      throw new Error('truth.json broke');
+    };
+    expect(() => fetchAll('v1', boom, () => 'present', () => {})).toThrow('truth.json broke');
+  });
+});
+
+describe('CI vets case data before git is given it', () => {
+  it('runs add-only and no-core-changes before the case-commit cache and fetch, and the eval steps after', () => {
+    const ci = parseYaml(readFileSync(path.join(repoRoot, '.github/workflows/ci.yml'), 'utf8')) as { jobs: { gates: { steps: { name?: string }[] } } };
+    const names = ci.jobs.gates.steps.map((s) => s.name ?? '');
+    const at = (prefix: string): number => {
+      const i = names.findIndex((n) => n.startsWith(prefix));
+      expect(i, prefix).toBeGreaterThanOrEqual(0);
+      return i;
+    };
+    const order = ['Eval add-only', 'No core changes', 'Cache golden-case commits', 'Fetch golden-case commits', 'Eval smoke', 'Eval pack gate', 'Eval results.md'].map(at);
+    expect(order).toEqual([...order].sort((a, b) => a - b));
   });
 });
 
