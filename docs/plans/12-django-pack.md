@@ -117,6 +117,7 @@ The check was built in M10's Core PR A and runs in CI on every PR (D57). This mi
 - **A hidden core coupling surfaces** (for example, JS-specific assumptions in staging, packets or gate 7 test counting). Mitigation: that is exactly what this milestone tests. Fix it in a separate core PR and record it.
 - **Django's string-based configuration hides usages from import graphs.** Mitigation: `string_ref` edges from M2, settings parsing, and seeded cases for each pattern.
 - **Django tests need a database or other services.** Mitigation: the user declares them in their checks (for example a SQLite test settings module), and missing services show up as baseline failures. Container mode was cut in v0.1 (`docs/design.md` D42), so no image can be supplied; the README states this limit.
+- **Neither M0 Django case's declared checks can run at L1 as written.** `django-ror-api-548` runs `python manage.py setup $TEST_DATA_DUMP_FILE -t`, but L1 runs checks as argv with no shell and a scrubbed environment, so the variable is neither expanded nor set. `django-thunderstore-1369` runs its tests through `docker compose`, and container mode is cut (D42). Mitigation: the L1 acceptance above likely needs a new Django case whose checks run as argv in a clean environment; look for one while finding the task 3 cases, and raise it with the maintainer if none can be found.
 
 ## Dependencies
 
