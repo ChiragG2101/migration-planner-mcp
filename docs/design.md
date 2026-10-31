@@ -898,3 +898,30 @@ Open item 3 (a test for `--` in the maintainer clones in `scripts/derive-truth.t
 **Alternatives:** catching in `fetchAll` alone, without a typed error, which could not name the folder; a second loader in `caseCommits.ts` with `safeParse`, which would duplicate `loadCases`; skipping a bad case and fetching the rest, which could let a run go ahead without a case it should have scored.
 
 **What would change it:** a check that needs the case checkouts to vet case data, which would have to run after the fetch.
+
+## 2026-11-01: v0.1 ships with the Next.js pack only
+
+### D60 - The Django pack moves to v0.2 (M12); M10 gains the L1 eval evidence for Next.js
+
+**Decision (the maintainer, 2026-11-01):** v0.1 goes live with one pack, the Next.js major upgrade. The Django LTS to LTS pack becomes v0.2, as a new milestone M12 (`docs/plans/12-django-pack.md`) that starts after M11.
+
+- **What moved.** M10's tasks 1 to 3 (the Django usage adapter, knowledge and pack, and eval cases), its "Why Django is pack 2" and "No core changes" sections, the Django tests, the three Django acceptance criteria, the Django risks and the Django live-run handover moved to M12 unchanged, except for lines that named M10 or both packs. M12 adds one task: the pack PR regenerates `plugin/` with the Django skill and updates the README's eval table and limits.
+- **What stays in M10**, with its task numbers kept so earlier references (for example D58's "M10 task 4") still hold: the AGENTS.md snippet (done), the "no core changes" check (done, D57), the open-source files, the plugin bundle, the name, the README and the demo. The plan file is renamed `docs/plans/10-snippet-readme-oss-demo.md`. M10's plugin bundle carries the Next.js skill. The README's limits become "one pack, Next.js, so TS/JS repos only (the Python adapter ships, the Django pack is v0.2)".
+- **The L1 evidence gap (found while making this change).** M10's acceptance asked for "an L1 run on at least one Django case" in `eval/results.md`. That moved with Django, but it was also standing in for M8's own first acceptance criterion: a full L1 run on at least 2 Next.js golden cases, with outcome metrics in `eval/results.md`. M8 was marked done with its live L1 runs as a handover (D39, D41), but the eval half for them was never built either: `eval/addOnly.ts` keeps L1 sets add-only and `eval/load.ts` skips them, and there is no L1 run record, export, replay or `results.md` section. Rather than ship v0.1 with the README's verify claim unbacked, or loosen M8's criterion (working rule 3), M10 gains task 10: build that half as a core PR, then hand over for live L1 runs on at least 2 of the Next.js cases that declare `checks` (`nextjs-bigcommerce-subscription-foundation-51`, `nextjs-couchers-web-9893`, `nextjs-neotree-editor-165`). It lands before the docs and release PR, which shows its results.
+- **What does not change.** The M0 Django cases (`django-ror-api-548`, `django-thunderstore-1369`) stay committed and are listed as pending in `results.md`, as for any case whose pack is not at HEAD (D17). Nothing is deleted. The "no core changes" and add-only checks keep running on every PR. The empty `knowledge/pypi/django/` folder stays. The Python language adapter stays in the engine and ships.
+- **Spine checks.** `scripts/check-spine.sh` maps M12 and later milestones to `docs/plans/<n>-*.md`.
+
+**Why:** the Next.js pack has its eval evidence (7 golden cases, engine 62.8% against the baseline's 40.7% worst-case pooled recall), and Django has almost none yet: no knowledge, 2 of at least 3 golden cases (only 1 strict LTS-to-LTS case and no messy case), and at least 18 live runs still to make. Keeping it in v0.1 would push go-live back by about 1 to 1.5 weeks, and further if the pack misses the baseline on its first try.
+
+**Cost, stated so the README does not overclaim:**
+- With one pack, "a general engine" is a design aim, not a measured result.
+- The "no core changes" check has not yet judged a real pack PR, so a contributor's first pack may surface a needed core change.
+- The audience is Next.js projects only.
+- PRD section 4 and the README limits now say this.
+
+**Alternatives:**
+- Ship a thinner Django pack under the old cut order. It still needs the cases and all the live runs, so it saves little time.
+- Delay go-live until Django is done.
+- Ship v0.1 with the README saying that L1 outcomes are not yet measured. That would loosen M8's acceptance criterion, which is the maintainer's call; the builder recommended against it.
+
+**What would change it:** early users asking mostly for Python or Django upgrades, which would pull M12 forward; or the maintainer deciding against the L1 evidence task.
