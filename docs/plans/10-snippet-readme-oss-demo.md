@@ -22,7 +22,7 @@
 
 1. **Core PR A:** `scripts/check-core-untouched.ts` with its planted-change tests, wired into CI. Done 2026-10-25 (D57). Its first real pack PR is M12's.
 2. **Core PR B:** the AGENTS.md snippet (task 4), with its permissions tests. Done 2026-10-31 (D58).
-3. **CI case-fetch-order core PR:** the PR #5 review's open items 1 and 2 (D59).
+3. **CI case-fetch-order core PR:** the PR #5 review's open items 1 and 2 (D59). Built 2026-10-31 as PR #6; approved, awaiting merge.
 4. **L1 evidence core PR:** task 10, then the live L1 runs (handover).
 5. **Docs and release PR:** open-source files, plugin bundle, name, README and demo (tasks 5 to 9). It comes after the L1 runs, because the README and the demo show their results. The name lands last because it renames the snippet heading and the bundle.
 
