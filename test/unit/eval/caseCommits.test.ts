@@ -8,6 +8,7 @@ import os from 'node:os';
 import path from 'node:path';
 import { pathToFileURL } from 'node:url';
 import { afterEach, describe, expect, it } from 'vitest';
+import { parse as parseYaml } from 'yaml';
 import { checkoutAtBase, fetchAll, fetchCaseCommit as fetchFrom, outcomeLine, type GitRunner } from '../../../eval/caseCommits.js';
 import { CaseRecordInvalid, loadCases } from '../../../eval/load.js';
 import { assertCommitsAvailable, generate } from '../../../eval/runner.js';
@@ -217,6 +218,20 @@ describe('a malformed case.json is a named error, never a stack or a skip', () =
       throw new Error('truth.json broke');
     };
     expect(() => fetchAll('v1', boom, () => 'present', () => {})).toThrow('truth.json broke');
+  });
+});
+
+describe('CI vets case data before git is given it', () => {
+  it('runs add-only and no-core-changes before the case-commit cache and fetch, and the eval steps after', () => {
+    const ci = parseYaml(readFileSync(path.join(repoRoot, '.github/workflows/ci.yml'), 'utf8')) as { jobs: { gates: { steps: { name?: string }[] } } };
+    const names = ci.jobs.gates.steps.map((s) => s.name ?? '');
+    const at = (prefix: string): number => {
+      const i = names.findIndex((n) => n.startsWith(prefix));
+      expect(i, prefix).toBeGreaterThanOrEqual(0);
+      return i;
+    };
+    const order = ['Eval add-only', 'No core changes', 'Cache golden-case commits', 'Fetch golden-case commits', 'Eval smoke', 'Eval pack gate', 'Eval results.md'].map(at);
+    expect(order).toEqual([...order].sort((a, b) => a - b));
   });
 });
 
