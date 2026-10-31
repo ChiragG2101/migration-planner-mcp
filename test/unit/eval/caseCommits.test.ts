@@ -202,6 +202,31 @@ describe('a malformed case.json is a named error, never a stack or a skip', () =
     expect(r.fetched).toEqual([]);
   });
 
+  // A line break in the message would let file text start its own CI log line, and a
+  // line that starts with `::` is a GitHub Actions workflow command. U+2028 and U+2029
+  // are built with fromCharCode because some tools turn their escapes into raw characters.
+  const [LS, PS] = [String.fromCharCode(0x2028), String.fromCharCode(0x2029)];
+  const LINE_BREAK = new RegExp(`[\\x00-\\x1f\\x7f-\\x9f${LS}${PS}]`);
+
+  it('a not-JSON file cannot break the line or start a workflow command', () => {
+    const r = run(casesWith('x\n::error::planted-json'));
+    expect(r.code).toBe(1);
+    expect(r.err).toHaveLength(1);
+    expect(r.err[0]).toMatch(/^FAIL case_record_invalid: zz-bad-record: .* is not valid JSON: /);
+    expect(r.err[0]).not.toMatch(LINE_BREAK);
+  });
+
+  it('a schema issue quoting a planted key cannot break the line or start a workflow command', () => {
+    const raw = JSON.parse(readFileSync(path.join(good, 'case.json'), 'utf8')) as Record<string, unknown>;
+    for (const key of ['k\n::warning::planted-key', 'k\r::warning::cr', `k${LS}::warning::ls`, `k${PS}::warning::ps`, 'k\x85::warning::nel']) {
+      const r = run(casesWith(JSON.stringify({ ...raw, [key]: 1 })));
+      expect(r.code, JSON.stringify(key)).toBe(1);
+      expect(r.err, JSON.stringify(key)).toHaveLength(1);
+      expect(r.err[0], JSON.stringify(key)).toMatch(/^FAIL case_record_invalid: zz-bad-record: .* fails the case schema: /);
+      expect(r.err[0], JSON.stringify(key)).not.toMatch(LINE_BREAK);
+    }
+  });
+
   it('with good records only, every case that needs a commit is fetched', () => {
     const root = tmpDir('mp-case-records-');
     cpSync(good, path.join(root, 'nextjs-scaffold-move-43'), { recursive: true });
