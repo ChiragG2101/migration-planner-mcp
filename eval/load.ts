@@ -19,13 +19,22 @@ export interface LoadedCase {
   annotations: Annotation[];
 }
 
+/**
+ * Control characters and line or paragraph separators. The message quotes the
+ * folder name and file text (V8's JSON error, Zod's unrecognized keys), and a
+ * line break there would let a pack PR's text start its own CI log line, which
+ * GitHub Actions reads as a workflow command when it starts with `::`.
+ */
+const BREAKS = /[\p{Cc}\p{Zl}\p{Zp}]/gu;
+const escapeBreaks = (s: string): string => s.replace(BREAKS, (c) => `\\u${c.charCodeAt(0).toString(16).padStart(4, '0')}`);
+
 /** A `case.json` that is not JSON or fails the case schema, named by its case folder. Callers fail on it; none skips the case. */
 export class CaseRecordInvalid extends Error {
   constructor(
     readonly caseId: string,
     detail: string,
   ) {
-    super(`case_record_invalid: ${caseId}: eval/cases/${caseId}/case.json ${detail}`);
+    super(escapeBreaks(`case_record_invalid: ${caseId}: eval/cases/${caseId}/case.json ${detail}`));
     this.name = 'CaseRecordInvalid';
   }
 }
