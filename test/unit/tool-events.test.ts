@@ -27,6 +27,7 @@ describe('tool events', () => {
       ['scan_repo', 'tool.start'],
       ['scan_repo', 'ingest.run'],
       ['scan_repo', 'scan.result'],
+      ['scan_repo', 'repo.hash'],
       ['scan_repo', 'tool.end'],
     ]);
     expect(JSON.parse(events[2]!.payload_json)).toEqual(res.scan);

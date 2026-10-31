@@ -10,6 +10,7 @@ import { PACKET_MAX_CHARS } from '../pipeline/packets.js';
 import { describeBundle, loadBundled, type Bundle } from '../rules/loader.js';
 import type { ScanLimits } from '../schema/scan.js';
 import { InputError, NotBuiltError, PermissionError } from '../security/errors.js';
+import { observeExec } from '../security/exec.js';
 import { initLevel, type Level } from '../security/level.js';
 import { isWithin, realpathAllowMissing } from '../security/pathBoundary.js';
 import { assertOutsideRepos, enclosingRepoTop, openOutDir, registerRepoRoot, type OutWriter } from '../security/safeWrite.js';
@@ -71,6 +72,18 @@ export interface EngineOptions {
    * cut (D42) and 'container' is refused with NotBuiltError (INV-63).
    */
   sandbox?: 'clone' | 'container';
+  /**
+   * Findings below this confidence go to "Needs human decision" (M9 routing).
+   * Default 0.6 (DEFAULT_CONFIDENCE_THRESHOLD); the value and whether it came
+   * from the flag are recorded per run at emit.
+   */
+  confidenceThreshold?: number;
+  /**
+   * The run budget (--budget-tokens, --budget-seconds). Once a run is over it,
+   * the remaining lenses and stages are recorded as budget_cut, never skipped
+   * silently (M9 task 5).
+   */
+  budget?: { tokens?: number; seconds?: number };
 }
 
 export interface Session {
@@ -98,6 +111,13 @@ export function createEngine(options: EngineOptions = {}): Engine {
   // both the CLI and the MCP server reject it the same way.
   if (options.sandbox === 'container') {
     throw new NotBuiltError('container sandbox mode is not built in v0.1 (cut per D42); use the default clone sandbox');
+  }
+  const t = options.confidenceThreshold;
+  if (t !== undefined && !(Number.isFinite(t) && t >= 0 && t <= 1)) {
+    throw new InputError('bad_threshold', `the confidence threshold must be a number from 0 to 1, got ${String(t)}`);
+  }
+  for (const [name, v] of Object.entries(options.budget ?? {})) {
+    if (v !== undefined && !(Number.isFinite(v) && v > 0)) throw new InputError('bad_budget', `the ${name} budget must be a positive number, got ${String(v)}`);
   }
   initLevel(options.level ?? 0);
   const log = options.log ?? (() => {});
@@ -159,6 +179,8 @@ export interface ToolCall {
   /** Ties the call's events to a run once one exists. Events before it are held, then written with the run ID. */
   attachRun(runId: string): void;
   event(kind: string, payload: unknown): void;
+  /** Records the tokens the host reported for this step (a `cost.reported` event carrying the token columns). */
+  cost(tokensIn: number, tokensOut: number): void;
 }
 
 export function errorPayload(err: unknown): Record<string, unknown> {
@@ -189,6 +211,10 @@ export async function runTool<T>(engine: Engine, session: Session, step: string,
       held.push({ runId, ts: engine.now().toISOString(), step, kind, payload });
       if (runId) flush();
     },
+    cost(tokensIn, tokensOut) {
+      held.push({ runId, ts: engine.now().toISOString(), step, kind: 'cost.reported', payload: { tokens_in: tokensIn, tokens_out: tokensOut }, tokensIn, tokensOut });
+      if (runId) flush();
+    },
   };
   held.push({ runId: null, ts: started.toISOString(), step, kind: 'tool.start', payload: { input } });
   try {
@@ -200,5 +226,18 @@ export async function runTool<T>(engine: Engine, session: Session, step: string,
     call.event('tool.error', errorPayload(err));
     flush();
     throw err;
+  }
+}
+
+/**
+ * Runs `fn` with every command the spawn point runs recorded as an `exec.run`
+ * event on the call (kind, argv, exit code, duration), for the run report.
+ */
+export async function withExecLog<T>(call: ToolCall, fn: () => Promise<T>): Promise<T> {
+  const stop = observeExec((r) => call.event('exec.run', r));
+  try {
+    return await fn();
+  } finally {
+    stop();
   }
 }

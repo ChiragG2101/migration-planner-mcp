@@ -637,7 +637,7 @@ What would change it: a Context7 tool rename, or a cache that has to keep docs f
 
 **Decision:**
 
-- Findings live in migration `005_findings.sql`. `004_docs.sql` already belonged to M4. M6's plan store is `006_plans.sql`, and M9's feedback store is `007_feedback.sql`, so those filenames stay unique. `round` is 1 until `validate_plan`. `status` accepts only `accepted` until a later migration needs more. M8's plan still names `005b_verify.sql`; the migration runner only applies `NNN_*.sql`, so that name will not run until M8 renames it.
+- Findings live in migration `005_findings.sql`. `004_docs.sql` already belonged to M4. M6's plan store is `006_plans.sql`, and M9's feedback store is `007_feedback.sql`, so those filenames stay unique. *Revised by D54:* M8 took 007, so feedback is `008_feedback.sql`. `round` is 1 until `validate_plan`. `status` accepts only `accepted` until a later migration needs more. M8's plan still names `005b_verify.sql`; the migration runner only applies `NNN_*.sql`, so that name will not run until M8 renames it.
 - A finding has no `stage`. M6 assigns stages when it builds the plan. The `Plan` schema is exported now so `schema://plan` exists; M5 does not build plans.
 - `get_lens_packet` and `submit_findings` are MCP only (PRD §11). There is no CLI command for them.
 - Which usage kinds a lens sees is `pack.usage_kinds[].lens`. Bound rules follow those usages. A rule that binds no in-scope packet usage goes to `dependency_build` when its event is `peer_requirement` or its match is `dependency` or `config_key`, to `behavior_runtime` when its event is `changed_behavior` or `changed_default` or its match is `file_convention`, and to `api` otherwise. `combined` is that union and is only for a `small` run. `verification` gets the pack `checks_hint`, rule `verify_hint`s and the test and import graph, not rule bodies, unless a verification-kind usage binds a rule. `dependency_build` and `combined` also get the scan section. `behavior_runtime` and `combined` also get risk signals.
@@ -772,4 +772,62 @@ Why: resetting to a named tag (not `HEAD`) is correct whether or not earlier att
 **Decision: if every declared check fails on the unmodified sandbox, `verify_stage` stops with `baseline_all_failing` instead of verifying. Checks that fail at baseline (but not all) are marked `baseline_failing` and judged on new failures only. The sandbox env is scrubbed to an allowlist plus a temp `HOME`; the only way a parent-env name reaches a check is the user's explicit `--pass-env NAME`, set in engine options, never from a tool arg, pack, knowledge or the agent.**
 
 Why: an all-failing baseline means the environment or the declared checks are wrong, so stage results would be meaningless. Per-check `baseline_failing` keeps a pre-existing failure from masking a regression. `--pass-env` keeps the scrub strict by default while letting a user opt a specific variable (for example a proxy setting) through.
+
+## 2026-10-22: M9 decisions
+
+### D50 - Routing runs at emit, on the gated plan, and never changes `plan.json`
+
+**Decision:** `routePlan` (`src/pipeline/routing.ts`) runs inside `emit_plan`, after `validate_plan`, and decides only where an item is shown. `plan.json` stays the gated plan. The rules:
+
+- A usage's rule "breaks" when any composed rule that binds it has `necessity: breaks`. A scope exclusion is judged against the rules up to the original target, ignoring `stop_at`. A lens mark is judged against the run's own rules. An engine `no rule in range` entry binds no rule, so it never routes.
+- A gate 7 hold is an attempt whose checks are all clean (`pass`, `baseline_failing` or `flaky`) while gate 7 failed. `submit_stage_patch` and routing share this test (`heldForReview`). A held stage stays in "Review first" until an attempt is kept.
+- A finding lifted into "Review first" or "Needs human decision" is left out of its stage's details. The stage summary says how many were moved, and the checklist marks them.
+
+Why: routing after the gates cannot be a gate bypass if it never touches what the gates checked. Taking any breaking rule errs toward flagging (PRD section 3). A risk's single highest-severity rule could hide a breaking one. The plan named no test for "held for review", so the existing M8 condition is reused rather than a new one invented.
+
+### D51 - The threshold stays at 0.6
+
+**Decision:** `DEFAULT_CONFIDENCE_THRESHOLD` stays 0.6. `eval/threshold.md` records why, and how to tune it.
+
+Why: `eval/calibration.csv` has only its header (M7 task 9's export was never written). The 21 recorded engine runs carry driver-set constant confidences (0.85 and 0.6, D41) with no `agent_judgment` findings. Tuning on them would be tuning by feel (PRD section 7). Revisit when live runs with agent-set confidences exist.
+
+### D52 - The run report is built from events alone
+
+**Decision:** `buildRunReport(runId, events)` is a pure function of the run's event rows. To make that possible, emit records `routing.result`, `report.facts` (versions, coverage, plan counts, budget use), a `repo.hash` at `emit` and, at L1, `verify.report`. Existing events gain fields:
+
+- `ingest.run` gains the run's campaign and repo IDs.
+- `scope.proposed` gains the size reasons and the question defaults.
+- `scope.set` gains the excluded usages.
+- `submit_stage_patch.result` gains the whole attempt.
+
+`scan_repo` records a `repo.hash` at `scan`. It hashes the files the engine walks (path and sha256), so deny-listed and over-limit files are not hashed, and the report says so. `scripts/repo-hash.ts` stays the full check the tests use. The codemod registry's version is a 12-hex hash of its entries. The gates' version is the engine version. Merge conflicts come from the last `merge_findings` call.
+
+Why: the plan requires every number to trace to an event, with nothing held only in memory. A pure function over events is that property, and a test checks it by rebuilding the report from the store. Reading the repo's deny-listed files to hash them would break C4.
+
+### D53 - The budget is checked where new work starts; tokens come from the host
+
+**Decision:** `--budget-tokens` and `--budget-seconds` (engine `budget`) are checked in `get_lens_packet` and `verify_stage`. Time runs from the run's first event. Tokens are what the host reports through an optional `tokens {in, out}` on `submit_findings` and `submit_stage_patch`, recorded as `cost.reported` events on the token columns. Once over budget, each lens not fetched (or stage not settled) is recorded once as `budget.cut`, and the call is refused with `budget_cut`. A submission for work already started is still accepted.
+
+Why: the engine runs no model (C7), so it can't count tokens itself. Refusing new work, and leaving cut usages uncovered for gate 2, is how "nothing is silently skipped" holds. Prompt v1 doesn't ask hosts to report tokens yet, so the token budget only applies when a host sends them. A prompt v2 can ask for it.
+
+### D54 - Feedback is migration 008; file and line only for `missing`
+
+**Decision:** the feedback table is `008_feedback.sql` (D47 took 007). The export is `<out>/eval/feedback/<run_id>-<n>.json` (`migration-planner-feedback@1`, `src/schema/feedback.ts`), and the file is written before the row is stored. A file and line are refused on any kind but `missing`. A named finding or stage must be in the run's plan. `scripts/feedback-to-case.ts` (`npm run feedback:case`) has two modes:
+
+- It appends an annotation, which needs `--reviewer`. Existing entries are kept, and a duplicate is refused.
+- It prints a seeded ground-truth entry for `missing` (expect `change`) or `wrong` (expect `no_finding`). The maintainer places it after planting the code.
+
+Why: D35 had reserved `007_feedback.sql` before M8 used 007. An annotation is a reviewed claim (D7), so it is never automatic. The other feedback kinds have no case shape, and the script says so.
+
+### D55 - Emit writes `verify_report.json` when L1 ran
+
+**Decision:** when the run has a sandbox, `emit_plan` writes `<out>/<run_id>/verify_report.json`, the same object `get_verify_report` returns (shared `buildVerifyReport`), and records it as `verify.report`. The CLI `verify` command emits again after the stages, so the plan, checklists and report carry the L1 results.
+
+Why: M8's plan named `verify_report.json`, and M9's acceptance compares against it, but M8 shipped only the tool. Writing it at emit fills that gap without a new tool. Baseline check durations are not stored by M8, so the report shows baseline status and exit code. Durations come from the stage attempts and the `exec.run` events.
+
+### D56 - Commands are recorded by an observer on the spawn point
+
+**Decision:** `src/security/exec.ts` exposes `observeExec`, called after every spawn with `{kind, argv, exit_code, duration_ms, timed_out}`. `verify_stage` and `submit_stage_patch` subscribe for the length of the call (`withExecLog`) and write `exec.run` events. The report lists every command, and lists as "may use the network" the install, codemod and check commands. A local clone is not listed.
+
+Why: the plan asks for every command with its exit code and the network-using steps. The commands run deep in the loop, so threading results back through every caller would touch most of M8. An observer is recording-only: it receives a copy and returns nothing. Clone mode does not isolate the network, so the report says what may use it rather than claiming to know. Accepted limit: two L1 calls running at once in one MCP process would record each other's commands. The verify loop runs stages in order, so this does not arise in the supported flow.
 

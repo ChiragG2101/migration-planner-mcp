@@ -19,5 +19,10 @@ export function formatValidateText(out: ValidatePlanOutput): string {
 }
 
 export function formatEmitText(out: EmitPlanOutput): string {
-  return [`run ${out.run_id}`, `round ${out.round}`, `status ${out.status}`, `wrote ${out.plan_json}`, `wrote ${out.plan_md}`, `unresolved ${out.unresolved}`].join('\n');
+  const lines = [`run ${out.run_id}`, `round ${out.round}`, `status ${out.status}`, `wrote ${out.plan_json}`, `wrote ${out.plan_md}`, `wrote ${out.run_report}`];
+  for (const c of out.checklists) lines.push(`wrote ${c}`);
+  if (out.verify_report) lines.push(`wrote ${out.verify_report}`);
+  lines.push(`unresolved ${out.unresolved}`);
+  lines.push(`review first ${out.routing.review_first}, needs human decision ${out.routing.needs_human} (threshold ${out.routing.threshold}, ${out.routing.threshold_source})`);
+  return lines.join('\n');
 }

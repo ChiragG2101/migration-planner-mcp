@@ -148,7 +148,13 @@ export async function proposeScope(engine: Engine, raw: unknown): Promise<Propos
       out_of_scope: existing?.out_of_scope ?? [],
       small_max: smallMax,
     });
-    call.event('scope.proposed', { size: out.size, questions: out.questions.map((q) => q.id), small_max_usages: smallMax });
+    call.event('scope.proposed', {
+      size: out.size,
+      reasons: out.reasons,
+      questions: out.questions.map((q) => q.id),
+      defaults: Object.fromEntries(out.questions.map((q) => [q.id, q.default])),
+      small_max_usages: smallMax,
+    });
     return out;
   });
 }
@@ -233,7 +239,7 @@ export async function setScope(engine: Engine, raw: unknown): Promise<SetScopeOu
     const answers = Object.fromEntries(chosen);
     const size: Size = depth === 'full' ? 'full' : facts.size.size;
     putScope(opened.session.db, opened.run.id, { answers, defaults, out_of_scope: outOfScope, small_max: stored?.small_max ?? DEFAULT_SMALL_MAX });
-    call.event('scope.set', { size, answers, defaults, out_of_scope: outOfScope.length });
+    call.event('scope.set', { size, answers, defaults, out_of_scope: outOfScope.length, excluded: outOfScope.map((o) => ({ usage_id: o.usage_id, reason: o.reason })) });
     return { run_id: opened.run.id, size, answers, defaults, out_of_scope: outOfScope };
   });
 }

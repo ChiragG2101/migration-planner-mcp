@@ -19,7 +19,8 @@ import { applyPatch, evaluateStage } from '../verify/loop.js';
 import { openSandbox, resetToStageStart, stageStartTag } from '../verify/sandbox.js';
 import { execGit } from '../security/exec.js';
 import { sandboxCommitEnv } from '../verify/sandbox.js';
-import { runTool, type Engine } from './engine.js';
+import { runTool, withExecLog, type Engine } from './engine.js';
+import { heldForReview } from '../pipeline/routing.js';
 import { openRunPack } from './packRun.js';
 
 /** Attempts allowed per stage before it goes to unresolved (plan task 6). */
@@ -33,110 +34,112 @@ export async function submitStagePatch(engine: Engine, raw: unknown): Promise<Su
   const opened = openRunPack(engine, parsed.data.run_id);
   return runTool(engine, opened.session, 'submit_stage_patch', parsed.data, async (call) => {
     call.attachRun(opened.run.id);
-    const db = opened.session.db;
-    const runId = opened.run.id;
-    const stageId = parsed.data.stage_id;
+    if (parsed.data.tokens) call.cost(parsed.data.tokens.in, parsed.data.tokens.out);
+    return withExecLog(call, async () => {
+      const db = opened.session.db;
+      const runId = opened.run.id;
+      const stageId = parsed.data.stage_id;
 
-    const storedPlan = getPlan(db, runId);
-    if (!storedPlan) throw new InputError('no_plan', `run ${runId} has no plan`);
-    const plan = storedPlan.plan as unknown as {
-      stages: Array<{ id: string; finding_ids: string[]; title: string }>;
-      findings: Finding[];
-    };
+      const storedPlan = getPlan(db, runId);
+      if (!storedPlan) throw new InputError('no_plan', `run ${runId} has no plan`);
+      const plan = storedPlan.plan as unknown as {
+        stages: Array<{ id: string; finding_ids: string[]; title: string }>;
+        findings: Finding[];
+      };
 
-    const stage = plan.stages.find((s) => s.id === stageId);
-    if (!stage) throw new InputError('unknown_stage', `stage ${stageId} not found in plan`);
+      const stage = plan.stages.find((s) => s.id === stageId);
+      if (!stage) throw new InputError('unknown_stage', `stage ${stageId} not found in plan`);
 
-    const sandboxRow = getSandbox(db, runId);
-    if (!sandboxRow) throw new InputError('no_sandbox', `no sandbox for run ${runId}; call verify_stage first`);
+      const sandboxRow = getSandbox(db, runId);
+      if (!sandboxRow) throw new InputError('no_sandbox', `no sandbox for run ${runId}; call verify_stage first`);
 
-    const sandboxHandle = openSandbox(realpathAbs(sandboxRow.path), sandboxRow.source_head);
+      const sandboxHandle = openSandbox(realpathAbs(sandboxRow.path), sandboxRow.source_head);
 
-    const checks = engine.options.checks ?? [];
-    const baselineRows = listBaselineChecks(db, runId);
-    const baselineFailingNames = new Set(
-      baselineRows.filter((r) => r.status === 'baseline_failing').map((r) => r.check_name),
-    );
+      const checks = engine.options.checks ?? [];
+      const baselineRows = listBaselineChecks(db, runId);
+      const baselineFailingNames = new Set(
+        baselineRows.filter((r) => r.status === 'baseline_failing').map((r) => r.check_name),
+      );
 
-    const prevAttempts = listStageAttempts(db, runId, stageId);
-    // A stage already decided kept or unresolved cannot be patched again.
-    const settled = prevAttempts.find((a) => a.decision === 'kept' || a.decision === 'unresolved');
-    if (settled) {
-      throw new InputError('stage_settled', `stage ${stageId} is already ${settled.decision}`);
-    }
-    const attempt = prevAttempts.length + 1;
+      const prevAttempts = listStageAttempts(db, runId, stageId);
+      // A stage already decided kept or unresolved cannot be patched again.
+      const settled = prevAttempts.find((a) => a.decision === 'kept' || a.decision === 'unresolved');
+      if (settled) {
+        throw new InputError('stage_settled', `stage ${stageId} is already ${settled.decision}`);
+      }
+      const attempt = prevAttempts.length + 1;
 
-    // Snapshot the test state at the stage start (before this patch) for gate 7.
-    const beforeSnapshot = await snapshotTests(sandboxHandle.root);
+      // Snapshot the test state at the stage start (before this patch) for gate 7.
+      const beforeSnapshot = await snapshotTests(sandboxHandle.root);
 
-    // Apply the patch. A failure (bad path, apply conflict) is a rejected attempt.
-    let patchDiff: string;
-    try {
-      patchDiff = applyPatch(sandboxHandle, parsed.data.patch);
-    } catch (err) {
-      const msg = err instanceof Error ? err.message : String(err);
-      resetToStageStart(sandboxHandle, stageId);
+      // Apply the patch. A failure (bad path, apply conflict) is a rejected attempt.
+      let patchDiff: string;
+      try {
+        patchDiff = applyPatch(sandboxHandle, parsed.data.patch);
+      } catch (err) {
+        const msg = err instanceof Error ? err.message : String(err);
+        resetToStageStart(sandboxHandle, stageId);
+        return recordAndReturn(db, call, {
+          runId, stageId, attempt,
+          codemodsJson: '[]', patchHash: null, checksJson: '[]',
+          gate7Json: JSON.stringify({ pass: false, violations: [] }),
+          decision: capDecision('rejected', attempt),
+          failures: [{ check: null, reason: `patch apply failed: ${msg}` }],
+        });
+      }
+
+      const lastCodemods = prevAttempts.length > 0
+        ? parseCodemods(prevAttempts[prevAttempts.length - 1]!.codemods_json)
+        : [];
+
+      const result = await evaluateStage(
+        sandboxHandle, beforeSnapshot, checks, baselineFailingNames, lastCodemods, patchDiff, attempt,
+        engine.options.passEnv,
+      );
+
+      // A gate-7 reduction with otherwise-clean checks is held for review, not kept.
+      const needsReview = heldForReview(result.checks, result.gate7);
+
+      let decision: StageDecision = result.decision;
+      let patchPath: string | undefined;
+
+      if (decision === 'kept') {
+        // Commit the stage in the sandbox and export the patch (stage start → commit).
+        commitStage(sandboxHandle, stageId);
+        const diff = execGit(
+          ['git', 'diff', `${stageStartTag(stageId)}`, 'HEAD'],
+          sandboxHandle.rootPath, sandboxHandle.root, 30_000,
+        ).stdout;
+        patchPath = exportPatch(engine, opened.session.outDir, runId, stage, diff, 'kept');
+      } else {
+        // Rejected. If we've hit the cap, the stage is unresolved; else reset for a retry.
+        decision = capDecision('rejected', attempt);
+        if (needsReview) {
+          patchPath = exportPatch(engine, opened.session.outDir, runId, stage, patchDiff, 'needs-review');
+        }
+        resetToStageStart(sandboxHandle, stageId);
+      }
+
+      const failures = decision !== 'kept'
+        ? [
+            ...result.checks
+              .filter((c) => c.status === 'fail' || c.status === 'timeout')
+              .map((c) => ({ check: c.name, reason: `${c.status} (exit ${c.exit_code ?? '?'})` })),
+            ...result.gate7.violations.map((v) => ({ check: null, reason: `gate7 ${v.rule}: ${v.detail}` })),
+          ]
+        : undefined;
+
       return recordAndReturn(db, call, {
         runId, stageId, attempt,
-        codemodsJson: '[]', patchHash: null, checksJson: '[]',
-        gate7Json: JSON.stringify({ pass: false, violations: [] }),
-        decision: capDecision('rejected', attempt),
-        failures: [{ check: null, reason: `patch apply failed: ${msg}` }],
+        codemodsJson: JSON.stringify(result.codemods),
+        patchHash: result.patchHash,
+        checksJson: JSON.stringify(result.checks),
+        gate7Json: JSON.stringify(result.gate7),
+        decision,
+        failures,
+        patchPath,
+        needsReview,
       });
-    }
-
-    const lastCodemods = prevAttempts.length > 0
-      ? parseCodemods(prevAttempts[prevAttempts.length - 1]!.codemods_json)
-      : [];
-
-    const result = await evaluateStage(
-      sandboxHandle, beforeSnapshot, checks, baselineFailingNames, lastCodemods, patchDiff, attempt,
-      engine.options.passEnv,
-    );
-
-    const checksClean = result.checks.every((c) => c.status === 'pass' || c.status === 'baseline_failing' || c.status === 'flaky');
-
-    // A gate-7 reduction with otherwise-clean checks is held for review, not kept.
-    const needsReview = checksClean && !result.gate7.pass;
-
-    let decision: StageDecision = result.decision;
-    let patchPath: string | undefined;
-
-    if (decision === 'kept') {
-      // Commit the stage in the sandbox and export the patch (stage start → commit).
-      commitStage(sandboxHandle, stageId);
-      const diff = execGit(
-        ['git', 'diff', `${stageStartTag(stageId)}`, 'HEAD'],
-        sandboxHandle.rootPath, sandboxHandle.root, 30_000,
-      ).stdout;
-      patchPath = exportPatch(engine, opened.session.outDir, runId, stage, diff, 'kept');
-    } else {
-      // Rejected. If we've hit the cap, the stage is unresolved; else reset for a retry.
-      decision = capDecision('rejected', attempt);
-      if (needsReview) {
-        patchPath = exportPatch(engine, opened.session.outDir, runId, stage, patchDiff, 'needs-review');
-      }
-      resetToStageStart(sandboxHandle, stageId);
-    }
-
-    const failures = decision !== 'kept'
-      ? [
-          ...result.checks
-            .filter((c) => c.status === 'fail' || c.status === 'timeout')
-            .map((c) => ({ check: c.name, reason: `${c.status} (exit ${c.exit_code ?? '?'})` })),
-          ...result.gate7.violations.map((v) => ({ check: null, reason: `gate7 ${v.rule}: ${v.detail}` })),
-        ]
-      : undefined;
-
-    return recordAndReturn(db, call, {
-      runId, stageId, attempt,
-      codemodsJson: JSON.stringify(result.codemods),
-      patchHash: result.patchHash,
-      checksJson: JSON.stringify(result.checks),
-      gate7Json: JSON.stringify(result.gate7),
-      decision,
-      failures,
-      patchPath,
     });
   });
 }
@@ -187,6 +190,7 @@ interface RecordArgs {
   decision: StageDecision;
   failures?: Array<{ check: string | null; reason: string }>;
   patchPath?: string;
+  needsReview?: boolean;
 }
 
 function recordAndReturn(
@@ -204,7 +208,19 @@ function recordAndReturn(
     gate7_json: a.gate7Json,
     decision: a.decision,
   });
-  call.event('submit_stage_patch.result', { stage_id: a.stageId, attempt: a.attempt, decision: a.decision });
+  // The whole attempt goes into the event, so the run report is rebuilt from events alone (M9).
+  call.event('submit_stage_patch.result', {
+    stage_id: a.stageId,
+    attempt: a.attempt,
+    decision: a.decision,
+    codemods: JSON.parse(a.codemodsJson) as unknown,
+    patch_hash: a.patchHash,
+    checks: JSON.parse(a.checksJson) as unknown,
+    gate7: JSON.parse(a.gate7Json) as unknown,
+    needs_review: a.needsReview ?? false,
+    patch_path: a.patchPath ?? null,
+    failures: a.failures ?? [],
+  });
   return {
     run_id: a.runId,
     stage_id: a.stageId,

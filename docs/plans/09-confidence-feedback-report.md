@@ -52,14 +52,24 @@
 5. **Budget (`src/pipeline/budget.ts`).** Time and token budget per run (`--budget-tokens`, `--budget-seconds`). When the budget is exceeded, the remaining lenses or stages are recorded as `budget_cut` and shown in the report. Nothing is silently skipped.
 6. **`record_feedback` (core, tool `src/tools/recordFeedback.ts`, CLI `feedback`).**
    - Input: `run_id`, `finding_id?` or `stage_id?`, `kind` (`wrong`, `missing`, `severity_wrong`, `bad_patch` or `other`), `note`, and optional `file` and `line` for `missing`.
-   - Stores to `feedback` (migration `007_feedback.sql`) with the run.
+   - Stores to `feedback` (migration `008_feedback.sql`; 007 is M8's verify store, `docs/design.md` D54) with the run.
    - Exports to `eval/feedback/<run_id>-<n>.json` under the output dir, in a format `eval/runner.ts` can turn into a seeded case or a golden-case annotation. `scripts/feedback-to-case.ts` is manual and reviewed. On an existing golden case it may only append new entries to `annotations.json` (or add the file with its first entries); existing entries are frozen, and headline metrics stay on raw truth (`docs/design.md` D15, INV-30).
    - No training and no network.
    - For `missing`, the file and line go through `SafePath` (the user cannot point outside the repo).
 
 ## Files and modules
 
-`src/pipeline/{routing,report,budget,checklists}.ts`, `src/pipeline/emit.ts` (updated), `src/core/recordFeedback.ts`, `src/tools/recordFeedback.ts`, `src/cli/feedback.ts`, `src/store/feedback.ts`, `src/store/migrations/007_feedback.sql`, `scripts/feedback-to-case.ts`, `eval/threshold.md`, `test/unit/{routing,report,budget,feedback,checklists}.test.ts`.
+`src/pipeline/{routing,report,budget,checklists}.ts`, `src/pipeline/emit.ts` (updated), `src/core/recordFeedback.ts`, `src/tools/recordFeedback.ts`, `src/cli/feedback.ts`, `src/store/feedback.ts`, `src/store/migrations/008_feedback.sql`, `scripts/feedback-to-case.ts`, `eval/threshold.md`, `test/unit/{routing,report,budget,feedback,checklists}.test.ts`.
+
+Also touched in the build, and why:
+- `src/schema/feedback.ts`: the Zod schemas live in `src/schema/`.
+- `src/core/emitPlan.ts`: routing, the checklists, the report and `verify_report.json` are written at emit (D50, D55).
+- `src/core/getVerifyReport.ts`: `buildVerifyReport` is shared with emit.
+- `src/security/exec.ts`: `observeExec`, recording only (D56).
+- `src/core/{engine,verifyStage,submitStagePatch,submitFindings,getLensPacket,proposeScope,scanRepo}.ts`: the budget checks and the events the report reads (D52, D53).
+- `src/schema/{finding,verify,plan}.ts`: the optional `tokens` and the emit output.
+- `src/cli/{index,plan}.ts`, `src/tools/index.ts`, `src/core/index.ts`: the adapters.
+- `test/unit/{emitOrder.test.ts,verify/reportL1.test.ts}`, `test/permissions/emit-outputs.test.ts`, `test/fixtures/{emit,report}/`: the tests.
 
 ## Tests
 

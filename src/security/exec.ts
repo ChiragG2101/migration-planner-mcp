@@ -86,7 +86,32 @@ function cap(s: string): string {
 // Core exec (internal — callers use the typed wrappers below)
 // ---------------------------------------------------------------------------
 
+/** What kind of command ran: the user's install or check, a registry codemod, or an allowed git operation. */
+export type ExecKind = 'install' | 'check' | 'codemod' | 'git';
+
+/** One command the spawn point ran, for the run report (M9: every command with its exit code). */
+export interface ExecRecord {
+  kind: ExecKind;
+  argv: string[];
+  exit_code: number;
+  duration_ms: number;
+  timed_out: boolean;
+}
+
+const observers = new Set<(r: ExecRecord) => void>();
+
+/**
+ * Calls `fn` after every command the spawn point runs, until the returned
+ * function is called. Recording only: an observer cannot change the argv, the
+ * cwd or the environment, and nothing it does can run a command.
+ */
+export function observeExec(fn: (r: ExecRecord) => void): () => void {
+  observers.add(fn);
+  return () => void observers.delete(fn);
+}
+
 export interface ExecRequest {
+  readonly kind: ExecKind;
   readonly argv: readonly string[];
   /** Must be a SafePath inside the sandbox (D43). Checked at runtime. */
   readonly cwd: SafePath;
@@ -137,6 +162,7 @@ function execRaw(req: ExecRequest): ExecResult {
     result.signal === 'SIGKILL' ||
     result.error?.message?.includes('ETIMEDOUT') ||
     false;
+  for (const fn of observers) fn({ kind: req.kind, argv: [...req.argv], exit_code: result.status ?? -1, duration_ms: duration, timed_out: timedOut });
   return {
     argv: [...req.argv],
     exit_code: result.status ?? -1,
@@ -163,7 +189,7 @@ export function execInstall(
   sandboxRoot: string,
   passEnv?: readonly string[],
 ): ExecResult {
-  return execRaw({ argv: config.argv, cwd, sandboxRoot, timeoutMs: config.timeout_ms, passEnv });
+  return execRaw({ kind: 'install', argv: config.argv, cwd, sandboxRoot, timeoutMs: config.timeout_ms, passEnv });
 }
 
 /** Run a user-declared check command. argv must exactly match the config. */
@@ -173,7 +199,7 @@ export function execCheck(
   sandboxRoot: string,
   passEnv?: readonly string[],
 ): ExecResult {
-  return execRaw({ argv: config.argv, cwd, sandboxRoot, timeoutMs: config.timeout_ms, passEnv });
+  return execRaw({ kind: 'check', argv: config.argv, cwd, sandboxRoot, timeoutMs: config.timeout_ms, passEnv });
 }
 
 /** Run a codemod from the registry. argv is built from the entry's template. */
@@ -193,7 +219,7 @@ export function execCodemod(
       expected: [expected0, expected1],
     });
   }
-  return execRaw({ argv, cwd, sandboxRoot, timeoutMs: 120_000 });
+  return execRaw({ kind: 'codemod', argv, cwd, sandboxRoot, timeoutMs: 120_000 });
 }
 
 /** Run an allowed git operation. Hooks are always disabled. */
@@ -210,7 +236,7 @@ export function execGit(
   }
   // Always disable hooks (C3).
   const safeArgv = [argv[0]!, '-c', 'core.hooksPath=/dev/null', ...argv.slice(1)];
-  return execRaw({ argv: safeArgv, cwd, sandboxRoot, timeoutMs, extraEnv });
+  return execRaw({ kind: 'git', argv: safeArgv, cwd, sandboxRoot, timeoutMs, extraEnv });
 }
 
 // ---------------------------------------------------------------------------

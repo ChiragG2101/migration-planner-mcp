@@ -24,6 +24,7 @@ import {
   validatePlan,
   verifyStage,
   getVerifyReport,
+  recordFeedback,
   type EngineOptions,
 } from '../core/index.js';
 import { parseChecksConfig } from '../verify/checks.js';
@@ -32,6 +33,7 @@ import { SetScopeInput } from '../schema/scope.js';
 import { readOperatorFile } from '../security/operatorFile.js';
 import { startMcpServer } from '../server.js';
 import { formatDocsText } from './docs.js';
+import { feedbackInput, formatFeedbackText } from './feedback.js';
 import { formatPackText } from './pack.js';
 import { formatRiskText } from './risk.js';
 import { formatScanText, scanInput } from './scan.js';
@@ -54,6 +56,8 @@ Usage:
   migration-planner-mcp verify <repo> --source <lib@ver> --target <lib@ver> [--answers <file.json>] [--install "<cmd>"] [--check name="<cmd>"]
                          [--junit name=<path>] [--pass-env NAME] [--format json|text]
   migration-planner-mcp report <repo> --source <lib@ver> --target <lib@ver> [--format json|text]
+  migration-planner-mcp feedback <repo> --source <lib@ver> --target <lib@ver> --kind <k> --note "<text>"
+                         [--finding <id>] [--stage <id>] [--file <f> --line <n>] [--format json|text]
   migration-planner-mcp mcp
 
 Shared flags:
@@ -61,6 +65,9 @@ Shared flags:
   --level <0|1>    autonomy level (default 0; 2 is not built in v0.1)
   --db <path>      SQLite store (default: <out>/store.sqlite)
   --rules-dir <d>  knowledge and packs (only the bundled ones in v0.1)
+  --confidence-threshold <0..1>  findings below it go to "Needs human decision" (default 0.6)
+  --budget-tokens <n>   run budget in reported tokens; lenses and stages past it are recorded as budget_cut
+  --budget-seconds <n>  run budget in seconds since the run started
 `;
 
 const err = (message: string): void => void process.stderr.write(`${message}\n`);
@@ -104,6 +111,13 @@ async function main(argv: string[]): Promise<number> {
       'pass-env': { type: 'string', multiple: true },
       sandbox: { type: 'string' },
       'sandbox-image': { type: 'string' },
+      'confidence-threshold': { type: 'string' },
+      'budget-tokens': { type: 'string' },
+      'budget-seconds': { type: 'string' },
+      note: { type: 'string' },
+      finding: { type: 'string' },
+      stage: { type: 'string' },
+      line: { type: 'string' },
       help: { type: 'boolean', short: 'h' },
     },
   });
@@ -133,6 +147,19 @@ async function main(argv: string[]): Promise<number> {
   if (values['rules-dir']) options.rulesDir = values['rules-dir'];
   if (values['pass-env']) options.passEnv = values['pass-env'] as string[];
   if (values.sandbox === 'container') options.sandbox = 'container';
+  const num = (flag: string, v: string | undefined): number | undefined => {
+    if (v === undefined) return undefined;
+    const n = Number(v);
+    if (v.trim() === '' || !Number.isFinite(n)) throw new InputError('bad_number', `${flag} must be a number, got "${v}"`);
+    return n;
+  };
+  const threshold = num('--confidence-threshold', values['confidence-threshold']);
+  if (threshold !== undefined) options.confidenceThreshold = threshold;
+  const budgetTokens = num('--budget-tokens', values['budget-tokens']);
+  const budgetSeconds = num('--budget-seconds', values['budget-seconds']);
+  if (budgetTokens !== undefined || budgetSeconds !== undefined) {
+    options.budget = { ...(budgetTokens !== undefined ? { tokens: budgetTokens } : {}), ...(budgetSeconds !== undefined ? { seconds: budgetSeconds } : {}) };
+  }
 
   switch (command) {
     case 'scan': {
@@ -319,6 +346,8 @@ async function main(argv: string[]): Promise<number> {
           const out = await verifyStage(engine, { run_id, stage_id: stage.id });
           results.push(out);
         }
+        // Emit again so the plan, the checklists and run_report.md carry the L1 results and verify_report.json is written.
+        await emitPlan(engine, { run_id });
         const report = await getVerifyReport(engine, { run_id });
         process.stdout.write(values.format === 'text'
           ? `verify complete: ${results.length} stages\n${JSON.stringify(report, null, 2)}\n`
@@ -340,6 +369,23 @@ async function main(argv: string[]): Promise<number> {
         }
         const out = await getVerifyReport(engine, { run_id: scan.run.run_id });
         process.stdout.write(`${JSON.stringify(out, null, 2)}\n`);
+        return 0;
+      } finally {
+        closeEngine(engine);
+      }
+    }
+    case 'feedback': {
+      if (values.format !== 'json' && values.format !== 'text') throw new InputError('bad_format', '--format must be json or text');
+      if (rest.length === 0) throw new InputError('missing_repo', 'feedback needs a repo path');
+      const engine = createEngine(options);
+      try {
+        const ing = await ingest(engine, scanInput(rest, values));
+        if (ing.status !== 'ok' || !ing.run) {
+          process.stdout.write(`${JSON.stringify(ing, null, 2)}\n`);
+          return 3;
+        }
+        const out = await recordFeedback(engine, feedbackInput(ing.run.run_id, values));
+        process.stdout.write(values.format === 'text' ? `${formatFeedbackText(out)}\n` : `${JSON.stringify(out, null, 2)}\n`);
         return 0;
       } finally {
         closeEngine(engine);

@@ -34,6 +34,7 @@
     "cases:verify": "tsx scripts/verify-case.ts",
     "cases:fetch": "tsx eval/caseCommits.ts",
     "runs:export": "tsx scripts/export-run.ts",
+    "feedback:case": "tsx scripts/feedback-to-case.ts",
     "build:packs": "tsx scripts/build-pack.ts",
     "knowledge:draft": "tsx scripts/draft-release.ts",
     "pack:report": "tsx scripts/pack-docs-report.ts"

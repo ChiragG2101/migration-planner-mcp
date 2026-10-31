@@ -1,6 +1,7 @@
 // Verify loop schemas (M8): check config, sandbox, codemod registry, stage
 // attempts, gate 7 results, and the tool I/O types.
 import { z } from 'zod';
+import { ReportedTokens } from './finding.js';
 
 // ---------------------------------------------------------------------------
 // Check config
@@ -206,6 +207,7 @@ export const SubmitStagePatchInput = z
     stage_id: z.string().min(1),
     /** A unified diff string, or a list of {path, content} entries. Exactly one must be provided. */
     patch: z.union([z.string(), z.array(PatchEntry)]),
+    tokens: ReportedTokens.optional().describe('Tokens this patch turn used, if the host reports them. Counted toward the run budget.'),
   })
   .strict();
 export type SubmitStagePatchInput = z.infer<typeof SubmitStagePatchInput>;

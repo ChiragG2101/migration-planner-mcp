@@ -1,6 +1,7 @@
 // Core API for ingest and scan_repo. Adapters call these and nothing else.
 import { z } from 'zod';
 import { analyzeRepo, type RepoFacts } from '../analysis/scanner.js';
+import { treeHash } from '../pipeline/report.js';
 import { createOrReuseRun, decideVersions, readGitState, resolveRepo, singleRepoPath, type Repo } from '../pipeline/ingest.js';
 import { IngestInput, type GitState, type Question, type RunRef, type Versions } from '../schema/ingest.js';
 import type { ScanRepoOutput, ScanResult } from '../schema/scan.js';
@@ -48,7 +49,7 @@ async function withIngest<T>(engine: Engine, raw: unknown, step: string, then: (
     }
     const run = createOrReuseRun({ db: session.db, now: engine.now, randomBytes: engine.randomBytes }, input, repo, git, decided);
     call.attachRun(run.ref.run_id);
-    call.event('ingest.run', { reused: run.reused, idem_key: run.idemKey, versions: decided.versions, pack: decided.pack?.ref ?? null, companions: decided.companions });
+    call.event('ingest.run', { run: run.ref, reused: run.reused, idem_key: run.idemKey, versions: decided.versions, pack: decided.pack?.ref ?? null, companions: decided.companions });
     return then({ input, repo, session, facts, git, question: null, run: run.ref, versions: decided.versions }, call);
   });
 }
@@ -85,6 +86,8 @@ export async function scanRepo(engine: Engine, raw: unknown): Promise<ScanRepoOu
     };
     recordFiles(ing.session.db, ing.run.run_id, ing.repo.repoId, facts.walk.files);
     call.event('scan.result', scan);
+    // The engine's view of the repo before planning; emit hashes it again for the run report's "untouched" line.
+    call.event('repo.hash', { phase: 'scan', hash: treeHash(facts.walk.files), files: facts.walk.files.length });
     setRunStatus(ing.session.db, ing.run.run_id, 'scanned');
     return { status: 'ok', run: ing.run, scan, question: null };
   });
