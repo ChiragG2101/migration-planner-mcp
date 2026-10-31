@@ -331,7 +331,7 @@ function verifyOne(id: string): boolean {
     process.stdout.write(`${pass ? 'ok  ' : 'FAIL'} ${id} ${name}: ${detail}\n`);
   };
   try {
-    execFileSync('git', ['clone', '--no-checkout', kase.repo_url, clone], { stdio: 'ignore' });
+    execFileSync('git', ['clone', '--no-checkout', '--', kase.repo_url, clone], { stdio: 'ignore' });
     const git = (...a: string[]): string => execFileSync('git', ['-C', clone, ...a], { encoding: 'utf8' });
     const fetched = fetchPinnedCommits(git, kase.base_commit, kase.merge_commit);
     const baseOk = fetched.baseOk;

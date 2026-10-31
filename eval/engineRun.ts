@@ -44,7 +44,7 @@ export async function scanUsagesWith(
   repoPath: string,
   source: { name: string },
   target: { name: string; version: string },
-): Promise<ScanResult & { run_id: string }> {
+): Promise<ScanResult & { run_id: string; repo_id: string }> {
   const scan = await scanRepo(engine, { repo_path: repoPath, source, target });
   if (scan.status !== 'ok' || !scan.run) throw new Error(`scan_repo asked a question: ${JSON.stringify(scan.question)}`);
   const usages: Usage[] = [];
@@ -56,7 +56,7 @@ export async function scanUsagesWith(
     adapter = page.summary.adapter;
     cursor = page.next_cursor ?? undefined;
   } while (cursor);
-  return { usages, adapter, run_id: scan.run.run_id };
+  return { usages, adapter, run_id: scan.run.run_id, repo_id: scan.run.repo_id };
 }
 
 /** A temp output folder outside any repo, and a cleanup. For callers that drive a multi-step run. */
