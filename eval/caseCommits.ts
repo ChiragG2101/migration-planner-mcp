@@ -9,7 +9,7 @@ import { execFileSync } from 'node:child_process';
 import { existsSync, mkdirSync, readFileSync, realpathSync } from 'node:fs';
 import path from 'node:path';
 import { fileURLToPath } from 'node:url';
-import { evalRoot, loadBaselineRuns, loadCases, loadEngineRuns, type LoadedCase } from './load.js';
+import { CaseRecordInvalid, evalRoot, loadBaselineRuns, loadCases, loadEngineRuns, type LoadedCase } from './load.js';
 import { FULL_SHA, GITHUB_REPO_URL } from './schema.js';
 
 /** Runs git in one checkout folder and returns stdout; throws on a non-zero exit. */
@@ -99,17 +99,43 @@ export function casesNeedingCommits(cases: readonly LoadedCase[], promptVersion:
   return cases.filter((c) => c.truth && (loadEngineRuns(c.case.id, promptVersion).length > 0 || loadBaselineRuns(c.case.id).length > 0));
 }
 
+const writeLine = (stream: 'out' | 'err', line: string): void => {
+  (stream === 'out' ? process.stdout : process.stderr).write(`${line}\n`);
+};
+
+/**
+ * `cases:fetch`: bring every case that needs a checkout to its base and return
+ * the exit code. A bad `case.json` stops it with one named line and no stack,
+ * before any case is fetched: all records load before git is given any of them.
+ */
+export function fetchAll(
+  promptVersion: string,
+  load: () => LoadedCase[] = loadCases,
+  fetch: (dir: string, repoUrl: string, base: string) => FetchOutcome = fetchCaseCommit,
+  write: (stream: 'out' | 'err', line: string) => void = writeLine,
+): number {
+  let cases: LoadedCase[];
+  try {
+    cases = load();
+  } catch (e) {
+    if (!(e instanceof CaseRecordInvalid)) throw e;
+    write('err', `FAIL ${e.message}`);
+    return 1;
+  }
+  let failed = 0;
+  for (const c of casesNeedingCommits(cases, promptVersion)) {
+    const outcome = fetch(path.join(workDir(), c.case.id), c.case.repo_url, c.case.base_commit);
+    const ok = outcome === 'present' || outcome === 'fetched';
+    if (!ok) failed += 1;
+    write(ok ? 'out' : 'err', outcomeLine(outcome, c.case.id, c.case.base_commit));
+  }
+  return failed ? 1 : 0;
+}
+
 function main(): number {
   const top = path.dirname(evalRoot());
   const manifest = JSON.parse(readFileSync(path.join(top, 'prompts', 'manifest.json'), 'utf8')) as { current: string };
-  let failed = 0;
-  for (const c of casesNeedingCommits(loadCases(), manifest.current)) {
-    const outcome = fetchCaseCommit(path.join(workDir(), c.case.id), c.case.repo_url, c.case.base_commit);
-    const ok = outcome === 'present' || outcome === 'fetched';
-    if (!ok) failed += 1;
-    (ok ? process.stdout : process.stderr).write(`${outcomeLine(outcome, c.case.id, c.case.base_commit)}\n`);
-  }
-  return failed ? 1 : 0;
+  return fetchAll(manifest.current);
 }
 
 if (process.argv[1] && realpathSync(process.argv[1]) === realpathSync(fileURLToPath(import.meta.url))) {

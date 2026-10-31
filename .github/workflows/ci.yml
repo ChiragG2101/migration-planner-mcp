@@ -54,18 +54,9 @@ jobs:
         env:
           BASE_SHA: ${{ github.event.pull_request.base.sha || github.event.before }}
         run: npm run recall -- --check --base "$BASE_SHA"
-      - name: Cache golden-case commits (D17)
-        uses: actions/cache@55cc8345863c7cc4c66a329aec7e433d2d1c52a9 # v6.1.0
-        with:
-          path: eval/.work
-          key: case-commits-${{ runner.os }}-${{ hashFiles('eval/cases/*/case.json') }}
-          restore-keys: case-commits-${{ runner.os }}-
-      - name: Fetch golden-case commits (fails closed with case_commit_unavailable)
-        shell: bash
-        run: npm run cases:fetch
-      - name: Eval smoke (replay, free; no model, no paid service)
-        shell: bash
-        run: npm run eval:smoke
+      # The two eval-data checks run before the case-commit cache and fetch, so a
+      # pack PR's case data is vetted before git is given it (D59). They read
+      # only git refs, never eval/.work.
       - name: Eval add-only (existing cases and runs are add-only, D15)
         shell: bash
         env:
@@ -78,6 +69,19 @@ jobs:
         # Self-skips on a core PR (nothing under packs/ or knowledge/). On a pack
         # PR it enforces the allowlist against the PR base.
         run: npm run check:core-untouched -- --base "$BASE_SHA"
+      - name: Cache golden-case commits (D17)
+        uses: actions/cache@55cc8345863c7cc4c66a329aec7e433d2d1c52a9 # v6.1.0
+        with:
+          path: eval/.work
+          key: case-commits-${{ runner.os }}-${{ hashFiles('eval/cases/*/case.json') }}
+          restore-keys: case-commits-${{ runner.os }}-
+      - name: Fetch golden-case commits (fails closed with case_commit_unavailable)
+        shell: bash
+        run: npm run cases:fetch
+      # Smoke replays a golden case, so it needs the checkouts the fetch makes.
+      - name: Eval smoke (replay, free; no model, no paid service)
+        shell: bash
+        run: npm run eval:smoke
       - name: Eval pack gate (replay, free; D17)
         shell: bash
         run: npm run eval:pack-gate
