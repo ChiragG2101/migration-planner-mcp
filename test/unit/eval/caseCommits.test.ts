@@ -216,6 +216,15 @@ describe('a malformed case.json is a named error, never a stack or a skip', () =
     expect(r.err[0]).not.toMatch(LINE_BREAK);
   });
 
+  it('a folder name cannot break the line or start a workflow command', () => {
+    // Built directly: Windows cannot create a folder with a line break in its name.
+    for (const id of ['zz\n::warning::folder', 'zz\r::warning::folder', `zz${LS}::warning::folder`, 'zz\x85::warning::folder']) {
+      const message = new CaseRecordInvalid(id, 'is not valid JSON: x').message;
+      expect(message, JSON.stringify(id)).toMatch(/^case_record_invalid: zz\\u00(0a|0d|85)|^case_record_invalid: zz\\u2028/);
+      expect(message, JSON.stringify(id)).not.toMatch(LINE_BREAK);
+    }
+  });
+
   it('a schema issue quoting a planted key cannot break the line or start a workflow command', () => {
     const raw = JSON.parse(readFileSync(path.join(good, 'case.json'), 'utf8')) as Record<string, unknown>;
     for (const key of ['k\n::warning::planted-key', 'k\r::warning::cr', `k${LS}::warning::ls`, `k${PS}::warning::ps`, 'k\x85::warning::nel']) {
