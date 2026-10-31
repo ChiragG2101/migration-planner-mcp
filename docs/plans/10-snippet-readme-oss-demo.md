@@ -1,6 +1,6 @@
 # M10 - AGENTS.md snippet, L1 evidence, README, open-source files, plugin, demo, name
 
-**PRD refs:** sections 10 (eval, for the L1 evidence), 14 (demo, README, snippet, open source). **Done when:** v0.1's one pack (Next.js) has its L1 evidence in `eval/results.md`, and the README states its limits and claims only what exists.
+**PRD refs:** sections 9 (packs and skills, for the plugin bundle), 10 (eval, for the L1 evidence), 14 (demo, README, snippet, open source). **Done when:** v0.1's one pack (Next.js) has its L1 evidence in `eval/results.md`, and the README states its limits and claims only what exists.
 
 **The Django pack moved to M12 (v0.2) on 2026-11-01 (`docs/design.md` D60).** Tasks 1 to 3 (the Django adapter, knowledge and pack, and eval cases), the "Why Django is pack 2" and "No core changes" sections, and the Django tests and acceptance now live in [`12-django-pack.md`](12-django-pack.md). The remaining tasks keep their numbers, so earlier references to them stay valid.
 
@@ -85,18 +85,19 @@ PR #5 (`npm run cases:fetch` in CI, `docs/design.md` "Case commits") was approve
    6. `git status` is still clean, and the repo hash matches
 
    Script it so it can be reproduced.
-10. **L1 eval evidence for Next.js (core PR; gap found on 2026-11-01, D60).** M8's first acceptance criterion asks for a full L1 run on at least 2 Next.js golden cases with runnable tests, "and outcome metrics in `eval/results.md`". M8 task 7 describes L1 runs recorded under `eval/runs/<case>/<prompt_version>/l1/<n>/` and a replay mode that re-scores their `stage_attempts`. The eval side has only the folder rule: `eval/addOnly.ts` keeps L1 sets add-only and `eval/load.ts` skips them. There is no L1 run record, export, replay or `results.md` section. M10 had relied on a Django L1 run for this, and that moved to M12. This task builds the missing half, so the README's verify claim rests on recorded evidence:
-   - an L1 run record in `eval/schema.ts`, exported from a run's store by `npm run runs:export` (D41)
-   - a replay that re-scores the recorded stage attempts with no model, no network and no command run
-   - an L1 section in `eval/results.md` for each case with L1 runs: stages kept, rolled back and sent to review, check results, and gate 7 rejections with their reasons. It stays a pure function of HEAD's tree (D17), and L1 runs never count toward N or the pack gate's recall.
+10. **L1 eval evidence for Next.js (core PR; gap found on 2026-11-01, D60).** M8's first acceptance criterion asks for a full L1 run on at least 2 Next.js golden cases with runnable tests, "and outcome metrics in `eval/results.md`". M8 task 11 describes L1 runs recorded under `eval/runs/<case>/<prompt_version>/l1/<n>/` and a replay mode that re-scores their `stage_attempts`. The eval side has only the folder rule and the metric: `eval/addOnly.ts` keeps L1 sets add-only, `eval/load.ts` skips them, and `outcomeMetrics` in `eval/metrics.ts` has nothing to feed it. There is no L1 run record, export, replay or `results.md` section. M10 had relied on a Django L1 run for this, and that moved to M12. This task builds the missing half, so the README's verify claim rests on recorded evidence. What replay re-checks is settled (D61); the record's fields are not:
+   - **Record (propose first).** Before coding, the builder proposes the L1 run record's field list, gets the maintainer's agreement and records it in `docs/design.md`. It holds at least, per stage, each attempt's patch, check results, gate 7 result and decision; the verify wall time; the sandbox's final tree hash from the live patch-replay check; and the source repo hash before and after the run. The same entry says how replay builds each stage's start and candidate trees from the pinned checkout and the recorded patches without running a command (for example in memory). The record lives in `eval/schema.ts`, and `npm run runs:export` exports it from a run's store (D41).
+   - **Load and replay.** `eval/load.ts` loads L1 sets instead of skipping them. `eval/replay.ts` re-scores them with no model, no network and no command run (INV-77). It re-runs HEAD's gate 7 statically on each recorded patch against the pinned case checkout, so a gate 7 change shows in `results.md` (D61). The patch-replay tree-hash check needs git to apply patches, so it stays live-only: replay shows the recorded hash and does not recompute it.
+   - **`results.md` section.** For each case with L1 runs, per run: `outcomeMetrics` from `eval/metrics.ts` (first-pass verify rate, mean attempts per stage, unresolved share, gate 7 incidents, flaky checks, and the verify wall time from the record), plus each stage's decision and gate 7 reasons, and the repo hash before and after. Gate 7 incidents and reasons are the ones HEAD's gate 7 gives on replay. The section stays a pure function of HEAD's tree (D17), and L1 runs never count toward N or the pack gate's recall (INV-77).
+   - **Coverage gap wording.** The same PR rewords the `django-upgrade` entry in `eval/cases/coverage-gaps.json` to name M12 instead of M10, and regenerates `eval/results.md`, which renders it.
 
-   Before coding, the builder settles with the maintainer which fields the record holds and what replay re-checks, since nothing runs in replay, and records it in `docs/design.md`.
-
-   **Live-run handover (D39, D41).** The L1 runs need a live host session on the maintainer's key, on at least 2 of the Next.js cases whose `case.json` declares `checks` (today `nextjs-bigcommerce-subscription-foundation-51`, `nextjs-couchers-web-9893` and `nextjs-neotree-editor-165`), with the M7 host (Cursor/databricks-claude-sonnet-4-6) unless the maintainer says otherwise. The builder prepares the tooling and the run instructions, then stops and hands over, as M7 did.
+   **Live-run handover (D39, D41).** The L1 runs need a live host session on the maintainer's key, on at least 2 of the Next.js cases whose `case.json` declares `checks` (today `nextjs-bigcommerce-subscription-foundation-51`, `nextjs-couchers-web-9893` and `nextjs-neotree-editor-165`), with the M7 host (Cursor/databricks-claude-sonnet-4-6) unless the maintainer says otherwise. The builder prepares the tooling and the run instructions, then stops and hands over, as M7 did. Per D61:
+   - Every live L1 run made is committed, whatever its outcome. Each case's L1 set lands whole in one PR, because it is frozen after that PR (INV-45).
+   - If fewer than 2 cases end with kept patches whose checks pass, the results are reported as they are and raised with the maintainer. No case is added silently to make up the count.
 
 ## Files and modules
 
-`scripts/check-core-untouched.ts`, `src/pipeline/agentsSnippet.ts`, plus `src/pipeline/ingest.ts`, `src/security/denyList.ts` and `src/verify/checks.ts` (separate PR), `examples/AGENTS.snippet.md`, `eval/schema.ts`, `eval/replay.ts`, `eval/results.ts`, `scripts/export-run.ts` and `eval/runs/<nextjs ids>/v1/l1/**` (task 10), `CONTRIBUTING.md`, `AI_POLICY.md`, `SECURITY.md`, `CODE_OF_CONDUCT.md`, `.github/ISSUE_TEMPLATE/*`, `plugin/**`, `README.md`, `docs/demo/{script.md,demo.gif}`, `test/unit/agentsSnippet.test.ts`, `test/unit/eval/l1.test.ts`, `test/permissions/{agents-snippet-cannot-widen,repo-checks-need-trust}.test.ts`.
+`scripts/check-core-untouched.ts`, `src/pipeline/agentsSnippet.ts`, plus `src/pipeline/ingest.ts`, `src/security/denyList.ts` and `src/verify/checks.ts` (separate PR), `examples/AGENTS.snippet.md`, `eval/schema.ts`, `eval/load.ts`, `eval/metrics.ts`, `eval/replay.ts`, `eval/results.ts`, `eval/results.md`, `eval/cases/coverage-gaps.json`, `scripts/export-run.ts` and `eval/runs/<nextjs ids>/v1/l1/**` (task 10), `CONTRIBUTING.md`, `AI_POLICY.md`, `SECURITY.md`, `CODE_OF_CONDUCT.md`, `.github/ISSUE_TEMPLATE/*`, `plugin/**`, `README.md`, `docs/demo/{script.md,demo.gif}`, `test/unit/agentsSnippet.test.ts`, `test/unit/eval/l1.test.ts`, `test/permissions/{agents-snippet-cannot-widen,repo-checks-need-trust}.test.ts`.
 
 ## Tests
 
@@ -109,7 +110,8 @@ PR #5 (`npm run cases:fetch` in CI, `docs/design.md` "Case commits") was approve
   - Without `confirm_target`, a snippet target that does not match the request is a question and no run. With `confirm_target: true`, the run uses the requested target.
 - **L1 evidence (`test/unit/eval/l1.test.ts`):**
   - replaying a recorded L1 set calls no model, network or command: a throwing spawn and a throwing `fetch` are never reached
-  - the L1 section of `results.md` is byte-stable across two generations and after a run is added
+  - replay re-runs HEAD's gate 7 on the recorded patches: a recorded patch that adds a `.skip` shows that gate 7 reason in the L1 section, and disabling that rule in gate 7 changes the section
+  - the L1 section of `results.md` is byte-stable across two generations, and other cases' L1 rows are byte-identical after a run is added to one case
   - an L1 set never changes N or recall
   - a missing case checkout still fails closed with `case_commit_unavailable`
 - **Plugin:** the generated bundle matches the packs (drift check).
@@ -121,7 +123,7 @@ PR #5 (`npm run cases:fetch` in CI, `docs/design.md` "Case commits") was approve
 - The open-source files and plugin bundle exist, and the README follows the order above, states its limits and claims only what exists.
 - The demo script reproduces the reject-then-pass flow, the gate 7 rejection and a clean `git status`.
 - The final name is recorded in `docs/design.md`.
-- `eval/results.md` shows the Next.js pack with the baseline comparison and its misses, and the L1 outcomes of at least 2 Next.js golden cases with kept patches whose checks pass (M8's first acceptance criterion). The source repo hash is unchanged after each L1 run.
+- `eval/results.md` shows the Next.js pack with the baseline comparison and its misses, and the L1 outcomes of at least 2 Next.js golden cases with kept patches whose checks pass (M8's first acceptance criterion). The source repo hash is unchanged after each L1 run, as each run's record shows. If fewer than 2 cases reach that, this criterion is not met: the results are reported as they are and the maintainer decides (D61).
 
 ## Risks
 

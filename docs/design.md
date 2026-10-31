@@ -924,3 +924,23 @@ Open item 3 (a test for `--` in the maintainer clones in `scripts/derive-truth.t
 - Ship v0.1 with the README saying that L1 outcomes are not yet measured. That would loosen M8's acceptance criterion, which is the maintainer's call; the builder recommended against it.
 
 **What would change it:** early users asking mostly for Python or Django upgrades, which would pull M12 forward; or the maintainer deciding against the L1 evidence task.
+
+## 2026-11-01: L1 replay, the live L1 runs and the v0.2 release
+
+### D61 - L1 replay re-runs gate 7 statically; every live L1 run is committed; v0.2 is published
+
+**Decision (the maintainer, 2026-11-01, settling the PR #7 plan review's open questions on M10 task 10 and M12):**
+
+1. **What L1 replay re-checks.** Replay of an L1 set (M10 task 10) calls no model or network and runs no command (INV-77). It re-runs HEAD's gate 7 statically on each recorded patch against the pinned case checkout, so a gate 7 change shows in `eval/results.md`, as a gate change does for engine runs (D17). The patch-replay tree-hash check (M8 task 11, INV-70) needs git to apply the patches, so it stays live-only: the record stores the sandbox's final tree hash from that check and the source repo hash before and after the run, and replay shows them without recomputing them. The `case_commit_unavailable` failure for a missing checkout still applies to L1 replay. The record's full field list is not settled here: the task 10 builder proposes it before coding and records it in `docs/design.md`.
+2. **Which live L1 runs are kept.** Every live L1 run made is committed, whatever its outcome. Each case's L1 set lands whole in one PR, because the set is frozen after that PR (INV-45). If fewer than 2 cases end with kept patches whose checks pass, the results are reported as they are and raised with the maintainer; no case is added silently to make up the count, and M10's acceptance criterion is not met until the maintainer decides.
+3. **v0.2 is a release.** M12 ends with an npm publish and a `v0.2.0` tag, as M11 does for v0.1. The version bump changes `package.json`, which is outside the pack PR's allowlist (INV-27), so it is a separate release PR after the pack PR.
+
+**Why:** a static gate 7 re-run is the one L1 check that needs no command, and without it a gate 7 change would leave the L1 evidence unchanged and untested. Committing every run keeps the evidence honest: picking the runs that went well would overstate the verify loop, and a case added after the fact to make the count would hide a weak result. The add-only rule means a set cannot be topped up later, so it has to land whole. Publishing v0.2 makes the Django pack usable the same way v0.1's pack is, instead of only in the repo.
+
+**Alternatives:**
+- Re-scoring only the recorded gate 7 results, which would never show a gate 7 change.
+- Re-applying patches with git in replay, which would run a command in CI's eval and break the "no command" rule.
+- Committing only the runs that kept patches.
+- Leaving v0.2 unpublished until a later milestone.
+
+**What would change it:** a gate 7 rule that cannot be judged without running something, which would have to be marked live-only in the record; or the maintainer choosing to release Django on a different schedule.
