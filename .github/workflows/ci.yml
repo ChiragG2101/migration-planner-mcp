@@ -71,6 +71,13 @@ jobs:
         env:
           BASE_SHA: ${{ github.event.pull_request.base.sha || github.event.before }}
         run: npm run eval:add-only -- --base "$BASE_SHA"
+      - name: No core changes (pack PRs only; a core change needs its own PR, D15/INV-27)
+        shell: bash
+        env:
+          BASE_SHA: ${{ github.event.pull_request.base.sha || github.event.before }}
+        # Self-skips on a core PR (nothing under packs/ or knowledge/). On a pack
+        # PR it enforces the allowlist against the PR base.
+        run: npm run check:core-untouched -- --base "$BASE_SHA"
       - name: Eval pack gate (replay, free; D17)
         shell: bash
         run: npm run eval:pack-gate

@@ -16,9 +16,13 @@ import type { ImportRow, SymbolRow } from '../../store/usages.js';
 import type { RepoFacts } from '../scanner.js';
 import { sliceLines, snippetHash } from '../snippet.js';
 import type { UsageAdapter, UsageContext, UsageDraft } from './adapter.js';
-import { nextjsAdapter } from './nextjs.js';
+import * as registry from './registry.js';
 
-export const usageAdapters: readonly UsageAdapter[] = [nextjsAdapter];
+// Every adapter re-exported by registry.ts. Object.values walks a module
+// namespace in alphabetical key order, not source order. Lookup is by id
+// (usageAdapterById), so that order is not part of the contract. A new pack
+// adds one line to registry.ts (D57); nothing here changes when a pack is added.
+export const usageAdapters: readonly UsageAdapter[] = Object.values(registry);
 
 /**
  * For a library no pack covers yet (Django until M10): the import graph and
