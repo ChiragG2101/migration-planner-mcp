@@ -12,7 +12,7 @@ A pack is data plus one usage adapter. The facts live in `knowledge/`, per libra
 - Packs only come from the repo's own `packs/` and `knowledge/` folders; third-party packs are not supported in v0.1.
 - Check demand: open an issue with the pack-request template, including evidence that people actually do this migration (for example merged PR counts or survey data).
 - Check the language is supported by an existing adapter in `src/lang/` (TS/JS and Python in v0.1), and that the version scheme and match kinds you need exist in the core. If not, that is a core change, not a pack.
-- Read `docs/plans/03-*` (knowledge and pack schema, composition, generator, lint) and `docs/plans/10-*` (how the Django pack was added).
+- Read `docs/plans/03-*` (knowledge and pack schema, composition, generator, lint) and `docs/plans/12-*` (the Django pack, the first pack added under the "no core changes" check).
 
 ## 1. Knowledge first
 

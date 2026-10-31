@@ -44,6 +44,7 @@ plan_for() {
     M0|M11) echo "$plans/00-overview.md" ;;
     M[1-9]) ls "$plans"/0"${1#M}"-*.md 2>/dev/null ;;
     M10) ls "$plans"/10-*.md 2>/dev/null ;;
+    M1[2-9]) ls "$plans"/"${1#M}"-*.md 2>/dev/null ;;
   esac
 }
 

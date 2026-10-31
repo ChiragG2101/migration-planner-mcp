@@ -33,7 +33,7 @@ By default one reviewer runs the four lenses one after another, in the order bel
 
 - **consistency:** questions 1 and 2;
 - **enforcement:** question 3, plus the failure-mode rows and invariants the diff adds;
-- **buildability:** question 4, walking M1 to M10 in order;
+- **buildability:** question 4, walking M1 to M12 in order;
 - **adversarial:** question 5, trying to pass each gate the diff touches without meeting its intent.
 
 ## 5. Verify each finding before reporting it

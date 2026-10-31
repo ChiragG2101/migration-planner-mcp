@@ -293,7 +293,7 @@ Why:
 
 ### D17 - A pack PR must beat the baseline on recall
 
-**Decision: a new pack's eval must beat the no-engine baseline on recall before the pack merges, and existing packs must not regress beyond the recorded noise band. This applies to the Django pack in M10. A pack that misses is not ready; the contributor raises it with the maintainer instead of tuning the eval or the baseline.**
+**Decision: a new pack's eval must beat the no-engine baseline on recall before the pack merges, and existing packs must not regress beyond the recorded noise band. This applies to the Django pack in M10 (M12 since D60). A pack that misses is not ready; the contributor raises it with the maintainer instead of tuning the eval or the baseline.**
 
 - **Recall** means M7's usage recall on the pack's golden cases, the one metric the engine and the baseline are both scored on. It is pooled over the pack's cases: true changed usages covered, over all true changed usages.
 - **What a run records.** Every engine run, whatever its size, records the ingest arguments, the `set_scope` answers, every `run_docs` entry whatever its `fetched_by` (`agent`, `engine` or `knowledge`), with URL, content, `doc_id`, `fetched_by`, `official` and status, and each `validate_plan` round's lens submissions in order, including any retry attempts within a round, with the file, span and `snippet_hash` of every usage ID its packets carried. It also records the transcript, the cost and wall time, and the host product and model. A baseline run records its Markdown plan, the hash of `eval/baseline/prompt.md`, and the host product and model.
@@ -306,7 +306,7 @@ Why:
 - **Worst and best case.** The engine's figure for a pack is its *worst-case pooled recall*: for each case take that case's lowest-recall engine run, then pool over the pack's cases. The baseline's figure is its *best-case pooled recall*: each case's highest-recall baseline run, pooled the same way. Neither depends on how the runs are numbered.
 - **The noise band** for a pack and side runs from the pooled recall of each case's worst run to the pooled recall of each case's best run. M7 records it in `eval/results.md`, with each case's covered and true changed usages for its worst and best run, so the band can be recomputed over any set of the pack's cases.
 - **Which packs are checked.** The gate checks only packs that exist under `packs/` at HEAD. A case whose pack doesn't exist yet, such as the Django cases M0 committed with only `case.json`, is listed as pending in `results.md`, not failed. A pack at HEAD needs at least 2 golden cases and at least one true changed usage across them.
-- **Beating the baseline** means the engine's worst-case pooled recall is above the baseline's best-case pooled recall. It is required of every pack at HEAD that has no band in `eval/results.md` on the base branch, whichever PR adds its cases. It is required again, over all the pack's cases including the new ones, of a PR that widens a pack that was beat-checked when it was added. The first pack, `nextjs-upgrade`, sets the first band in M7 and is exempt: the beat check applies from the Django pack (M10), and M7's `results.md` states plainly where the engine does not beat the baseline. When `nextjs-upgrade` is widened, its beat result over all its cases is shown (`results.md` always shows it) but not enforced.
+- **Beating the baseline** means the engine's worst-case pooled recall is above the baseline's best-case pooled recall. It is required of every pack at HEAD that has no band in `eval/results.md` on the base branch, whichever PR adds its cases. It is required again, over all the pack's cases including the new ones, of a PR that widens a pack that was beat-checked when it was added. The first pack, `nextjs-upgrade`, sets the first band in M7 and is exempt: the beat check applies from the Django pack (M10, M12 since D60), and M7's `results.md` states plainly where the engine does not beat the baseline. When `nextjs-upgrade` is widened, its beat result over all its cases is shown (`results.md` always shows it) but not enforced.
 - **A regression** means the PR's engine worst-case pooled recall, over the cases in the base branch's band that are also present at HEAD, falls below the low end of the base band recomputed over the same cases. The band is the one in `eval/results.md` on the base branch; the PR's own regenerated band is never the reference, since it is computed from the runs being checked. When the base branch has no band for a pack, the regression check is skipped for it and the CI job output says so.
 - **Widening a pack.** Golden cases a PR adds to an existing pack are not in the base band, so the regression check leaves them out. The beat check, where it applies, counts them: over all the pack's cases, the engine's worst-case pooled recall must still be above the baseline's best-case pooled recall. The new cases must have the same N as the pack's existing cases. Their runs join the pack's band in the PR's regenerated `results.md`, which becomes the base for later PRs.
 - **It is checked in code.** On every PR, not only on the regression-rule paths, CI replays the recorded runs. Replay calls no model and no paid service (C1). The pinned case commits are fetched by eval tooling, outside the engine, and CI caches them; C6 covers only the engine's own network, so it is unaffected. For each pack at HEAD, it fails the PR when:
@@ -336,7 +336,7 @@ Why:
 - Re-scoring only the recorded findings would leave the numbers unchanged when the knowledge or the engine changes, so the regression rule could be met without measuring anything. Replaying the lens submissions through HEAD's engine measures the change without paying for new runs, and a recorded finding that HEAD no longer accepts counts against the engine rather than being scored as if it still matched.
 - A beat check tied to the PR that creates `packs/<pack>/` could be dodged by adding the pack with no cases and the cases in a later PR. Tying it to "no band on the base branch", with at least 2 cases and some true changed usage, closes that gap.
 - The first pack has no earlier band and no earlier pack to compare with: M7 is where the engine is first measured. Blocking M7 on the beat check would leave the eval unbuilt, so M7 reports plainly where the engine loses instead.
-- The Django cases were committed in M0, before the Django pack exists. Failing them would fail every PR until M10, so they are listed as pending, and the Django pack PR completes them.
+- The Django cases were committed in M0, before the Django pack exists. Failing them would fail every PR until the Django pack PR (M12 since D60), so they are listed as pending, and the Django pack PR completes them.
 - Runs under an older prompt version, or a baseline given a different prompt, measure something else. Scoring only HEAD's prompt version and HEAD's baseline prompt keeps the two sides comparable.
 - A gate that only a reviewer checks can be skipped or misread. Replay is free (C1): it calls no model and no paid service, and the case commits it needs are cached in CI. So CI can check it on every PR, including one that touches only `eval/`.
 - The gate scores whatever runs are committed. Comparing with the base branch's band, and keeping existing cases and runs add-only on every PR, not only pack PRs, stops any PR from moving the bar by re-recording or editing the runs it is judged on.
@@ -573,7 +573,7 @@ The plan types each rule's `match` but doesn't say when a usage counts as matche
 | `config_key {file_kind, path}` | the module is the config file kind (`next.config`, `segment`, `tsconfig`) and the symbol is `path` or a key under it |
 | `dependency {package, range}` | the module is `package`; `range` documents the affected versions and is not checked |
 | `file_convention {glob, symbol?}` | the file matches `glob`, anchored at a path-segment boundary as if it began with `**/`, and, when `symbol` is given, the symbol is equal |
-| `setting`, `string_ref`, `template_tag`, `template_filter` | the symbol equals the name or dotted path (M10 may tighten these when the Django adapter exists) |
+| `setting`, `string_ref`, `template_tag`, `template_filter` | the symbol equals the name or dotted path (M10 may tighten these when the Django adapter exists; M12 since D60) |
 
 Values are not checked: any `runtime` segment export binds a `runtime` rule, and any declared `@types/react` binds a rule on old `@types/react`. Code already in the target form therefore still binds, and a lens marks it out of scope (D16). An unresolved dynamic import binds nothing, so it stays unmapped for the lenses and gate 2.
 
@@ -897,3 +897,59 @@ Open item 3 (a test for `--` in the maintainer clones in `scripts/derive-truth.t
 **Alternatives:** catching in `fetchAll` alone, without a typed error, which could not name the folder; a second loader in `caseCommits.ts` with `safeParse`, which would duplicate `loadCases`; skipping a bad case and fetching the rest, which could let a run go ahead without a case it should have scored.
 
 **What would change it:** a check that needs the case checkouts to vet case data, which would have to run after the fetch.
+
+## 2026-11-01: v0.1 ships with the Next.js pack only
+
+### D60 - The Django pack moves to v0.2 (M12); M10 gains the L1 eval evidence for Next.js
+
+**Decision (the maintainer, 2026-11-01):** v0.1 goes live with one pack, the Next.js major upgrade. The Django LTS to LTS pack becomes v0.2, as a new milestone M12 (`docs/plans/12-django-pack.md`) that starts after M11.
+
+- **What moved.** M10's tasks 1 to 3 (the Django usage adapter, knowledge and pack, and eval cases), its "Why Django is pack 2" and "No core changes" sections, the Django tests, the three Django acceptance criteria, the Django risks and the Django live-run handover moved to M12 unchanged, except for lines that named M10 or both packs. M12 adds one task: the pack PR regenerates `plugin/` with the Django skill and updates the README's eval table and limits. Earlier plans and records that name M10 for the Django pack (the done milestones' plans and the decisions before this one) now mean M12; they are left as written.
+- **What stays in M10**, with its task numbers kept so earlier references (for example D58's "M10 task 4") still hold: the AGENTS.md snippet (done), the "no core changes" check (done, D57), the open-source files, the plugin bundle, the name, the README and the demo. The plan file is renamed `docs/plans/10-snippet-readme-oss-demo.md`. M10's plugin bundle carries the Next.js skill. The README's limits become "one pack, Next.js, so TS/JS repos only (the Python adapter ships, the Django pack is v0.2)".
+- **The L1 evidence gap (found while making this change).** M10's acceptance asked for "an L1 run on at least one Django case" in `eval/results.md`. That moved with Django, but it was also standing in for M8's own first acceptance criterion: a full L1 run on at least 2 Next.js golden cases, with outcome metrics in `eval/results.md`. M8 was marked done with its live L1 runs as a handover (D39, D41), but the eval half for them was never built either: `eval/addOnly.ts` keeps L1 sets add-only and `eval/load.ts` skips them, and there is no L1 run record, export, replay or `results.md` section. Rather than ship v0.1 with the README's verify claim unbacked, or loosen M8's criterion (working rule 3), M10 gains task 10: build that half as a core PR, then hand over for live L1 runs on at least 2 of the Next.js cases that declare `checks` (`nextjs-bigcommerce-subscription-foundation-51`, `nextjs-couchers-web-9893`, `nextjs-neotree-editor-165`). It lands before the docs and release PR, which shows its results.
+- **What does not change.** The M0 Django cases (`django-ror-api-548`, `django-thunderstore-1369`) stay committed and are listed as pending in `results.md`, as for any case whose pack is not at HEAD (D17). Nothing is deleted. The "no core changes" and add-only checks keep running on every PR. The empty `knowledge/pypi/django/` folder stays. The Python language adapter stays in the engine and ships.
+- **Spine checks.** `scripts/check-spine.sh` maps M12 and later milestones to `docs/plans/<n>-*.md`.
+
+**Why:** the Next.js pack has its eval evidence (7 golden cases, engine 62.8% against the baseline's 40.7% worst-case pooled recall), and Django has almost none yet: no knowledge, 2 of at least 3 golden cases (only 1 strict LTS-to-LTS case and no messy case), and at least 18 live runs still to make. Keeping it in v0.1 would push go-live back by about 1 to 1.5 weeks, and further if the pack misses the baseline on its first try.
+
+**Cost, stated so the README does not overclaim:**
+- With one pack, "a general engine" is a design aim, not a measured result.
+- The "no core changes" check has not yet judged a real pack PR, so a contributor's first pack may surface a needed core change.
+- The audience is Next.js projects only.
+- PRD section 4 and the README limits now say this.
+
+**Alternatives:**
+- Ship a thinner Django pack under the old cut order. It still needs the cases and all the live runs, so it saves little time.
+- Delay go-live until Django is done.
+- Ship v0.1 with the README saying that L1 outcomes are not yet measured. That would loosen M8's acceptance criterion, which is the maintainer's call; the builder recommended against it.
+
+**What would change it:** early users asking mostly for Python or Django upgrades, which would pull M12 forward; or the maintainer deciding against the L1 evidence task.
+
+## 2026-11-01: L1 replay, the live L1 runs and the v0.2 release
+
+### D61 - L1 replay re-runs gate 7 statically; every live L1 run is committed; v0.2 is published
+
+**Decision (the maintainer, 2026-11-01, settling the PR #7 plan review's open questions on M10 task 10 and M12):**
+
+1. **What L1 replay re-checks.** Replay of an L1 set (M10 task 10) calls no model or network and runs no command (INV-77). It re-runs HEAD's gate 7 statically on each recorded patch against the pinned case checkout, so a gate 7 change shows in `eval/results.md`, as a gate change does for engine runs (D17). The patch-replay tree-hash check (M8 task 11, INV-70) needs git to apply the patches, so it stays live-only: the record stores the sandbox's final tree hash from that check and the source repo hash before and after the run, and replay shows them without recomputing them. The `case_commit_unavailable` failure for a missing checkout still applies to L1 replay. The record's full field list is not settled here: the task 10 builder proposes it before coding and records it in `docs/design.md`.
+2. **Which live L1 runs are kept.** Every live L1 run made is committed, whatever its outcome. Each case's L1 set lands whole in one PR, because the set is frozen after that PR (INV-45). If fewer than 2 cases end with kept patches whose checks pass, the results are reported as they are and raised with the maintainer; no case is added silently to make up the count, and M10's acceptance criterion is not met until the maintainer decides.
+3. **v0.2 is a release.** M12 ends with an npm publish and a `v0.2.0` tag, as M11 does for v0.1. The version bump changes `package.json`, which is outside the pack PR's allowlist (INV-27), so it is a separate release PR after the pack PR.
+
+**Why:** a static gate 7 re-run is the one L1 check that needs no command, and without it a gate 7 change would leave the L1 evidence unchanged and untested. Committing every run keeps the evidence honest: picking the runs that went well would overstate the verify loop, and a case added after the fact to make the count would hide a weak result. The add-only rule means a set cannot be topped up later, so it has to land whole. Publishing v0.2 makes the Django pack usable the same way v0.1's pack is, instead of only in the repo.
+
+**Alternatives:**
+- Re-scoring only the recorded gate 7 results, which would never show a gate 7 change.
+- Re-applying patches with git in replay, which would run a command in CI's eval and break the "no command" rule.
+- Committing only the runs that kept patches.
+- Leaving v0.2 unpublished until a later milestone.
+
+**What would change it:** a gate 7 rule that cannot be judged without running something, which would have to be marked live-only in the record; or the maintainer choosing to release Django on a different schedule.
+
+**Addendum to item 4 (the maintainer, 2026-11-01, settling the PR #7 round-2 plan review's open item OI-1).** Item 1's static re-run can disagree with the recorded run.
+
+4. **When HEAD's gate 7 rejects a kept patch on replay:**
+   - The L1 row shows the recorded decision unchanged and marks the stage plainly, for example "kept, rejected by HEAD's gate 7".
+   - That stage's gate 7 reasons count in gate 7 incidents.
+   - The stage does not count as a "kept patch whose checks pass" for M10's acceptance criterion.
+
+**Why:** rewriting the recorded decision would show an outcome the live run never had, and hiding the disagreement would let a gate 7 change pass without a visible effect on the L1 evidence. Not counting the stage keeps the acceptance count to patches that HEAD's engine would still keep.

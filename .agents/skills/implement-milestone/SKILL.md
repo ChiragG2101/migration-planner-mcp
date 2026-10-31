@@ -1,6 +1,6 @@
 ---
 name: implement-milestone
-description: Use when building a milestone (M1 to M10) of this repo, or any task in docs/plans/. It keeps the work inside the plan's scope and runs the milestone gates before calling it done.
+description: Use when building a milestone (M1 to M10, or M12) of this repo, or any task in docs/plans/. It keeps the work inside the plan's scope and runs the milestone gates before calling it done.
 ---
 
 # Implement a milestone

@@ -1,8 +1,8 @@
 # 00 - Implementation plan overview
 
-This folder turns [`docs/PRD.md`](../PRD.md) into milestone plans. It is a plan, not an implementation. Each milestone file (`01` to `10`, matching M1 to M10) lists its scope, tasks, files and modules, tests, acceptance criteria, risks and dependencies.
+This folder turns [`docs/PRD.md`](../PRD.md) into milestone plans. It is a plan, not an implementation. Each milestone file (`01` to `10` and `12`, matching M1 to M10 and M12) lists its scope, tasks, files and modules, tests, acceptance criteria, risks and dependencies.
 
-The project in one paragraph: a general migration engine (run state, plan schema, gates, verify loop, eval, permissions) with migration packs plugged in. The CLI, the MCP server and generated skills are thin adapters over the same engine. Pack 1 is a Next.js major upgrade; pack 2 is a Django LTS to LTS upgrade, chosen to prove the engine works for a second language. L0 (report only) is the default; L1 applies and verifies each stage in a sandbox copy and emits patches. The user's repo is never written.
+The project in one paragraph: a general migration engine (run state, plan schema, gates, verify loop, eval, permissions) with migration packs plugged in. The CLI, the MCP server and generated skills are thin adapters over the same engine. Pack 1 is a Next.js major upgrade and is the one pack in v0.1. Pack 2 is a Django LTS to LTS upgrade, chosen to prove the engine works for a second language; it is v0.2 (M12, `docs/design.md` D60). L0 (report only) is the default; L1 applies and verifies each stage in a sandbox copy and emits patches. The user's repo is never written.
 
 ## Non-negotiable constraints (apply to every milestone)
 
@@ -35,12 +35,13 @@ These come from PRD sections 1, 3 and 7A. A milestone that breaks one of them is
 | M7 | [`07-eval-runner-golden-baseline.md`](07-eval-runner-golden-baseline.md) | Eval runner, 5 Next.js golden cases, baseline run, golden-case finder and re-checker | M6 |
 | M8 | [`08-sandboxed-verify-loop.md`](08-sandboxed-verify-loop.md) | Sandboxed verify loop (L1), codemod registry, gate 7 (test integrity), outcome metrics | M6, M7 |
 | M9 | [`09-confidence-feedback-report.md`](09-confidence-feedback-report.md) | Confidence routing, `record_feedback`, run report | M6, M7, M8 |
-| M10 | [`10-django-pack-readme-oss-demo.md`](10-django-pack-readme-oss-demo.md) | Django pack (no core changes), README, open-source files, plugin bundle, demo, name decided | M3, M7, M8, M9 |
+| M10 | [`10-snippet-readme-oss-demo.md`](10-snippet-readme-oss-demo.md) | AGENTS.md snippet, "no core changes" check, L1 eval evidence for Next.js, README, open-source files, plugin bundle, demo, name decided (the Django pack moved to M12, D60) | M3, M7, M8, M9 |
 | M11 | (this file, section below) | npm publish, tag v0.1 | M10 |
+| M12 | [`12-django-pack.md`](12-django-pack.md) | v0.2: Django pack (no core changes), beating the baseline; npm publish, tag v0.2.0 | M2, M3, M7, M8, M10, M11 |
 
 M4 can run in parallel with M2 and M3 once M1 lands, except that M4's `official` labelling needs `src/docs/officialUrl.ts` from M3 task 7, so that file lands before M4's labelling. Everything else runs in order.
 
-**Cut order if behind:** server-side Context7 (a stretch goal anyway), then container sandbox mode (keep the clone sandbox), then the depth of the Django pack (fewer rules, same golden cases and the same "no core changes" check). **Never cut** the gates (M6 and gate 7 in M8), the permissions rules (M1 and every later milestone), the eval (M7) or the clone-based verify loop (M8).
+**Cut order if behind:** server-side Context7 (a stretch goal anyway), then container sandbox mode (keep the clone sandbox). The Django pack left v0.1 on 2026-11-01 (M12, D60); within M12 the cut is its depth (fewer rules, same golden cases and the same "no core changes" check). **Never cut** the gates (M6 and gate 7 in M8), the permissions rules (M1 and every later milestone), the eval (M7) or the clone-based verify loop (M8).
 
 ## M0 - Spine docs and golden cases (pre-code)
 
@@ -113,3 +114,5 @@ test/                       # unit/, permissions/, fixtures/
 ## M11 - Publish (after M10, not given its own plan here)
 
 Publish to npm under the name chosen in M10, tag `v0.1.0`, and check the `npx` install on a clean machine or container, for both the CLI and the MCP config. Publish the Claude Code plugin bundle. Only once real eval numbers exist does the README change from "currently building".
+
+M12 repeats these release steps for v0.2 (`v0.2.0`, with the Django pack) once its pack PR has merged (`docs/design.md` D61).

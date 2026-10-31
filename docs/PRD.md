@@ -62,11 +62,13 @@ Migrations come in four kinds, each checked differently:
 | Kind | Example | How it is checked | v0.1 |
 | --- | --- | --- | --- |
 | A. Library or tool swap | Jest to Vitest, webpack to Vite | Existing tests, typecheck, build | Supported by the engine; no bundled pack |
-| B. Version or framework upgrade | Next.js major, Django LTS to LTS | Tests, typecheck, framework checks, deprecation warnings | **The v0.1 packs** |
+| B. Version or framework upgrade | Next.js major, Django LTS to LTS | Tests, typecheck, framework checks, deprecation warnings | **The v0.1 pack (Next.js); Django in v0.2** |
 | C. Language translation | JS to Rust, Python to Go | Differential and characterization tests | Out of scope |
 | D. Architecture | Monolith to services, multi-repo | Contract tests, shadow traffic, cutover plan | Out of scope (data model ready) |
 
-**v0.1:** TS/JS and Python repos. Pack 1: Next.js major upgrade (including the React changes it requires). Pack 2: Django LTS to LTS upgrade. Single repo per run.
+**v0.1:** TS/JS repos. One pack: Next.js major upgrade (including the React changes it requires). Single repo per run. The Python language adapter is built and ships, but has no pack until v0.2.
+
+**v0.2:** Pack 2, Django LTS to LTS upgrade, the first Python pack, added with no core changes (moved from v0.1 on 2026-11-01, `docs/design.md` D60).
 
 **Out of scope:** writing to the user's repo, other languages, kinds C and D, Next.js pages to app router (a later pack), a web UI, hosting, auth, "any technology" claims, third-party packs installed from outside the repo.
 
@@ -243,7 +245,7 @@ Build the eval set early, because a system that was great on its test data can d
 ### Tiers
 
 1. **Unit tests** for the scanner, language adapters, usage finders, each gate, the verify loop and the permissions rules. Fast, run on every change.
-2. **Golden cases:** 5 to 8 real public Next.js upgrades and at least 2 Django upgrades where the true PR is the ground truth. Check out the parent commit, run the planner, compare with the real diff. Include at least one failed or messy migration.
+2. **Golden cases:** 5 to 8 real public Next.js upgrades (v0.1) and at least 3 Django upgrades (v0.2) where the true PR is the ground truth. Check out the parent commit, run the planner, compare with the real diff. Include at least one failed or messy migration.
 3. **Seeded-defect cases:** take a repo and plant tricky usages (indirect re-exports, config-driven behaviour, async API misuse, removed settings) to test recall on known hard items.
 4. **Baseline comparison:** the same host agent with no engine, given the same task. The result that matters is "with engine vs. without", measured on the same metrics.
 
@@ -317,10 +319,11 @@ Write the design, break it into milestones with a written definition of done, an
 | M7 | Eval runner, 5 Next.js golden cases, baseline run, golden-case finder and re-checker | eval/results.md published |
 | M8 | Sandboxed verify loop (L1), codemod registry, gate 7 | Permissions tests for execution pass; weakened-test fixtures are all rejected |
 | M9 | Confidence routing, record_feedback, run report | Needs-human section works; report traces to events |
-| M10 | Django pack (no core changes), README, open-source files, demo, name decided | Pack added with no core changes; README states limits |
+| M10 | AGENTS.md snippet, "no core changes" check, L1 eval evidence for Next.js, README, open-source files, demo, name decided | L1 outcomes in eval/results.md; README states limits |
 | M11 | Publish to npm, tag v0.1 | Install works from a clean machine |
+| M12 | v0.2: Django pack (no core changes), publish to npm, tag v0.2 | Pack added with no core changes and beats the baseline; v0.2 installs from a clean machine |
 
-**Cut order if behind:** server-side Context7, then container sandbox mode, then the depth of the Django pack (fewer rules, same golden cases). Never cut the gates (including gate 7), the permissions rules, the eval or the clone-based verify loop.
+**Cut order if behind:** server-side Context7, then container sandbox mode. The Django pack moved to v0.2 (M12); there, its depth is what is cut (fewer rules, same golden cases). Never cut the gates (including gate 7), the permissions rules, the eval or the clone-based verify loop.
 
 ## 13. Repo layout
 
@@ -340,9 +343,9 @@ migration-planner-mcp/          (working name)
        schema/ finding.ts plan.ts knowledge.ts pack.ts match.ts
        store/ (sqlite event spine, campaigns, repos)
        docs/ context7.ts cache.ts officialUrl.ts
-  knowledge/npm/next/ npm/react/ pypi/django/ (library.json, releases/*.json)
+  knowledge/npm/next/ npm/react/ pypi/django/ (v0.2) (library.json, releases/*.json)
   packs/nextjs-upgrade/ (pack.json, SKILL.md, references/)
-  packs/django-upgrade/
+  packs/django-upgrade/ (v0.2)
   scripts/ (maintainer tools: pack build and lint, release drafter, pack update report, golden-case finder and re-checker; never imported by src/)
   prompts/ plan_migration.v1.md
   eval/ cases/ seeded/ baseline/ runs/ dryruns/ history/ runner.ts results.md
@@ -355,7 +358,7 @@ migration-planner-mcp/          (working name)
 
 - **Demo (60 to 90 seconds):** point Claude Code at a real Next.js repo on an older major, ask for a plan, show the critic rejecting a draft for an uncited claim, then the passing plan with file:line links and the "needs human decision" section. Then run one stage at L1 and show gate 7 rejecting a patch that skipped a failing test. Show the repo is untouched afterwards (git status clean).
 - **README order:** pitch, demo GIF, one-snippet install (CLI, Claude Code, Cursor), example output, how it works (diagram), eval table with baseline comparison, limits, how to add a pack.
-- **Limits section:** TS/JS and Python only, two packs, single repo, never writes to your repo, L1 runs your declared checks in a sandbox copy, no third-party packs.
+- **Limits section:** one pack (Next.js), so TS/JS repos only, with Django in v0.2; single repo, never writes to your repo, L1 runs your declared checks in a sandbox copy, no third-party packs.
 - **Optional AGENTS.md snippet.** `examples/AGENTS.snippet.md` is a few lines users paste into their repo's AGENTS.md: the check commands (test, typecheck, lint, and any install step), directories the engine should not read, and the target versions. The engine reads it at ingest if present. It is optional. A snippet can only add restrictions to the deny list, never widen the path boundary. Its check commands are the only commands L1 will run apart from allowlisted codemods.
 - **Open source.** Apache-2.0. `CONTRIBUTING.md` makes packs the unit of contribution: a pack PR must include golden cases and beat the baseline on recall in the eval. `AI_POLICY.md` asks contributors to disclose AI assistance and keeps the human contributor responsible for every change. A Claude Code plugin bundle packages the generated skills and the MCP config.
 
@@ -368,8 +371,8 @@ migration-planner-mcp/          (working name)
 - **Sandbox misuse or escape:** single spawn point, commands from user config only, cwd pinned to the sandbox, scrubbed environment, permissions tests. The clone sandbox is not a security boundary against hostile code; the user's own checks are code they already run. Say this in the README, and offer `--sandbox container` for stronger isolation.
 - **Installs and checks need network or services** (databases for Django tests): declared by the user, reported in the run report, never assumed.
 - **Python parsing fidelity:** tree-sitter gives syntax, not types. Usages found by name resolution are labelled heuristic, and recall is measured on a seeded Django repo.
-- **Pack 2 forces changes to the engine:** that is the point of M10. Fix the coupling in a separate core PR before the pack PR.
-- **Over-building:** v0.1 is two packs, one repo, L0 and L1. Add dashboards, embeddings and multi-repo behaviour only when the eval or users show a need.
+- **Pack 2 forces changes to the engine:** that is the point of M12 (v0.2). Fix the coupling in a separate core PR before the pack PR.
+- **Over-building:** v0.1 is one pack, one repo, L0 and L1. Add dashboards, embeddings and multi-repo behaviour only when the eval or users show a need.
 - **Pack or skill supply chain:** reviewed packs only, no scripts, codemods only through the core registry, versions recorded in every plan.
 
 ## Appendix: sources and what was borrowed
