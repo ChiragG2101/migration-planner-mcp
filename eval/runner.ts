@@ -15,6 +15,7 @@ import { existsSync, readFileSync, realpathSync, writeFileSync } from 'node:fs';
 import path from 'node:path';
 import { fileURLToPath } from 'node:url';
 import { loadBundled } from '../src/rules/loader.js';
+import { checkoutAtBase, workDir } from './caseCommits.js';
 import { loadCases, loadBaselineRuns, loadEngineRuns, loadRemoved, evalRoot, type LoadedCase } from './load.js';
 import type { CaseRunRecall } from './metrics.js';
 import { packGate, type BaseBand, type Host, type PackRuns } from './packGate.js';
@@ -46,10 +47,15 @@ function packsAtHead(): Set<string> {
   return new Set(bundle.packs.keys());
 }
 
-/** Resolve a case's base checkout folder from the eval workspace cache (eval/.work/<id>). */
-function baseCheckout(caseId: string): string | null {
-  const dir = path.join(evalRoot(), '.work', caseId);
-  return existsSync(dir) ? realpathSync(dir) : null;
+/** Resolves a case's checkout folder at its pinned base commit, or null when it is unavailable. */
+export type CheckoutResolver = (c: LoadedCase) => string | null;
+
+/** The eval workspace cache (eval/.work/<id>), used only when it sits clean at the pinned base commit. */
+const baseCheckout: CheckoutResolver = (c) => checkoutAtBase(path.join(workDir(), c.case.id), c.case.base_commit);
+
+/** Fails closed when a case with recorded runs has no checkout at its base: never score or render without it (D17). */
+export function assertCommitsAvailable(ids: readonly string[]): void {
+  if (ids.length) throw new Error(`case_commit_unavailable: ${ids.join(', ')} (run \`npm run cases:fetch\`)`);
 }
 
 /** The set of repo-relative files at a case's base checkout (for baseline citation resolution). */
@@ -70,7 +76,7 @@ export interface ScoredPack {
 }
 
 /** Replay and score every recorded run of the cases of one pack. */
-export async function scorePack(pack: string, cases: LoadedCase[], present: boolean, promptVersion: string): Promise<ScoredPack> {
+export async function scorePack(pack: string, cases: LoadedCase[], present: boolean, promptVersion: string, checkoutFor: CheckoutResolver = baseCheckout): Promise<ScoredPack> {
   const engine = new Map<string, CaseRunRecall[]>();
   const baseline = new Map<string, CaseRunRecall[]>();
   const hosts: Host[] = [];
@@ -84,7 +90,7 @@ export async function scorePack(pack: string, cases: LoadedCase[], present: bool
     const truth: Truth | null = c.truth;
     if (!truth) continue; // a case with no truth has no recorded runs yet
     trueUsages += truth.changed_usages.length;
-    const checkout = baseCheckout(c.case.id);
+    const checkout = checkoutFor(c);
     const engineRuns = loadEngineRuns(c.case.id, promptVersion);
     const baselineRuns = loadBaselineRuns(c.case.id);
     if ((engineRuns.length || baselineRuns.length) && !checkout) {
@@ -138,14 +144,15 @@ function readCoverageGaps(): string[] {
   return JSON.parse(readFileSync(p, 'utf8')) as string[];
 }
 
-/** Generate results.md bytes for HEAD's tree. */
-export async function generate(): Promise<string> {
+/** Generate results.md bytes for HEAD's tree. Throws `case_commit_unavailable` rather than rendering without a case. */
+export async function generate(checkoutFor: CheckoutResolver = baseCheckout): Promise<string> {
   const promptVersion = currentPromptVersion();
   const cases = loadCases();
   const packsHead = packsAtHead();
   const packNames = [...new Set([...cases.map((c) => c.case.pack)].filter((p) => packsHead.has(p)))].sort();
   const packs: ScoredPack[] = [];
-  for (const name of packNames) packs.push(await scorePack(name, cases, true, promptVersion));
+  for (const name of packNames) packs.push(await scorePack(name, cases, true, promptVersion, checkoutFor));
+  assertCommitsAvailable(packs.flatMap((p) => p.commitUnavailable));
   return renderResults(toResultsInput(packs, cases, packsHead, promptVersion));
 }
 

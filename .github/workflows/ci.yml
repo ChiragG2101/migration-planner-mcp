@@ -1,6 +1,8 @@
-# Runs the gates that need no network or model on every push and PR:
-# typecheck, lint, the whole test suite (permissions included), the seeded
-# recall ratchet, the build, and the spine and skills checks (docs/design.md D23).
+# Runs the gates that need no model on every push and PR: typecheck, lint, the
+# whole test suite (permissions included), the seeded recall ratchet, the eval
+# replay, the build, and the spine and skills checks (docs/design.md D23). The
+# only network step is the golden cases' pinned commits, fetched from their
+# public repos by eval tooling and cached (D17).
 name: CI
 
 on:
@@ -52,6 +54,15 @@ jobs:
         env:
           BASE_SHA: ${{ github.event.pull_request.base.sha || github.event.before }}
         run: npm run recall -- --check --base "$BASE_SHA"
+      - name: Cache golden-case commits (D17)
+        uses: actions/cache@55cc8345863c7cc4c66a329aec7e433d2d1c52a9 # v6.1.0
+        with:
+          path: eval/.work
+          key: case-commits-${{ runner.os }}-${{ hashFiles('eval/cases/*/case.json') }}
+          restore-keys: case-commits-${{ runner.os }}-
+      - name: Fetch golden-case commits (fails closed with case_commit_unavailable)
+        shell: bash
+        run: npm run cases:fetch
       - name: Eval smoke (replay, free; no model, no paid service)
         shell: bash
         run: npm run eval:smoke
