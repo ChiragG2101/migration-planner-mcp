@@ -944,3 +944,12 @@ Open item 3 (a test for `--` in the maintainer clones in `scripts/derive-truth.t
 - Leaving v0.2 unpublished until a later milestone.
 
 **What would change it:** a gate 7 rule that cannot be judged without running something, which would have to be marked live-only in the record; or the maintainer choosing to release Django on a different schedule.
+
+**Addendum to item 4 (the maintainer, 2026-11-01, settling the PR #7 round-2 plan review's open item OI-1).** Item 1's static re-run can disagree with the recorded run.
+
+4. **When HEAD's gate 7 rejects a kept patch on replay:**
+   - The L1 row shows the recorded decision unchanged and marks the stage plainly, for example "kept, rejected by HEAD's gate 7".
+   - That stage's gate 7 reasons count in gate 7 incidents.
+   - The stage does not count as a "kept patch whose checks pass" for M10's acceptance criterion.
+
+**Why:** rewriting the recorded decision would show an outcome the live run never had, and hiding the disagreement would let a gate 7 change pass without a visible effect on the L1 evidence. Not counting the stage keeps the acceptance count to patches that HEAD's engine would still keep.
