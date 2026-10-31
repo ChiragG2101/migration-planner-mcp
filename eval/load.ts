@@ -19,14 +19,41 @@ export interface LoadedCase {
   annotations: Annotation[];
 }
 
-/** Every case folder, with its truth and annotations when present. */
-export function loadCases(): LoadedCase[] {
+/** A `case.json` that is not JSON or fails the case schema, named by its case folder. Callers fail on it; none skips the case. */
+export class CaseRecordInvalid extends Error {
+  constructor(
+    readonly caseId: string,
+    detail: string,
+  ) {
+    super(`case_record_invalid: ${caseId}: eval/cases/${caseId}/case.json ${detail}`);
+    this.name = 'CaseRecordInvalid';
+  }
+}
+
+function parseCase(id: string, casePath: string): Case {
+  const text = readFileSync(casePath, 'utf8');
+  let raw: unknown;
+  try {
+    raw = JSON.parse(text);
+  } catch (e) {
+    throw new CaseRecordInvalid(id, `is not valid JSON: ${(e as Error).message}`);
+  }
+  const parsed = Case.safeParse(raw);
+  if (!parsed.success) {
+    const issues = parsed.error.issues.map((i) => `${i.path.join('.') || '(root)'}: ${i.message}`).join('; ');
+    throw new CaseRecordInvalid(id, `fails the case schema: ${issues}`);
+  }
+  return parsed.data;
+}
+
+/** Every case folder, with its truth and annotations when present. Throws `CaseRecordInvalid` on the first bad `case.json`. */
+export function loadCases(root: string = casesDir()): LoadedCase[] {
   const out: LoadedCase[] = [];
-  for (const id of dirs(casesDir())) {
-    const dir = path.join(casesDir(), id);
+  for (const id of dirs(root)) {
+    const dir = path.join(root, id);
     const casePath = path.join(dir, 'case.json');
     if (!existsSync(casePath)) continue;
-    const kase = Case.parse(JSON.parse(readFileSync(casePath, 'utf8')));
+    const kase = parseCase(id, casePath);
     const truthPath = path.join(dir, 'truth.json');
     const annPath = path.join(dir, 'annotations.json');
     out.push({
