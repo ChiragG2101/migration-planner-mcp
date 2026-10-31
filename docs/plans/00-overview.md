@@ -37,7 +37,7 @@ These come from PRD sections 1, 3 and 7A. A milestone that breaks one of them is
 | M9 | [`09-confidence-feedback-report.md`](09-confidence-feedback-report.md) | Confidence routing, `record_feedback`, run report | M6, M7, M8 |
 | M10 | [`10-snippet-readme-oss-demo.md`](10-snippet-readme-oss-demo.md) | AGENTS.md snippet, "no core changes" check, L1 eval evidence for Next.js, README, open-source files, plugin bundle, demo, name decided (the Django pack moved to M12, D60) | M3, M7, M8, M9 |
 | M11 | (this file, section below) | npm publish, tag v0.1 | M10 |
-| M12 | [`12-django-pack.md`](12-django-pack.md) | v0.2: Django pack (no core changes), beating the baseline | M11 |
+| M12 | [`12-django-pack.md`](12-django-pack.md) | v0.2: Django pack (no core changes), beating the baseline; npm publish, tag v0.2.0 | M2, M3, M7, M8, M10, M11 |
 
 M4 can run in parallel with M2 and M3 once M1 lands, except that M4's `official` labelling needs `src/docs/officialUrl.ts` from M3 task 7, so that file lands before M4's labelling. Everything else runs in order.
 
@@ -114,3 +114,5 @@ test/                       # unit/, permissions/, fixtures/
 ## M11 - Publish (after M10, not given its own plan here)
 
 Publish to npm under the name chosen in M10, tag `v0.1.0`, and check the `npx` install on a clean machine or container, for both the CLI and the MCP config. Publish the Claude Code plugin bundle. Only once real eval numbers exist does the README change from "currently building".
+
+M12 repeats these release steps for v0.2 (`v0.2.0`, with the Django pack) once its pack PR has merged (`docs/design.md` D61).

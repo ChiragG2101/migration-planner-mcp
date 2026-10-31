@@ -1,6 +1,6 @@
-# M12 - Django pack (v0.2)
+# M12 - Django pack and the v0.2 release
 
-**PRD refs:** sections 4 (scope, pack 2), 9 (packs and skills), 10 (eval). **Done when:** the Django pack is added with **no core changes** and beats the baseline on recall, and the README claims two packs only once that holds.
+**PRD refs:** sections 4 (scope, pack 2), 9 (packs and skills), 10 (eval). **Done when:** the Django pack is added with **no core changes** and beats the baseline on recall, and the README claims two packs only once that holds; v0.2.0 is published to npm and tagged.
 
 **Moved from M10 on 2026-11-01 (`docs/design.md` D60).** v0.1 ships with the Next.js pack only. This milestone is the headline of v0.2 and starts after M11. The text below is M10's Django scope, tasks, tests and acceptance, moved unchanged except where a line named M10 or both packs.
 
@@ -10,6 +10,7 @@
   - the Django LTS to LTS upgrade pack, its usage adapter, generated skill and references
   - Django eval cases (golden and seeded)
   - the Django skill in the generated plugin bundle, and the README's eval table and limits for two packs
+  - the v0.2 release: npm publish and the `v0.2.0` tag, as M11 does for v0.1 (`docs/design.md` D61)
 - Out of scope: third-party packs loaded from outside the repo, and other languages.
 - Cut order: if behind, the Django pack keeps its golden cases and the "no core changes" check, but ships fewer rules.
 
@@ -38,6 +39,7 @@ The check was built in M10's Core PR A and runs in CI on every PR (D57). This mi
 
 1. **Core fixes first.** Any core change the pack turns out to need is its own reviewed core PR before the pack PR (see "No core changes").
 2. **Pack PR:** the Django adapter, knowledge, pack, eval cases and seeded repo (tasks 1 to 3), with the regenerated `plugin/` and the README update (task 4), all inside the allowlist. `check-core-untouched` and `check-eval-add-only` must pass on it unchanged.
+3. **Release PR, then publish (task 5).** The version bump changes `package.json`, which is outside the pack PR's allowlist, so it is its own PR after the pack PR merges and the other acceptance criteria below hold (D61).
 
 **Live-run handover (D39, D41).** The Django golden runs (N of at least 3 engine runs and N baseline runs per case, one host agent) and the L1 run on a Django case need a live host session on the maintainer's own key. The builder prepares the cases, `truth.json`, `django-tricky` and the run instructions, then stops and hands over, as M7 did. The beat check and the `eval/results.md` acceptance line cannot pass before that. Decision to record: which host and model make the Django runs. Use the M7 host (Cursor/databricks-claude-sonnet-4-6) unless the maintainer says otherwise, so the two packs stay comparable.
 
@@ -77,10 +79,11 @@ The check was built in M10's Core PR A and runs in CI on every PR (D57). This mi
    - Golden cases are picked for spread using the M7 coverage matrix (settings layout, monorepo or not, test runner, one LTS hop or more), not for count.
    - Recall is reported with the M2 recall script and ratcheted. Both packs appear in `eval/results.md`.
 4. **Plugin bundle and README.** Regenerating the packs adds the Django skill to `plugin/` (generated, drift-checked). The README's eval table gains the Django rows copied from `eval/results.md`, and its limits change from one pack to two. Its status line belongs to M11 and does not change here.
+5. **Publish v0.2 (D61).** After the pack PR merges, a release PR bumps the version in `package.json` to `0.2.0`. Then publish to npm under the name chosen in M10, tag `v0.2.0`, check the `npx` install on a clean machine or container for both the CLI and the MCP config, and publish the regenerated Claude Code plugin bundle, as M11 does for v0.1.
 
 ## Files and modules
 
-`src/analysis/usages/django.ts`, `src/analysis/usages/registry.ts` (one added registry line; the registry file was added in M10's Core PR A, D57), `knowledge/pypi/django/**`, `packs/django-upgrade/**`, `eval/cases/<django ids>/**`, `eval/runs/<django ids>/**`, `eval/seeded/django-tricky/**`, `plugin/**`, `README.md`, `test/unit/djangoAdapter.test.ts`.
+`src/analysis/usages/django.ts`, `src/analysis/usages/registry.ts` (one added registry line; the registry file was added in M10's Core PR A, D57), `knowledge/pypi/django/**`, `packs/django-upgrade/**`, `eval/cases/<django ids>/**`, `eval/runs/<django ids>/**`, `eval/seeded/django-tricky/**`, `plugin/**`, `README.md`, `test/unit/djangoAdapter.test.ts`, and `package.json` (the version, in the release PR only).
 
 ## Tests
 
@@ -107,6 +110,7 @@ The check was built in M10's Core PR A and runs in CI on every PR (D57). This mi
 - `eval/results.md` includes both packs and the baseline comparison, with misses listed, and an L1 run on at least one Django case. The Django pack beats the baseline on recall (`docs/design.md` D17).
 - The Django golden set has at least 3 licensed cases, including at least 2 tagged `lts-to-lts` and at least 1 tagged `messy`, and `npm run cases:verify -- --all` passes.
 - The README lists both packs with their eval numbers and claims only what exists.
+- v0.2.0 is published to npm and tagged `v0.2.0`, and the `npx` install of the CLI and the MCP config works from a clean machine.
 
 ## Risks
 
@@ -116,7 +120,7 @@ The check was built in M10's Core PR A and runs in CI on every PR (D57). This mi
 
 ## Dependencies
 
-- M11 (v0.1 published), M10 (the "no core changes" check, the L1 eval evidence, the plugin bundle), M3 (pack tooling), M2 (the adapter interfaces and Python adapter), M7 (the eval harness), M8 (checks, codemod registry, gate 7).
+- M11 (v0.1 published, and the release steps v0.2 repeats), M10 (the "no core changes" check, the L1 eval evidence, the plugin bundle, the name), M3 (pack tooling), M2 (the adapter interfaces and Python adapter), M7 (the eval harness), M8 (checks, codemod registry, gate 7).
 
 ## Must not break
 

@@ -18,7 +18,7 @@ A milestone is done only when every per-milestone gate holds (overview, "Per-mil
 | M9 | Confidence routing, `record_feedback`, run report | [09](docs/plans/09-confidence-feedback-report.md) | done (2026-10-24, review approved in round 2; live golden-case L1 runs are the D39/D41 handover) |
 | M10 | AGENTS.md snippet, "no core changes" check, L1 eval evidence for Next.js, README, open-source files, plugin bundle, demo, name decided (the Django pack moved to M12 on 2026-11-01, D60) | [10](docs/plans/10-snippet-readme-oss-demo.md) | in progress (see "Delivery order": core PR A, the `check:core-untouched` allowlist, done 2026-10-25, review approved in round 2; core PR B, the AGENTS.md snippet, done 2026-10-31, re-check approved; the CI case-fetch-order PR in review; then the L1 evidence PR and the docs and release PR) |
 | M11 | Publish to npm, tag v0.1 (Next.js pack only) | [overview §M11](docs/plans/00-overview.md) | not started |
-| M12 | v0.2: Django pack (no core changes) | [12](docs/plans/12-django-pack.md) | not started (after M11) |
+| M12 | v0.2: Django pack (no core changes), publish to npm, tag v0.2.0 | [12](docs/plans/12-django-pack.md) | not started (after M11) |
 
 ## Noted for later (not yet planned)
 

@@ -321,7 +321,7 @@ Write the design, break it into milestones with a written definition of done, an
 | M9 | Confidence routing, record_feedback, run report | Needs-human section works; report traces to events |
 | M10 | AGENTS.md snippet, "no core changes" check, L1 eval evidence for Next.js, README, open-source files, demo, name decided | L1 outcomes in eval/results.md; README states limits |
 | M11 | Publish to npm, tag v0.1 | Install works from a clean machine |
-| M12 | v0.2: Django pack (no core changes) | Pack added with no core changes and beats the baseline |
+| M12 | v0.2: Django pack (no core changes), publish to npm, tag v0.2 | Pack added with no core changes and beats the baseline; v0.2 installs from a clean machine |
 
 **Cut order if behind:** server-side Context7, then container sandbox mode. The Django pack moved to v0.2 (M12); there, its depth is what is cut (fewer rules, same golden cases). Never cut the gates (including gate 7), the permissions rules, the eval or the clone-based verify loop.
 
