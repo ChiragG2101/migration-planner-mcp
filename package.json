@@ -54,7 +54,7 @@
     "@types/semver": "7.8.0",
     "eslint": "10.13.0",
     "tsx": "4.23.15",
-    "typescript-eslint": "8.71.2",
+    "typescript-eslint": "8.72.0",
     "vitest": "5.0.5"
   }
 }
