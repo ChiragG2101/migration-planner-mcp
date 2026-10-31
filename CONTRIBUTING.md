@@ -8,7 +8,7 @@ Pre-code: M0 (spine docs and golden cases) is done, and code starts at M1. There
 
 - [`docs/PRD.md`](docs/PRD.md) — the product requirements and build spec.
 - [`docs/plans/00-overview.md`](docs/plans/00-overview.md) — the cross-cutting constraints (C1-C10), tech decisions, per-milestone gates, cut order and target layout.
-- [`docs/plans/01-...`](docs/plans/) to `10-...` — one plan per milestone (M1-M10). M0 and M11 live in the overview.
+- [`docs/plans/01-...`](docs/plans/) to `10-...` and `12-...` — one plan per milestone (M1-M10, M12). M0 and M11 live in the overview.
 
 ## How work is organized
 

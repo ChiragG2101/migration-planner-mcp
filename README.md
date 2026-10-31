@@ -12,7 +12,7 @@ Design constraints: it runs locally and costs nothing to host. Storage is SQLite
 
 - [`docs/PRD.md`](docs/PRD.md): the product requirements and build spec.
 - [`docs/plans/00-overview.md`](docs/plans/00-overview.md): the implementation plan overview, cross-cutting rules and milestone map.
-- `docs/plans/01-...` to `10-...`: one plan per milestone, M1 to M10.
+- `docs/plans/01-...` to `10-...` and `12-...`: one plan per milestone, M1 to M10 and M12.
 
 M0 (spine docs and golden-case selection) and M11 (publishing) are covered in the overview.
 

@@ -1,6 +1,6 @@
 # 00 - Implementation plan overview
 
-This folder turns [`docs/PRD.md`](../PRD.md) into milestone plans. It is a plan, not an implementation. Each milestone file (`01` to `10`, matching M1 to M10) lists its scope, tasks, files and modules, tests, acceptance criteria, risks and dependencies.
+This folder turns [`docs/PRD.md`](../PRD.md) into milestone plans. It is a plan, not an implementation. Each milestone file (`01` to `10` and `12`, matching M1 to M10 and M12) lists its scope, tasks, files and modules, tests, acceptance criteria, risks and dependencies.
 
 The project in one paragraph: a general migration engine (run state, plan schema, gates, verify loop, eval, permissions) with migration packs plugged in. The CLI, the MCP server and generated skills are thin adapters over the same engine. Pack 1 is a Next.js major upgrade and is the one pack in v0.1. Pack 2 is a Django LTS to LTS upgrade, chosen to prove the engine works for a second language; it is v0.2 (M12, `docs/design.md` D60). L0 (report only) is the default; L1 applies and verifies each stage in a sandbox copy and emits patches. The user's repo is never written.
 
