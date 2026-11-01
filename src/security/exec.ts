@@ -7,7 +7,7 @@
 //   2. A codemod registry entry (exact id match → pinned argv).
 //   3. A fixed set of git operations with hooks disabled.
 //   4. Nothing else — not a tool argument, not a pack field, not an agent message.
-import { spawnSync } from 'node:child_process';
+import { spawnSync, type SpawnSyncReturns } from 'node:child_process';
 import { realpathSync } from 'node:fs';
 import os from 'node:os';
 import path from 'node:path';
@@ -16,7 +16,7 @@ import type { CodemodEntry } from '../schema/verify.js';
 import { PermissionError } from './errors.js';
 import { assertLevel } from './level.js';
 import { isWithin, type SafePath } from './pathBoundary.js';
-import { mkdtempSandbox } from './safeWrite.js';
+import { mkdtempSandbox, rmSandbox } from './safeWrite.js';
 
 // ---------------------------------------------------------------------------
 // Sandbox path guard (D43)
@@ -152,15 +152,23 @@ function execRaw(req: ExecRequest): ExecResult {
   const timeoutMs = req.timeoutMs ?? 120_000;
   const env = scrubEnv(req.passEnv, req.extraEnv);
   const start = Date.now();
-  const result = spawnSync(req.argv[0]!, req.argv.slice(1), {
-    cwd: req.cwd.abs,
-    env,
-    timeout: timeoutMs,
-    maxBuffer: OUTPUT_CAP * 2,
-    encoding: 'utf8',
-    killSignal: 'SIGKILL',
-  });
-  const duration = Date.now() - start;
+  let result: SpawnSyncReturns<string>;
+  let duration: number;
+  try {
+    result = spawnSync(req.argv[0]!, req.argv.slice(1), {
+      cwd: req.cwd.abs,
+      env,
+      timeout: timeoutMs,
+      maxBuffer: OUTPUT_CAP * 2,
+      encoding: 'utf8',
+      killSignal: 'SIGKILL',
+    });
+    duration = Date.now() - start;
+  } finally {
+    // The temp home lives for one command, so caches an install writes there
+    // do not pile up in the system temp dir (D63).
+    rmSandbox(env['HOME']!);
+  }
   const stdout = cap(typeof result.stdout === 'string' ? result.stdout : '');
   const stderr = cap(typeof result.stderr === 'string' ? result.stderr : '');
   const timedOut =
