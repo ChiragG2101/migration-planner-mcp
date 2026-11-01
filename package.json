@@ -41,8 +41,8 @@
     "pack:report": "tsx scripts/pack-docs-report.ts"
   },
   "dependencies": {
-    "@modelcontextprotocol/server": "2.3.1",
-    "@modelcontextprotocol/client": "2.3.1",
+    "@modelcontextprotocol/server": "2.4.0",
+    "@modelcontextprotocol/client": "2.4.0",
     "semver": "7.8.5",
     "smol-toml": "1.9.1",
     "typescript": "6.0.3",
@@ -56,7 +56,7 @@
     "@types/semver": "7.8.0",
     "eslint": "10.13.0",
     "tsx": "4.23.15",
-    "typescript-eslint": "8.71.2",
+    "typescript-eslint": "8.72.1",
     "vitest": "5.0.5"
   }
 }
