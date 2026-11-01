@@ -58,16 +58,22 @@ function isAllowedGit(argv: readonly string[]): boolean {
 // Environment scrubbing (C3, C6)
 // ---------------------------------------------------------------------------
 
-const ALLOWED_ENV_KEYS = new Set(['PATH', 'LANG', 'TERM', 'HOME', 'CI', 'TMPDIR', 'TMP', 'TEMP']);
+// HOME is not here: it is always a fresh temp dir (D62).
+const ALLOWED_ENV_KEYS = new Set(['PATH', 'LANG', 'TERM', 'CI', 'TMPDIR', 'TMP', 'TEMP']);
 
-function scrubEnv(passEnv: readonly string[] = []): Record<string, string> {
+function scrubEnv(
+  passEnv: readonly string[] = [],
+  extraEnv: Readonly<Record<string, string>> = {},
+): Record<string, string> {
   const env: Record<string, string> = { CI: '1' };
-  // Temp home inside a fresh temp dir so no user dotfiles are read.
-  env['HOME'] = mkdtempSandbox(path.join(realpathSync(os.tmpdir()), 'mp-exec-home-'));
   for (const key of [...ALLOWED_ENV_KEYS, ...passEnv]) {
     const val = process.env[key];
     if (val !== undefined) env[key] = val;
   }
+  Object.assign(env, extraEnv);
+  // Temp home inside a fresh temp dir so no user dotfiles are read. Set last,
+  // so neither the parent, --pass-env HOME nor extraEnv can replace it.
+  env['HOME'] = mkdtempSandbox(path.join(realpathSync(os.tmpdir()), 'mp-exec-home-'));
   return env;
 }
 
@@ -144,7 +150,7 @@ function execRaw(req: ExecRequest): ExecResult {
     });
   }
   const timeoutMs = req.timeoutMs ?? 120_000;
-  const env = { ...scrubEnv(req.passEnv), ...(req.extraEnv ?? {}) };
+  const env = scrubEnv(req.passEnv, req.extraEnv);
   const start = Date.now();
   const result = spawnSync(req.argv[0]!, req.argv.slice(1), {
     cwd: req.cwd.abs,
