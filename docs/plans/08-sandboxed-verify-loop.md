@@ -30,7 +30,7 @@
    - Asserts level 1 or above.
    - `cwd` must be a branded `SandboxPath` (a `SafePath` under `<out>/<run_id>/sandbox`). Nothing else type-checks.
    - `argv` must exactly match one of: a configured install or check command, a codemod registry entry (task 5), or one of a fixed set of git operations (`clone`, `apply`, `add`, `commit`, `reset`, `diff`, `status`). The git operations always run with `-c core.hooksPath=/dev/null`, so no repo hook ever runs.
-   - The environment is built from an allowlist (`PATH`, `LANG`, `TERM`, `CI=1`, a `HOME` set to a temp dir inside the sandbox), plus any names the user passes with `--pass-env NAME`. Tokens and keys in the parent environment are not inherited.
+   - The environment is built from an allowlist (`PATH`, `LANG`, `TERM`, `CI=1`, and the temp-dir variables `TMPDIR`, `TMP`, `TEMP`), plus any names the user passes with `--pass-env NAME`. `HOME` is always a fresh, empty temp dir under the system temp dir, set last so nothing replaces it (D62). Tokens and keys in the parent environment are not inherited.
    - Timeouts per command (default per check, overridable per check). On timeout, the whole process group is killed.
    - stdout and stderr are captured with a size cap. The full size and a hash are recorded, and the tail is kept for the agent.
    - Every call writes `exec.start` and `exec.end` events with argv, cwd, exit code, duration and output hash.
