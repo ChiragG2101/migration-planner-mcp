@@ -94,7 +94,7 @@ These are enforced in code, not in prose. A change that breaks one of them is wr
 
 ## Tooling
 
-Node 22.13 or later so `node:sqlite` needs no flag (`docs/design.md` D18), TypeScript 6.0 strict (not 7, D21), ESM, npm, Vitest, ESLint (flat `eslint.config.js`), the official MCP TS SDK v2 (`@modelcontextprotocol/server` 2.3.1, pinned), Zod. Licence Apache-2.0. The `typescript` compiler API (6.0.3, a runtime dependency) parses TS/JS; `web-tree-sitter` 0.27.1 with the vendored Python grammar in `src/lang/python/grammar/` parses Python (D26).
+Node 22.13 or later so `node:sqlite` needs no flag (`docs/design.md` D18), TypeScript 6.0 strict (not 7, D21), ESM, npm, Vitest, ESLint (flat `eslint.config.js`), the official MCP TS SDK v2 (`@modelcontextprotocol/server` 2.4.0, pinned), Zod. Licence Apache-2.0. The `typescript` compiler API (6.0.3, a runtime dependency) parses TS/JS; `web-tree-sitter` 0.27.1 with the vendored Python grammar in `src/lang/python/grammar/` parses Python (D26).
 
 Commands that exist now:
 

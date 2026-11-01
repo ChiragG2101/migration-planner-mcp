@@ -395,6 +395,8 @@ Why:
 
 **Decision:** TypeScript 6.0.3, not 7. `@modelcontextprotocol/server` 2.3.1 (the stable v2 line), with `@modelcontextprotocol/client` 2.3.1 for tests. ESLint 10 with a flat `eslint.config.js` instead of the plan's `.eslintrc.*`. `yaml` and `smol-toml` (pure JS) parse pnpm lockfiles and TOML.
 
+*SDK bump (2026-11-01, PR #8):* `@modelcontextprotocol/server` and `@modelcontextprotocol/client` moved from 2.3.1 to 2.4.0, still pinned. The changelog was read first (D23). 2.4.0 adds the opt-in Skills extension and fixes HTTP transports, number-typed `x-mcp-header` parameters and a zod `.meta({ id })` output-schema root. The stdio server uses none of these, and CI passed on Linux and macOS.
+
 Why:
 
 - TypeScript 7 is the native port; its JS API is published under `unstable/*`, and M2 needs the stable compiler API. typescript-eslint supports TypeScript below 6.1.
