@@ -953,3 +953,17 @@ Open item 3 (a test for `--` in the maintainer clones in `scripts/derive-truth.t
    - The stage does not count as a "kept patch whose checks pass" for M10's acceptance criterion.
 
 **Why:** rewriting the recorded decision would show an outcome the live run never had, and hiding the disagreement would let a gate 7 change pass without a visible effect on the L1 evidence. Not counting the stage keeps the acceptance count to patches that HEAD's engine would still keep.
+
+## 2026-11-01: M10 core PR — the child `HOME`
+
+### D62 - A spawned command's `HOME` is always a fresh temp dir; nothing can replace it
+
+**Decision:** `scrubEnv` in `src/security/exec.ts` sets `HOME` to a new empty dir under the system temp dir (`mp-exec-home-*`) after everything else: after the allowlist, after the user's `--pass-env` names and after the engine's own fixed `extraEnv`. `HOME` is no longer in the allowlist. A `--pass-env HOME` is accepted and has no effect on `HOME`.
+
+**Why:** until this fix `HOME` was set to the temp dir and then overwritten, because it was also in the allowlist, so every L1 command (install, check, codemod, git) ran with the user's real `HOME`. That let it read `~/.npmrc`, `~/.netrc`, `~/.gitconfig` and similar dotfiles, which can hold registry and git tokens, contrary to the scrub's purpose (INV-7, D49) and to the code's own comment. `--pass-env` takes any name with no filter, so `--pass-env HOME` could also bring the real home back; and `extraEnv` was spread over the scrubbed env, so it could too, though its only caller sets the sandbox's git identity. Setting `HOME` last closes all three paths in one place. Found on 2026-11-01; `test/permissions/exec-home.test.ts` covers each path.
+
+**Alternatives:**
+- Refusing `--pass-env HOME` at the CLI with an error. Clearer to the user, but it leaves the spawn point trusting its callers; it can be added on top later.
+- Putting the temp home inside `<out>/<run_id>/sandbox`, as the M8 plan first said. The sandbox is a git clone, so anything a check writes to its home (an npm cache, for example) would show in `git status` and could end up in a stage patch.
+
+**What would change it:** a declared check that truly needs the user's real home config, which would need its own opt-in flag and an invariant, not `--pass-env`.
