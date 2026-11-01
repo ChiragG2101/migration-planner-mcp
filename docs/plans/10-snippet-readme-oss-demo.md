@@ -32,6 +32,13 @@ PR #5 (`npm run cases:fetch` in CI, `docs/design.md` "Case commits") was approve
 
 3. **Test for `--` in the maintainer clones.** The `--` before `kase.repo_url` in the `git clone` calls in `scripts/derive-truth.ts` and `scripts/verify-case.ts` has no test of its own. It backs up the tested `Case.parse` check. Add one if those scripts gain a seam for it (they clone over the network, so they have none today).
 
+## Open items (from the PR #10 review, 2026-11-02)
+
+PR #10 (the child's `HOME`, D62) was approved with these left open. Settle them with the maintainer before the live L1 runs (task 10's handover).
+
+1. **`--pass-env` names that point a child at the user's config.** `--pass-env` takes any name. `HOME` is now ignored silently (D62), but `XDG_CONFIG_HOME`, `GIT_CONFIG_GLOBAL`, `NPM_CONFIG_USERCONFIG` or `USERPROFILE` would still point a child at the user's own dotfiles. Decide whether the CLI refuses these names, warns, or allows them as a deliberate opt-in, and whether `--pass-env HOME` is refused rather than ignored. Decision to record in `docs/design.md`; test: a permissions test that the chosen names are refused or warned about at startup, never at a tool argument.
+2. **A parent `CI` replaces `CI=1`.** `CI` is in the allowlist, so a parent `CI=false` reaches the child, while M8 task 2 says `CI=1`. Decide whether `CI` is always `1`. Decision to record; test: with `CI=false` in the parent, a check sees the chosen value.
+
 ## Tasks
 
 4. **AGENTS.md snippet (separate core PR).**
@@ -70,6 +77,7 @@ PR #5 (`npm run cases:fetch` in CI, `docs/design.md` "Case commits") was approve
       - single repo
       - never writes to your repo
       - L1 runs your declared checks in a sandbox copy; the clone sandbox is not a security boundary
+      - L1 commands get an empty temp home, so an install that needs a private-registry login from `~/.npmrc` or `~/.pypirc` fails at baseline until the token is passed with `--pass-env`, and every install starts with an empty cache (D62)
       - the engine cannot stop your agent's own tools from editing your repo
       - no third-party packs
    8. how to add a pack (link to `CONTRIBUTING.md`)
