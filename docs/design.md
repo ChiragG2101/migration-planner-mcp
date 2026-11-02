@@ -969,3 +969,21 @@ Open item 3 (a test for `--` in the maintainer clones in `scripts/derive-truth.t
 - Putting the temp home inside `<out>/<run_id>/sandbox`, as the M8 plan first said. The sandbox is a git clone, so anything a check writes to its home (an npm cache, for example) would show in `git status` and could end up in a stage patch.
 
 **What would change it:** a declared check that truly needs the user's real home config, which would need its own opt-in flag and an invariant, not `--pass-env`.
+
+## 2026-11-02: M10 core PR — removing the temp `HOME`
+
+### D63 - The temp `HOME` lives for one command and is removed when it ends
+
+**Decision:** `execRaw` in `src/security/exec.ts` removes the command's temp `HOME` (D62) in a `finally` around `spawnSync`, through `safeWrite`'s `rmSandbox`, so it goes after a normal exit, a timeout kill, or a spawn that throws. The recorded duration covers only the command, not the removal.
+
+The removal is best effort. When `rmSync` is refused (`EACCES`, `EPERM`), `rmSandbox` gives the dirs under the home back owner write permission, without following symlinks, and tries once more, since tools such as Go's module cache leave read-only dirs. Any other failure (a file held open, for example) is written as one line to stderr, and the command's result is returned as usual. A `PermissionError` from the boundary guard, which means the home was swapped for a link into a registered repo, still throws.
+
+**Why:** nothing removed these dirs, and the PR #10 review found one machine with about 5,200 of them. Since D62 an install's caches (`~/.npm`, `~/.cache/pip`) land in that home, so every install would leave a full cache behind and disk use would grow over a run of live L1 cases.
+
+**Alternatives:**
+- One temp home per run, removed when the run ends. The cache would then be shared between an install and the checks after it, which is faster, but it needs a run-end hook, and a crashed run would still leave the dir behind.
+- Pruning old `mp-exec-home-*` dirs at startup, which would also clean up after a killed engine but could remove a dir another engine process is using.
+
+**What would change it:** installs becoming too slow without a shared cache, which would point to the per-run home.
+
+*Round 2 of the PR #11 review (2026-11-02):* the review found that a read-only dir left in the home made the removal throw and lose the command's result. That led to the best-effort rule above.

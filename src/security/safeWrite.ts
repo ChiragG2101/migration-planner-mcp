@@ -1,6 +1,6 @@
 // C3: the only module that writes files. Writes land under `--out`, never
 // inside a registered repo root, and each write declares the level it needs.
-import { lstatSync, mkdirSync, mkdtempSync, rmSync, writeFileSync } from 'node:fs';
+import { chmodSync, lstatSync, mkdirSync, mkdtempSync, readdirSync, rmSync, writeFileSync } from 'node:fs';
 import path from 'node:path';
 import { PermissionError } from './errors.js';
 import { assertLevel, type Level } from './level.js';
@@ -102,14 +102,34 @@ export function mkdtempSandbox(prefix: string): string {
   return mkdtempSync(prefix);
 }
 
-/** Remove a directory inside the sandbox. Refuses if the path resolves inside a repo. */
+/**
+ * Remove a directory inside the sandbox. Refuses if the path resolves inside a
+ * repo. A tool can leave read-only dirs behind (Go's module cache does), so a
+ * refused removal gives the dirs under `abs` back owner write permission,
+ * without following symlinks, and tries once more (D63).
+ */
 export function rmSandbox(abs: string): void {
   for (const repo of repoRoots) {
     if (isWithin(repo, realpathAllowMissing(abs))) {
       throw new PermissionError('write_inside_repo', `rm inside the repo refused: ${abs}`, { path: abs, repo });
     }
   }
-  rmSync(abs, { recursive: true, force: true });
+  try {
+    rmSync(abs, { recursive: true, force: true });
+  } catch (e) {
+    const code = (e as NodeJS.ErrnoException).code;
+    if (code !== 'EACCES' && code !== 'EPERM') throw e;
+    restoreDirWrite(abs);
+    rmSync(abs, { recursive: true, force: true });
+  }
+}
+
+function restoreDirWrite(dir: string): void {
+  if (!lstatSync(dir, { throwIfNoEntry: false })?.isDirectory()) return;
+  chmodSync(dir, 0o700);
+  for (const ent of readdirSync(dir, { withFileTypes: true })) {
+    if (ent.isDirectory()) restoreDirWrite(path.join(dir, ent.name));
+  }
 }
 
 /** Creates the output folder (refused inside a registered repo) and returns its writer. */
