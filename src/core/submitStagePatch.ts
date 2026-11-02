@@ -15,7 +15,7 @@ import { writeFileSandbox, mkdirSandbox } from '../security/safeWrite.js';
 import { getPlan } from '../store/plans.js';
 import { getSandbox, listBaselineChecks, putStageAttempt, listStageAttempts, parseCodemods } from '../store/verify.js';
 import { snapshotTests } from '../verify/testIntegrity.js';
-import { applyPatch, evaluateStage } from '../verify/loop.js';
+import { applyPatch, evaluateStage, gitDiff } from '../verify/loop.js';
 import { openSandbox, resetToStageStart, stageStartTag } from '../verify/sandbox.js';
 import { execGit } from '../security/exec.js';
 import { sandboxCommitEnv } from '../verify/sandbox.js';
@@ -106,10 +106,7 @@ export async function submitStagePatch(engine: Engine, raw: unknown): Promise<Su
       if (decision === 'kept') {
         // Commit the stage in the sandbox and export the patch (stage start → commit).
         commitStage(sandboxHandle, stageId);
-        const diff = execGit(
-          ['git', 'diff', `${stageStartTag(stageId)}`, 'HEAD'],
-          sandboxHandle.rootPath, sandboxHandle.root, 30_000,
-        ).stdout;
+        const diff = gitDiff(sandboxHandle, [stageStartTag(stageId), 'HEAD']);
         patchPath = exportPatch(engine, opened.session.outDir, runId, stage, diff, 'kept');
       } else {
         // Rejected. If we've hit the cap, the stage is unresolved; else reset for a retry.
