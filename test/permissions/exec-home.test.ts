@@ -173,4 +173,70 @@ describe('exec-home-removed', () => {
       vi.doUnmock('../../src/security/safeWrite.js');
     }
   });
+
+  it('a read-only dir the command leaves in HOME neither loses the result nor stays behind', async () => {
+    const { exec, pathBoundary } = await atLevel1();
+    const cwd = pathBoundary.resolveInside(sandboxRoot, '.', null);
+    // Like Go's module cache: a dir with a file in it, then made read-only.
+    const readOnly = {
+      name: 'read-only',
+      argv: [
+        'node',
+        '-e',
+        'const fs = require("fs"); const h = process.env.HOME; fs.mkdirSync(h + "/ro"); fs.writeFileSync(h + "/ro/f", "x"); fs.chmodSync(h + "/ro", 0o555); process.stdout.write("done:" + h)',
+      ],
+      timeout_ms: 20000,
+    };
+    const res = exec.execCheck(readOnly, cwd, sandboxRoot);
+    expect(res.exit_code).toBe(0);
+    expect(res.stdout.startsWith(`done:${TEMP_HOME_PREFIX()}`)).toBe(true);
+    expect(existsSync(res.stdout.slice('done:'.length))).toBe(false);
+  });
+
+  /** Loads exec.ts at L1 with safeWrite's rmSandbox replaced by `rm`. */
+  async function withRmSandbox(rm: (abs: string) => void) {
+    vi.resetModules();
+    vi.doMock('../../src/security/safeWrite.js', async (importOriginal) => ({
+      ...(await importOriginal<typeof import('../../src/security/safeWrite.js')>()),
+      rmSandbox: rm,
+    }));
+    const { initLevel } = await import('../../src/security/level.js');
+    initLevel(1);
+    const exec = await import('../../src/security/exec.js');
+    const pathBoundary = await import('../../src/security/pathBoundary.js');
+    return { exec, cwd: pathBoundary.resolveInside(sandboxRoot, '.', null) };
+  }
+
+  it('a removal that fails is reported on stderr and the command result is kept', async () => {
+    const warn = vi.spyOn(process.stderr, 'write').mockImplementation(() => true);
+    try {
+      const { exec, cwd } = await withRmSandbox(() => { throw new Error('EBUSY: resource busy'); });
+      const echo = { name: 'echo', argv: ['node', '-e', 'process.stdout.write("kept")'], timeout_ms: 20000 };
+      const res = exec.execCheck(echo, cwd, sandboxRoot);
+      expect(res.exit_code).toBe(0);
+      expect(res.stdout).toBe('kept');
+      const lines = warn.mock.calls.map((c) => String(c[0]));
+      expect(lines.some((l) => l.includes('could not remove the temp HOME') && l.includes('EBUSY: resource busy'))).toBe(true);
+    } finally {
+      warn.mockRestore();
+      vi.doUnmock('../../src/security/safeWrite.js');
+    }
+  });
+
+  it('a boundary refusal from the removal still throws', async () => {
+    try {
+      // The class must come from the module copy exec.ts loads, after the reset.
+      let PE: typeof import('../../src/security/errors.js').PermissionError | undefined;
+      const { exec, cwd } = await withRmSandbox((abs) => {
+        throw new PE!('write_inside_repo', `rm inside the repo refused: ${abs}`);
+      });
+      PE = (await import('../../src/security/errors.js')).PermissionError;
+      const echo = { name: 'echo', argv: ['node', '-e', 'process.stdout.write("x")'], timeout_ms: 20000 };
+      let caught: unknown;
+      try { exec.execCheck(echo, cwd, sandboxRoot); } catch (e) { caught = e; }
+      expect((caught as { code?: string } | undefined)?.code).toBe('write_inside_repo');
+    } finally {
+      vi.doUnmock('../../src/security/safeWrite.js');
+    }
+  });
 });

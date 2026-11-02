@@ -77,6 +77,21 @@ function scrubEnv(
   return env;
 }
 
+/**
+ * The temp home lives for one command, so caches an install writes there do
+ * not pile up in the system temp dir. Best effort: a failed removal is reported
+ * on stderr and never replaces the command's result. A boundary refusal (the
+ * home swapped for a link into the repo) still throws (D63).
+ */
+function removeTempHome(home: string): void {
+  try {
+    rmSandbox(home);
+  } catch (e) {
+    if (e instanceof PermissionError) throw e;
+    process.stderr.write(`migration-planner: could not remove the temp HOME ${home}: ${(e as Error).message}\n`);
+  }
+}
+
 // ---------------------------------------------------------------------------
 // Output cap
 // ---------------------------------------------------------------------------
@@ -165,9 +180,7 @@ function execRaw(req: ExecRequest): ExecResult {
     });
     duration = Date.now() - start;
   } finally {
-    // The temp home lives for one command, so caches an install writes there
-    // do not pile up in the system temp dir (D63).
-    rmSandbox(env['HOME']!);
+    removeTempHome(env['HOME']!);
   }
   const stdout = cap(typeof result.stdout === 'string' ? result.stdout : '');
   const stderr = cap(typeof result.stderr === 'string' ? result.stderr : '');
