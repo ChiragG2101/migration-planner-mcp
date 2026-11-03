@@ -1001,3 +1001,19 @@ The removal is best effort. When `rmSync` is refused (`EACCES`, `EPERM`), `rmSan
 - An uncapped stdout mode in `exec.ts` for git only. That widens the spawn point for one caller, where a file under `--out` needs no change there.
 
 **What would change it:** a diff too large to hold in memory, which would need streaming the file to the patch export.
+
+### D65 - The L1 evidence: re-install after dependency changes, the acceptance count, and gate 7's base
+
+**Decision (the maintainer, 2026-11-02, on the M10 task 10 proposal):**
+
+1. **Re-install before the live runs.** The declared install runs once, before stage 1, so later stages' checks run against the old dependencies. A separate core PR re-runs the declared install after a stage changes a manifest or lockfile, before the live L1 runs (plan 10, "Delivery order" step 4.2).
+2. **Whole diffs first,** in their own core PR (D64).
+3. **What counts toward M10's acceptance.** A case counts when at least one of its runs has at least one kept stage whose last attempt's checks all pass (or are `baseline_failing`, or `flaky` and labelled so) and that HEAD's gate 7 accepts on replay. A stage replay could not re-check (a binary diff, say) does not count, and a run whose source repo hash changed fails the criterion. "Every stage kept" was the stricter alternative.
+4. **Gate 7's base stays after the codemods.** Gate 7 compares the tree after the stage's pinned, allowlisted codemods with the candidate, as the code does, not the stage start as the M8 plan said; plan 08 is updated. L1 replay mirrors it, so the record carries the diff to that tree.
+5. **The rest of the proposal as recommended:** one `run.json` per run, exported by `npm run runs:export -- --l1`; replay rebuilds trees in memory with a strict diff applier and a gate 7 entry point that takes files instead of a directory; recorded decisions drive first-pass rate, attempts and unresolved share, HEAD's gate 7 drives incidents; the full repo hash, with "before" as an export argument; INV-77 reworded so the read-only checkout check stays. The task 10 builder records the final field list as its own decision.
+
+**Why:** without the re-install, the evidence would show that patches keep the old tests passing on the old Next.js, not that the upgrade works. Without whole diffs, every kept patch with a lockfile change would be corrupt. Counting one kept stage matches how far real runs are likely to get, while the gate 7 and repo-hash conditions keep it honest. Trusting pinned codemod output avoids holding every stage whose codemod edits `package.json` scripts.
+
+**Alternatives:** disclosing the single install instead of fixing it; folding the diff fix into task 10's PR; counting only runs that kept every stage; gate 7 from the stage start.
+
+**What would change it:** live runs where re-installs make the checks too slow or flaky to finish, or a codemod found editing tests or check definitions, which would move gate 7's base back to the stage start.

@@ -57,7 +57,7 @@
      - **Rejected:** the sandbox is reset to the stage start, and the agent gets the exact failures (check name, exit code, output tail, failing test names when JUnit is available, gate 7 reasons).
      - **Retry cap = 3 attempts per stage.** After that, the stage goes to `unresolved` with every attempt's reasons, and the sandbox is left at the stage start.
    - A check that fails, then passes on an immediate single rerun, is marked `flaky` in the report. It never counts silently as a pass.
-7. **Gate 7: test integrity (`src/verify/testIntegrity.ts`).** It uses the shared M6 `Gate` interface and compares the stage start with the candidate tree. Test files are identified with the M1 test setup and globs, and counts come from the M2 language adapters (syntax trees, not regex). The candidate fails on any of:
+7. **Gate 7: test integrity (`src/verify/testIntegrity.ts`).** It uses the shared M6 `Gate` interface and compares the tree after the stage's pinned codemods ran with the candidate tree (D65 item 4: codemod output is trusted, so gate 7 judges what the agent's patch and the checks changed). Test files are identified with the M1 test setup and globs, and counts come from the M2 language adapters (syntax trees, not regex). The candidate fails on any of:
    - a deleted or renamed-away test file
    - fewer test cases (TS/JS: `it`, `test` and `describe`-level counts; Python: `test_*` functions and `TestCase` methods)
    - fewer assertions (`expect(...)`, `assert`, `self.assert*`)
