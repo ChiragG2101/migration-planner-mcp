@@ -987,3 +987,17 @@ The removal is best effort. When `rmSync` is refused (`EACCES`, `EPERM`), `rmSan
 **What would change it:** installs becoming too slow without a shared cache, which would point to the per-run home.
 
 *Round 2 of the PR #11 review (2026-11-02):* the review found that a read-only dir left in the home made the removal throw and lose the command's result. That led to the best-effort rule above.
+
+## 2026-11-02: M10 verify-loop fixes and the L1 evidence decisions
+
+### D64 - The verify loop reads every diff from a file git writes, not from stdout
+
+**Decision:** `gitDiff` in `src/verify/loop.ts` runs `git diff --output=<file> <args>` with the file under `<out>/<run_id>/`, reads it back through `readTextSandbox` and removes it. Every diff the loop records or exports uses it: each codemod's diff, the prepared stage's diff, both `applyPatch` paths and the kept-patch export in `submitStagePatch`. A failed `git diff` throws instead of returning an empty diff (INV-78).
+
+**Why:** the spawn point keeps only the last 256 KiB of a command's stdout (and kills it past 512 KiB). A kept patch that touches a lockfile (338 to 682 KB in the Next.js golden cases) lost its start, so it could not be applied, and the recorded attempt diffs and their hashes were cut the same way. Found by the M10 task 10 proposal on 2026-11-02.
+
+**Alternatives:**
+- Raising the output cap. Any fixed cap fails on a big enough lockfile, and the cap protects the agent's context from huge check logs.
+- An uncapped stdout mode in `exec.ts` for git only. That widens the spawn point for one caller, where a file under `--out` needs no change there.
+
+**What would change it:** a diff too large to hold in memory, which would need streaming the file to the patch export.
