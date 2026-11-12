@@ -226,11 +226,11 @@ describe('exec-home-removed', () => {
   it('a boundary refusal from the removal still throws', async () => {
     try {
       // The class must come from the module copy exec.ts loads, after the reset.
-      let PE: typeof import('../../src/security/errors.js').PermissionError | undefined;
+      const errors: { PE?: typeof import('../../src/security/errors.js').PermissionError } = {};
       const { exec, cwd } = await withRmSandbox((abs) => {
-        throw new PE!('write_inside_repo', `rm inside the repo refused: ${abs}`);
+        throw new errors.PE!('write_inside_repo', `rm inside the repo refused: ${abs}`);
       });
-      PE = (await import('../../src/security/errors.js')).PermissionError;
+      errors.PE = (await import('../../src/security/errors.js')).PermissionError;
       const echo = { name: 'echo', argv: ['node', '-e', 'process.stdout.write("x")'], timeout_ms: 20000 };
       let caught: unknown;
       try { exec.execCheck(echo, cwd, sandboxRoot); } catch (e) { caught = e; }
