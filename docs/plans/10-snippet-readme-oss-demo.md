@@ -23,8 +23,11 @@
 1. **Core PR A:** `scripts/check-core-untouched.ts` with its planted-change tests, wired into CI. Done 2026-10-25 (D57). Its first real pack PR is M12's.
 2. **Core PR B:** the AGENTS.md snippet (task 4), with its permissions tests. Done 2026-10-31 (D58).
 3. **CI case-fetch-order core PR:** the PR #5 review's open items 1 and 2 (D59). Built 2026-10-31 as PR #6; approved and merged 2026-11-01.
-4. **L1 evidence core PR:** task 10, then the live L1 runs (handover).
-5. **Docs and release PR:** open-source files, plugin bundle, name, README and demo (tasks 5 to 9). It comes after the L1 runs, because the README and the demo show their results. The name lands last because it renames the snippet heading and the bundle.
+4. **Verify-loop core PRs (D64, D65).** The task 10 proposal (2026-11-02) found two verify-loop faults that would make the live L1 runs mean less than the README claims. Both are fixed first, each in its own core PR:
+   1. **Whole diffs (D64, INV-78).** Diffs were read from git's stdout, which the spawn point cuts to its last 256 KiB, so a kept patch touching a lockfile was corrupted. Built 2026-11-02.
+   2. **Re-install after a dependency change (D65 item 1).** The declared install runs once, before stage 1 (`src/core/verifyStage.ts`), so after the stage that bumps `next` the checks still run against the old version. The fix re-runs the declared install commands after a stage's patch (or codemods) changes a manifest or lockfile, before that stage's checks; the live runs then declare installs that can update the lockfile. Decision to record in `docs/design.md`: which files count as manifests and lockfiles, and how a failed re-install is reported. Tests: a stage that changes `package.json` re-runs the install before its checks and a stage that does not change one does not; a failing re-install rejects the stage with the install's exit code; the re-install is an `exec.run` event.
+5. **L1 evidence core PR:** task 10, then the live L1 runs (handover). The record and replay design is settled (D65; the proposal is in the maintainer's notes).
+6. **Docs and release PR:** open-source files, plugin bundle, name, README and demo (tasks 5 to 9). It comes after the L1 runs, because the README and the demo show their results. The name lands last because it renames the snippet heading and the bundle.
 
 ## Open items (deferred from the PR #5 review, 2026-10-31)
 
@@ -38,6 +41,16 @@ PR #10 (the child's `HOME`, D62) was approved with these left open. Settle them 
 
 1. **`--pass-env` names that point a child at the user's config.** `--pass-env` takes any name. `HOME` is now ignored silently (D62), but `XDG_CONFIG_HOME`, `GIT_CONFIG_GLOBAL`, `NPM_CONFIG_USERCONFIG` or `USERPROFILE` would still point a child at the user's own dotfiles. Decide whether the CLI refuses these names, warns, or allows them as a deliberate opt-in, and whether `--pass-env HOME` is refused rather than ignored. Decision to record in `docs/design.md`; test: a permissions test that the chosen names, given with the `--pass-env` CLI flag, are refused or warned about at startup.
 2. **A parent `CI` replaces `CI=1`.** `CI` is in the allowlist, so a parent `CI=false` reaches the child, while M8 task 2 says `CI=1`. Decide whether `CI` is always `1`. Decision to record; test: with `CI=false` in the parent, a check sees the chosen value.
+
+## Open items (from the task 10 proposal, 2026-11-02)
+
+Found by the read-only task 10 builder session while reading the verify loop. Item 1 must be settled before the live L1 runs; the others may go to a later PR.
+
+1. **A unified-diff patch cannot touch a file a codemod changed.** `applyPatch` runs `git apply --index` while the codemods' edits are unstaged (`src/verify/loop.ts`, unified-diff branch), so such a patch fails with "does not match index". The Next.js stages run codemods. Decision to record; test: a unified diff that edits a codemod-changed file applies.
+2. **`codemods_json` is always `[]`.** Each attempt copies the previous attempt's value, which starts empty (`src/core/submitStagePatch.ts`). Test: a stage that ran a codemod records it on its attempts.
+3. **CLI `verify` covers only the first stage.** It calls `verifyStage` alone, so stage 2 is refused `out_of_order` (`src/cli/index.ts`). Decide whether the CLI drives later stages or says it does not. Test: the chosen behaviour on a two-stage plan.
+4. **Kept patch names are not zero-padded,** despite the comment, so a `*.patch` glob can apply them out of order (`exportPatch` in `src/core/submitStagePatch.ts`). Test: stage 10's patch sorts after stage 9's.
+5. **Gate 7's Python test pattern is unanchored** (`test_.*\.py$` in `src/verify/testIntegrity.ts`), so `contest_utils.py` counts as a test file. Test: it does not.
 
 ## Tasks
 
@@ -132,7 +145,7 @@ PR #10 (the child's `HOME`, D62) was approved with these left open. Settle them 
 - The open-source files and plugin bundle exist, and the README follows the order above, states its limits and claims only what exists.
 - The demo script reproduces the reject-then-pass flow, the gate 7 rejection and a clean `git status`.
 - The final name is recorded in `docs/design.md`.
-- `eval/results.md` shows the Next.js pack with the baseline comparison and its misses, and the L1 outcomes of at least 2 Next.js golden cases with kept patches whose checks pass (M8's first acceptance criterion); a stage HEAD's gate 7 rejects on replay does not count (D61 item 4). The source repo hash is unchanged after each L1 run, as each run's record shows. If fewer than 2 cases reach that, this criterion is not met: the results are reported as they are and the maintainer decides (D61).
+- `eval/results.md` shows the Next.js pack with the baseline comparison and its misses, and the L1 outcomes of at least 2 Next.js golden cases with kept patches whose checks pass (M8's first acceptance criterion); a stage HEAD's gate 7 rejects on replay does not count (D61 item 4). The source repo hash is unchanged after each L1 run, as each run's record shows. If fewer than 2 cases reach that, this criterion is not met: the results are reported as they are and the maintainer decides (D61). A case counts when at least one of its runs has at least one kept stage whose last attempt's checks all pass (or are `baseline_failing`, or `flaky` and labelled so) and that HEAD's gate 7 accepts on replay; a stage replay could not re-check does not count, and a run whose source repo hash changed fails the criterion (D65 item 3).
 
 ## Risks
 

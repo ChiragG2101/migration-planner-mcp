@@ -6,7 +6,8 @@ import { execCheck, execInstall, execCodemod, execGit } from '../security/exec.j
 import { assertLevel } from '../security/level.js';
 import { PermissionError } from '../security/errors.js';
 import { isDenied } from '../security/denyList.js';
-import { writeFileSandbox, mkdirSandbox } from '../security/safeWrite.js';
+import { resolveInside } from '../security/pathBoundary.js';
+import { writeFileSandbox, mkdirSandbox, rmSandbox } from '../security/safeWrite.js';
 import { readTextSandbox } from '../security/safeRead.js';
 import type { CheckConfig, InstallConfig, CheckResult, CodemodResult, Gate7Result, StageDecision } from '../schema/verify.js';
 import { getCodemodEntry, buildCodemodArgv } from './codemods.js';
@@ -22,6 +23,30 @@ import type { Finding } from '../schema/finding.js';
 const TAIL_CHARS = 8192;
 function tail(s: string): string {
   return s.length > TAIL_CHARS ? s.slice(s.length - TAIL_CHARS) : s;
+}
+
+// ---------------------------------------------------------------------------
+// Full git diff (D64)
+// ---------------------------------------------------------------------------
+
+let diffSeq = 0;
+
+/**
+ * The whole output of `git diff <args>` in the sandbox. git writes it to a file
+ * in the run dir, which is read back and removed, so a diff larger than the
+ * spawn point's output cap (a lockfile change) is never cut to its tail.
+ */
+export function gitDiff(sandbox: Sandbox, args: readonly string[]): string {
+  const runDir = path.dirname(sandbox.root); // <out>/<run_id>
+  const name = `diff-${process.pid}-${diffSeq++}.patch`;
+  const file = path.join(runDir, name);
+  try {
+    const res = execGit(['git', 'diff', `--output=${file}`, ...args], sandbox.rootPath, sandbox.root, 30_000);
+    if (res.exit_code !== 0) throw new Error(`git diff failed (exit ${res.exit_code}): ${tail(res.stderr)}`);
+    return readTextSandbox(resolveInside(runDir, name, null));
+  } finally {
+    rmSandbox(file);
+  }
 }
 
 // ---------------------------------------------------------------------------
@@ -134,8 +159,7 @@ export function runCodemods(
     const execResult = execCodemod(entry, argv, sandbox.rootPath, sandbox.root);
     const duration_ms = Date.now() - start;
     // Get the diff of what the codemod changed.
-    const diffResult = execGit(['git', 'diff'], sandbox.rootPath, sandbox.root, 30_000);
-    const diff = diffResult.stdout;
+    const diff = gitDiff(sandbox, []);
     results.push({
       id: codemodId,
       status: execResult.exit_code === 0 ? 'ok' : 'failed',
@@ -208,8 +232,7 @@ export function applyPatch(
     if (result.exit_code !== 0) {
       throw new Error(`git apply failed (exit ${result.exit_code}): ${tail(result.stderr)}`);
     }
-    const diffResult = execGit(['git', 'diff', '--cached'], sandbox.rootPath, sandbox.root, 30_000);
-    return diffResult.stdout || patch;
+    return gitDiff(sandbox, ['--cached']) || patch;
   } else {
     assertPatchPathsSafe(sandbox, patch.map((p) => p.path));
     for (const { path: rel, content } of patch) {
@@ -218,8 +241,7 @@ export function applyPatch(
       writeFileSandbox(safe.abs, content);
     }
     execGit(['git', 'add', '-A'], sandbox.rootPath, sandbox.root, 30_000);
-    const diffResult = execGit(['git', 'diff', '--cached'], sandbox.rootPath, sandbox.root, 30_000);
-    return diffResult.stdout;
+    return gitDiff(sandbox, ['--cached']);
   }
 }
 
@@ -264,8 +286,7 @@ export function prepareStage(
   assertLevel(1);
   const codemods = runCodemods(sandbox, findings);
   // Get the combined diff after all codemods.
-  const diffResult = execGit(['git', 'diff'], sandbox.rootPath, sandbox.root, 30_000);
-  const codemodDiff = diffResult.stdout;
+  const codemodDiff = gitDiff(sandbox, []);
   // Findings without a codemod (or whose codemod failed) need a manual patch.
   const coveredByCodemod = new Set(
     codemods.filter((r) => r.status === 'ok').map((r) => r.id),
