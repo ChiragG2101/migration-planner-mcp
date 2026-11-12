@@ -4,7 +4,7 @@
 // values may reach a spawned command. The temp HOME is removed when the
 // command ends, even on a timeout. These spawn through the real exec.ts.
 import { execFileSync } from 'node:child_process';
-import { existsSync, mkdtempSync, mkdirSync, realpathSync, rmSync, writeFileSync } from 'node:fs';
+import { chmodSync, existsSync, mkdtempSync, mkdirSync, readFileSync, realpathSync, rmSync, statSync, writeFileSync } from 'node:fs';
 import os from 'node:os';
 import path from 'node:path';
 import { afterEach, beforeEach, describe, expect, it, vi } from 'vitest';
@@ -193,12 +193,49 @@ describe('exec-home-removed', () => {
     expect(existsSync(res.stdout.slice('done:'.length))).toBe(false);
   });
 
-  /** Loads exec.ts at L1 with safeWrite's rmSandbox replaced by `rm`. */
+  it('making dirs writable again never follows a link out of HOME', async () => {
+    const { exec, pathBoundary } = await atLevel1();
+    const cwd = pathBoundary.resolveInside(sandboxRoot, '.', null);
+    // A read-only dir outside HOME (it could be in the user's repo), and a
+    // link to it inside a read-only dir in HOME. The first removal cannot
+    // unlink anything in that dir, so the link is still there when the chmod
+    // retry walks it.
+    const outside = path.join(tmp, 'outside');
+    mkdirSync(outside);
+    writeFileSync(path.join(outside, 'keep'), 'k');
+    chmodSync(outside, 0o555);
+    try {
+      const linkOut = {
+        name: 'link-out',
+        argv: [
+          'node',
+          '-e',
+          `const fs = require("fs"); const h = process.env.HOME; fs.mkdirSync(h + "/ro"); fs.symlinkSync(${JSON.stringify(outside)}, h + "/ro/link"); fs.chmodSync(h + "/ro", 0o555); process.stdout.write(h)`,
+        ],
+        timeout_ms: 20000,
+      };
+      const res = exec.execCheck(linkOut, cwd, sandboxRoot);
+      expect(res.exit_code).toBe(0);
+      expect(existsSync(res.stdout)).toBe(false);
+      expect(statSync(outside).mode & 0o777).toBe(0o555);
+      expect(readFileSync(path.join(outside, 'keep'), 'utf8')).toBe('k');
+    } finally {
+      chmodSync(outside, 0o755); // so afterEach can remove tmp
+    }
+  });
+
+  /**
+   * Loads exec.ts at L1 with safeWrite's rmSandbox replaced by `rm`. The home
+   * is still deleted first, so these tests leave no temp home behind.
+   */
   async function withRmSandbox(rm: (abs: string) => void) {
     vi.resetModules();
     vi.doMock('../../src/security/safeWrite.js', async (importOriginal) => ({
       ...(await importOriginal<typeof import('../../src/security/safeWrite.js')>()),
-      rmSandbox: rm,
+      rmSandbox: (abs: string) => {
+        rmSync(abs, { recursive: true, force: true });
+        rm(abs);
+      },
     }));
     const { initLevel } = await import('../../src/security/level.js');
     initLevel(1);
